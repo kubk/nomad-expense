@@ -1,36 +1,17 @@
-import { getEnv } from "./env";
-import { neon } from "@neondatabase/serverless";
-import { drizzle as drizzleNeon } from "drizzle-orm/neon-http";
-import { drizzle as drizzlePostgres } from "drizzle-orm/postgres-js";
-import postgres from "postgres";
-import * as schema from "../db/schema";
+import { drizzle } from "drizzle-orm/d1";
 
-function createNeonDb() {
-  const sql = neon(getEnv().DATABASE_URL);
-  const db = drizzleNeon(sql, { schema });
-  return db;
-}
-
-type DB = ReturnType<typeof createNeonDb>;
-
-function createPostgresDb() {
-  const pg = postgres(getEnv().DATABASE_URL, {
-    prepare: false,
-    fetch_types: false,
-    max: 7,
-  });
-  const db = drizzlePostgres(pg, { schema });
-  return db as any as DB;
-}
+type DB = ReturnType<typeof drizzle>;
 
 let db: DB | undefined;
 
+// Should be D1Database
+export function setDb(d1: any) {
+  db = drizzle(d1);
+}
+
 export function getDb(): DB {
-  if (getEnv().STAGE === "local") {
-    return createPostgresDb();
-  }
   if (!db) {
-    db = createNeonDb();
+    throw new Error("DB is not initialized, call setDb first");
   }
   return db;
 }
