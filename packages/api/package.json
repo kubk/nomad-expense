@@ -1,0 +1,49 @@
+{
+  "name": "api",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "main": "src/shared.ts",
+  "scripts": {
+    "--- local ---": "",
+    "start": "wrangler dev",
+    "test": "vitest",
+    "typecheck": "npx tsc -b --noEmit",
+    "prettier:fix": "prettier --write src/**/*.ts",
+    "cf-typegen": "wrangler types",
+    "db:generate-migrations": "dotenvx run -f .dev.vars -- npx drizzle-kit generate",
+    "db:migrate": "dotenvx run -f .dev.vars -- tsx migrate.ts",
+    "db:studio": "dotenvx run -f .dev.vars -- npx drizzle-kit studio",
+    "--- development ---": "",
+    "development:env:encrypt": "dotenvx encrypt -f .env.development",
+    "development:env:decrypt": "dotenvx decrypt --stdout -f .env.development",
+    "development:env:check": "dotenvx run -f .env.development -- tsx bin/check-envs.ts",
+    "development:db:migrate": "dotenvx run -f .env.development -- tsx migrate.ts",
+    "development:db:studio": "dotenvx run -f .env.development -- npx drizzle-kit studio",
+    "--- production ---": "",
+    "production:env:encrypt": "dotenvx encrypt -f .env.production",
+    "production:env:decrypt": "dotenvx decrypt --stdout -f .env.production",
+    "production:env:check": "dotenvx run -f .env.production -- tsx bin/check-envs.ts",
+    "production:db:migrate": "dotenvx run -f .env.production -- tsx migrate.ts",
+    "production:db:studio": "dotenvx run -f .env.production -- npx drizzle-kit studio"
+  },
+  "devDependencies": {
+    "dotenv": "^16.5.0",
+    "dotenv-cli": "^8.0.0",
+    "drizzle-kit": "^0.30.6",
+    "postgres": "^3.4.5",
+    "prettier": "^3.5.3",
+    "tsx": "^4.19.3",
+    "typescript": "^5.5.2",
+    "vitest": "~3.0.7",
+    "wrangler": "^4.25.0"
+  },
+  "dependencies": {
+    "@dotenvx/dotenvx": "^1.39.1",
+    "@neondatabase/serverless": "^0.10.4",
+    "@trpc/client": "^11.4.3",
+    "@trpc/server": "^11.4.3",
+    "drizzle-orm": "^0.41.0",
+    "zod": "^3.24.2"
+  }
+}
