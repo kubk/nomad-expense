@@ -1,0 +1,21 @@
+{
+  "name": "fullstack-serverless",
+  "version": "1.0.0",
+  "scripts": {
+    "start": "npx concurrently --kill-others-on-fail \"npm run start -w=api\" \"npm run start -w=frontend\"",
+    "prettier:fix": "git ls-files -mo --exclude-standard -- './packages' | grep -E '\\.(ts|tsx)$' | xargs -I {} prettier --write {}",
+    "prettier:fix:full": "prettier --write \"./packages/**/*.+(ts|tsx)\"",
+    "typecheck": "npm run typecheck --workspaces",
+    "test": "npm run test --workspaces"
+  },
+  "workspaces": [
+    "./packages/*"
+  ],
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "concurrently": "^9.1.2",
+    "prettier": "^3.5.3"
+  }
+}
