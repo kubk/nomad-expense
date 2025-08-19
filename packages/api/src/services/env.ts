@@ -2,8 +2,10 @@ import { z } from "zod";
 
 const envSchema = z
   .object({
-    DATABASE_URL: z.string(),
-    STAGE: z.enum(["local", "development", "production"]),
+    CLOUDFLARE_ACCOUNT_ID: z.string(),
+    CLOUDFLARE_API_TOKEN: z.string(),
+    D1_DB_ID: z.string(),
+    STAGE: z.enum(["local", "production"]),
     FRONTEND_URL: z.string(),
   })
   .required();

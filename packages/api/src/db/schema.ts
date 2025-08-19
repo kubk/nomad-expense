@@ -1,5 +1,11 @@
-import { pgTable, uuid } from "drizzle-orm/pg-core";
+import { sqliteTable, text } from "drizzle-orm/sqlite-core";
+import { sql } from "drizzle-orm";
 
-export const userTable = pgTable("user", {
-  id: uuid().primaryKey().notNull().defaultRandom(),
+const id = text("id")
+  .primaryKey()
+  .notNull()
+  .default(sql`(lower(hex(randomblob(16))))`);
+
+export const userTable = sqliteTable("user", {
+  id: id,
 });

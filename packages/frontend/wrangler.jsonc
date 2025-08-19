@@ -5,11 +5,8 @@
         "not_found_handling": "single-page-application"
     },
     "env": {
-        "development": {
-            "name": "example-frontend-dev"
-        },
         "production": {
-            "name": "example-frontend-prod"
+            "name": "expense-tracker-frontend"
         }
     }
 }

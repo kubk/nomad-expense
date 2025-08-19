@@ -3,10 +3,12 @@ import { createContext } from "./trpc/trpc";
 import { addCorsHeaders } from "./lib/cloudflare/cors";
 import { setEnv } from "./services/env";
 import { router } from "./trpc/router";
+import { setDb } from "./services/db";
 
 export default {
   async fetch(request, env) {
     setEnv(env);
+    setDb(env.DB);
 
     if (request.method === "OPTIONS") {
       return addCorsHeaders();
