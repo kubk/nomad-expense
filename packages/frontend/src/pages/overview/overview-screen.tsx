@@ -1,7 +1,13 @@
 import { RecentTransactionsOverview } from "./recent-transactions-overview";
 import { OverviewHeader } from "./overview-header";
 import { MonthlyBreakdownOverview } from "./monthly-breakdown-overview";
-import { Account, DateRange, MonthlyData, Transaction } from "@/shared/types";
+import {
+  Account,
+  DateRange,
+  MonthlyData,
+  Route,
+  Transaction,
+} from "@/shared/types";
 import { useCurrency } from "@/shared/currency-context";
 import { currencyService } from "@/shared/currency-service";
 
@@ -16,7 +22,7 @@ export function OverviewScreen({
   monthlyData: MonthlyData[];
   transactions: Transaction[];
   accounts: Account[];
-  setCurrentScreen: (screen: string) => void;
+  setCurrentScreen: (screen: Route) => void;
   setDateRange: (range: DateRange) => void;
   setSelectedAccount: (account: string) => void;
 }) {

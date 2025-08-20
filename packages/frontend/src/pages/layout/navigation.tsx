@@ -5,13 +5,14 @@ import {
   SettingsIcon,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Route } from "@/shared/types";
 
 export function Navigation({
   currentScreen,
   setCurrentScreen,
 }: {
-  currentScreen: string;
-  setCurrentScreen: (screen: string) => void;
+  currentScreen: Route;
+  setCurrentScreen: (screen: Route) => void;
 }) {
   return (
     <div className="fixed bottom-0 left-0 right-0 bg-white border-t">

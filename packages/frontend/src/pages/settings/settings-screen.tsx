@@ -14,11 +14,12 @@ import {
   SupportedCurrency,
 } from "../../shared/currency-service";
 import { useCurrency } from "../../shared/currency-context";
+import { Route } from "../../shared/types";
 
 export function SettingsScreen({
   setCurrentScreen,
 }: {
-  setCurrentScreen: (screen: string) => void;
+  setCurrentScreen: (screen: Route) => void;
 }) {
   const { baseCurrency, setBaseCurrency } = useCurrency();
 

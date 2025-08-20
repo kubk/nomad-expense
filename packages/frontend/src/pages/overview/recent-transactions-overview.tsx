@@ -1,7 +1,7 @@
 import { ChevronRightIcon } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Account, Transaction } from "@/shared/types";
+import { Account, Transaction, Route } from "@/shared/types";
 import { TransactionItem } from "../shared/transaction-item";
 
 export function RecentTransactionsOverview({
@@ -11,7 +11,7 @@ export function RecentTransactionsOverview({
 }: {
   transactions: Transaction[];
   accounts: Account[];
-  setCurrentScreen: (screen: string) => void;
+  setCurrentScreen: (screen: Route) => void;
 }) {
   return (
     <div className="px-4 mt-6">

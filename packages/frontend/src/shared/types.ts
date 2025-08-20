@@ -29,9 +29,16 @@ export interface DateRange {
 }
 
 export interface ExpenseTrackerState {
-  currentScreen: string;
+  currentScreen: Route;
   selectedAccount: string;
   dateRange: DateRange;
   showFilters: boolean;
   selectedMonth: MonthlyData | null;
 }
+
+export type Route =
+  | "overview"
+  | "transactions"
+  | "monthly-breakdown-full"
+  | "accounts"
+  | "settings";
