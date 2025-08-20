@@ -71,7 +71,7 @@ export function MonthlyBreakdownItem({
           {/* Horizontal chart bar */}
           <div className="relative h-2 bg-gray-100 rounded-full overflow-hidden">
             <div
-              className="h-full bg-indigo-500 rounded-full transition-all duration-500"
+              className="h-full bg-primary rounded-full transition-all duration-500"
               style={{
                 width: `${barWidth}%`,
               }}
