@@ -2,9 +2,12 @@ import { ArrowLeftIcon, PlusIcon, ChevronRightIcon } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Account, Transaction } from "./types";
-import { useCurrency } from "./currency-context";
-import { currencyService, SupportedCurrency } from "./currency-service";
+import { Account, Transaction } from "../../shared/types";
+import { useCurrency } from "../../shared/currency-context";
+import {
+  currencyService,
+  SupportedCurrency,
+} from "../../shared/currency-service";
 
 export function AccountsScreen({
   accounts,

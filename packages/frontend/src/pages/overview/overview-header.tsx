@@ -1,13 +1,13 @@
-import { MonthlyData } from "./types";
-import { currencyService } from "./currency-service";
+import { useCurrency } from "@/shared/currency-context";
+import { currencyService } from "@/shared/currency-service";
+import { MonthlyData } from "@/shared/types";
 
 export function OverviewHeader({
   convertedMonthlyData,
-  baseCurrency,
 }: {
   convertedMonthlyData: (MonthlyData & { convertedAmount: number })[];
-  baseCurrency: string;
 }) {
+  const { baseCurrency } = useCurrency();
   return (
     <div className="bg-gradient-to-b from-indigo-600 to-indigo-500 text-white px-4 py-6 pb-18">
       {/* Total This Month */}

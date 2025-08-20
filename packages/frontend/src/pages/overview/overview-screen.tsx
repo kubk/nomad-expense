@@ -1,9 +1,9 @@
-import { MonthlyData, Transaction, DateRange, Account } from "./types";
-import { useCurrency } from "./currency-context";
-import { currencyService } from "./currency-service";
-import { MonthlyBreakdownOverview } from "./monthly-breakdown-overview";
 import { RecentTransactionsOverview } from "./recent-transactions-overview";
 import { OverviewHeader } from "./overview-header";
+import { MonthlyBreakdownOverview } from "./monthly-breakdown-overview";
+import { Account, DateRange, MonthlyData, Transaction } from "@/shared/types";
+import { useCurrency } from "@/shared/currency-context";
+import { currencyService } from "@/shared/currency-service";
 
 export function OverviewScreen({
   monthlyData,
@@ -30,10 +30,7 @@ export function OverviewScreen({
 
   return (
     <div className="min-h-screen bg-gray-50 pb-20">
-      <OverviewHeader
-        convertedMonthlyData={convertedMonthlyData}
-        baseCurrency={baseCurrency}
-      />
+      <OverviewHeader convertedMonthlyData={convertedMonthlyData} />
 
       <MonthlyBreakdownOverview
         monthlyData={monthlyData}

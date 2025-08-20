@@ -8,12 +8,12 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { useCurrency } from "./currency-context";
 import {
   currencyService,
   SUPPORTED_CURRENCIES,
   SupportedCurrency,
-} from "./currency-service";
+} from "../../shared/currency-service";
+import { useCurrency } from "../../shared/currency-context";
 
 export function SettingsScreen({
   setCurrentScreen,

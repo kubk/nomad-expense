@@ -1,10 +1,10 @@
 import { FilterIcon } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Account, Transaction, DateRange } from "./types";
-import { TransactionItem } from "./transaction-item";
-import { useCurrency } from "./currency-context";
-import { currencyService } from "./currency-service";
+import { Account, Transaction, DateRange } from "../../shared/types";
+import { TransactionItem } from "../shared/transaction-item";
+import { useCurrency } from "../../shared/currency-context";
+import { currencyService } from "../../shared/currency-service";
 import { TransactionFilters } from "./transaction-filters";
 
 export function TransactionsScreen({
@@ -42,7 +42,7 @@ export function TransactionsScreen({
             size="sm"
             onClick={() => setCurrentScreen("overview")}
           >
-            ← Back
+            ←
           </Button>
           <h1 className="font-semibold text-gray-900">Transactions</h1>
           <Button

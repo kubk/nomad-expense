@@ -1,8 +1,8 @@
 import { ChevronRightIcon } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Transaction, Account } from "./types";
-import { TransactionItem } from "./transaction-item";
+import { Account, Transaction } from "@/shared/types";
+import { TransactionItem } from "../shared/transaction-item";
 
 export function RecentTransactionsOverview({
   transactions,
