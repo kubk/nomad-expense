@@ -1,26 +1,27 @@
-import { ArrowLeftIcon, PlusIcon, ChevronRightIcon } from "lucide-react";
+import { PlusIcon, ChevronRightIcon } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Account, Transaction, Route } from "../../shared/types";
+import { useLocation } from "wouter";
+import { Account, Transaction } from "../../shared/types";
 import { useCurrency } from "../../shared/currency-context";
 import {
   currencyService,
   SupportedCurrency,
 } from "../../shared/currency-service";
+import { BackButton } from "../../shared/back-button";
 
 export function AccountsScreen({
   accounts,
   transactions,
-  setCurrentScreen,
   setSelectedAccount,
 }: {
   accounts: Account[];
   transactions: Transaction[];
-  setCurrentScreen: (screen: Route) => void;
   setSelectedAccount: (account: string) => void;
 }) {
   const { baseCurrency } = useCurrency();
+  const [, setLocation] = useLocation();
 
   // Calculate total in base currency
   const totalInBaseCurrency = transactions.reduce((sum, t) => {
@@ -33,14 +34,7 @@ export function AccountsScreen({
       {/* Header */}
       <div className="bg-white border-b sticky top-0 z-10">
         <div className="flex items-center justify-between p-4">
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => setCurrentScreen("overview")}
-          >
-            <ArrowLeftIcon className="w-4 h-4 mr-1" />
-            Back
-          </Button>
+          <BackButton />
           <h1 className="font-semibold text-gray-900">Accounts</h1>
           <Button variant="ghost" size="sm">
             <PlusIcon className="w-4 h-4" />
@@ -87,7 +81,7 @@ export function AccountsScreen({
                 className="border-0 shadow-sm cursor-pointer hover:shadow-md transition-shadow"
                 onClick={() => {
                   setSelectedAccount(account.id);
-                  setCurrentScreen("transactions");
+                  setLocation("/transactions");
                 }}
               >
                 <CardContent className="p-4">
