@@ -156,14 +156,21 @@ export class CurrencyService {
   }
 
   // Format amount with currency symbol (amount in cents)
-  formatAmount(amountInCents: number, currency: SupportedCurrency): string {
+  formatAmount(
+    amountInCents: number,
+    currency: SupportedCurrency,
+    options: { showFractions?: boolean } = { showFractions: true },
+  ): string {
     // Convert from integer cents to decimal amount
     const decimalAmount = amountInCents / 100;
+    const { showFractions = true } = options;
 
     // Handle crypto currencies that aren't supported by Intl.NumberFormat
     if (["USDT", "BTC", "ETH"].includes(currency)) {
       const symbol = this.getCurrencySymbol(currency);
-      const formattedAmount = decimalAmount.toFixed(2);
+      const formattedAmount = showFractions
+        ? decimalAmount.toFixed(2)
+        : Math.round(decimalAmount).toString();
       return `${symbol}${formattedAmount}`;
     }
 
@@ -171,8 +178,8 @@ export class CurrencyService {
     return new Intl.NumberFormat("en-US", {
       style: "currency",
       currency: currency,
-      minimumFractionDigits: 2,
-      maximumFractionDigits: 2,
+      minimumFractionDigits: showFractions ? 2 : 0,
+      maximumFractionDigits: showFractions ? 2 : 0,
     }).format(decimalAmount);
   }
 
