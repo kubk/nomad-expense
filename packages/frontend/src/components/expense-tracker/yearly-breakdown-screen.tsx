@@ -67,7 +67,7 @@ export function YearlyBreakdownScreen({
             <ArrowLeftIcon className="w-4 h-4 mr-1" />
             Back
           </Button>
-          <h1 className="font-semibold text-gray-900">Monthly Breakdown</h1>
+          <h1 className="font-semibold text-gray-900">Monthly breakdown</h1>
           <div className="w-[60px]" />
         </div>
       </div>

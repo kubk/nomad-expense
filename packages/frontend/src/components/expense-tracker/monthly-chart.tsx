@@ -86,7 +86,7 @@ export function MonthlyChart({
       ref={scrollContainerRef}
       className="overflow-x-auto scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100"
     >
-      <div className="flex items-end gap-3 pb-4 min-w-max">
+      <div className="flex items-end pb-4 min-w-max">
         {sortedMonthlyData.map((month) => {
           const heightPercentage = (month.convertedAmount / maxAmount) * 100;
           const barHeight = (heightPercentage / 100) * 100; // 100px max height
@@ -94,38 +94,33 @@ export function MonthlyChart({
           return (
             <div
               key={month.month}
-              className="flex flex-col items-center min-w-[64px]"
+              className="flex flex-col cursor-pointer items-center min-w-[64px] active:scale-95 transition-transform duration-150"
+              onClick={() => handleMonthClick(month)}
             >
-              {/* Amount label above bar */}
               <div className="mb-4 text-xs font-semibold text-gray-900 text-center">
                 {currencyService.formatAmount(
                   month.convertedAmount,
                   baseCurrency,
+                  { showFractions: false },
                 )}
               </div>
 
               {/* Chart container */}
-              <button
-                onClick={() => handleMonthClick(month)}
+              <div
                 className="relative flex items-end cursor-pointer hover:bg-gray-50 rounded-lg p-1 -m-1 transition-colors group"
                 style={{ height: "100px" }}
               >
-                {/* Violet bar - only visible part */}
                 <div
                   className="w-10 bg-indigo-500 rounded-t-lg transition-all duration-300 group-hover:bg-indigo-600"
                   style={{
                     height: `${barHeight}px`,
                   }}
                 />
-              </button>
+              </div>
 
-              {/* Month name below bar - clickable */}
-              <button
-                onClick={() => handleMonthClick(month)}
-                className="mt-2 text-xs font-medium text-gray-900 hover:text-indigo-600 hover:underline transition-colors cursor-pointer"
-              >
+              <div className="mt-2 text-xs font-medium text-gray-900 hover:text-indigo-600 hover:underline transition-colors cursor-pointer">
                 {month.shortMonth}
-              </button>
+              </div>
             </div>
           );
         })}
