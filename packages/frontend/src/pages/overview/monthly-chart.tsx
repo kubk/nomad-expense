@@ -1,21 +1,21 @@
 import { useEffect, useRef } from "react";
-import { MonthlyData, DateRange, Route } from "../../shared/types";
+import { useLocation } from "wouter";
+import { MonthlyData, DateRange } from "../../shared/types";
 import { useCurrency } from "../../shared/currency-context";
 import { currencyService } from "../../shared/currency-service";
 
 export function MonthlyChart({
   monthlyData,
-  setCurrentScreen,
   setDateRange,
   setSelectedAccount,
 }: {
   monthlyData: MonthlyData[];
-  setCurrentScreen: (screen: Route) => void;
   setDateRange: (range: DateRange) => void;
   setSelectedAccount: (account: string) => void;
 }) {
   const { baseCurrency } = useCurrency();
   const scrollContainerRef = useRef<HTMLDivElement>(null);
+  const [, setLocation] = useLocation();
 
   // Convert monthly data amounts to base currency
   const convertedMonthlyData = monthlyData.map((month) => ({
@@ -78,7 +78,7 @@ export function MonthlyChart({
 
     setDateRange({ from: startDate, to: endDate });
     setSelectedAccount("all");
-    setCurrentScreen("transactions");
+    setLocation("/transactions");
   };
 
   return (

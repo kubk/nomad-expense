@@ -1,4 +1,5 @@
-import { MonthlyData, DateRange, Route } from "../../shared/types";
+import { useLocation } from "wouter";
+import { MonthlyData, DateRange } from "../../shared/types";
 import { useCurrency } from "../../shared/currency-context";
 import { currencyService } from "../../shared/currency-service";
 
@@ -9,7 +10,6 @@ export function MonthlyBreakdownItem({
   maxAmount,
   setDateRange,
   setSelectedAccount,
-  setCurrentScreen,
 }: {
   month: MonthlyData & { convertedAmount: number };
   index: number;
@@ -17,9 +17,9 @@ export function MonthlyBreakdownItem({
   maxAmount: number;
   setDateRange: (range: DateRange) => void;
   setSelectedAccount: (account: string) => void;
-  setCurrentScreen: (screen: Route) => void;
 }) {
   const { baseCurrency } = useCurrency();
+  const [, setLocation] = useLocation();
 
   const monthNames = [
     "Jan",
@@ -52,7 +52,7 @@ export function MonthlyBreakdownItem({
         onClick={() => {
           setDateRange({ from: startDate, to: endDate });
           setSelectedAccount("all");
-          setCurrentScreen("transactions");
+          setLocation("/transactions");
         }}
       >
         <div className="space-y-3">

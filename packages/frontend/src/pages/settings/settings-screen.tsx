@@ -1,5 +1,3 @@
-import { ArrowLeft } from "lucide-react";
-import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import {
   Select,
@@ -14,13 +12,9 @@ import {
   SupportedCurrency,
 } from "../../shared/currency-service";
 import { useCurrency } from "../../shared/currency-context";
-import { Route } from "../../shared/types";
+import { BackButton } from "../../shared/back-button";
 
-export function SettingsScreen({
-  setCurrentScreen,
-}: {
-  setCurrentScreen: (screen: Route) => void;
-}) {
+export function SettingsScreen() {
   const { baseCurrency, setBaseCurrency } = useCurrency();
 
   const handleCurrencyChange = (value: string) => {
@@ -31,14 +25,7 @@ export function SettingsScreen({
     <div className="flex flex-col h-full">
       {/* Header */}
       <div className="sticky top-0 bg-white border-b px-4 py-3 flex items-center gap-3">
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={() => setCurrentScreen("overview")}
-          className="p-0 h-auto"
-        >
-          <ArrowLeft className="w-5 h-5" />
-        </Button>
+        <BackButton className="p-0 h-auto" />
         <h1 className="text-lg font-semibold">Settings</h1>
       </div>
 
