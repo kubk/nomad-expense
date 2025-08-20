@@ -55,7 +55,7 @@ export function YearSummaryCard({
   return (
     <div className="px-4 mt-4">
       <Card
-        className="bg-gradient-to-r py-4 pt-2.5 from-indigo-500 to-purple-500 text-white border-0 cursor-pointer hover:from-indigo-600 hover:to-purple-600 transition-colors"
+        className="bg-primary text-primary-foreground pb-3 pt-1.5 border-0 cursor-pointer hover:bg-primary/90 transition-colors"
         onClick={onFiltersClick}
       >
         <CardContent className="px-4 relative">
@@ -64,11 +64,11 @@ export function YearSummaryCard({
               <p className="text-2xl font-bold mt-1">
                 {currencyService.formatAmount(totalAmount, baseCurrency)}
               </p>
-              <p className="text-indigo-100 text-xs mt-2">
+              <p className="text-primary-foreground/70 text-xs mt-2">
                 {getFilterDescription()}
               </p>
             </div>
-            <FilterIcon className="w-5 h-5 mt-1" />
+            <FilterIcon className="w-5 h-5 mt-2" />
           </div>
         </CardContent>
       </Card>

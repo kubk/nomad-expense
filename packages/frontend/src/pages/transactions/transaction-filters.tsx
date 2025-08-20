@@ -96,7 +96,7 @@ export function TransactionFilters({
           <Button
             size="sm"
             onClick={() => setShowFilters(false)}
-            className="flex-1 bg-indigo-600"
+            className="flex-1"
           >
             Apply
           </Button>
