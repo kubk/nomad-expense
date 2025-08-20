@@ -35,7 +35,7 @@ export const OverviewScreen = ({
   return (
     <div className="min-h-screen bg-gray-50 pb-20">
       {/* Header */}
-      <div className="bg-gradient-to-b from-indigo-600 to-indigo-500 text-white p-6 pb-8">
+      <div className="bg-gradient-to-b from-indigo-600 to-indigo-500 text-white p-6 pb-18">
         {/* Total This Month */}
         <div className="bg-white/10 backdrop-blur rounded-2xl p-4">
           <p className="text-indigo-100 text-sm mb-1">Total this month</p>
@@ -60,7 +60,7 @@ export const OverviewScreen = ({
       </div>
 
       {/* Monthly Comparison - Vertical Bar Chart */}
-      <div className="px-4 -mt-4">
+      <div className="px-4 -mt-14">
         <Card className="shadow border-0 gap-0 py-4">
           <CardHeader className="pb-3">
             <div className="flex justify-between items-center">
@@ -69,7 +69,7 @@ export const OverviewScreen = ({
                 variant="ghost"
                 size="sm"
                 onClick={() => setCurrentScreen("yearly-breakdown")}
-                className="text-indigo-600"
+                className="text-indigo-600 -mr-3"
               >
                 View all
                 <ChevronRight className="w-3 h-3 ml-1" />

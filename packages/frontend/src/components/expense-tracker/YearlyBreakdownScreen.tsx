@@ -20,11 +20,39 @@ export const YearlyBreakdownScreen = ({
 }: YearlyBreakdownScreenProps) => {
   const { baseCurrency, formatAmount } = useCurrency();
 
-  // Convert monthly data amounts to base currency
-  const convertedMonthlyData = monthlyData.map((month) => ({
-    ...month,
-    convertedAmount: currencyService.convert(month.amount, "USD", baseCurrency),
-  }));
+  // Convert monthly data amounts to base currency and sort by newest first
+  const convertedMonthlyData = monthlyData
+    .map((month) => ({
+      ...month,
+      convertedAmount: currencyService.convert(
+        month.amount,
+        "USD",
+        baseCurrency,
+      ),
+    }))
+    .sort((a, b) => {
+      // Sort by year first (descending), then by month (descending)
+      if (a.year !== b.year) {
+        return b.year - a.year;
+      }
+      const monthNames = [
+        "Jan",
+        "Feb",
+        "Mar",
+        "Apr",
+        "May",
+        "Jun",
+        "Jul",
+        "Aug",
+        "Sep",
+        "Oct",
+        "Nov",
+        "Dec",
+      ];
+      const aMonthIndex = monthNames.indexOf(a.shortMonth);
+      const bMonthIndex = monthNames.indexOf(b.shortMonth);
+      return bMonthIndex - aMonthIndex;
+    });
 
   return (
     <div className="min-h-screen bg-gray-50 pb-20">
@@ -44,163 +72,63 @@ export const YearlyBreakdownScreen = ({
         </div>
       </div>
 
-      {/* All Months Chart */}
+      {/* All Months - Transaction Style List */}
       <div className="px-4 mt-4">
-        <Card className="shadow-lg border-0">
-          <CardHeader className="pb-3">
-            <CardTitle className="text-base">
-              All Months ({Math.min(...monthlyData.map((m) => m.year))}-
-              {Math.max(...monthlyData.map((m) => m.year))})
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-3">
-              {/* Previous Year Section */}
-              {monthlyData.filter((m) => m.year < new Date().getFullYear())
-                .length > 0 && (
-                <div>
-                  <h3 className="text-sm font-semibold text-gray-700 mb-3">
-                    {Math.min(
-                      ...monthlyData
-                        .filter((m) => m.year < new Date().getFullYear())
-                        .map((m) => m.year),
-                    )}
-                  </h3>
-                  <div className="space-y-2">
-                    {convertedMonthlyData
-                      .filter((m) => m.year < new Date().getFullYear())
-                      .map((month) => {
-                        const monthNames = [
-                          "Jan",
-                          "Feb",
-                          "Mar",
-                          "Apr",
-                          "May",
-                          "Jun",
-                          "Jul",
-                          "Aug",
-                          "Sep",
-                          "Oct",
-                          "Nov",
-                          "Dec",
-                        ];
-                        const monthNumber =
-                          monthNames.indexOf(month.shortMonth) + 1;
-                        const startDate = `${month.year}-${String(monthNumber).padStart(2, "0")}-01`;
-                        const endDate = new Date(month.year, monthNumber, 0)
-                          .toISOString()
-                          .split("T")[0];
-                        const maxAmount = Math.max(
-                          ...convertedMonthlyData.map((m) => m.convertedAmount),
-                        );
+        <Card className="shadow border-0 p-0">
+          <CardContent className="p-0">
+            {convertedMonthlyData.map((month, index) => {
+              const monthNames = [
+                "Jan",
+                "Feb",
+                "Mar",
+                "Apr",
+                "May",
+                "Jun",
+                "Jul",
+                "Aug",
+                "Sep",
+                "Oct",
+                "Nov",
+                "Dec",
+              ];
+              const monthNumber = monthNames.indexOf(month.shortMonth) + 1;
+              const startDate = `${month.year}-${String(monthNumber).padStart(2, "0")}-01`;
+              const endDate = new Date(month.year, monthNumber, 0)
+                .toISOString()
+                .split("T")[0];
 
-                        return (
-                          <div
-                            key={month.month}
-                            className="cursor-pointer hover:opacity-80 transition-opacity p-2 rounded-lg hover:bg-gray-50"
-                            onClick={() => {
-                              setDateRange({ from: startDate, to: endDate });
-                              setSelectedAccount("all");
-                              setCurrentScreen("transactions");
-                            }}
-                          >
-                            <div className="flex items-center justify-between mb-1">
-                              <span className="text-xs font-medium text-gray-900">
-                                {month.shortMonth}
-                              </span>
-                              <span className="text-xs font-semibold text-gray-900">
-                                {formatAmount(
-                                  month.convertedAmount,
-                                  baseCurrency,
-                                )}
-                              </span>
-                            </div>
-                            <div className="w-full bg-gray-200 rounded-full h-1.5">
-                              <div
-                                className="bg-indigo-500 h-1.5 rounded-full transition-all duration-300"
-                                style={{
-                                  width: `${(month.convertedAmount / maxAmount) * 100}%`,
-                                }}
-                              />
-                            </div>
-                          </div>
-                        );
-                      })}
+              return (
+                <div key={month.month}>
+                  <div
+                    className="cursor-pointer hover:bg-gray-50 transition-colors p-4"
+                    onClick={() => {
+                      setDateRange({ from: startDate, to: endDate });
+                      setSelectedAccount("all");
+                      setCurrentScreen("transactions");
+                    }}
+                  >
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <div className="font-medium text-gray-900">
+                          {month.shortMonth} {month.year}
+                        </div>
+                        <div className="text-sm text-gray-500">
+                          Monthly expenses
+                        </div>
+                      </div>
+                      <div className="text-right">
+                        <div className="font-semibold text-gray-900">
+                          {formatAmount(month.convertedAmount, baseCurrency)}
+                        </div>
+                      </div>
+                    </div>
                   </div>
+                  {index < convertedMonthlyData.length - 1 && (
+                    <div className="border-b border-gray-200" />
+                  )}
                 </div>
-              )}
-
-              {/* Current Year Section */}
-              {monthlyData.filter((m) => m.year === new Date().getFullYear())
-                .length > 0 && (
-                <div>
-                  <h3 className="text-sm font-semibold text-gray-700 mb-3">
-                    {new Date().getFullYear()}
-                  </h3>
-                  <div className="space-y-2">
-                    {convertedMonthlyData
-                      .filter((m) => m.year === new Date().getFullYear())
-                      .map((month) => {
-                        const monthNames = [
-                          "Jan",
-                          "Feb",
-                          "Mar",
-                          "Apr",
-                          "May",
-                          "Jun",
-                          "Jul",
-                          "Aug",
-                          "Sep",
-                          "Oct",
-                          "Nov",
-                          "Dec",
-                        ];
-                        const monthNumber =
-                          monthNames.indexOf(month.shortMonth) + 1;
-                        const startDate = `${month.year}-${String(monthNumber).padStart(2, "0")}-01`;
-                        const endDate = new Date(month.year, monthNumber, 0)
-                          .toISOString()
-                          .split("T")[0];
-                        const maxAmount = Math.max(
-                          ...convertedMonthlyData.map((m) => m.convertedAmount),
-                        );
-
-                        return (
-                          <div
-                            key={month.month}
-                            className="cursor-pointer hover:opacity-80 transition-opacity p-2 rounded-lg hover:bg-gray-50"
-                            onClick={() => {
-                              setDateRange({ from: startDate, to: endDate });
-                              setSelectedAccount("all");
-                              setCurrentScreen("transactions");
-                            }}
-                          >
-                            <div className="flex items-center justify-between mb-1">
-                              <span className="text-xs font-medium text-gray-900">
-                                {month.shortMonth}
-                              </span>
-                              <span className="text-xs font-semibold text-gray-900">
-                                {formatAmount(
-                                  month.convertedAmount,
-                                  baseCurrency,
-                                )}
-                              </span>
-                            </div>
-                            <div className="w-full bg-gray-200 rounded-full h-1.5">
-                              <div
-                                className="bg-indigo-500 h-1.5 rounded-full transition-all duration-300"
-                                style={{
-                                  width: `${(month.convertedAmount / maxAmount) * 100}%`,
-                                }}
-                              />
-                            </div>
-                          </div>
-                        );
-                      })}
-                  </div>
-                </div>
-              )}
-            </div>
+              );
+            })}
           </CardContent>
         </Card>
       </div>
@@ -208,7 +136,7 @@ export const YearlyBreakdownScreen = ({
       {/* Year Summary */}
       <div className="px-4 mt-4">
         <Card className="bg-gradient-to-r from-indigo-500 to-purple-500 text-white border-0">
-          <CardContent className="p-4">
+          <CardContent className="px-4">
             <p className="text-indigo-100 text-sm">
               Total {new Date().getFullYear()}
             </p>
@@ -230,62 +158,6 @@ export const YearlyBreakdownScreen = ({
             </p>
           </CardContent>
         </Card>
-      </div>
-
-      {/* Monthly Stats */}
-      <div className="px-4 mt-4">
-        <h2 className="font-semibold text-gray-900 mb-3">Monthly Statistics</h2>
-        <div className="grid grid-cols-2 gap-3">
-          <Card className="border-0 shadow-sm">
-            <CardContent className="p-3">
-              <p className="text-sm font-medium text-gray-900">Highest Month</p>
-              <p className="text-lg font-bold text-green-600">
-                {formatAmount(
-                  Math.max(
-                    ...convertedMonthlyData.map((m) => m.convertedAmount),
-                  ),
-                  baseCurrency,
-                )}
-              </p>
-              <p className="text-xs text-gray-500">
-                {
-                  convertedMonthlyData.find(
-                    (m) =>
-                      m.convertedAmount ===
-                      Math.max(
-                        ...convertedMonthlyData.map((m) => m.convertedAmount),
-                      ),
-                  )?.shortMonth
-                }
-              </p>
-            </CardContent>
-          </Card>
-
-          <Card className="border-0 shadow-sm">
-            <CardContent className="p-3">
-              <p className="text-sm font-medium text-gray-900">Lowest Month</p>
-              <p className="text-lg font-bold text-blue-600">
-                {formatAmount(
-                  Math.min(
-                    ...convertedMonthlyData.map((m) => m.convertedAmount),
-                  ),
-                  baseCurrency,
-                )}
-              </p>
-              <p className="text-xs text-gray-500">
-                {
-                  convertedMonthlyData.find(
-                    (m) =>
-                      m.convertedAmount ===
-                      Math.min(
-                        ...convertedMonthlyData.map((m) => m.convertedAmount),
-                      ),
-                  )?.shortMonth
-                }
-              </p>
-            </CardContent>
-          </Card>
-        </div>
       </div>
     </div>
   );
