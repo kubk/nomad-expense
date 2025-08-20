@@ -35,7 +35,7 @@ export const OverviewScreen = ({
   return (
     <div className="min-h-screen bg-gray-50 pb-20">
       {/* Header */}
-      <div className="bg-gradient-to-b from-indigo-600 to-indigo-500 text-white p-6 pb-18">
+      <div className="bg-gradient-to-b from-indigo-600 to-indigo-500 text-white px-4 py-6 pb-18">
         {/* Total This Month */}
         <div className="bg-white/10 backdrop-blur rounded-2xl p-4">
           <p className="text-indigo-100 text-sm mb-1">Total this month</p>
