@@ -3,10 +3,10 @@ import { accounts, monthlyData, transactions } from "../../shared/data";
 import { TransactionsScreen } from "../transactions/transactions-screen";
 import { MonthlyBreakdownFull } from "../monthly-breakdown-full/monthly-breakdown-full";
 import { AccountsScreen } from "../accounts/accounts-screen";
-import { Navigation } from "./navigation";
 import { OverviewScreen } from "../overview/overview-screen";
 import { SettingsScreen } from "../settings/settings-screen";
 import { calculateTotal, filterTransactions } from "@/shared/utils";
+import { Navigation } from "../layout/navigation";
 import { Route } from "@/shared/types";
 
 export function ExpenseTracker() {

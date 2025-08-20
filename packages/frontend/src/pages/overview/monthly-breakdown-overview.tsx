@@ -1,7 +1,7 @@
 import { ChevronRightIcon } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { MonthlyData } from "../../shared/types";
+import { MonthlyData, Route } from "../../shared/types";
 import { MonthlyChart } from "./monthly-chart";
 
 export function MonthlyBreakdownOverview({
@@ -11,7 +11,7 @@ export function MonthlyBreakdownOverview({
   setSelectedAccount,
 }: {
   monthlyData: MonthlyData[];
-  setCurrentScreen: (screen: string) => void;
+  setCurrentScreen: (screen: Route) => void;
   setDateRange: (range: any) => void;
   setSelectedAccount: (account: string) => void;
 }) {
@@ -24,7 +24,7 @@ export function MonthlyBreakdownOverview({
             <Button
               variant="ghost"
               size="sm"
-              onClick={() => setCurrentScreen("yearly-breakdown")}
+              onClick={() => setCurrentScreen("monthly-breakdown-full")}
               className="text-indigo-600 -mr-3 active:scale-95 transition-transform duration-150"
             >
               View all

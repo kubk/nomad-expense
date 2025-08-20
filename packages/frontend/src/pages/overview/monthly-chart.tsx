@@ -1,5 +1,5 @@
 import { useEffect, useRef } from "react";
-import { MonthlyData, DateRange } from "../../shared/types";
+import { MonthlyData, DateRange, Route } from "../../shared/types";
 import { useCurrency } from "../../shared/currency-context";
 import { currencyService } from "../../shared/currency-service";
 
@@ -10,7 +10,7 @@ export function MonthlyChart({
   setSelectedAccount,
 }: {
   monthlyData: MonthlyData[];
-  setCurrentScreen: (screen: string) => void;
+  setCurrentScreen: (screen: Route) => void;
   setDateRange: (range: DateRange) => void;
   setSelectedAccount: (account: string) => void;
 }) {
