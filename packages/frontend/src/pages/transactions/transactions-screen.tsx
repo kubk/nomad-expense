@@ -42,7 +42,7 @@ export function TransactionsScreen({
             variant="ghost"
             size="sm"
             onClick={() => setShowFilters(!showFilters)}
-            className={showFilters ? "bg-indigo-50" : ""}
+            className={showFilters ? "bg-muted" : ""}
           >
             <FilterIcon className="w-4 h-4" />
           </Button>
@@ -63,9 +63,9 @@ export function TransactionsScreen({
 
       {/* Summary Card */}
       <div className="px-4 mt-4">
-        <Card className="bg-gradient-to-r from-indigo-500 to-purple-500 text-white border-0">
+        <Card className="bg-primary text-primary-foreground border-0">
           <CardContent className="px-4">
-            <p className="text-indigo-100 text-sm">
+            <p className="text-primary-foreground/70 text-sm">
               {selectedAccount === "all"
                 ? "All Accounts"
                 : accounts.find((a) => a.id === selectedAccount)?.name}

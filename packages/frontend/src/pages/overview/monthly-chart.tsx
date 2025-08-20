@@ -111,14 +111,14 @@ export function MonthlyChart({
                 style={{ height: "100px" }}
               >
                 <div
-                  className="w-10 bg-indigo-500 rounded-t-lg transition-all duration-300 group-hover:bg-indigo-600"
+                  className="w-10 bg-primary rounded-t-lg transition-all duration-300 group-hover:bg-primary/90"
                   style={{
                     height: `${barHeight}px`,
                   }}
                 />
               </div>
 
-              <div className="mt-2 text-xs font-medium text-gray-900 hover:text-indigo-600 hover:underline transition-colors cursor-pointer">
+              <div className="mt-2 text-xs font-medium text-gray-900 hover:text-primary hover:underline transition-colors cursor-pointer">
                 {month.shortMonth}
               </div>
             </div>

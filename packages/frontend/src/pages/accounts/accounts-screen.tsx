@@ -135,7 +135,7 @@ export function AccountsScreen({
 
       {/* Add Account Button */}
       <div className="px-4 mt-6">
-        <Button className="w-full bg-indigo-600" size="lg">
+        <Button className="w-full" size="lg">
           <PlusIcon className="w-5 h-5 mr-2" />
           Add New Account
         </Button>
