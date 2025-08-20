@@ -124,21 +124,25 @@ export class CurrencyService {
     return SUPPORTED_CURRENCIES.find((c) => c.code === currencyCode);
   }
 
-  // Convert from one currency to another
+  // Convert from one currency to another (amounts in cents)
   convert(
-    amount: number,
+    amountInCents: number,
     fromCurrency: SupportedCurrency,
     toCurrency: SupportedCurrency,
   ): number {
     if (fromCurrency === toCurrency) {
-      return amount;
+      return amountInCents;
     }
 
+    // Convert cents to dollars for calculation
+    const dollarAmount = amountInCents / 100;
+
     // Convert to USD first, then to target currency
-    const usdAmount = amount / this.exchangeRates[fromCurrency];
+    const usdAmount = dollarAmount / this.exchangeRates[fromCurrency];
     const convertedAmount = usdAmount * this.exchangeRates[toCurrency];
 
-    return Math.round(convertedAmount * 100) / 100;
+    // Return as cents (rounded)
+    return Math.round(convertedAmount * 100);
   }
 
   // Convert from any currency to the current base currency
@@ -151,17 +155,25 @@ export class CurrencyService {
     return this.convert(amount, this.baseCurrency, toCurrency);
   }
 
-  // Format amount with currency symbol
-  formatAmount(amount: number, currency: SupportedCurrency): string {
-    const symbol = this.getCurrencySymbol(currency);
-    const formattedAmount = amount.toFixed(2);
+  // Format amount with currency symbol (amount in cents)
+  formatAmount(amountInCents: number, currency: SupportedCurrency): string {
+    // Convert from integer cents to decimal amount
+    const decimalAmount = amountInCents / 100;
 
-    // Handle currencies that typically show symbol after amount
-    if (["SEK", "NOK", "DKK", "PLN", "CZK", "HUF"].includes(currency)) {
-      return `${formattedAmount} ${symbol}`;
+    // Handle crypto currencies that aren't supported by Intl.NumberFormat
+    if (["USDT", "BTC", "ETH"].includes(currency)) {
+      const symbol = this.getCurrencySymbol(currency);
+      const formattedAmount = decimalAmount.toFixed(2);
+      return `${symbol}${formattedAmount}`;
     }
 
-    return `${symbol}${formattedAmount}`;
+    // Use Intl.NumberFormat for all standard currencies
+    return new Intl.NumberFormat("en-US", {
+      style: "currency",
+      currency: currency,
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    }).format(decimalAmount);
   }
 
   // Get all supported currencies

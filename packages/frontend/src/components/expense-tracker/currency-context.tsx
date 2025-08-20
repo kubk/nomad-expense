@@ -5,21 +5,12 @@ import {
   useEffect,
   ReactNode,
 } from "react";
-import {
-  currencyService,
-  SupportedCurrency,
-  CurrencyService,
-} from "./currency-service";
+import { currencyService, SupportedCurrency } from "./currency-service";
 
-interface CurrencyContextType {
+type CurrencyContextType = {
   baseCurrency: SupportedCurrency;
-  currencyService: CurrencyService;
   setBaseCurrency: (currency: SupportedCurrency) => void;
-  formatAmount: (amount: number, currency: SupportedCurrency) => string;
-  convertToBase: (amount: number, fromCurrency: SupportedCurrency) => number;
-  convertFromBase: (amount: number, toCurrency: SupportedCurrency) => number;
-  getCurrencySymbol: (currency: SupportedCurrency) => string;
-}
+};
 
 const CurrencyContext = createContext<CurrencyContextType | undefined>(
   undefined,
@@ -33,11 +24,7 @@ export const useCurrency = (): CurrencyContextType => {
   return context;
 };
 
-interface CurrencyProviderProps {
-  children: ReactNode;
-}
-
-export const CurrencyProvider = ({ children }: CurrencyProviderProps) => {
+export function CurrencyProvider({ children }: { children: ReactNode }) {
   const [baseCurrency, setBaseCurrencyState] = useState<SupportedCurrency>(
     () => {
       // Try to load from localStorage first
@@ -59,12 +46,7 @@ export const CurrencyProvider = ({ children }: CurrencyProviderProps) => {
 
   const contextValue: CurrencyContextType = {
     baseCurrency,
-    currencyService,
     setBaseCurrency,
-    formatAmount: currencyService.formatAmount.bind(currencyService),
-    convertToBase: currencyService.convertToBase.bind(currencyService),
-    convertFromBase: currencyService.convertFromBase.bind(currencyService),
-    getCurrencySymbol: currencyService.getCurrencySymbol.bind(currencyService),
   };
 
   return (
@@ -72,4 +54,4 @@ export const CurrencyProvider = ({ children }: CurrencyProviderProps) => {
       {children}
     </CurrencyContext.Provider>
   );
-};
+}

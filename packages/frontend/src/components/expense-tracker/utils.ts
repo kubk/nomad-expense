@@ -39,13 +39,16 @@ export const calculateTotal = (
   const targetCurrency = baseCurrency || currencyService.getBaseCurrency();
 
   return transactions.reduce((sum, t) => {
-    // Convert from USD (which is stored in t.usd) to the target currency
-    const convertedAmount = currencyService.convert(
-      t.usd,
+    // Only include expenses (negative amounts) in the total
+    if (t.usd >= 0) return sum; // Skip income transactions
+
+    // Convert from USD (stored in t.usd as cents) to the target currency
+    const convertedAmountInCents = currencyService.convert(
+      Math.abs(t.usd),
       "USD",
       targetCurrency,
     );
-    return sum + convertedAmount;
+    return sum + convertedAmountInCents;
   }, 0);
 };
 
@@ -69,8 +72,4 @@ export const formatDisplayDate = (dateString: string): string => {
       day: "numeric",
     });
   }
-};
-
-export const getCurrencySymbol = (currencyCode: string): string => {
-  return currencyService.getCurrencySymbol(currencyCode as SupportedCurrency);
 };
