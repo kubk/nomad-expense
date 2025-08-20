@@ -8,8 +8,11 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Account, DateRange } from "./types";
-import { currencyService, SupportedCurrency } from "./currency-service";
+import { Account, DateRange } from "../../shared/types";
+import {
+  currencyService,
+  SupportedCurrency,
+} from "../../shared/currency-service";
 
 export function TransactionFilters({
   accounts,
@@ -26,8 +29,6 @@ export function TransactionFilters({
   setDateRange: (range: DateRange) => void;
   setShowFilters: (show: boolean) => void;
 }) {
-  // No need for currency context here
-
   return (
     <div className="px-4 pb-4 border-t">
       <div className="space-y-3 mt-4">

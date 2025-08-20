@@ -1,9 +1,9 @@
 import { ArrowLeftIcon } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { MonthlyData, DateRange } from "./types";
-import { useCurrency } from "./currency-context";
-import { currencyService } from "./currency-service";
+import { MonthlyData, DateRange } from "../../shared/types";
+import { useCurrency } from "../../shared/currency-context";
+import { currencyService } from "../../shared/currency-service";
 import { MonthlyBreakdownItem } from "./monthly-breakdown-item";
 import { YearSummaryCard } from "./year-summary-card";
 
@@ -65,7 +65,6 @@ export function YearlyBreakdownScreen({
             onClick={() => setCurrentScreen("overview")}
           >
             <ArrowLeftIcon className="w-4 h-4 mr-1" />
-            Back
           </Button>
           <h1 className="font-semibold text-gray-900">Monthly breakdown</h1>
           <div className="w-[60px]" />

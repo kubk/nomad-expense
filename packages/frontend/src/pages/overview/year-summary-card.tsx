@@ -1,7 +1,7 @@
 import { Card, CardContent } from "@/components/ui/card";
-import { MonthlyData } from "./types";
-import { useCurrency } from "./currency-context";
-import { currencyService } from "./currency-service";
+import { MonthlyData } from "../../shared/types";
+import { useCurrency } from "../../shared/currency-context";
+import { currencyService } from "../../shared/currency-service";
 
 export function YearSummaryCard({
   convertedMonthlyData,

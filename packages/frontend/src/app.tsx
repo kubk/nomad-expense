@@ -1,5 +1,10 @@
-import { ExpenseTracker } from "@/components/ExpenseTracker";
+import { CurrencyProvider } from "./shared/currency-context";
+import { ExpenseTracker } from "./pages/layout/expense-tracker";
 
 export function App() {
-  return <ExpenseTracker />;
+  return (
+    <CurrencyProvider>
+      <ExpenseTracker />
+    </CurrencyProvider>
+  );
 }

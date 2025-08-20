@@ -1,6 +1,6 @@
-import { MonthlyData, DateRange } from "./types";
-import { useCurrency } from "./currency-context";
-import { currencyService } from "./currency-service";
+import { MonthlyData, DateRange } from "../../shared/types";
+import { useCurrency } from "../../shared/currency-context";
+import { currencyService } from "../../shared/currency-service";
 
 export function MonthlyBreakdownItem({
   month,

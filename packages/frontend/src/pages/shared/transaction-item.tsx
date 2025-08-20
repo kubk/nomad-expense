@@ -1,7 +1,10 @@
-import { Transaction, Account } from "./types";
-import { formatDisplayDate } from "./utils";
-import { useCurrency } from "./currency-context";
-import { currencyService, SupportedCurrency } from "./currency-service";
+import { Transaction, Account } from "../../shared/types";
+import { useCurrency } from "../../shared/currency-context";
+import {
+  currencyService,
+  SupportedCurrency,
+} from "../../shared/currency-service";
+import { formatDisplayDate } from "@/shared/utils";
 
 export function TransactionItem({
   transaction,
