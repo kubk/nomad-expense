@@ -1,5 +1,6 @@
 import { MonthlyData, DateRange } from "./types";
 import { useCurrency } from "./currency-context";
+import { currencyService } from "./currency-service";
 
 export function MonthlyBreakdownItem({
   month,
@@ -16,7 +17,7 @@ export function MonthlyBreakdownItem({
   setSelectedAccount: (account: string) => void;
   setCurrentScreen: (screen: string) => void;
 }) {
-  const { baseCurrency, formatAmount } = useCurrency();
+  const { baseCurrency } = useCurrency();
 
   const monthNames = [
     "Jan",
@@ -58,7 +59,10 @@ export function MonthlyBreakdownItem({
           </div>
           <div className="text-right">
             <div className="font-semibold text-gray-900">
-              {formatAmount(month.convertedAmount, baseCurrency)}
+              {currencyService.formatAmount(
+                month.convertedAmount,
+                baseCurrency,
+              )}
             </div>
           </div>
         </div>

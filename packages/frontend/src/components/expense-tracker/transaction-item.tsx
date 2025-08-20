@@ -1,20 +1,18 @@
 import { Transaction, Account } from "./types";
 import { formatDisplayDate } from "./utils";
 import { useCurrency } from "./currency-context";
-import { SupportedCurrency } from "./currency-service";
+import { currencyService, SupportedCurrency } from "./currency-service";
 
-interface TransactionItemProps {
-  transaction: Transaction;
-  account: Account | undefined;
-  showBorder?: boolean;
-}
-
-export const TransactionItem = ({
+export function TransactionItem({
   transaction,
   account,
   showBorder = false,
-}: TransactionItemProps) => {
-  const { baseCurrency, formatAmount, currencyService } = useCurrency();
+}: {
+  transaction: Transaction;
+  account: Account | undefined;
+  showBorder?: boolean;
+}) {
+  const { baseCurrency } = useCurrency();
 
   // Convert the transaction amount to base currency for comparison display
   const amountInBaseCurrency = currencyService.convert(
@@ -22,6 +20,10 @@ export const TransactionItem = ({
     "USD",
     baseCurrency,
   );
+
+  const isIncome = transaction.amount > 0;
+  const displayAmount = Math.abs(transaction.amount);
+  const displayAmountInBaseCurrency = Math.abs(amountInBaseCurrency);
 
   return (
     <div
@@ -40,19 +42,28 @@ export const TransactionItem = ({
           {formatDisplayDate(transaction.date)}
         </p>
       </div>
-      <div className="text-right">
-        <p className="font-semibold text-sm">
-          {formatAmount(
-            transaction.amount,
+      <div className="self-start text-right">
+        <p
+          className={`font-semibold text-sm ${isIncome ? "text-green-700" : ""}`}
+        >
+          {isIncome ? "+ " : ""}
+          {currencyService.formatAmount(
+            displayAmount,
             transaction.currency as SupportedCurrency,
           )}
         </p>
         {transaction.currency !== baseCurrency && (
-          <p className="text-xs text-gray-500">
-            {formatAmount(amountInBaseCurrency, baseCurrency)}
+          <p
+            className={`text-xs ${isIncome ? "text-green-600" : "text-gray-500"}`}
+          >
+            {isIncome ? "+ " : ""}
+            {currencyService.formatAmount(
+              displayAmountInBaseCurrency,
+              baseCurrency,
+            )}
           </p>
         )}
       </div>
     </div>
   );
-};
+}

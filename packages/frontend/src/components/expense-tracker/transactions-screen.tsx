@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Account, Transaction, DateRange } from "./types";
 import { TransactionItem } from "./transaction-item";
 import { useCurrency } from "./currency-context";
+import { currencyService } from "./currency-service";
 import { TransactionFilters } from "./transaction-filters";
 
 export function TransactionsScreen({
@@ -29,7 +30,7 @@ export function TransactionsScreen({
   setDateRange: (range: DateRange) => void;
   setShowFilters: (show: boolean) => void;
 }) {
-  const { baseCurrency, formatAmount } = useCurrency();
+  const { baseCurrency } = useCurrency();
 
   return (
     <div className="min-h-screen bg-gray-50 pb-20">
@@ -77,11 +78,7 @@ export function TransactionsScreen({
                 : accounts.find((a) => a.id === selectedAccount)?.name}
             </p>
             <p className="text-2xl font-bold mt-1">
-              {formatAmount(totalInBaseCurrency, baseCurrency)}
-            </p>
-            <p className="text-indigo-100 text-xs mt-2">
-              {filteredTransactions.length} transactions (converted to{" "}
-              {baseCurrency})
+              {currencyService.formatAmount(totalInBaseCurrency, baseCurrency)}
             </p>
           </CardContent>
         </Card>

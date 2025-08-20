@@ -9,8 +9,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Account, DateRange } from "./types";
-import { useCurrency } from "./currency-context";
-import { SupportedCurrency } from "./currency-service";
+import { currencyService, SupportedCurrency } from "./currency-service";
 
 export function TransactionFilters({
   accounts,
@@ -27,7 +26,7 @@ export function TransactionFilters({
   setDateRange: (range: DateRange) => void;
   setShowFilters: (show: boolean) => void;
 }) {
-  const { getCurrencySymbol } = useCurrency();
+  // No need for currency context here
 
   return (
     <div className="px-4 pb-4 border-t">
@@ -45,7 +44,10 @@ export function TransactionFilters({
                   <div className="flex items-center">
                     <div className={`w-2 h-2 rounded-full ${acc.color} mr-2`} />
                     {acc.name} (
-                    {getCurrencySymbol(acc.currency as SupportedCurrency)})
+                    {currencyService.getCurrencySymbol(
+                      acc.currency as SupportedCurrency,
+                    )}
+                    )
                   </div>
                 </SelectItem>
               ))}

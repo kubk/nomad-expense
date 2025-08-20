@@ -3,20 +3,18 @@ import { MonthlyData, DateRange } from "./types";
 import { useCurrency } from "./currency-context";
 import { currencyService } from "./currency-service";
 
-interface MonthlyChartProps {
-  monthlyData: MonthlyData[];
-  setCurrentScreen: (screen: string) => void;
-  setDateRange: (range: DateRange) => void;
-  setSelectedAccount: (account: string) => void;
-}
-
-export const MonthlyChart = ({
+export function MonthlyChart({
   monthlyData,
   setCurrentScreen,
   setDateRange,
   setSelectedAccount,
-}: MonthlyChartProps) => {
-  const { baseCurrency, formatAmount } = useCurrency();
+}: {
+  monthlyData: MonthlyData[];
+  setCurrentScreen: (screen: string) => void;
+  setDateRange: (range: DateRange) => void;
+  setSelectedAccount: (account: string) => void;
+}) {
+  const { baseCurrency } = useCurrency();
   const scrollContainerRef = useRef<HTMLDivElement>(null);
 
   // Convert monthly data amounts to base currency
@@ -99,8 +97,11 @@ export const MonthlyChart = ({
               className="flex flex-col items-center min-w-[64px]"
             >
               {/* Amount label above bar */}
-              <div className="mb-2 text-xs font-semibold text-gray-900 text-center">
-                {formatAmount(month.convertedAmount, baseCurrency)}
+              <div className="mb-4 text-xs font-semibold text-gray-900 text-center">
+                {currencyService.formatAmount(
+                  month.convertedAmount,
+                  baseCurrency,
+                )}
               </div>
 
               {/* Chart container */}
@@ -131,4 +132,4 @@ export const MonthlyChart = ({
       </div>
     </div>
   );
-};
+}
