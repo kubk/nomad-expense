@@ -6,7 +6,7 @@ import { currencyService } from "../../shared/currency-service";
 import { MonthlyBreakdownItem } from "./monthly-breakdown-item";
 import { YearSummaryCard } from "./year-summary-card";
 import { FiltersDrawer } from "./filters-drawer";
-import { BackButton } from "../../shared/back-button";
+import { PageHeader } from "../shared/page-header";
 import { accounts, transactions } from "../../shared/data";
 
 export function MonthlyBreakdownFull({
@@ -186,15 +186,8 @@ export function MonthlyBreakdownFull({
   );
 
   return (
-    <div className="min-h-screen bg-gray-50 pb-20">
-      {/* Header */}
-      <div className="bg-white border-b sticky top-0 z-10">
-        <div className="flex items-center justify-between p-4">
-          <BackButton />
-          <h1 className="font-semibold text-gray-900">Monthly breakdown</h1>
-          <div className="w-[60px]" />
-        </div>
-      </div>
+    <div className="min-h-screen pb-20">
+      <PageHeader title="Monthly breakdown" />
 
       <YearSummaryCard
         convertedMonthlyData={filteredMonthlyData}

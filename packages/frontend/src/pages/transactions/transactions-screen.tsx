@@ -6,7 +6,7 @@ import { TransactionItem } from "../shared/transaction-item";
 import { useCurrency } from "../../shared/currency-context";
 import { currencyService } from "../../shared/currency-service";
 import { TransactionFilters } from "./transaction-filters";
-import { BackButton } from "../../shared/back-button";
+import { PageHeader } from "../shared/page-header";
 
 export function TransactionsScreen({
   accounts,
@@ -32,12 +32,10 @@ export function TransactionsScreen({
   const { baseCurrency } = useCurrency();
 
   return (
-    <div className="min-h-screen bg-gray-50 pb-20">
-      {/* Header */}
-      <div className="bg-white border-b sticky top-0 z-10">
-        <div className="flex items-center justify-between p-4">
-          <BackButton />
-          <h1 className="font-semibold text-gray-900">Transactions</h1>
+    <div className="min-h-screen pb-20">
+      <PageHeader
+        title="Transactions"
+        rightSlot={
           <Button
             variant="ghost"
             size="sm"
@@ -46,10 +44,12 @@ export function TransactionsScreen({
           >
             <FilterIcon className="w-4 h-4" />
           </Button>
-        </div>
+        }
+      />
 
-        {/* Filters */}
-        {showFilters && (
+      {/* Filters */}
+      {showFilters && (
+        <div className="bg-background border-b">
           <TransactionFilters
             accounts={accounts}
             selectedAccount={selectedAccount}
@@ -58,8 +58,8 @@ export function TransactionsScreen({
             setDateRange={setDateRange}
             setShowFilters={setShowFilters}
           />
-        )}
-      </div>
+        </div>
+      )}
 
       {/* Summary Card */}
       <div className="px-4 mt-4">

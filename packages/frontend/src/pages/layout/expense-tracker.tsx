@@ -29,7 +29,7 @@ export function ExpenseTracker() {
 
   return (
     <div
-      className="max-w-md mx-auto bg-white shadow-2xl relative"
+      className="max-w-md mx-auto bg-muted/100 shadow-2xl relative"
       style={{ height: "100vh", overflow: "auto" }}
     >
       <Router>

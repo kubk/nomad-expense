@@ -97,7 +97,7 @@ export function MonthlyChart({
               className="flex flex-col cursor-pointer items-center min-w-[64px] active:scale-95 transition-transform duration-150"
               onClick={() => handleMonthClick(month)}
             >
-              <div className="mb-4 text-xs font-semibold text-gray-900 text-center">
+              <div className="mb-4 text-xs font-semibold text-foreground text-center">
                 {currencyService.formatAmount(
                   month.convertedAmount,
                   baseCurrency,
@@ -107,7 +107,7 @@ export function MonthlyChart({
 
               {/* Chart container */}
               <div
-                className="relative flex items-end cursor-pointer hover:bg-gray-50 rounded-lg p-1 -m-1 transition-colors group"
+                className="relative flex items-end cursor-pointer hover:bg-muted/50 rounded-lg p-1 -m-1 transition-colors group"
                 style={{ height: "100px" }}
               >
                 <div
@@ -118,7 +118,7 @@ export function MonthlyChart({
                 />
               </div>
 
-              <div className="mt-2 text-xs font-medium text-gray-900 hover:text-primary hover:underline transition-colors cursor-pointer">
+              <div className="mt-2 text-xs font-medium text-foreground hover:text-primary hover:underline transition-colors cursor-pointer">
                 {month.shortMonth}
               </div>
             </div>

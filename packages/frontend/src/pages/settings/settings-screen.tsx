@@ -12,7 +12,8 @@ import {
   SupportedCurrency,
 } from "../../shared/currency-service";
 import { useCurrency } from "../../shared/currency-context";
-import { BackButton } from "../../shared/back-button";
+import { PageHeader } from "../shared/page-header";
+import { ModeToggle } from "../../components/mode-toggle";
 
 export function SettingsScreen() {
   const { baseCurrency, setBaseCurrency } = useCurrency();
@@ -23,14 +24,10 @@ export function SettingsScreen() {
 
   return (
     <div className="flex flex-col h-full">
-      {/* Header */}
-      <div className="sticky top-0 bg-white border-b px-4 py-3 flex items-center gap-3">
-        <BackButton className="p-0 h-auto" />
-        <h1 className="text-lg font-semibold">Settings</h1>
-      </div>
+      <PageHeader title="Settings" />
 
       {/* Content */}
-      <div className="flex-1 px-4 py-6">
+      <div className="flex-1 bg-background px-4 py-6">
         <div className="space-y-8">
           {/* Currency Section */}
           <div className="space-y-4">
@@ -81,6 +78,14 @@ export function SettingsScreen() {
                   ))}
                 </SelectContent>
               </Select>
+            </div>
+          </div>
+
+          {/* Theme Section */}
+          <div className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="theme-select">Theme</Label>
+              <ModeToggle />
             </div>
           </div>
         </div>

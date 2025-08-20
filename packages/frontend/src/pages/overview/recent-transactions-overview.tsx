@@ -14,7 +14,7 @@ export function RecentTransactionsOverview({
   return (
     <div className="px-4 mt-6">
       <div className="flex justify-between items-center mb-3">
-        <h2 className="font-semibold pl-4 text-gray-900">Recent</h2>
+        <h2 className="font-semibold pl-4 text-foreground">Recent</h2>
         <Link
           href="/transactions"
           className="text-primary active:scale-95 transition-transform duration-150 inline-flex items-center text-sm font-medium hover:underline"
