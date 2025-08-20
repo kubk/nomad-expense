@@ -37,11 +37,11 @@ export function TransactionItem({
       <div className="flex-1">
         <div className="flex items-center gap-2 mb-1">
           <div className={`w-2 h-2 rounded-full ${account?.color}`} />
-          <p className="font-medium text-sm text-gray-900">
+          <p className="font-medium text-sm text-foreground">
             {transaction.desc}
           </p>
         </div>
-        <p className="text-xs text-gray-500 mt-1">
+        <p className="text-xs text-muted-foreground mt-1">
           {formatDisplayDate(transaction.date)}
         </p>
       </div>
@@ -57,7 +57,7 @@ export function TransactionItem({
         </p>
         {transaction.currency !== baseCurrency && (
           <p
-            className={`text-xs ${isIncome ? "text-green-600" : "text-gray-500"}`}
+            className={`text-xs ${isIncome ? "text-green-600" : "text-muted-foreground"}`}
           >
             {isIncome ? "+ " : ""}
             {currencyService.formatAmount(

@@ -16,7 +16,7 @@ export function Navigation({ currentScreen }: { currentScreen: string }) {
   ];
 
   return (
-    <div className="fixed bottom-0 left-0 right-0 bg-white border-t">
+    <div className="fixed bottom-0 left-0 right-0 bg-background border-t border-border">
       <div className="flex justify-around items-center py-3">
         {navItems.map(({ route, icon: Icon, label }) => (
           <Link
@@ -26,7 +26,7 @@ export function Navigation({ currentScreen }: { currentScreen: string }) {
               "flex flex-col items-center gap-1 px-3 py-2 rounded-lg transition-colors",
               currentScreen === route.slice(1)
                 ? "text-primary bg-primary/5 font-semibold"
-                : "text-gray-500 hover:text-gray-700",
+                : "text-muted-foreground hover:text-foreground",
             )}
           >
             <Icon className="w-5 h-5" />

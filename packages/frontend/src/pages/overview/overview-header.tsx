@@ -11,7 +11,7 @@ export function OverviewHeader({
   return (
     <div className="bg-primary text-primary-foreground px-4 py-6 pb-18">
       {/* Total This Month */}
-      <div className="bg-white/10 backdrop-blur rounded-2xl p-4">
+      <div className="bg-background/10 backdrop-blur rounded-2xl p-4">
         <p className="text-primary-foreground/70 text-sm mb-1">
           Total this month
         </p>

@@ -33,7 +33,7 @@ export function TransactionFilters({
     <div className="px-4 pb-4 border-t">
       <div className="space-y-3 mt-4">
         <div>
-          <Label className="text-xs text-gray-600">Account</Label>
+          <Label className="text-xs text-muted-foreground">Account</Label>
           <Select value={selectedAccount} onValueChange={setSelectedAccount}>
             <SelectTrigger className="mt-1">
               <SelectValue />
@@ -58,7 +58,7 @@ export function TransactionFilters({
 
         <div className="grid grid-cols-2 gap-3">
           <div>
-            <Label className="text-xs text-gray-600">From</Label>
+            <Label className="text-xs text-muted-foreground">From</Label>
             <Input
               type="date"
               className="mt-1"
@@ -69,7 +69,7 @@ export function TransactionFilters({
             />
           </div>
           <div>
-            <Label className="text-xs text-gray-600">To</Label>
+            <Label className="text-xs text-muted-foreground">To</Label>
             <Input
               type="date"
               className="mt-1"

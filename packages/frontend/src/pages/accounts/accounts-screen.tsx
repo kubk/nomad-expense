@@ -9,7 +9,7 @@ import {
   currencyService,
   SupportedCurrency,
 } from "../../shared/currency-service";
-import { BackButton } from "../../shared/back-button";
+import { PageHeader } from "../shared/page-header";
 
 export function AccountsScreen({
   accounts,
@@ -23,44 +23,18 @@ export function AccountsScreen({
   const { baseCurrency } = useCurrency();
   const [, setLocation] = useLocation();
 
-  // Calculate total in base currency
-  const totalInBaseCurrency = transactions.reduce((sum, t) => {
-    const convertedAmount = currencyService.convert(t.usd, "USD", baseCurrency);
-    return sum + convertedAmount;
-  }, 0);
-
   return (
-    <div className="min-h-screen bg-gray-50 pb-20">
-      {/* Header */}
-      <div className="bg-white border-b sticky top-0 z-10">
-        <div className="flex items-center justify-between p-4">
-          <BackButton />
-          <h1 className="font-semibold text-gray-900">Accounts</h1>
+    <div className="min-h-screen pb-20">
+      <PageHeader
+        title="Accounts"
+        rightSlot={
           <Button variant="ghost" size="sm">
             <PlusIcon className="w-4 h-4" />
           </Button>
-        </div>
-      </div>
+        }
+      />
 
-      {/* Total in Base Currency */}
       <div className="px-4 mt-4">
-        <Card className="bg-gray-900 text-white border-0">
-          <CardContent className="p-4">
-            <p className="text-gray-400 text-sm">
-              Total Expenses (All Accounts)
-            </p>
-            <p className="text-3xl font-bold mt-1">
-              {currencyService.formatAmount(totalInBaseCurrency, baseCurrency)}
-            </p>
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* Accounts List */}
-      <div className="px-4 mt-4">
-        <h2 className="font-semibold text-gray-900 mb-3">
-          {accounts.length} Accounts
-        </h2>
         <div className="space-y-3">
           {accounts.map((account) => {
             const accountTransactions = transactions.filter(
@@ -84,7 +58,7 @@ export function AccountsScreen({
                   setLocation("/transactions");
                 }}
               >
-                <CardContent className="p-4">
+                <CardContent className="px-4">
                   <div className="flex items-start justify-between mb-3">
                     <div className="flex items-center gap-3">
                       <div
@@ -94,7 +68,7 @@ export function AccountsScreen({
                         className={`w-3 h-3 rounded-full ${account.color} absolute ml-3.5`}
                       />
                       <div>
-                        <p className="font-medium text-gray-900">
+                        <p className="font-medium text-foreground">
                           {account.name}
                         </p>
                         <Badge variant="outline" className="mt-1">
@@ -104,12 +78,14 @@ export function AccountsScreen({
                         </Badge>
                       </div>
                     </div>
-                    <ChevronRightIcon className="w-5 h-5 text-gray-400" />
+                    <ChevronRightIcon className="w-5 h-5 text-muted-foreground" />
                   </div>
 
                   <div className="flex justify-between items-center pt-3 border-t">
                     <div>
-                      <p className="text-xs text-gray-500">This month</p>
+                      <p className="text-xs text-muted-foreground">
+                        This month
+                      </p>
                       <p className="font-semibold text-lg">
                         {currencyService.formatAmount(
                           accountTotal,
@@ -118,10 +94,10 @@ export function AccountsScreen({
                       </p>
                     </div>
                     <div className="text-right">
-                      <p className="text-xs text-gray-500">
+                      <p className="text-xs text-muted-foreground">
                         {accountTransactions.length} transactions
                       </p>
-                      <p className="text-xs text-gray-400 mt-1">
+                      <p className="text-xs text-muted-foreground mt-1">
                         Last: {accountTransactions[0]?.date || "N/A"}
                       </p>
                     </div>
