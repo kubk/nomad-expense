@@ -10,6 +10,7 @@ export interface MonthlyData {
   shortMonth: string;
   amount: number;
   year: number;
+  account?: string;
 }
 
 export interface Transaction {
