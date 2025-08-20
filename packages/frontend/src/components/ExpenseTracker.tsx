@@ -5,9 +5,11 @@ import { OverviewScreen } from "./expense-tracker/OverviewScreen";
 import { TransactionsScreen } from "./expense-tracker/TransactionsScreen";
 import { YearlyBreakdownScreen } from "./expense-tracker/YearlyBreakdownScreen";
 import { AccountsScreen } from "./expense-tracker/AccountsScreen";
+import { SettingsScreen } from "./expense-tracker/settings-screen";
 import { Navigation } from "./expense-tracker/Navigation";
+import { CurrencyProvider } from "./expense-tracker/currency-context";
 
-const ExpenseTracker = () => {
+const ExpenseTrackerContent = () => {
   const [currentScreen, setCurrentScreen] = useState("overview");
   const [selectedAccount, setSelectedAccount] = useState("all");
   const [dateRange, setDateRange] = useState({ from: "", to: "" });
@@ -18,7 +20,7 @@ const ExpenseTracker = () => {
     selectedAccount,
     dateRange,
   );
-  const totalUSD = calculateTotal(filteredTransactions);
+  const totalInBaseCurrency = calculateTotal(filteredTransactions);
 
   return (
     <div
@@ -27,9 +29,9 @@ const ExpenseTracker = () => {
     >
       {currentScreen === "overview" && (
         <OverviewScreen
-          accounts={accounts}
           monthlyData={monthlyData}
           transactions={transactions}
+          accounts={accounts}
           setCurrentScreen={setCurrentScreen}
           setDateRange={setDateRange}
           setSelectedAccount={setSelectedAccount}
@@ -40,7 +42,7 @@ const ExpenseTracker = () => {
         <TransactionsScreen
           accounts={accounts}
           filteredTransactions={filteredTransactions}
-          totalUSD={totalUSD}
+          totalInBaseCurrency={totalInBaseCurrency}
           selectedAccount={selectedAccount}
           dateRange={dateRange}
           showFilters={showFilters}
@@ -69,13 +71,25 @@ const ExpenseTracker = () => {
         />
       )}
 
-      {!["yearly-breakdown"].includes(currentScreen) && (
+      {currentScreen === "settings" && (
+        <SettingsScreen setCurrentScreen={setCurrentScreen} />
+      )}
+
+      {!["yearly-breakdown", "settings"].includes(currentScreen) && (
         <Navigation
           currentScreen={currentScreen}
           setCurrentScreen={setCurrentScreen}
         />
       )}
     </div>
+  );
+};
+
+const ExpenseTracker = () => {
+  return (
+    <CurrencyProvider>
+      <ExpenseTrackerContent />
+    </CurrencyProvider>
   );
 };
 

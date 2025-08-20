@@ -20,7 +20,6 @@ export interface Transaction {
   usd: number;
   date: string;
   account: string;
-  category: string;
   month: string;
 }
 
