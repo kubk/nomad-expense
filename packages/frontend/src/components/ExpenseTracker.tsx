@@ -1,12 +1,12 @@
 import { useState } from "react";
 import { accounts, monthlyData, transactions } from "./expense-tracker/data";
 import { filterTransactions, calculateTotal } from "./expense-tracker/utils";
-import { OverviewScreen } from "./expense-tracker/OverviewScreen";
-import { TransactionsScreen } from "./expense-tracker/TransactionsScreen";
-import { YearlyBreakdownScreen } from "./expense-tracker/YearlyBreakdownScreen";
-import { AccountsScreen } from "./expense-tracker/AccountsScreen";
+import { OverviewScreen } from "./expense-tracker/overview-screen";
+import { TransactionsScreen } from "./expense-tracker/transactions-screen";
+import { YearlyBreakdownScreen } from "./expense-tracker/yearly-breakdown-screen";
+import { AccountsScreen } from "./expense-tracker/accounts-screen";
 import { SettingsScreen } from "./expense-tracker/settings-screen";
-import { Navigation } from "./expense-tracker/Navigation";
+import { Navigation } from "./expense-tracker/navigation";
 import { CurrencyProvider } from "./expense-tracker/currency-context";
 
 const ExpenseTrackerContent = () => {
@@ -85,12 +85,10 @@ const ExpenseTrackerContent = () => {
   );
 };
 
-const ExpenseTracker = () => {
+export function ExpenseTracker() {
   return (
     <CurrencyProvider>
       <ExpenseTrackerContent />
     </CurrencyProvider>
   );
-};
-
-export default ExpenseTracker;
+}

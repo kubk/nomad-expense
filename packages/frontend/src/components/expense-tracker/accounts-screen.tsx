@@ -1,4 +1,4 @@
-import { ArrowLeft, Plus, ChevronRight } from "lucide-react";
+import { ArrowLeftIcon, PlusIcon, ChevronRightIcon } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -6,19 +6,17 @@ import { Account, Transaction } from "./types";
 import { useCurrency } from "./currency-context";
 import { currencyService, SupportedCurrency } from "./currency-service";
 
-interface AccountsScreenProps {
-  accounts: Account[];
-  transactions: Transaction[];
-  setCurrentScreen: (screen: string) => void;
-  setSelectedAccount: (account: string) => void;
-}
-
-export const AccountsScreen = ({
+export function AccountsScreen({
   accounts,
   transactions,
   setCurrentScreen,
   setSelectedAccount,
-}: AccountsScreenProps) => {
+}: {
+  accounts: Account[];
+  transactions: Transaction[];
+  setCurrentScreen: (screen: string) => void;
+  setSelectedAccount: (account: string) => void;
+}) {
   const { baseCurrency, formatAmount, getCurrencySymbol } = useCurrency();
 
   // Calculate total in base currency
@@ -37,12 +35,12 @@ export const AccountsScreen = ({
             size="sm"
             onClick={() => setCurrentScreen("overview")}
           >
-            <ArrowLeft className="w-4 h-4 mr-1" />
+            <ArrowLeftIcon className="w-4 h-4 mr-1" />
             Back
           </Button>
           <h1 className="font-semibold text-gray-900">Accounts</h1>
           <Button variant="ghost" size="sm">
-            <Plus className="w-4 h-4" />
+            <PlusIcon className="w-4 h-4" />
           </Button>
         </div>
       </div>
@@ -112,7 +110,7 @@ export const AccountsScreen = ({
                         </Badge>
                       </div>
                     </div>
-                    <ChevronRight className="w-5 h-5 text-gray-400" />
+                    <ChevronRightIcon className="w-5 h-5 text-gray-400" />
                   </div>
 
                   <div className="flex justify-between items-center pt-3 border-t">
@@ -141,10 +139,10 @@ export const AccountsScreen = ({
       {/* Add Account Button */}
       <div className="px-4 mt-6">
         <Button className="w-full bg-indigo-600" size="lg">
-          <Plus className="w-5 h-5 mr-2" />
+          <PlusIcon className="w-5 h-5 mr-2" />
           Add New Account
         </Button>
       </div>
     </div>
   );
-};
+}
