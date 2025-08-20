@@ -104,18 +104,19 @@ export const MonthlyChart = ({
               </div>
 
               {/* Chart container */}
-              <div
-                className="relative flex items-end"
+              <button
+                onClick={() => handleMonthClick(month)}
+                className="relative flex items-end cursor-pointer hover:bg-gray-50 rounded-lg p-1 -m-1 transition-colors group"
                 style={{ height: "100px" }}
               >
                 {/* Violet bar - only visible part */}
                 <div
-                  className="w-10 bg-indigo-500 rounded-t-lg transition-all duration-300"
+                  className="w-10 bg-indigo-500 rounded-t-lg transition-all duration-300 group-hover:bg-indigo-600"
                   style={{
                     height: `${barHeight}px`,
                   }}
                 />
-              </div>
+              </button>
 
               {/* Month name below bar - clickable */}
               <button
