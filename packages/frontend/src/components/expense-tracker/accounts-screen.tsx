@@ -17,7 +17,7 @@ export function AccountsScreen({
   setCurrentScreen: (screen: string) => void;
   setSelectedAccount: (account: string) => void;
 }) {
-  const { baseCurrency, formatAmount, getCurrencySymbol } = useCurrency();
+  const { baseCurrency } = useCurrency();
 
   // Calculate total in base currency
   const totalInBaseCurrency = transactions.reduce((sum, t) => {
@@ -53,10 +53,7 @@ export function AccountsScreen({
               Total Expenses (All Accounts)
             </p>
             <p className="text-3xl font-bold mt-1">
-              {formatAmount(totalInBaseCurrency, baseCurrency)}
-            </p>
-            <p className="text-gray-400 text-xs mt-2">
-              Converted to {baseCurrency} • All time
+              {currencyService.formatAmount(totalInBaseCurrency, baseCurrency)}
             </p>
           </CardContent>
         </Card>
@@ -104,7 +101,7 @@ export function AccountsScreen({
                           {account.name}
                         </p>
                         <Badge variant="outline" className="mt-1">
-                          {getCurrencySymbol(
+                          {currencyService.getCurrencySymbol(
                             account.currency as SupportedCurrency,
                           )}
                         </Badge>
@@ -117,7 +114,10 @@ export function AccountsScreen({
                     <div>
                       <p className="text-xs text-gray-500">This month</p>
                       <p className="font-semibold text-lg">
-                        {formatAmount(accountTotal, baseCurrency)}
+                        {currencyService.formatAmount(
+                          accountTotal,
+                          baseCurrency,
+                        )}
                       </p>
                     </div>
                     <div className="text-right">

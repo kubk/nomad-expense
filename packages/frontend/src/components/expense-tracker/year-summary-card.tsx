@@ -1,13 +1,14 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { MonthlyData } from "./types";
 import { useCurrency } from "./currency-context";
+import { currencyService } from "./currency-service";
 
 export function YearSummaryCard({
   convertedMonthlyData,
 }: {
   convertedMonthlyData: (MonthlyData & { convertedAmount: number })[];
 }) {
-  const { baseCurrency, formatAmount } = useCurrency();
+  const { baseCurrency } = useCurrency();
 
   const currentYear = new Date().getFullYear();
   const currentYearData = convertedMonthlyData.filter(
@@ -24,7 +25,7 @@ export function YearSummaryCard({
         <CardContent className="px-4">
           <p className="text-indigo-100 text-sm">Total {currentYear}</p>
           <p className="text-2xl font-bold mt-1">
-            {formatAmount(totalAmount, baseCurrency)}
+            {currencyService.formatAmount(totalAmount, baseCurrency)}
           </p>
           <p className="text-indigo-100 text-xs mt-2">
             {currentYearData.length} months

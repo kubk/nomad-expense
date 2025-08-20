@@ -9,14 +9,18 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useCurrency } from "./currency-context";
-import { SUPPORTED_CURRENCIES, SupportedCurrency } from "./currency-service";
+import {
+  currencyService,
+  SUPPORTED_CURRENCIES,
+  SupportedCurrency,
+} from "./currency-service";
 
-interface SettingsScreenProps {
+export function SettingsScreen({
+  setCurrentScreen,
+}: {
   setCurrentScreen: (screen: string) => void;
-}
-
-export const SettingsScreen = ({ setCurrentScreen }: SettingsScreenProps) => {
-  const { baseCurrency, setBaseCurrency, getCurrencySymbol } = useCurrency();
+}) {
+  const { baseCurrency, setBaseCurrency } = useCurrency();
 
   const handleCurrencyChange = (value: string) => {
     setBaseCurrency(value as SupportedCurrency);
@@ -57,7 +61,7 @@ export const SettingsScreen = ({ setCurrentScreen }: SettingsScreenProps) => {
                   <SelectValue>
                     <div className="flex items-center gap-2">
                       <span className="font-medium">
-                        {getCurrencySymbol(baseCurrency)}
+                        {currencyService.getCurrencySymbol(baseCurrency)}
                       </span>
                       <span>{baseCurrency}</span>
                       <span className="text-muted-foreground">
@@ -76,7 +80,7 @@ export const SettingsScreen = ({ setCurrentScreen }: SettingsScreenProps) => {
                     <SelectItem key={currency.code} value={currency.code}>
                       <div className="flex items-center gap-3">
                         <span className="font-medium w-6">
-                          {getCurrencySymbol(currency.code)}
+                          {currencyService.getCurrencySymbol(currency.code)}
                         </span>
                         <div>
                           <div className="font-medium">{currency.code}</div>
@@ -95,4 +99,4 @@ export const SettingsScreen = ({ setCurrentScreen }: SettingsScreenProps) => {
       </div>
     </div>
   );
-};
+}

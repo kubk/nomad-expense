@@ -22,7 +22,7 @@ export function OverviewScreen({
   setDateRange: (range: DateRange) => void;
   setSelectedAccount: (account: string) => void;
 }) {
-  const { baseCurrency, formatAmount } = useCurrency();
+  const { baseCurrency } = useCurrency();
 
   // Convert monthly data amounts to base currency
   const convertedMonthlyData = monthlyData.map((month) => ({
@@ -48,7 +48,7 @@ export function OverviewScreen({
               const monthData = convertedMonthlyData.find(
                 (m) => m.month === currentMonthKey,
               );
-              return formatAmount(
+              return currencyService.formatAmount(
                 monthData?.convertedAmount || 0,
                 baseCurrency,
               );

@@ -39,49 +39,69 @@ const generateTransactionsForMonth = (monthsAgo: number): Transaction[] => {
     {
       desc: "Grocery Store",
       account: "1",
-      baseAmount: 120,
+      baseAmount: -120,
     },
     {
       desc: "Gas Station",
       account: "1",
-      baseAmount: 65,
+      baseAmount: -65,
     },
-    { desc: "Restaurant", account: "2", baseAmount: 85 },
-    { desc: "Amazon", account: "1", baseAmount: 45 },
+    { desc: "Restaurant", account: "2", baseAmount: -85 },
+    { desc: "Amazon", account: "1", baseAmount: -45 },
     {
       desc: "Netflix",
       account: "1",
-      baseAmount: 16,
+      baseAmount: -16,
     },
-    { desc: "Coffee Shop", account: "3", baseAmount: 25 },
-    { desc: "Uber", account: "2", baseAmount: 35 },
-    { desc: "Pharmacy", account: "1", baseAmount: 55 },
+    { desc: "Coffee Shop", account: "3", baseAmount: -25 },
+    { desc: "Uber", account: "2", baseAmount: -35 },
+    { desc: "Pharmacy", account: "1", baseAmount: -55 },
     {
       desc: "Electric Bill",
       account: "1",
-      baseAmount: 120,
+      baseAmount: -120,
     },
-    { desc: "Phone Bill", account: "2", baseAmount: 85 },
+    { desc: "Phone Bill", account: "2", baseAmount: -85 },
     {
       desc: "Supermarket",
       account: "2",
-      baseAmount: 95,
+      baseAmount: -95,
     },
     {
       desc: "Online Shopping",
       account: "1",
-      baseAmount: 75,
+      baseAmount: -75,
     },
     {
       desc: "Public Transport",
       account: "4",
-      baseAmount: 15,
+      baseAmount: -15,
     },
-    { desc: "Fast Food", account: "1", baseAmount: 18 },
+    { desc: "Fast Food", account: "1", baseAmount: -18 },
     {
       desc: "Internet Bill",
       account: "1",
-      baseAmount: 65,
+      baseAmount: -65,
+    },
+    {
+      desc: "Salary",
+      account: "1",
+      baseAmount: 3500,
+    },
+    {
+      desc: "Freelance Work",
+      account: "2",
+      baseAmount: 800,
+    },
+    {
+      desc: "Investment Return",
+      account: "5",
+      baseAmount: 150,
+    },
+    {
+      desc: "Cash Back",
+      account: "1",
+      baseAmount: 25,
     },
   ];
 
@@ -95,7 +115,11 @@ const generateTransactionsForMonth = (monthsAgo: number): Transaction[] => {
         Math.floor(Math.random() * transactionTemplates.length)
       ];
     const day = Math.floor(Math.random() * daysInMonth) + 1;
-    const amount = template.baseAmount + (Math.random() - 0.5) * 40; // ±20 variation
+    const baseAmount = template.baseAmount;
+    const variation = (Math.random() - 0.5) * 40; // ±20 variation
+    const amount = Math.round(
+      (baseAmount + (baseAmount > 0 ? variation : -variation)) * 100,
+    ); // Convert to cents
 
     const account = accounts.find((acc) => acc.id === template.account);
     const currency = account?.currency || "USD";
@@ -110,7 +134,7 @@ const generateTransactionsForMonth = (monthsAgo: number): Transaction[] => {
         JPY: 0.0067,
         USDT: 1.0,
       };
-      usdAmount = amount * (rates[currency] || 1);
+      usdAmount = Math.round(amount * (rates[currency] || 1));
     }
 
     transactions.push({
@@ -148,11 +172,13 @@ const generateRecentTransactions = (): Transaction[] => {
   ];
 
   const recentTemplates = [
-    { desc: "Coffee Shop", account: "1", amount: 4.5 },
-    { desc: "Uber Ride", account: "2", amount: 18.25 },
-    { desc: "Lunch Spot", account: "1", amount: 12.99 },
-    { desc: "Gas Station", account: "1", amount: 45.0 },
-    { desc: "Grocery Run", account: "1", amount: 67.43 },
+    { desc: "Coffee Shop", account: "1", amount: -450 },
+    { desc: "Uber Ride", account: "2", amount: -1825 },
+    { desc: "Lunch Spot", account: "1", amount: -1299 },
+    { desc: "Gas Station", account: "1", amount: -4500 },
+    { desc: "Grocery Run", account: "1", amount: -6743 },
+    { desc: "Part-time Work", account: "2", amount: 15000 },
+    { desc: "Refund", account: "1", amount: 2350 },
   ];
 
   const transactions: Transaction[] = [];
@@ -167,8 +193,10 @@ const generateRecentTransactions = (): Transaction[] => {
     const account = accounts.find((acc) => acc.id === template.account);
     const currency = account?.currency || "USD";
 
+    const amountInCents = template.amount;
+
     // Convert to USD if not already USD
-    let usdAmount = template.amount;
+    let usdAmount = amountInCents;
     if (currency !== "USD") {
       // Simple conversion rates for demo
       const rates: { [key: string]: number } = {
@@ -177,13 +205,13 @@ const generateRecentTransactions = (): Transaction[] => {
         JPY: 0.0067,
         USDT: 1.0,
       };
-      usdAmount = template.amount * (rates[currency] || 1);
+      usdAmount = Math.round(amountInCents * (rates[currency] || 1));
     }
 
     transactions.push({
       id: `today-${i}`,
       desc: template.desc,
-      amount: template.amount,
+      amount: amountInCents,
       currency: currency,
       usd: usdAmount,
       date: currentDate.toISOString().split("T")[0],
@@ -202,8 +230,10 @@ const generateRecentTransactions = (): Transaction[] => {
     const account = accounts.find((acc) => acc.id === template.account);
     const currency = account?.currency || "USD";
 
+    const amountInCents = template.amount;
+
     // Convert to USD if not already USD
-    let usdAmount = template.amount;
+    let usdAmount = amountInCents;
     if (currency !== "USD") {
       // Simple conversion rates for demo
       const rates: { [key: string]: number } = {
@@ -212,13 +242,13 @@ const generateRecentTransactions = (): Transaction[] => {
         JPY: 0.0067,
         USDT: 1.0,
       };
-      usdAmount = template.amount * (rates[currency] || 1);
+      usdAmount = Math.round(amountInCents * (rates[currency] || 1));
     }
 
     transactions.push({
       id: `yesterday-${i}`,
       desc: template.desc,
-      amount: template.amount,
+      amount: amountInCents,
       currency: currency,
       usd: usdAmount,
       date: yesterday.toISOString().split("T")[0],
@@ -255,6 +285,9 @@ const calculateMonthlyData = (): MonthlyData[] => {
   } = {};
 
   transactions.forEach((transaction) => {
+    // Only include expenses (negative amounts) in monthly totals
+    if (transaction.usd >= 0) return; // Skip income transactions
+
     const date = new Date(transaction.date);
     const year = date.getFullYear();
     const month = date.getMonth() + 1;
@@ -283,7 +316,8 @@ const calculateMonthlyData = (): MonthlyData[] => {
       };
     }
 
-    monthlyTotals[monthKey].amount += transaction.usd;
+    // Add absolute value of expense (convert negative to positive)
+    monthlyTotals[monthKey].amount += Math.abs(transaction.usd);
   });
 
   return Object.keys(monthlyTotals)
@@ -312,7 +346,7 @@ const calculateMonthlyData = (): MonthlyData[] => {
     .map((monthKey) => ({
       month: monthKey,
       shortMonth: monthlyTotals[monthKey].shortMonth,
-      amount: Math.round(monthlyTotals[monthKey].amount * 100) / 100,
+      amount: Math.round(monthlyTotals[monthKey].amount),
       year: monthlyTotals[monthKey].year,
     }));
 };
@@ -335,13 +369,16 @@ export const getMonthlyTransactions = (
     { desc: "Internet", account: "2" },
   ];
 
-  return baseTransactions.map((transaction, index) => ({
-    id: `${monthData.month}-${index}`,
-    ...transaction,
-    amount: Math.random() * 200 + 10,
-    currency: "USD",
-    usd: Math.random() * 200 + 10,
-    date: `${monthData.shortMonth} ${Math.floor(Math.random() * 28) + 1}`,
-    month: monthData.month,
-  }));
+  return baseTransactions.map((transaction, index) => {
+    const amount = Math.round((Math.random() * 200 + 10) * -1 * 100); // Negative expenses in cents
+    return {
+      id: `${monthData.month}-${index}`,
+      ...transaction,
+      amount: amount,
+      currency: "USD",
+      usd: amount,
+      date: `${monthData.shortMonth} ${Math.floor(Math.random() * 28) + 1}`,
+      month: monthData.month,
+    };
+  });
 };
