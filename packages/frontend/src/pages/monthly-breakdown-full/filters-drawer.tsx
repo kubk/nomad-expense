@@ -9,7 +9,7 @@ import {
   DrawerTitle,
 } from "@/components/ui/drawer";
 import { Button } from "@/components/ui/button";
-import { Checkbox } from "@/components/ui/checkbox";
+import { CheckIcon } from "lucide-react";
 import { MonthlyData, Account } from "../../shared/types";
 import { cn } from "@/lib/utils";
 
@@ -157,16 +157,15 @@ export function FiltersDrawer({
                       )
                     }
                     className={cn(
-                      "h-8 px-3 text-xs flex items-center gap-2",
+                      "h-8 px-3 text-xs flex items-center gap-2 transition-none",
                       selectedMonths === period.value
                         ? "bg-primary text-primary-foreground border-primary"
                         : "bg-background text-foreground border-border hover:bg-muted",
                     )}
                   >
-                    <Checkbox
-                      checked={selectedMonths === period.value}
-                      className="size-3"
-                    />
+                    {selectedMonths === period.value && (
+                      <CheckIcon className="size-3" />
+                    )}
                     {period.label}
                   </Button>
                 ))}
@@ -182,16 +181,15 @@ export function FiltersDrawer({
                       }
                     }}
                     className={cn(
-                      "h-8 px-3 text-xs flex items-center gap-2",
+                      "h-8 px-3 text-xs flex items-center gap-2 transition-none",
                       selectedYears.includes(year)
                         ? "bg-primary text-primary-foreground border-primary"
                         : "bg-background text-foreground border-border hover:bg-muted",
                     )}
                   >
-                    <Checkbox
-                      checked={selectedYears.includes(year)}
-                      className="size-3"
-                    />
+                    {selectedYears.includes(year) && (
+                      <CheckIcon className="size-3" />
+                    )}
                     {year}
                   </Button>
                 ))}
@@ -218,16 +216,15 @@ export function FiltersDrawer({
                     size="sm"
                     onClick={() => handleAccountToggle(account.id)}
                     className={cn(
-                      "h-8 px-3 text-xs flex items-center gap-2",
+                      "h-8 px-3 text-xs flex items-center gap-2 transition-none",
                       selectedAccounts.includes(account.id)
                         ? "bg-primary text-primary-foreground border-primary"
                         : "bg-background text-foreground border-border hover:bg-muted",
                     )}
                   >
-                    <Checkbox
-                      checked={selectedAccounts.includes(account.id)}
-                      className="size-3"
-                    />
+                    {selectedAccounts.includes(account.id) && (
+                      <CheckIcon className="size-3" />
+                    )}
                     {account.name}
                   </Button>
                 ))}

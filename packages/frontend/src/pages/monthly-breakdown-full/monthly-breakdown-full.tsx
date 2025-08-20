@@ -1,23 +1,20 @@
 import { useState } from "react";
-import { ArrowLeftIcon } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { MonthlyData, DateRange, Route } from "../../shared/types";
+import { MonthlyData, DateRange } from "../../shared/types";
 import { useCurrency } from "../../shared/currency-context";
 import { currencyService } from "../../shared/currency-service";
 import { MonthlyBreakdownItem } from "./monthly-breakdown-item";
 import { YearSummaryCard } from "./year-summary-card";
 import { FiltersDrawer } from "./filters-drawer";
+import { BackButton } from "../../shared/back-button";
 import { accounts, transactions } from "../../shared/data";
 
 export function MonthlyBreakdownFull({
   monthlyData,
-  setCurrentScreen,
   setDateRange,
   setSelectedAccount,
 }: {
   monthlyData: MonthlyData[];
-  setCurrentScreen: (screen: Route) => void;
   setDateRange: (range: DateRange) => void;
   setSelectedAccount: (account: string) => void;
 }) {
@@ -193,13 +190,7 @@ export function MonthlyBreakdownFull({
       {/* Header */}
       <div className="bg-white border-b sticky top-0 z-10">
         <div className="flex items-center justify-between p-4">
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => setCurrentScreen("overview")}
-          >
-            <ArrowLeftIcon className="w-4 h-4 mr-1" />
-          </Button>
+          <BackButton />
           <h1 className="font-semibold text-gray-900">Monthly breakdown</h1>
           <div className="w-[60px]" />
         </div>
@@ -224,7 +215,6 @@ export function MonthlyBreakdownFull({
                 maxAmount={maxAmount}
                 setDateRange={setDateRange}
                 setSelectedAccount={setSelectedAccount}
-                setCurrentScreen={setCurrentScreen}
               />
             ))}
           </CardContent>

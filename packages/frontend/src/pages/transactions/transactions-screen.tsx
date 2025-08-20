@@ -1,11 +1,12 @@
 import { FilterIcon } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Account, Transaction, DateRange, Route } from "../../shared/types";
+import { Account, Transaction, DateRange } from "../../shared/types";
 import { TransactionItem } from "../shared/transaction-item";
 import { useCurrency } from "../../shared/currency-context";
 import { currencyService } from "../../shared/currency-service";
 import { TransactionFilters } from "./transaction-filters";
+import { BackButton } from "../../shared/back-button";
 
 export function TransactionsScreen({
   accounts,
@@ -14,7 +15,6 @@ export function TransactionsScreen({
   selectedAccount,
   dateRange,
   showFilters,
-  setCurrentScreen,
   setSelectedAccount,
   setDateRange,
   setShowFilters,
@@ -25,7 +25,6 @@ export function TransactionsScreen({
   selectedAccount: string;
   dateRange: DateRange;
   showFilters: boolean;
-  setCurrentScreen: (screen: Route) => void;
   setSelectedAccount: (account: string) => void;
   setDateRange: (range: DateRange) => void;
   setShowFilters: (show: boolean) => void;
@@ -37,13 +36,7 @@ export function TransactionsScreen({
       {/* Header */}
       <div className="bg-white border-b sticky top-0 z-10">
         <div className="flex items-center justify-between p-4">
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => setCurrentScreen("overview")}
-          >
-            ←
-          </Button>
+          <BackButton />
           <h1 className="font-semibold text-gray-900">Transactions</h1>
           <Button
             variant="ghost"

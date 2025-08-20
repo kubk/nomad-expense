@@ -4,55 +4,35 @@ import {
   CreditCardIcon,
   SettingsIcon,
 } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Route } from "@/shared/types";
+import { Link } from "wouter";
+import { cn } from "@/lib/utils";
 
-export function Navigation({
-  currentScreen,
-  setCurrentScreen,
-}: {
-  currentScreen: Route;
-  setCurrentScreen: (screen: Route) => void;
-}) {
+export function Navigation({ currentScreen }: { currentScreen: string }) {
+  const navItems = [
+    { route: "/overview", icon: ChartNoAxesColumnIcon, label: "Overview" },
+    { route: "/transactions", icon: CreditCardIcon, label: "Transactions" },
+    { route: "/accounts", icon: CalendarIcon, label: "Accounts" },
+    { route: "/settings", icon: SettingsIcon, label: "Settings" },
+  ];
+
   return (
     <div className="fixed bottom-0 left-0 right-0 bg-white border-t">
       <div className="flex justify-around items-center py-3">
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={() => setCurrentScreen("overview")}
-          className={`flex flex-col items-center gap-1 ${currentScreen === "overview" ? "text-indigo-600" : "text-gray-500"}`}
-        >
-          <ChartNoAxesColumnIcon className="w-5 h-5" />
-          <span className="text-xs">Overview</span>
-        </Button>
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={() => setCurrentScreen("transactions")}
-          className={`flex flex-col items-center gap-1 ${currentScreen === "transactions" ? "text-indigo-600" : "text-gray-500"}`}
-        >
-          <CreditCardIcon className="w-5 h-5" />
-          <span className="text-xs">Transactions</span>
-        </Button>
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={() => setCurrentScreen("accounts")}
-          className={`flex flex-col items-center gap-1 ${currentScreen === "accounts" ? "text-indigo-600" : "text-gray-500"}`}
-        >
-          <CalendarIcon className="w-5 h-5" />
-          <span className="text-xs">Accounts</span>
-        </Button>
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={() => setCurrentScreen("settings")}
-          className={`flex flex-col items-center gap-1 ${currentScreen === "settings" ? "text-indigo-600" : "text-gray-500"}`}
-        >
-          <SettingsIcon className="w-5 h-5" />
-          <span className="text-xs">Settings</span>
-        </Button>
+        {navItems.map(({ route, icon: Icon, label }) => (
+          <Link
+            key={route}
+            href={route}
+            className={cn(
+              "flex flex-col items-center gap-1 px-3 py-2 rounded-lg transition-colors",
+              currentScreen === route.slice(1)
+                ? "text-indigo-600"
+                : "text-gray-500 hover:text-gray-700",
+            )}
+          >
+            <Icon className="w-5 h-5" />
+            <span className="text-xs">{label}</span>
+          </Link>
+        ))}
       </div>
     </div>
   );

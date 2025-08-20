@@ -1,17 +1,15 @@
 import { ChevronRightIcon } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { MonthlyData, Route } from "../../shared/types";
+import { Link } from "wouter";
+import { MonthlyData } from "../../shared/types";
 import { MonthlyChart } from "./monthly-chart";
 
 export function MonthlyBreakdownOverview({
   monthlyData,
-  setCurrentScreen,
   setDateRange,
   setSelectedAccount,
 }: {
   monthlyData: MonthlyData[];
-  setCurrentScreen: (screen: Route) => void;
   setDateRange: (range: any) => void;
   setSelectedAccount: (account: string) => void;
 }) {
@@ -21,21 +19,18 @@ export function MonthlyBreakdownOverview({
         <CardHeader className="pb-3">
           <div className="flex justify-between items-center">
             <CardTitle className="text-base">Monthly breakdown</CardTitle>
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => setCurrentScreen("monthly-breakdown-full")}
-              className="text-indigo-600 -mr-3 active:scale-95 transition-transform duration-150"
+            <Link
+              href="/monthly-breakdown-full"
+              className="text-indigo-600 -mr-3 active:scale-95 transition-transform duration-150 inline-flex items-center text-sm font-medium hover:underline"
             >
               View all
               <ChevronRightIcon className="w-3 h-3 ml-1" />
-            </Button>
+            </Link>
           </div>
         </CardHeader>
         <CardContent className="pr-4 pt-1">
           <MonthlyChart
             monthlyData={monthlyData}
-            setCurrentScreen={setCurrentScreen}
             setDateRange={setDateRange}
             setSelectedAccount={setSelectedAccount}
           />
