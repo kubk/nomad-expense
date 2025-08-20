@@ -1,4 +1,4 @@
-import { ChevronRight } from "lucide-react";
+import { ChevronRightIcon } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { MonthlyData, Transaction, DateRange, Account } from "./types";
@@ -7,23 +7,21 @@ import { useCurrency } from "./currency-context";
 import { currencyService } from "./currency-service";
 import { MonthlyChart } from "./monthly-chart";
 
-interface OverviewScreenProps {
-  monthlyData: MonthlyData[];
-  transactions: Transaction[];
-  accounts: Account[];
-  setCurrentScreen: (screen: string) => void;
-  setDateRange: (range: DateRange) => void;
-  setSelectedAccount: (account: string) => void;
-}
-
-export const OverviewScreen = ({
+export function OverviewScreen({
   monthlyData,
   transactions,
   accounts,
   setCurrentScreen,
   setDateRange,
   setSelectedAccount,
-}: OverviewScreenProps) => {
+}: {
+  monthlyData: MonthlyData[];
+  transactions: Transaction[];
+  accounts: Account[];
+  setCurrentScreen: (screen: string) => void;
+  setDateRange: (range: DateRange) => void;
+  setSelectedAccount: (account: string) => void;
+}) {
   const { baseCurrency, formatAmount } = useCurrency();
 
   // Convert monthly data amounts to base currency
@@ -72,7 +70,7 @@ export const OverviewScreen = ({
                 className="text-indigo-600 -mr-3"
               >
                 View all
-                <ChevronRight className="w-3 h-3 ml-1" />
+                <ChevronRightIcon className="w-3 h-3 ml-1" />
               </Button>
             </div>
           </CardHeader>
@@ -98,7 +96,7 @@ export const OverviewScreen = ({
             className="text-indigo-600"
           >
             See all
-            <ChevronRight className="w-4 h-4 ml-1" />
+            <ChevronRightIcon className="w-4 h-4 ml-1" />
           </Button>
         </div>
 
@@ -120,4 +118,4 @@ export const OverviewScreen = ({
       </div>
     </div>
   );
-};
+}
