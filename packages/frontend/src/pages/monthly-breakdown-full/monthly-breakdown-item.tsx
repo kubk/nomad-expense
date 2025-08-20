@@ -48,7 +48,7 @@ export function MonthlyBreakdownItem({
   return (
     <div key={month.month}>
       <div
-        className="cursor-pointer hover:bg-gray-50 transition-colors p-4"
+        className="cursor-pointer hover:bg-muted/50 transition-colors p-4"
         onClick={() => {
           setDateRange({ from: startDate, to: endDate });
           setSelectedAccount("all");
@@ -57,10 +57,10 @@ export function MonthlyBreakdownItem({
       >
         <div className="space-y-3">
           <div className="flex items-center justify-between">
-            <div className="font-medium text-gray-900">
+            <div className="font-medium text-foreground">
               {month.shortMonth} {month.year}
             </div>
-            <div className="font-semibold text-gray-900">
+            <div className="font-semibold text-foreground">
               {currencyService.formatAmount(
                 month.convertedAmount,
                 baseCurrency,
@@ -69,7 +69,7 @@ export function MonthlyBreakdownItem({
           </div>
 
           {/* Horizontal chart bar */}
-          <div className="relative h-2 bg-gray-100 rounded-full overflow-hidden">
+          <div className="relative h-2 bg-muted/10 rounded-full overflow-hidden">
             <div
               className="h-full bg-primary rounded-full transition-all duration-500"
               style={{
@@ -79,7 +79,7 @@ export function MonthlyBreakdownItem({
           </div>
         </div>
       </div>
-      {index < totalItems - 1 && <div className="border-b border-gray-200" />}
+      {index < totalItems - 1 && <div className="border-b border-border" />}
     </div>
   );
 }

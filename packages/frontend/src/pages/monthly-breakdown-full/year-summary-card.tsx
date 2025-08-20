@@ -55,7 +55,7 @@ export function YearSummaryCard({
   return (
     <div className="px-4 mt-4">
       <Card
-        className="bg-primary text-primary-foreground pb-3 pt-1.5 border-0 cursor-pointer hover:bg-primary/90 transition-colors"
+        className="bg-primary text-primary-foreground pb-3.5 pt-2 border-0 cursor-pointer hover:bg-primary/90 transition-colors"
         onClick={onFiltersClick}
       >
         <CardContent className="px-4 relative">
@@ -68,7 +68,7 @@ export function YearSummaryCard({
                 {getFilterDescription()}
               </p>
             </div>
-            <FilterIcon className="w-5 h-5 mt-2" />
+            <FilterIcon className="w-5 h-5 mt-2.5" />
           </div>
         </CardContent>
       </Card>

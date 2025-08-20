@@ -11,7 +11,6 @@ import {
 import { Button } from "@/components/ui/button";
 import { CheckIcon } from "lucide-react";
 import { MonthlyData, Account } from "../../shared/types";
-import { cn } from "@/lib/utils";
 
 export function FiltersDrawer({
   open,
@@ -149,19 +148,16 @@ export function FiltersDrawer({
                 {timePeriods.map((period) => (
                   <Button
                     key={period.value}
-                    variant="outline"
+                    variant={
+                      selectedMonths === period.value ? "default" : "outline"
+                    }
                     size="sm"
                     onClick={() =>
                       handleMonthsChange(
                         selectedMonths === period.value ? 0 : period.value,
                       )
                     }
-                    className={cn(
-                      "h-8 px-3 text-xs flex items-center gap-2 transition-none",
-                      selectedMonths === period.value
-                        ? "bg-primary text-primary-foreground border-primary"
-                        : "bg-background text-foreground border-border hover:bg-muted",
-                    )}
+                    className="h-8 px-3 text-xs flex items-center gap-2"
                   >
                     {selectedMonths === period.value && (
                       <CheckIcon className="size-3" />
@@ -172,7 +168,9 @@ export function FiltersDrawer({
                 {availableYears.map((year) => (
                   <Button
                     key={year}
-                    variant="outline"
+                    variant={
+                      selectedYears.includes(year) ? "default" : "outline"
+                    }
                     size="sm"
                     onClick={() => {
                       handleYearToggle(year);
@@ -180,12 +178,7 @@ export function FiltersDrawer({
                         setSelectedMonths(0);
                       }
                     }}
-                    className={cn(
-                      "h-8 px-3 text-xs flex items-center gap-2 transition-none",
-                      selectedYears.includes(year)
-                        ? "bg-primary text-primary-foreground border-primary"
-                        : "bg-background text-foreground border-border hover:bg-muted",
-                    )}
+                    className="h-8 px-3 text-xs flex items-center gap-2"
                   >
                     {selectedYears.includes(year) && (
                       <CheckIcon className="size-3" />
@@ -212,15 +205,14 @@ export function FiltersDrawer({
                 {accounts.map((account) => (
                   <Button
                     key={account.id}
-                    variant="outline"
+                    variant={
+                      selectedAccounts.includes(account.id)
+                        ? "default"
+                        : "outline"
+                    }
                     size="sm"
                     onClick={() => handleAccountToggle(account.id)}
-                    className={cn(
-                      "h-8 px-3 text-xs flex items-center gap-2 transition-none",
-                      selectedAccounts.includes(account.id)
-                        ? "bg-primary text-primary-foreground border-primary"
-                        : "bg-background text-foreground border-border hover:bg-muted",
-                    )}
+                    className="h-8 px-3 text-xs flex items-center gap-2"
                   >
                     {selectedAccounts.includes(account.id) && (
                       <CheckIcon className="size-3" />
