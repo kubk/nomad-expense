@@ -1,7 +1,7 @@
 import { ChevronRightIcon } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { MonthlyData } from "./types";
+import { MonthlyData } from "../../shared/types";
 import { MonthlyChart } from "./monthly-chart";
 
 export function MonthlyBreakdownOverview({

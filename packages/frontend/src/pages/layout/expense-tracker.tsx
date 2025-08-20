@@ -1,15 +1,14 @@
 import { useState } from "react";
-import { accounts, monthlyData, transactions } from "./expense-tracker/data";
-import { filterTransactions, calculateTotal } from "./expense-tracker/utils";
-import { OverviewScreen } from "./expense-tracker/overview-screen";
-import { TransactionsScreen } from "./expense-tracker/transactions-screen";
-import { YearlyBreakdownScreen } from "./expense-tracker/yearly-breakdown-screen";
-import { AccountsScreen } from "./expense-tracker/accounts-screen";
-import { SettingsScreen } from "./expense-tracker/settings-screen";
-import { Navigation } from "./expense-tracker/navigation";
-import { CurrencyProvider } from "./expense-tracker/currency-context";
+import { accounts, monthlyData, transactions } from "../../shared/data";
+import { TransactionsScreen } from "../transactions/transactions-screen";
+import { YearlyBreakdownScreen } from "../overview/yearly-breakdown-screen";
+import { AccountsScreen } from "../accounts/accounts-screen";
+import { Navigation } from "./navigation";
+import { OverviewScreen } from "../overview/overview-screen";
+import { SettingsScreen } from "../settings/settings-screen";
+import { calculateTotal, filterTransactions } from "@/shared/utils";
 
-const ExpenseTrackerContent = () => {
+export function ExpenseTracker() {
   const [currentScreen, setCurrentScreen] = useState("overview");
   const [selectedAccount, setSelectedAccount] = useState("all");
   const [dateRange, setDateRange] = useState({ from: "", to: "" });
@@ -82,13 +81,5 @@ const ExpenseTrackerContent = () => {
         />
       )}
     </div>
-  );
-};
-
-export function ExpenseTracker() {
-  return (
-    <CurrencyProvider>
-      <ExpenseTrackerContent />
-    </CurrencyProvider>
   );
 }

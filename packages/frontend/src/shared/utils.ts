@@ -1,5 +1,5 @@
-import { Transaction, DateRange } from "./types";
 import { currencyService, SupportedCurrency } from "./currency-service";
+import { DateRange, Transaction } from "./types";
 
 export const filterTransactions = (
   transactions: Transaction[],
