@@ -1,20 +1,20 @@
 import { ArrowLeftIcon } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { MonthlyData, DateRange } from "../../shared/types";
+import { MonthlyData, DateRange, Route } from "../../shared/types";
 import { useCurrency } from "../../shared/currency-context";
 import { currencyService } from "../../shared/currency-service";
 import { MonthlyBreakdownItem } from "./monthly-breakdown-item";
 import { YearSummaryCard } from "./year-summary-card";
 
-export function YearlyBreakdownScreen({
+export function MonthlyBreakdownFull({
   monthlyData,
   setCurrentScreen,
   setDateRange,
   setSelectedAccount,
 }: {
   monthlyData: MonthlyData[];
-  setCurrentScreen: (screen: string) => void;
+  setCurrentScreen: (screen: Route) => void;
   setDateRange: (range: DateRange) => void;
   setSelectedAccount: (account: string) => void;
 }) {

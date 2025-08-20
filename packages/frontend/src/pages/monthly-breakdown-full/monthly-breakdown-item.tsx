@@ -1,4 +1,4 @@
-import { MonthlyData, DateRange } from "../../shared/types";
+import { MonthlyData, DateRange, Route } from "../../shared/types";
 import { useCurrency } from "../../shared/currency-context";
 import { currencyService } from "../../shared/currency-service";
 
@@ -15,7 +15,7 @@ export function MonthlyBreakdownItem({
   totalItems: number;
   setDateRange: (range: DateRange) => void;
   setSelectedAccount: (account: string) => void;
-  setCurrentScreen: (screen: string) => void;
+  setCurrentScreen: (screen: Route) => void;
 }) {
   const { baseCurrency } = useCurrency();
 

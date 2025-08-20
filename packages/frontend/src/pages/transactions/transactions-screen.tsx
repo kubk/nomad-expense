@@ -1,7 +1,7 @@
 import { FilterIcon } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Account, Transaction, DateRange } from "../../shared/types";
+import { Account, Transaction, DateRange, Route } from "../../shared/types";
 import { TransactionItem } from "../shared/transaction-item";
 import { useCurrency } from "../../shared/currency-context";
 import { currencyService } from "../../shared/currency-service";
@@ -25,7 +25,7 @@ export function TransactionsScreen({
   selectedAccount: string;
   dateRange: DateRange;
   showFilters: boolean;
-  setCurrentScreen: (screen: string) => void;
+  setCurrentScreen: (screen: Route) => void;
   setSelectedAccount: (account: string) => void;
   setDateRange: (range: DateRange) => void;
   setShowFilters: (show: boolean) => void;
