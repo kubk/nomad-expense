@@ -54,6 +54,10 @@ export function MonthlyBreakdownFull({
       return bMonthIndex - aMonthIndex;
     });
 
+  const maxAmount = Math.max(
+    ...convertedMonthlyData.map((m) => m.convertedAmount),
+  );
+
   return (
     <div className="min-h-screen bg-gray-50 pb-20">
       {/* Header */}
@@ -81,6 +85,7 @@ export function MonthlyBreakdownFull({
                 month={month}
                 index={index}
                 totalItems={convertedMonthlyData.length}
+                maxAmount={maxAmount}
                 setDateRange={setDateRange}
                 setSelectedAccount={setSelectedAccount}
                 setCurrentScreen={setCurrentScreen}
