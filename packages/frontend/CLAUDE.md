@@ -2,25 +2,12 @@
 
 This is a React-based expense tracking application built with TypeScript, Tailwind CSS, and shadcn/ui components.
 
-## Project Structure
-
-### Components Architecture
-
-The main `ExpenseTracker` component has been split into smaller, focused components for better maintainability:
-
-### Data Flow
-
-- **State Management**: React useState hooks in main component
-- **Data Filtering**: Utility functions handle transaction filtering by account and date
-- **Props Passing**: Clean prop interfaces between components
-
 ### Development Commands
 
 ```bash
 npm run start      # Start dev server
 npm run build      # Build for production
 npm run typecheck  # TypeScript type checking
-npm run lint       # ESLint code checking
 ```
 
 ### Tech Stack
@@ -38,7 +25,6 @@ npm run lint       # ESLint code checking
 - Utility functions are separated for reusability
 - Types are centralized for consistency
 - Data is mocked but structured for easy API integration
-- All components are properly typed with TypeScript interfaces
 
 ## Transaction System
 
@@ -84,3 +70,21 @@ export function Component({
 - **Icons**: Lucide React (use for all icons), import them ending with "Icon", so "XIcon" is good, "X" is bad
 - Don't add any screen reader code
 - It's Vite SPA, never use 'use client'
+
+## 📁 Frontend Folder Structure
+
+### Core Folders (Shadcn UI)
+- `components/` - Shadcn UI components only. Keep shadcn separate from our custom code
+- `lib/` - Shadcn utilities (e.g., `utils.ts` with `cn` function)
+- `hooks/` - Shadcn hooks only
+
+### Application Structure
+- `pages/` - All application pages organized by feature:
+  - `accounts/` - Accounts page and related components
+  - `transactions/` - Transactions page and related components
+  - `overview/` - Overview page and related components
+  - `settings/` - Settings page and related components
+
+### Shared Resources
+- `shared/` - Reusable functions and logic (NOT UI components)
+  - API utilities, providers, routing helpers, etc.
