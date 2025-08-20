@@ -38,56 +38,48 @@ const generateTransactionsForMonth = (monthsAgo: number): Transaction[] => {
   const transactionTemplates = [
     {
       desc: "Grocery Store",
-      category: "Groceries",
       account: "1",
       baseAmount: 120,
     },
     {
       desc: "Gas Station",
-      category: "Transport",
       account: "1",
       baseAmount: 65,
     },
-    { desc: "Restaurant", category: "Dining", account: "2", baseAmount: 85 },
-    { desc: "Amazon", category: "Shopping", account: "1", baseAmount: 45 },
+    { desc: "Restaurant", account: "2", baseAmount: 85 },
+    { desc: "Amazon", account: "1", baseAmount: 45 },
     {
       desc: "Netflix",
-      category: "Entertainment",
       account: "1",
       baseAmount: 16,
     },
-    { desc: "Coffee Shop", category: "Dining", account: "3", baseAmount: 25 },
-    { desc: "Uber", category: "Transport", account: "2", baseAmount: 35 },
-    { desc: "Pharmacy", category: "Health", account: "1", baseAmount: 55 },
+    { desc: "Coffee Shop", account: "3", baseAmount: 25 },
+    { desc: "Uber", account: "2", baseAmount: 35 },
+    { desc: "Pharmacy", account: "1", baseAmount: 55 },
     {
       desc: "Electric Bill",
-      category: "Utilities",
       account: "1",
       baseAmount: 120,
     },
-    { desc: "Phone Bill", category: "Utilities", account: "2", baseAmount: 85 },
+    { desc: "Phone Bill", account: "2", baseAmount: 85 },
     {
       desc: "Supermarket",
-      category: "Groceries",
       account: "2",
       baseAmount: 95,
     },
     {
       desc: "Online Shopping",
-      category: "Shopping",
       account: "1",
       baseAmount: 75,
     },
     {
       desc: "Public Transport",
-      category: "Transport",
       account: "4",
       baseAmount: 15,
     },
-    { desc: "Fast Food", category: "Dining", account: "1", baseAmount: 18 },
+    { desc: "Fast Food", account: "1", baseAmount: 18 },
     {
       desc: "Internet Bill",
-      category: "Utilities",
       account: "1",
       baseAmount: 65,
     },
@@ -105,15 +97,30 @@ const generateTransactionsForMonth = (monthsAgo: number): Transaction[] => {
     const day = Math.floor(Math.random() * daysInMonth) + 1;
     const amount = template.baseAmount + (Math.random() - 0.5) * 40; // ±20 variation
 
+    const account = accounts.find((acc) => acc.id === template.account);
+    const currency = account?.currency || "USD";
+
+    // Convert to USD if not already USD
+    let usdAmount = amount;
+    if (currency !== "USD") {
+      // Simple conversion rates for demo
+      const rates: { [key: string]: number } = {
+        GBP: 1.27,
+        EUR: 1.08,
+        JPY: 0.0067,
+        USDT: 1.0,
+      };
+      usdAmount = amount * (rates[currency] || 1);
+    }
+
     transactions.push({
       id: `${year}-${month.toString().padStart(2, "0")}-${i}`,
       desc: template.desc,
       amount: amount,
-      currency: "USD",
-      usd: amount,
+      currency: currency,
+      usd: usdAmount,
       date: `${year}-${month.toString().padStart(2, "0")}-${day.toString().padStart(2, "0")}`,
       account: template.account,
-      category: template.category,
       month: `${monthName} ${year}`,
     });
   }
@@ -141,11 +148,11 @@ const generateRecentTransactions = (): Transaction[] => {
   ];
 
   const recentTemplates = [
-    { desc: "Coffee Shop", category: "Dining", account: "1", amount: 4.5 },
-    { desc: "Uber Ride", category: "Transport", account: "2", amount: 18.25 },
-    { desc: "Lunch Spot", category: "Dining", account: "1", amount: 12.99 },
-    { desc: "Gas Station", category: "Transport", account: "1", amount: 45.0 },
-    { desc: "Grocery Run", category: "Groceries", account: "1", amount: 67.43 },
+    { desc: "Coffee Shop", account: "1", amount: 4.5 },
+    { desc: "Uber Ride", account: "2", amount: 18.25 },
+    { desc: "Lunch Spot", account: "1", amount: 12.99 },
+    { desc: "Gas Station", account: "1", amount: 45.0 },
+    { desc: "Grocery Run", account: "1", amount: 67.43 },
   ];
 
   const transactions: Transaction[] = [];
@@ -157,15 +164,30 @@ const generateRecentTransactions = (): Transaction[] => {
       recentTemplates[Math.floor(Math.random() * recentTemplates.length)];
     const currentMonth = `${monthNames[currentDate.getMonth()]} ${currentDate.getFullYear()}`;
 
+    const account = accounts.find((acc) => acc.id === template.account);
+    const currency = account?.currency || "USD";
+
+    // Convert to USD if not already USD
+    let usdAmount = template.amount;
+    if (currency !== "USD") {
+      // Simple conversion rates for demo
+      const rates: { [key: string]: number } = {
+        GBP: 1.27,
+        EUR: 1.08,
+        JPY: 0.0067,
+        USDT: 1.0,
+      };
+      usdAmount = template.amount * (rates[currency] || 1);
+    }
+
     transactions.push({
       id: `today-${i}`,
       desc: template.desc,
       amount: template.amount,
-      currency: "USD",
-      usd: template.amount,
+      currency: currency,
+      usd: usdAmount,
       date: currentDate.toISOString().split("T")[0],
       account: template.account,
-      category: template.category,
       month: currentMonth,
     });
   }
@@ -177,15 +199,30 @@ const generateRecentTransactions = (): Transaction[] => {
       recentTemplates[Math.floor(Math.random() * recentTemplates.length)];
     const yesterdayMonth = `${monthNames[yesterday.getMonth()]} ${yesterday.getFullYear()}`;
 
+    const account = accounts.find((acc) => acc.id === template.account);
+    const currency = account?.currency || "USD";
+
+    // Convert to USD if not already USD
+    let usdAmount = template.amount;
+    if (currency !== "USD") {
+      // Simple conversion rates for demo
+      const rates: { [key: string]: number } = {
+        GBP: 1.27,
+        EUR: 1.08,
+        JPY: 0.0067,
+        USDT: 1.0,
+      };
+      usdAmount = template.amount * (rates[currency] || 1);
+    }
+
     transactions.push({
       id: `yesterday-${i}`,
       desc: template.desc,
       amount: template.amount,
-      currency: "USD",
-      usd: template.amount,
+      currency: currency,
+      usd: usdAmount,
       date: yesterday.toISOString().split("T")[0],
       account: template.account,
-      category: template.category,
       month: yesterdayMonth,
     });
   }
@@ -286,16 +323,16 @@ export const getMonthlyTransactions = (
   monthData: MonthlyData,
 ): Transaction[] => {
   const baseTransactions = [
-    { desc: "Grocery Store", category: "Groceries", account: "1" },
-    { desc: "Gas Station", category: "Transport", account: "1" },
-    { desc: "Restaurant", category: "Dining", account: "2" },
-    { desc: "Amazon", category: "Shopping", account: "1" },
-    { desc: "Netflix", category: "Entertainment", account: "1" },
-    { desc: "Uber", category: "Transport", account: "2" },
-    { desc: "Coffee Shop", category: "Dining", account: "3" },
-    { desc: "Pharmacy", category: "Health", account: "1" },
-    { desc: "Electric Bill", category: "Utilities", account: "1" },
-    { desc: "Internet", category: "Utilities", account: "2" },
+    { desc: "Grocery Store", account: "1" },
+    { desc: "Gas Station", account: "1" },
+    { desc: "Restaurant", account: "2" },
+    { desc: "Amazon", account: "1" },
+    { desc: "Netflix", account: "1" },
+    { desc: "Uber", account: "2" },
+    { desc: "Coffee Shop", account: "3" },
+    { desc: "Pharmacy", account: "1" },
+    { desc: "Electric Bill", account: "1" },
+    { desc: "Internet", account: "2" },
   ];
 
   return baseTransactions.map((transaction, index) => ({
