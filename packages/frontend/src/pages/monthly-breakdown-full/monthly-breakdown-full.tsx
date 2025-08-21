@@ -1,8 +1,8 @@
 import { useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { MonthlyData, DateRange } from "../../shared/types";
-import { useCurrency } from "../../shared/currency-context";
-import { currencyService } from "../../shared/currency-service";
+import { currencyStore } from "../../store/currency-store";
+import { convert } from "../../shared/currency-converter";
 import { MonthlyBreakdownItem } from "./monthly-breakdown-item";
 import { YearSummaryCard } from "./year-summary-card";
 import { FiltersDrawer } from "./filters-drawer";
@@ -18,7 +18,6 @@ export function MonthlyBreakdownFull({
   setDateRange: (range: DateRange) => void;
   setSelectedAccount: (account: string) => void;
 }) {
-  const { baseCurrency } = useCurrency();
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [appliedFilters, setAppliedFilters] = useState<{
     years: number[];
@@ -34,11 +33,7 @@ export function MonthlyBreakdownFull({
   const convertedMonthlyData = monthlyData
     .map((month) => ({
       ...month,
-      convertedAmount: currencyService.convert(
-        month.amount,
-        "USD",
-        baseCurrency,
-      ),
+      convertedAmount: convert(month.amount, "USD", currencyStore.baseCurrency),
     }))
     .sort((a, b) => {
       // Sort by year first (descending), then by month (descending)
@@ -147,10 +142,10 @@ export function MonthlyBreakdownFull({
         shortMonth: monthlyTotals[monthKey].shortMonth,
         amount: Math.round(monthlyTotals[monthKey].amount),
         year: monthlyTotals[monthKey].year,
-        convertedAmount: currencyService.convert(
+        convertedAmount: convert(
           Math.round(monthlyTotals[monthKey].amount),
           "USD",
-          baseCurrency,
+          currencyStore.baseCurrency,
         ),
       }))
       .sort((a, b) => {

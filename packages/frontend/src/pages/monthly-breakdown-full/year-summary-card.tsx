@@ -1,7 +1,7 @@
 import { FilterIcon, CalendarIcon, Building2Icon } from "lucide-react";
 import { MonthlyData } from "../../shared/types";
-import { useCurrency } from "../../shared/currency-context";
-import { currencyService } from "../../shared/currency-service";
+import { currencyStore } from "../../store/currency-store";
+import { formatAmount } from "../../shared/currency-converter";
 
 export function YearSummaryCard({
   convertedMonthlyData,
@@ -12,8 +12,6 @@ export function YearSummaryCard({
   onFiltersClick: () => void;
   appliedFilters: { years: number[]; accounts: string[]; months: number };
 }) {
-  const { baseCurrency } = useCurrency();
-
   const totalAmount = convertedMonthlyData.reduce(
     (sum, m) => sum + m.convertedAmount,
     0,
@@ -65,7 +63,7 @@ export function YearSummaryCard({
                 </span>
               </div>
               <div className="text-2xl font-bold text-foreground">
-                {currencyService.formatAmount(totalAmount, baseCurrency, {
+                {formatAmount(totalAmount, currencyStore.baseCurrency, {
                   showFractions: false,
                 })}
               </div>
@@ -80,7 +78,7 @@ export function YearSummaryCard({
               </div>
               <div className="text-2xl font-bold text-green-600">
                 +
-                {currencyService.formatAmount(hardcodedIncome, baseCurrency, {
+                {formatAmount(hardcodedIncome, currencyStore.baseCurrency, {
                   showFractions: false,
                 })}
               </div>

@@ -1,8 +1,8 @@
 import { useEffect, useRef } from "react";
 import { useLocation } from "wouter";
 import { MonthlyData, DateRange } from "../../shared/types";
-import { useCurrency } from "../../shared/currency-context";
-import { currencyService } from "../../shared/currency-service";
+import { currencyStore } from "../../store/currency-store";
+import { convert, formatAmount } from "../../shared/currency-converter";
 
 export function MonthlyChart({
   monthlyData,
@@ -13,14 +13,13 @@ export function MonthlyChart({
   setDateRange: (range: DateRange) => void;
   setSelectedAccount: (account: string) => void;
 }) {
-  const { baseCurrency } = useCurrency();
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const [, setLocation] = useLocation();
 
   // Convert monthly data amounts to base currency
   const convertedMonthlyData = monthlyData.map((month) => ({
     ...month,
-    convertedAmount: currencyService.convert(month.amount, "USD", baseCurrency),
+    convertedAmount: convert(month.amount, "USD", currencyStore.baseCurrency),
   }));
 
   // Sort months chronologically with current month on the right
@@ -98,9 +97,9 @@ export function MonthlyChart({
               onClick={() => handleMonthClick(month)}
             >
               <div className="mb-4 text-xs font-semibold text-foreground text-center">
-                {currencyService.formatAmount(
+                {formatAmount(
                   month.convertedAmount,
-                  baseCurrency,
+                  currencyStore.baseCurrency,
                   { showFractions: false },
                 )}
               </div>

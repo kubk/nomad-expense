@@ -1,4 +1,5 @@
-import { currencyService, SupportedCurrency } from "./currency-service";
+import { convert, SupportedCurrency } from "./currency-converter";
+import { currencyStore } from "../store/currency-store";
 import { DateRange, Transaction } from "./types";
 
 export const filterTransactions = (
@@ -36,14 +37,14 @@ export const calculateTotal = (
   transactions: Transaction[],
   baseCurrency?: SupportedCurrency,
 ): number => {
-  const targetCurrency = baseCurrency || currencyService.getBaseCurrency();
+  const targetCurrency = baseCurrency || currencyStore.baseCurrency;
 
   return transactions.reduce((sum, t) => {
     // Only include expenses (negative amounts) in the total
     if (t.usd >= 0) return sum; // Skip income transactions
 
     // Convert from USD (stored in t.usd as cents) to the target currency
-    const convertedAmountInCents = currencyService.convert(
+    const convertedAmountInCents = convert(
       Math.abs(t.usd),
       "USD",
       targetCurrency,

@@ -1,7 +1,7 @@
 import { useLocation } from "wouter";
 import { MonthlyData, DateRange } from "../../shared/types";
-import { useCurrency } from "../../shared/currency-context";
-import { currencyService } from "../../shared/currency-service";
+import { currencyStore } from "../../store/currency-store";
+import { formatAmount } from "../../shared/currency-converter";
 
 export function MonthlyBreakdownItem({
   month,
@@ -18,7 +18,6 @@ export function MonthlyBreakdownItem({
   setDateRange: (range: DateRange) => void;
   setSelectedAccount: (account: string) => void;
 }) {
-  const { baseCurrency } = useCurrency();
   const [, setLocation] = useLocation();
 
   const monthNames = [
@@ -61,10 +60,7 @@ export function MonthlyBreakdownItem({
               {month.shortMonth} {month.year}
             </div>
             <div className="font-semibold text-foreground">
-              {currencyService.formatAmount(
-                month.convertedAmount,
-                baseCurrency,
-              )}
+              {formatAmount(month.convertedAmount, currencyStore.baseCurrency)}
             </div>
           </div>
 
