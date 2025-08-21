@@ -6,9 +6,7 @@ export function OverviewScreen() {
   return (
     <div className="min-h-screen pb-20">
       <OverviewHeader />
-
       <MonthlyBreakdownOverview />
-
       <RecentTransactionsOverview />
     </div>
   );

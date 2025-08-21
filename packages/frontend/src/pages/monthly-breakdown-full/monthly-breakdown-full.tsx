@@ -1,4 +1,6 @@
 import { useState } from "react";
+import { useSearch } from "wouter";
+import { safeParseQuery } from "typesafe-routes";
 import { Card, CardContent } from "@/components/ui/card";
 import { currencyStore } from "../../store/currency-store";
 import { convert } from "../../shared/currency-converter";
@@ -7,18 +9,24 @@ import { YearSummaryCard } from "./year-summary-card";
 import { FiltersDrawer } from "./filters-drawer";
 import { PageHeader } from "../shared/page-header";
 import { expenseStore } from "@/store/expense-store";
+import { routes } from "../../routes";
 
 export function MonthlyBreakdownFull() {
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
-  const [appliedFilters, setAppliedFilters] = useState<{
-    years: number[];
-    accounts: string[];
-    months: number;
-  }>({
-    years: [],
-    accounts: [], // Empty means "all accounts"
-    months: 0, // 0 means "all time"
-  });
+
+  const parsedQuery = safeParseQuery(routes.monthlyBreakdownFull, useSearch());
+
+  const appliedFilters = {
+    years:
+      parsedQuery.success && parsedQuery.data.years
+        ? parsedQuery.data.years.split(",").map(Number)
+        : [],
+    accounts:
+      parsedQuery.success && parsedQuery.data.accounts
+        ? parsedQuery.data.accounts.split(",")
+        : expenseStore.accounts.map((a) => a.id),
+    months: parsedQuery.success ? parsedQuery.data.months || 0 : 3,
+  };
 
   // Convert monthly data amounts to base currency and sort by newest first
   const convertedMonthlyData = expenseStore.monthlyData
@@ -208,7 +216,6 @@ export function MonthlyBreakdownFull() {
         onOpenChange={setIsDrawerOpen}
         monthlyData={expenseStore.monthlyData}
         appliedFilters={appliedFilters}
-        onApplyFilters={setAppliedFilters}
       />
     </div>
   );

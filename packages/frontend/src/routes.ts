@@ -1,4 +1,4 @@
-import { createRoutes } from "typesafe-routes";
+import { createRoutes, int, str } from "typesafe-routes";
 
 export const routes = createRoutes({
   overview: {
@@ -9,6 +9,7 @@ export const routes = createRoutes({
   },
   monthlyBreakdownFull: {
     path: ["monthly-breakdown-full"],
+    query: [str.optional("years"), str("accounts"), int.optional("months")],
   },
   accounts: {
     path: ["accounts"],
@@ -17,5 +18,3 @@ export const routes = createRoutes({
     path: ["settings"],
   },
 });
-
-export type RouteKey = keyof typeof routes;
