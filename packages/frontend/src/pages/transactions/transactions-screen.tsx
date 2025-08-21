@@ -1,15 +1,15 @@
 import { FilterIcon } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Account, Transaction, DateRange } from "../../shared/types";
+import { Transaction, DateRange } from "../../shared/types";
 import { TransactionItem } from "../shared/transaction-item";
 import { currencyStore } from "../../store/currency-store";
 import { formatAmount } from "../../shared/currency-converter";
 import { TransactionFilters } from "./transaction-filters";
 import { PageHeader } from "../shared/page-header";
+import { accounts } from "@/shared/data";
 
 export function TransactionsScreen({
-  accounts,
   filteredTransactions,
   totalInBaseCurrency,
   selectedAccount,
@@ -19,7 +19,6 @@ export function TransactionsScreen({
   setDateRange,
   setShowFilters,
 }: {
-  accounts: Account[];
   filteredTransactions: Transaction[];
   totalInBaseCurrency: number;
   selectedAccount: string;

@@ -9,7 +9,7 @@ import { cn } from "@/lib/utils";
 
 export function Navigation({ currentScreen }: { currentScreen: string }) {
   const navItems = [
-    { route: "/overview", icon: ChartNoAxesColumnIcon, label: "Overview" },
+    { route: "/", icon: ChartNoAxesColumnIcon, label: "Overview" },
     { route: "/transactions", icon: CreditCardIcon, label: "Transactions" },
     { route: "/accounts", icon: CalendarIcon, label: "Accounts" },
     { route: "/settings", icon: SettingsIcon, label: "Settings" },
