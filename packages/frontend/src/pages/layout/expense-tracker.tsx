@@ -1,4 +1,6 @@
-import { Router, Route, useLocation } from "wouter";
+import { Router, Route, Switch } from "wouter";
+import { template } from "typesafe-routes";
+import { routes } from "../../routes";
 import { TransactionsScreen } from "../transactions/transactions-screen";
 import { MonthlyBreakdownFull } from "../monthly-breakdown-full/monthly-breakdown-full";
 import { AccountsScreen } from "../accounts/accounts-screen";
@@ -8,36 +10,35 @@ import { SettingsScreen } from "../settings/settings-screen";
 import { api } from "@/api";
 
 export function ExpenseTracker() {
-  const [location] = useLocation();
-
   api.users.me.useQuery();
 
-  const currentRoute = location.slice(1) || "overview";
-  const hideNavigation = ["monthly-breakdown-full", "settings"].includes(
-    currentRoute,
-  );
-
   return (
-    <div
-      className="max-w-md mx-auto bg-muted/100 shadow-2xl relative"
-      style={{ height: "100vh", overflow: "auto" }}
-    >
+    <div className="max-w-md mx-auto bg-muted/100 shadow-2xl relative h-screen overflow-auto">
       <Router>
-        <Route path="/" component={() => <OverviewScreen />} />
+        <Switch>
+          <Route path={template(routes.overview)}>
+            <OverviewScreen />
+          </Route>
 
-        <Route path="/transactions" component={() => <TransactionsScreen />} />
+          <Route path={template(routes.transactions)}>
+            <TransactionsScreen />
+          </Route>
 
-        <Route
-          path="/monthly-breakdown-full"
-          component={() => <MonthlyBreakdownFull />}
-        />
+          <Route path={template(routes.monthlyBreakdownFull)}>
+            <MonthlyBreakdownFull />
+          </Route>
 
-        <Route path="/accounts" component={() => <AccountsScreen />} />
+          <Route path={template(routes.accounts)}>
+            <AccountsScreen />
+          </Route>
 
-        <Route path="/settings" component={() => <SettingsScreen />} />
+          <Route path={template(routes.settings)}>
+            <SettingsScreen />
+          </Route>
+        </Switch>
       </Router>
 
-      {!hideNavigation && <Navigation currentScreen={currentRoute} />}
+      <Navigation />
     </div>
   );
 }
