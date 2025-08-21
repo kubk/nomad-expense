@@ -1,5 +1,5 @@
 import { FilterIcon, CalendarIcon, Building2Icon } from "lucide-react";
-import { MonthlyData } from "../../shared/types";
+import { MonthlyBreakdownFilters, MonthlyData } from "../../shared/types";
 import { currencyStore } from "../../store/currency-store";
 import { formatAmount } from "../../shared/currency-converter";
 
@@ -10,7 +10,7 @@ export function YearSummaryCard({
 }: {
   convertedMonthlyData: (MonthlyData & { convertedAmount: number })[];
   onFiltersClick: () => void;
-  appliedFilters: { years: number[]; accounts: string[]; months: number };
+  appliedFilters: MonthlyBreakdownFilters;
 }) {
   const totalAmount = convertedMonthlyData.reduce(
     (sum, m) => sum + m.convertedAmount,

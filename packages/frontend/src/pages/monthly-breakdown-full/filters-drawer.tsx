@@ -12,7 +12,7 @@ import {
 } from "@/components/ui/drawer";
 import { Button } from "@/components/ui/button";
 import { CheckIcon } from "lucide-react";
-import { MonthlyData } from "../../shared/types";
+import { MonthlyBreakdownFilters, MonthlyData } from "../../shared/types";
 import { expenseStore } from "@/store/expense-store";
 import { routes } from "../../routes";
 
@@ -25,34 +25,15 @@ export function FiltersDrawer({
   open: boolean;
   onOpenChange: (open: boolean) => void;
   monthlyData: MonthlyData[];
-  appliedFilters: { years: number[]; accounts: string[]; months: number };
+  appliedFilters: MonthlyBreakdownFilters;
 }) {
   const [, navigate] = useLocation();
-  const [selectedYears, setSelectedYears] = useState<number[]>(
-    appliedFilters.years,
-  );
-  const [selectedAccounts, setSelectedAccounts] = useState<string[]>(
-    appliedFilters.accounts,
-  );
-  const [selectedMonths, setSelectedMonths] = useState<number>(
-    appliedFilters.months,
-  );
+  const [filters, setFilters] =
+    useState<MonthlyBreakdownFilters>(appliedFilters);
 
-  // Reset selections to applied filters when drawer opens/closes
-  const resetToAppliedFilters = () => {
-    setSelectedYears(appliedFilters.years);
-    setSelectedAccounts(
-      appliedFilters.accounts.length === 0
-        ? expenseStore.accounts.map((a) => a.id)
-        : appliedFilters.accounts,
-    );
-    setSelectedMonths(appliedFilters.months);
-  };
-
-  // Handle drawer close - reset to applied filters
   const handleOpenChange = (newOpen: boolean) => {
-    if (!newOpen) {
-      resetToAppliedFilters();
+    if (newOpen) {
+      setFilters(appliedFilters);
     }
     onOpenChange(newOpen);
   };
@@ -69,52 +50,59 @@ export function FiltersDrawer({
   ];
 
   const handleYearToggle = (year: number) => {
-    setSelectedYears((prev) =>
-      prev.includes(year) ? prev.filter((y) => y !== year) : [...prev, year],
-    );
+    setFilters((prev) => ({
+      ...prev,
+      years: prev.years.includes(year)
+        ? prev.years.filter((y) => y !== year)
+        : [...prev.years, year],
+    }));
   };
 
   const handleAccountToggle = (account: string) => {
-    setSelectedAccounts((prev) =>
-      prev.includes(account)
-        ? prev.filter((a) => a !== account)
-        : [...prev, account],
-    );
+    setFilters((prev) => ({
+      ...prev,
+      accounts: prev.accounts.includes(account)
+        ? prev.accounts.filter((a) => a !== account)
+        : [...prev.accounts, account],
+    }));
   };
 
   const handleMonthsChange = (months: number) => {
-    setSelectedMonths(months);
-    // Clear year selection when using months filter
-    if (months > 0) {
-      setSelectedYears([]);
-    }
+    setFilters((prev) => ({
+      ...prev,
+      months,
+      // Clear year selection when using months filter
+      years: months > 0 ? [] : prev.years,
+    }));
   };
 
   const handleApply = () => {
-    const queryParams: { years?: string; accounts: string; months?: number } = {
-      accounts: selectedAccounts.join(","),
-    };
-
-    if (selectedYears.length > 0) {
-      queryParams.years = selectedYears.join(",");
-    }
-    if (selectedMonths > 0) {
-      queryParams.months = selectedMonths;
-    }
-
     navigate(
-      render(routes.monthlyBreakdownFull, { query: queryParams, path: {} }),
+      render(routes.monthlyBreakdownFull, {
+        query: {
+          accounts: filters.accounts.join(","),
+          years: filters.years.join(","),
+          months: filters.months,
+        },
+        path: {},
+      }),
     );
     onOpenChange(false);
   };
 
   const handleAllTime = () => {
-    setSelectedMonths(0);
-    setSelectedYears(availableYears);
+    setFilters((prev) => ({
+      ...prev,
+      months: 0,
+      years: availableYears,
+    }));
   };
 
   const handleSelectAllAccounts = () => {
-    setSelectedAccounts(expenseStore.accounts.map((a) => a.id));
+    setFilters((prev) => ({
+      ...prev,
+      accounts: expenseStore.accounts.map((a) => a.id),
+    }));
   };
 
   return (
@@ -144,17 +132,17 @@ export function FiltersDrawer({
                   <Button
                     key={period.value}
                     variant={
-                      selectedMonths === period.value ? "default" : "outline"
+                      filters.months === period.value ? "default" : "outline"
                     }
                     size="sm"
                     onClick={() =>
                       handleMonthsChange(
-                        selectedMonths === period.value ? 0 : period.value,
+                        filters.months === period.value ? 0 : period.value,
                       )
                     }
                     className="h-8 px-3 text-xs flex items-center gap-2 transition-none"
                   >
-                    {selectedMonths === period.value && (
+                    {filters.months === period.value && (
                       <CheckIcon className="size-3" />
                     )}
                     {period.label}
@@ -164,18 +152,18 @@ export function FiltersDrawer({
                   <Button
                     key={year}
                     variant={
-                      selectedYears.includes(year) ? "default" : "outline"
+                      filters.years.includes(year) ? "default" : "outline"
                     }
                     size="sm"
                     onClick={() => {
                       handleYearToggle(year);
-                      if (!selectedYears.includes(year)) {
-                        setSelectedMonths(0);
+                      if (!filters.years.includes(year)) {
+                        setFilters((prev) => ({ ...prev, months: 0 }));
                       }
                     }}
                     className="h-8 px-3 text-xs flex items-center gap-2"
                   >
-                    {selectedYears.includes(year) && (
+                    {filters.years.includes(year) && (
                       <CheckIcon className="size-3" />
                     )}
                     {year}
@@ -201,7 +189,7 @@ export function FiltersDrawer({
                   <Button
                     key={account.id}
                     variant={
-                      selectedAccounts.includes(account.id)
+                      filters.accounts.includes(account.id)
                         ? "default"
                         : "outline"
                     }
@@ -209,7 +197,7 @@ export function FiltersDrawer({
                     onClick={() => handleAccountToggle(account.id)}
                     className="h-8 px-3 text-xs flex items-center gap-2 transition-none"
                   >
-                    {selectedAccounts.includes(account.id) && (
+                    {filters.accounts.includes(account.id) && (
                       <CheckIcon className="size-3" />
                     )}
                     {account.name}
