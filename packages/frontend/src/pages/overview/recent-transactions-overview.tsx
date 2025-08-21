@@ -20,7 +20,7 @@ export function RecentTransactionsOverview() {
 
       <Card className="border-0 p-0 shadow-sm">
         <CardContent className="p-0">
-          {expenseStore.recentTransactions.slice(0, 3).map((t, idx) => {
+          {expenseStore.recentTransactions.map((t, idx) => {
             const account = expenseStore.accounts.find(
               (a) => a.id === t.account,
             );
