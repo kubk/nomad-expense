@@ -11,8 +11,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { CheckIcon } from "lucide-react";
 import { MonthlyData } from "../../shared/types";
-import { accounts } from "@/shared/data";
-
+import { expenseStore } from "@/store/expense-store";
 export function FiltersDrawer({
   open,
   onOpenChange,
@@ -35,7 +34,7 @@ export function FiltersDrawer({
   );
   const [selectedAccounts, setSelectedAccounts] = useState<string[]>(
     appliedFilters.accounts.length === 0
-      ? accounts.map((a) => a.id)
+      ? expenseStore.accounts.map((a) => a.id)
       : appliedFilters.accounts,
   );
   const [selectedMonths, setSelectedMonths] = useState<number>(
@@ -47,7 +46,7 @@ export function FiltersDrawer({
     setSelectedYears(appliedFilters.years);
     setSelectedAccounts(
       appliedFilters.accounts.length === 0
-        ? accounts.map((a) => a.id)
+        ? expenseStore.accounts.map((a) => a.id)
         : appliedFilters.accounts,
     );
     setSelectedMonths(appliedFilters.months);
@@ -97,7 +96,9 @@ export function FiltersDrawer({
   const handleApply = () => {
     // If all accounts are selected, pass empty array to indicate "all"
     const accountsToSend =
-      selectedAccounts.length === accounts.length ? [] : selectedAccounts;
+      selectedAccounts.length === expenseStore.accounts.length
+        ? []
+        : selectedAccounts;
     // If all years are selected and no month filter, pass empty array to indicate "all"
     const yearsToSend =
       selectedYears.length === availableYears.length && selectedMonths === 0
@@ -118,7 +119,7 @@ export function FiltersDrawer({
   };
 
   const handleSelectAllAccounts = () => {
-    setSelectedAccounts(accounts.map((a) => a.id));
+    setSelectedAccounts(expenseStore.accounts.map((a) => a.id));
   };
 
   return (
@@ -201,7 +202,7 @@ export function FiltersDrawer({
                 </Button>
               </div>
               <div className="flex flex-wrap gap-2">
-                {accounts.map((account) => (
+                {expenseStore.accounts.map((account) => (
                   <Button
                     key={account.id}
                     variant={
