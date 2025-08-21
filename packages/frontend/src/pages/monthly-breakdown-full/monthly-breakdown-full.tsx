@@ -210,7 +210,6 @@ export function MonthlyBreakdownFull() {
         </Card>
       </div>
 
-      {/* Filters Drawer */}
       <FiltersDrawer
         open={isDrawerOpen}
         onOpenChange={setIsDrawerOpen}
