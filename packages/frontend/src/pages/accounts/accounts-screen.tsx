@@ -3,23 +3,14 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { useLocation } from "wouter";
-import { Transaction } from "../../shared/types";
-import { currencyStore } from "../../store/currency-store";
 import {
-  convert,
   getCurrencySymbol,
   SupportedCurrency,
 } from "../../shared/currency-converter";
 import { PageHeader } from "../shared/page-header";
-import { accounts } from "@/shared/data";
+import { expenseStore } from "@/store/expense-store";
 
-export function AccountsScreen({
-  transactions,
-  setSelectedAccount,
-}: {
-  transactions: Transaction[];
-  setSelectedAccount: (account: string) => void;
-}) {
+export function AccountsScreen() {
   const [, setLocation] = useLocation();
 
   return (
@@ -35,8 +26,8 @@ export function AccountsScreen({
 
       <div className="px-4 mt-4">
         <div className="space-y-3">
-          {accounts.map((account) => {
-            const accountTransactions = transactions.filter(
+          {expenseStore.accounts.map((account) => {
+            const accountTransactions = expenseStore.transactions.filter(
               (t) => t.account === account.id,
             );
 
@@ -45,7 +36,7 @@ export function AccountsScreen({
                 key={account.id}
                 className="border-0 shadow-sm cursor-pointer hover:shadow-md transition-shadow"
                 onClick={() => {
-                  setSelectedAccount(account.id);
+                  expenseStore.setSelectedAccount(account.id);
                   setLocation("/transactions");
                 }}
               >

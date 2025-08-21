@@ -1,23 +1,15 @@
 import { useEffect, useRef } from "react";
 import { useLocation } from "wouter";
-import { MonthlyData, DateRange } from "../../shared/types";
 import { currencyStore } from "../../store/currency-store";
 import { convert, formatAmount } from "../../shared/currency-converter";
+import { expenseStore } from "@/store/expense-store";
 
-export function MonthlyChart({
-  monthlyData,
-  setDateRange,
-  setSelectedAccount,
-}: {
-  monthlyData: MonthlyData[];
-  setDateRange: (range: DateRange) => void;
-  setSelectedAccount: (account: string) => void;
-}) {
+export function MonthlyChart() {
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const [, setLocation] = useLocation();
 
   // Convert monthly data amounts to base currency
-  const convertedMonthlyData = monthlyData.map((month) => ({
+  const convertedMonthlyData = expenseStore.monthlyData.map((month) => ({
     ...month,
     convertedAmount: convert(month.amount, "USD", currencyStore.baseCurrency),
   }));
@@ -75,8 +67,8 @@ export function MonthlyChart({
       .toISOString()
       .split("T")[0];
 
-    setDateRange({ from: startDate, to: endDate });
-    setSelectedAccount("all");
+    expenseStore.setDateRange({ from: startDate, to: endDate });
+    expenseStore.setSelectedAccount("all");
     setLocation("/transactions");
   };
 

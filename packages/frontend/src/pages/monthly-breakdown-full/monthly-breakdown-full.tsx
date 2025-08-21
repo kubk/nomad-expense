@@ -1,23 +1,14 @@
 import { useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
-import { MonthlyData, DateRange } from "../../shared/types";
 import { currencyStore } from "../../store/currency-store";
 import { convert } from "../../shared/currency-converter";
 import { MonthlyBreakdownItem } from "./monthly-breakdown-item";
 import { YearSummaryCard } from "./year-summary-card";
 import { FiltersDrawer } from "./filters-drawer";
 import { PageHeader } from "../shared/page-header";
-import { transactions } from "../../shared/data";
+import { expenseStore } from "@/store/expense-store";
 
-export function MonthlyBreakdownFull({
-  monthlyData,
-  setDateRange,
-  setSelectedAccount,
-}: {
-  monthlyData: MonthlyData[];
-  setDateRange: (range: DateRange) => void;
-  setSelectedAccount: (account: string) => void;
-}) {
+export function MonthlyBreakdownFull() {
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [appliedFilters, setAppliedFilters] = useState<{
     years: number[];
@@ -30,7 +21,7 @@ export function MonthlyBreakdownFull({
   });
 
   // Convert monthly data amounts to base currency and sort by newest first
-  const convertedMonthlyData = monthlyData
+  const convertedMonthlyData = expenseStore.monthlyData
     .map((month) => ({
       ...month,
       convertedAmount: convert(month.amount, "USD", currencyStore.baseCurrency),
@@ -71,33 +62,35 @@ export function MonthlyBreakdownFull({
     }
 
     // Filter transactions first
-    const filteredTransactions = transactions.filter((transaction) => {
-      const transactionDate = new Date(transaction.date);
-      const transactionYear = transactionDate.getFullYear();
-      const transactionMonth = transactionDate.getMonth();
-      const currentDate = new Date();
-      const currentMonth = currentDate.getMonth();
-      const currentYear = currentDate.getFullYear();
+    const filteredTransactions = expenseStore.transactions.filter(
+      (transaction) => {
+        const transactionDate = new Date(transaction.date);
+        const transactionYear = transactionDate.getFullYear();
+        const transactionMonth = transactionDate.getMonth();
+        const currentDate = new Date();
+        const currentMonth = currentDate.getMonth();
+        const currentYear = currentDate.getFullYear();
 
-      // Account filter
-      const accountMatch =
-        appliedFilters.accounts.length === 0 ||
-        appliedFilters.accounts.includes(transaction.account);
+        // Account filter
+        const accountMatch =
+          appliedFilters.accounts.length === 0 ||
+          appliedFilters.accounts.includes(transaction.account);
 
-      // Time filter
-      let timeMatch = true;
-      if (appliedFilters.months > 0) {
-        // Calculate months ago
-        const monthsAgo =
-          (currentYear - transactionYear) * 12 +
-          (currentMonth - transactionMonth);
-        timeMatch = monthsAgo < appliedFilters.months;
-      } else if (appliedFilters.years.length > 0) {
-        timeMatch = appliedFilters.years.includes(transactionYear);
-      }
+        // Time filter
+        let timeMatch = true;
+        if (appliedFilters.months > 0) {
+          // Calculate months ago
+          const monthsAgo =
+            (currentYear - transactionYear) * 12 +
+            (currentMonth - transactionMonth);
+          timeMatch = monthsAgo < appliedFilters.months;
+        } else if (appliedFilters.years.length > 0) {
+          timeMatch = appliedFilters.years.includes(transactionYear);
+        }
 
-      return accountMatch && timeMatch && transaction.usd < 0; // Only expenses
-    });
+        return accountMatch && timeMatch && transaction.usd < 0; // Only expenses
+      },
+    );
 
     // Recalculate monthly data from filtered transactions
     const monthlyTotals: {
@@ -201,8 +194,8 @@ export function MonthlyBreakdownFull({
                 index={index}
                 totalItems={filteredMonthlyData.length}
                 maxAmount={maxAmount}
-                setDateRange={setDateRange}
-                setSelectedAccount={setSelectedAccount}
+                setDateRange={expenseStore.setDateRange}
+                setSelectedAccount={expenseStore.setSelectedAccount}
               />
             ))}
           </CardContent>
@@ -213,7 +206,7 @@ export function MonthlyBreakdownFull({
       <FiltersDrawer
         open={isDrawerOpen}
         onOpenChange={setIsDrawerOpen}
-        monthlyData={monthlyData}
+        monthlyData={expenseStore.monthlyData}
         appliedFilters={appliedFilters}
         onApplyFilters={setAppliedFilters}
       />

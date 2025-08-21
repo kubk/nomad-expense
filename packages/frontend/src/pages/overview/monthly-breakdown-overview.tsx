@@ -1,18 +1,9 @@
 import { ChevronRightIcon } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Link } from "wouter";
-import { MonthlyData } from "../../shared/types";
 import { MonthlyChart } from "./monthly-chart";
 
-export function MonthlyBreakdownOverview({
-  monthlyData,
-  setDateRange,
-  setSelectedAccount,
-}: {
-  monthlyData: MonthlyData[];
-  setDateRange: (range: any) => void;
-  setSelectedAccount: (account: string) => void;
-}) {
+export function MonthlyBreakdownOverview() {
   return (
     <div className="px-4 -mt-14">
       <Card className="shadow border-0 gap-0 py-4">
@@ -29,11 +20,7 @@ export function MonthlyBreakdownOverview({
           </div>
         </CardHeader>
         <CardContent className="pr-4 pt-1">
-          <MonthlyChart
-            monthlyData={monthlyData}
-            setDateRange={setDateRange}
-            setSelectedAccount={setSelectedAccount}
-          />
+          <MonthlyChart />
         </CardContent>
       </Card>
     </div>

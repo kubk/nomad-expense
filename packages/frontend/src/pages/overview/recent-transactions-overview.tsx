@@ -1,15 +1,10 @@
 import { ChevronRightIcon } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Link } from "wouter";
-import { Transaction } from "@/shared/types";
 import { TransactionItem } from "../shared/transaction-item";
-import { accounts } from "@/shared/data";
+import { expenseStore } from "@/store/expense-store";
 
-export function RecentTransactionsOverview({
-  transactions,
-}: {
-  transactions: Transaction[];
-}) {
+export function RecentTransactionsOverview() {
   return (
     <div className="px-4 mt-6">
       <div className="flex justify-between items-center mb-3">
@@ -25,8 +20,10 @@ export function RecentTransactionsOverview({
 
       <Card className="border-0 p-0 shadow-sm">
         <CardContent className="p-0">
-          {transactions.slice(0, 3).map((t, idx) => {
-            const account = accounts.find((a) => a.id === t.account);
+          {expenseStore.recentTransactions.slice(0, 3).map((t, idx) => {
+            const account = expenseStore.accounts.find(
+              (a) => a.id === t.account,
+            );
             return (
               <TransactionItem
                 key={t.id}

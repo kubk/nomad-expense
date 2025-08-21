@@ -1,33 +1,16 @@
 import { FilterIcon } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Transaction, DateRange } from "../../shared/types";
 import { TransactionItem } from "../shared/transaction-item";
 import { currencyStore } from "../../store/currency-store";
 import { formatAmount } from "../../shared/currency-converter";
 import { TransactionFilters } from "./transaction-filters";
 import { PageHeader } from "../shared/page-header";
-import { accounts } from "@/shared/data";
+import { expenseStore } from "@/store/expense-store";
+import { useState } from "react";
 
-export function TransactionsScreen({
-  filteredTransactions,
-  totalInBaseCurrency,
-  selectedAccount,
-  dateRange,
-  showFilters,
-  setSelectedAccount,
-  setDateRange,
-  setShowFilters,
-}: {
-  filteredTransactions: Transaction[];
-  totalInBaseCurrency: number;
-  selectedAccount: string;
-  dateRange: DateRange;
-  showFilters: boolean;
-  setSelectedAccount: (account: string) => void;
-  setDateRange: (range: DateRange) => void;
-  setShowFilters: (show: boolean) => void;
-}) {
+export function TransactionsScreen() {
+  const [showFilters, setShowFilters] = useState(false);
   return (
     <div className="min-h-screen pb-20">
       <PageHeader
@@ -48,11 +31,11 @@ export function TransactionsScreen({
       {showFilters && (
         <div className="bg-background border-b">
           <TransactionFilters
-            accounts={accounts}
-            selectedAccount={selectedAccount}
-            dateRange={dateRange}
-            setSelectedAccount={setSelectedAccount}
-            setDateRange={setDateRange}
+            accounts={expenseStore.accounts}
+            selectedAccount={expenseStore.selectedAccount}
+            dateRange={expenseStore.dateRange}
+            setSelectedAccount={expenseStore.setSelectedAccount}
+            setDateRange={expenseStore.setDateRange}
             setShowFilters={setShowFilters}
           />
         </div>
@@ -63,12 +46,17 @@ export function TransactionsScreen({
         <Card className="bg-primary text-primary-foreground border-0">
           <CardContent className="px-4">
             <p className="text-primary-foreground/70 text-sm">
-              {selectedAccount === "all"
+              {expenseStore.selectedAccount === "all"
                 ? "All Accounts"
-                : accounts.find((a) => a.id === selectedAccount)?.name}
+                : expenseStore.accounts.find(
+                    (a) => a.id === expenseStore.selectedAccount,
+                  )?.name}
             </p>
             <p className="text-2xl font-bold mt-1">
-              {formatAmount(totalInBaseCurrency, currencyStore.baseCurrency)}
+              {formatAmount(
+                expenseStore.totalInBaseCurrency,
+                currencyStore.baseCurrency,
+              )}
             </p>
           </CardContent>
         </Card>
@@ -78,8 +66,8 @@ export function TransactionsScreen({
       <div className="px-4 mt-4">
         <Card className="border-0 p-0 shadow-sm">
           <CardContent className="p-0">
-            {filteredTransactions.map((transaction, idx) => {
-              const account = accounts.find(
+            {expenseStore.filteredTransactions.map((transaction, idx) => {
+              const account = expenseStore.accounts.find(
                 (a) => a.id === transaction.account,
               );
               return (
@@ -87,7 +75,9 @@ export function TransactionsScreen({
                   key={transaction.id}
                   transaction={transaction}
                   account={account}
-                  showBorder={idx !== filteredTransactions.length - 1}
+                  showBorder={
+                    idx !== expenseStore.filteredTransactions.length - 1
+                  }
                 />
               );
             })}
