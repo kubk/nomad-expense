@@ -1,15 +1,14 @@
 import { ChevronRightIcon } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Link } from "wouter";
-import { Account, Transaction } from "@/shared/types";
+import { Transaction } from "@/shared/types";
 import { TransactionItem } from "../shared/transaction-item";
+import { accounts } from "@/shared/data";
 
 export function RecentTransactionsOverview({
   transactions,
-  accounts,
 }: {
   transactions: Transaction[];
-  accounts: Account[];
 }) {
   return (
     <div className="px-4 mt-6">

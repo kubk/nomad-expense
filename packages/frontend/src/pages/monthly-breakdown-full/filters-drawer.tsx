@@ -10,20 +10,19 @@ import {
 } from "@/components/ui/drawer";
 import { Button } from "@/components/ui/button";
 import { CheckIcon } from "lucide-react";
-import { MonthlyData, Account } from "../../shared/types";
+import { MonthlyData } from "../../shared/types";
+import { accounts } from "@/shared/data";
 
 export function FiltersDrawer({
   open,
   onOpenChange,
   monthlyData,
-  accounts,
   appliedFilters,
   onApplyFilters,
 }: {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   monthlyData: MonthlyData[];
-  accounts: Account[];
   appliedFilters: { years: number[]; accounts: string[]; months: number };
   onApplyFilters: (filters: {
     years: number[];
@@ -225,9 +224,13 @@ export function FiltersDrawer({
           </div>
 
           <DrawerFooter>
-            <Button size="lg" onClick={handleApply}>Apply Filters</Button>
+            <Button size="lg" onClick={handleApply}>
+              Apply Filters
+            </Button>
             <DrawerClose asChild>
-              <Button size="lg" variant="outline">Cancel</Button>
+              <Button size="lg" variant="outline">
+                Cancel
+              </Button>
             </DrawerClose>
           </DrawerFooter>
         </div>

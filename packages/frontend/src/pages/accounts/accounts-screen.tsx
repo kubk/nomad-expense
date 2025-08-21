@@ -3,7 +3,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { useLocation } from "wouter";
-import { Account, Transaction } from "../../shared/types";
+import { Transaction } from "../../shared/types";
 import { currencyStore } from "../../store/currency-store";
 import {
   convert,
@@ -12,13 +12,12 @@ import {
   SupportedCurrency,
 } from "../../shared/currency-converter";
 import { PageHeader } from "../shared/page-header";
+import { accounts } from "@/shared/data";
 
 export function AccountsScreen({
-  accounts,
   transactions,
   setSelectedAccount,
 }: {
-  accounts: Account[];
   transactions: Transaction[];
   setSelectedAccount: (account: string) => void;
 }) {
@@ -83,22 +82,12 @@ export function AccountsScreen({
                   </div>
 
                   <div className="flex justify-between items-center pt-3 border-t">
-                    <div>
-                      <p className="text-xs text-muted-foreground">
-                        This month
-                      </p>
-                      <p className="font-semibold text-lg">
-                        {formatAmount(accountTotal, currencyStore.baseCurrency)}
-                      </p>
-                    </div>
-                    <div className="text-right">
-                      <p className="text-xs text-muted-foreground">
-                        {accountTransactions.length} transactions
-                      </p>
-                      <p className="text-xs text-muted-foreground mt-1">
-                        Last: {accountTransactions[0]?.date || "N/A"}
-                      </p>
-                    </div>
+                    <p className="text-xs text-muted-foreground">
+                      {accountTransactions.length} transactions
+                    </p>
+                    <p className="text-xs text-muted-foreground mt-1">
+                      Last: {accountTransactions[0]?.date || "N/A"}
+                    </p>
                   </div>
                 </CardContent>
               </Card>
