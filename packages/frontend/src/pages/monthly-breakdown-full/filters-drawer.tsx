@@ -157,7 +157,7 @@ export function FiltersDrawer({
                         selectedMonths === period.value ? 0 : period.value,
                       )
                     }
-                    className="h-8 px-3 text-xs flex items-center gap-2"
+                    className="h-8 px-3 text-xs flex items-center gap-2 transition-none"
                   >
                     {selectedMonths === period.value && (
                       <CheckIcon className="size-3" />
@@ -212,7 +212,7 @@ export function FiltersDrawer({
                     }
                     size="sm"
                     onClick={() => handleAccountToggle(account.id)}
-                    className="h-8 px-3 text-xs flex items-center gap-2"
+                    className="h-8 px-3 text-xs flex items-center gap-2 transition-none"
                   >
                     {selectedAccounts.includes(account.id) && (
                       <CheckIcon className="size-3" />
