@@ -9,6 +9,12 @@ export const trpcClient = api.createClient({
   links: [
     httpBatchLink({
       url: env.VITE_API_URL,
+      headers:
+        env.VITE_USER_ID && env.VITE_STAGE === "local"
+          ? {
+              "x-user-id": env.VITE_USER_ID,
+            }
+          : undefined,
     }),
   ],
 });

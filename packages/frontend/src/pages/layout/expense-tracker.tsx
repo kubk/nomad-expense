@@ -5,9 +5,12 @@ import { AccountsScreen } from "../accounts/accounts-screen";
 import { Navigation } from "./navigation";
 import { OverviewScreen } from "../overview/overview-screen";
 import { SettingsScreen } from "../settings/settings-screen";
+import { api } from "@/api";
 
 export function ExpenseTracker() {
   const [location] = useLocation();
+
+  api.users.me.useQuery();
 
   const currentRoute = location.slice(1) || "overview";
   const hideNavigation = ["monthly-breakdown-full", "settings"].includes(
