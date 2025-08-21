@@ -1,26 +1,13 @@
-import { useState } from "react";
 import { Router, Route, useLocation } from "wouter";
-import { monthlyData, transactions } from "../../shared/data";
 import { TransactionsScreen } from "../transactions/transactions-screen";
 import { MonthlyBreakdownFull } from "../monthly-breakdown-full/monthly-breakdown-full";
 import { AccountsScreen } from "../accounts/accounts-screen";
 import { Navigation } from "./navigation";
 import { OverviewScreen } from "../overview/overview-screen";
 import { SettingsScreen } from "../settings/settings-screen";
-import { calculateTotal, filterTransactions } from "@/shared/utils";
 
 export function ExpenseTracker() {
-  const [showFilters, setShowFilters] = useState(false);
   const [location] = useLocation();
-
-  const [dateRange, setDateRange] = useState({ from: "", to: "" });
-  const [selectedAccount, setSelectedAccount] = useState("all");
-  const filteredTransactions = filterTransactions(
-    transactions,
-    selectedAccount,
-    dateRange,
-  );
-  const totalInBaseCurrency = calculateTotal(filteredTransactions);
 
   const currentRoute = location.slice(1) || "overview";
   const hideNavigation = ["monthly-breakdown-full", "settings"].includes(
@@ -33,54 +20,16 @@ export function ExpenseTracker() {
       style={{ height: "100vh", overflow: "auto" }}
     >
       <Router>
-        <Route
-          path="/"
-          component={() => (
-            <OverviewScreen
-              monthlyData={monthlyData}
-              transactions={transactions}
-              setDateRange={setDateRange}
-              setSelectedAccount={setSelectedAccount}
-            />
-          )}
-        />
+        <Route path="/" component={() => <OverviewScreen />} />
 
-        <Route
-          path="/transactions"
-          component={() => (
-            <TransactionsScreen
-              filteredTransactions={filteredTransactions}
-              totalInBaseCurrency={totalInBaseCurrency}
-              selectedAccount={selectedAccount}
-              dateRange={dateRange}
-              showFilters={showFilters}
-              setSelectedAccount={setSelectedAccount}
-              setDateRange={setDateRange}
-              setShowFilters={setShowFilters}
-            />
-          )}
-        />
+        <Route path="/transactions" component={() => <TransactionsScreen />} />
 
         <Route
           path="/monthly-breakdown-full"
-          component={() => (
-            <MonthlyBreakdownFull
-              monthlyData={monthlyData}
-              setDateRange={setDateRange}
-              setSelectedAccount={setSelectedAccount}
-            />
-          )}
+          component={() => <MonthlyBreakdownFull />}
         />
 
-        <Route
-          path="/accounts"
-          component={() => (
-            <AccountsScreen
-              transactions={transactions}
-              setSelectedAccount={setSelectedAccount}
-            />
-          )}
-        />
+        <Route path="/accounts" component={() => <AccountsScreen />} />
 
         <Route path="/settings" component={() => <SettingsScreen />} />
       </Router>

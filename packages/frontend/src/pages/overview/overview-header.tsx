@@ -1,12 +1,14 @@
 import { formatAmount } from "@/shared/currency-converter";
 import { currencyStore } from "@/store/currency-store";
-import { MonthlyData } from "@/shared/types";
+import { expenseStore } from "@/store/expense-store";
+import { convert } from "@/shared/currency-converter";
 
-export function OverviewHeader({
-  convertedMonthlyData,
-}: {
-  convertedMonthlyData: (MonthlyData & { convertedAmount: number })[];
-}) {
+export function OverviewHeader() {
+  // Convert monthly data amounts to base currency
+  const convertedMonthlyData = expenseStore.monthlyData.map((month) => ({
+    ...month,
+    convertedAmount: convert(month.amount, "USD", currencyStore.baseCurrency),
+  }));
   return (
     <div className="bg-primary text-primary-foreground dark:bg-muted px-4 py-6 pb-18">
       <div className="bg-background/10 dark:bg-background/50 backdrop-blur rounded-2xl p-4">
