@@ -9,13 +9,12 @@ export function OverviewHeader({
 }) {
   const { baseCurrency } = useCurrency();
   return (
-    <div className="bg-primary text-primary-foreground px-4 py-6 pb-18">
-      {/* Total This Month */}
-      <div className="bg-background/10 backdrop-blur rounded-2xl p-4">
-        <p className="text-primary-foreground/70 text-sm mb-1">
+    <div className="bg-primary text-primary-foreground dark:bg-muted px-4 py-6 pb-18">
+      <div className="bg-background/10 dark:bg-background/50 backdrop-blur rounded-2xl p-4">
+        <p className="text-primary-foreground/70 dark:text-foreground/70 text-sm mb-1">
           Total this month
         </p>
-        <p className="text-3xl font-bold">
+        <p className="text-3xl dark:text-foreground font-bold">
           {(() => {
             const currentDate = new Date();
             const currentMonth = currentDate.toLocaleDateString("en-US", {

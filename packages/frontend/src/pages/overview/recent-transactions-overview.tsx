@@ -17,7 +17,7 @@ export function RecentTransactionsOverview({
         <h2 className="font-semibold pl-4 text-foreground">Recent</h2>
         <Link
           href="/transactions"
-          className="text-primary active:scale-95 transition-transform duration-150 inline-flex items-center text-sm font-medium hover:underline"
+          className="text-primary/70 active:scale-95 transition-transform duration-150 inline-flex items-center text-sm font-medium hover:underline"
         >
           See all
           <ChevronRightIcon className="w-4 h-4 ml-1" />
