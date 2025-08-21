@@ -225,9 +225,9 @@ export function FiltersDrawer({
           </div>
 
           <DrawerFooter>
-            <Button onClick={handleApply}>Apply Filters</Button>
+            <Button size="lg" onClick={handleApply}>Apply Filters</Button>
             <DrawerClose asChild>
-              <Button variant="outline">Cancel</Button>
+              <Button size="lg" variant="outline">Cancel</Button>
             </DrawerClose>
           </DrawerFooter>
         </div>
