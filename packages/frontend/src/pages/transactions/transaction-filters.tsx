@@ -10,9 +10,9 @@ import {
 } from "@/components/ui/select";
 import { Account, DateRange } from "../../shared/types";
 import {
-  currencyService,
+  getCurrencySymbol,
   SupportedCurrency,
-} from "../../shared/currency-service";
+} from "../../shared/currency-converter";
 
 export function TransactionFilters({
   accounts,
@@ -45,10 +45,7 @@ export function TransactionFilters({
                   <div className="flex items-center">
                     <div className={`w-2 h-2 rounded-full ${acc.color} mr-2`} />
                     {acc.name} (
-                    {currencyService.getCurrencySymbol(
-                      acc.currency as SupportedCurrency,
-                    )}
-                    )
+                    {getCurrencySymbol(acc.currency as SupportedCurrency)})
                   </div>
                 </SelectItem>
               ))}

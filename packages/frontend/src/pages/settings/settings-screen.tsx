@@ -7,19 +7,17 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import {
-  currencyService,
-  SUPPORTED_CURRENCIES,
+  getCurrencySymbol,
+  getSupportedCurrencies,
   SupportedCurrency,
-} from "../../shared/currency-service";
-import { useCurrency } from "../../shared/currency-context";
+} from "../../shared/currency-converter";
+import { currencyStore } from "../../store/currency-store";
 import { PageHeader } from "../shared/page-header";
 import { ModeToggle } from "../../components/mode-toggle";
 
 export function SettingsScreen() {
-  const { baseCurrency, setBaseCurrency } = useCurrency();
-
   const handleCurrencyChange = (value: string) => {
-    setBaseCurrency(value as SupportedCurrency);
+    currencyStore.setBaseCurrency(value as SupportedCurrency);
   };
 
   return (
@@ -41,19 +39,22 @@ export function SettingsScreen() {
 
             <div className="space-y-2">
               <Label htmlFor="currency-select">Currency</Label>
-              <Select value={baseCurrency} onValueChange={handleCurrencyChange}>
+              <Select
+                value={currencyStore.baseCurrency}
+                onValueChange={handleCurrencyChange}
+              >
                 <SelectTrigger id="currency-select" className="w-full">
                   <SelectValue>
                     <div className="flex items-center gap-2">
                       <span className="font-medium">
-                        {currencyService.getCurrencySymbol(baseCurrency)}
+                        {getCurrencySymbol(currencyStore.baseCurrency)}
                       </span>
-                      <span>{baseCurrency}</span>
+                      <span>{currencyStore.baseCurrency}</span>
                       <span className="text-muted-foreground">
                         -{" "}
                         {
-                          SUPPORTED_CURRENCIES.find(
-                            (c) => c.code === baseCurrency,
+                          getSupportedCurrencies().find(
+                            (c) => c.code === currencyStore.baseCurrency,
                           )?.name
                         }
                       </span>
@@ -61,11 +62,11 @@ export function SettingsScreen() {
                   </SelectValue>
                 </SelectTrigger>
                 <SelectContent>
-                  {SUPPORTED_CURRENCIES.map((currency) => (
+                  {getSupportedCurrencies().map((currency) => (
                     <SelectItem key={currency.code} value={currency.code}>
                       <div className="flex items-center gap-3">
                         <span className="font-medium w-6">
-                          {currencyService.getCurrencySymbol(currency.code)}
+                          {getCurrencySymbol(currency.code)}
                         </span>
                         <div>
                           <div className="font-medium">{currency.code}</div>
