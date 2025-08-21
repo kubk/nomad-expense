@@ -3,8 +3,8 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Account, Transaction, DateRange } from "../../shared/types";
 import { TransactionItem } from "../shared/transaction-item";
-import { useCurrency } from "../../shared/currency-context";
-import { currencyService } from "../../shared/currency-service";
+import { currencyStore } from "../../store/currency-store";
+import { formatAmount } from "../../shared/currency-converter";
 import { TransactionFilters } from "./transaction-filters";
 import { PageHeader } from "../shared/page-header";
 
@@ -29,8 +29,6 @@ export function TransactionsScreen({
   setDateRange: (range: DateRange) => void;
   setShowFilters: (show: boolean) => void;
 }) {
-  const { baseCurrency } = useCurrency();
-
   return (
     <div className="min-h-screen pb-20">
       <PageHeader
@@ -71,7 +69,7 @@ export function TransactionsScreen({
                 : accounts.find((a) => a.id === selectedAccount)?.name}
             </p>
             <p className="text-2xl font-bold mt-1">
-              {currencyService.formatAmount(totalInBaseCurrency, baseCurrency)}
+              {formatAmount(totalInBaseCurrency, currencyStore.baseCurrency)}
             </p>
           </CardContent>
         </Card>

@@ -10,11 +10,11 @@ import { SettingsScreen } from "../settings/settings-screen";
 import { calculateTotal, filterTransactions } from "@/shared/utils";
 
 export function ExpenseTracker() {
-  const [selectedAccount, setSelectedAccount] = useState("all");
-  const [dateRange, setDateRange] = useState({ from: "", to: "" });
   const [showFilters, setShowFilters] = useState(false);
   const [location] = useLocation();
 
+  const [dateRange, setDateRange] = useState({ from: "", to: "" });
+  const [selectedAccount, setSelectedAccount] = useState("all");
   const filteredTransactions = filterTransactions(
     transactions,
     selectedAccount,

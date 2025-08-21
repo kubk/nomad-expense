@@ -1,5 +1,5 @@
-import { useCurrency } from "@/shared/currency-context";
-import { currencyService } from "@/shared/currency-service";
+import { formatAmount } from "@/shared/currency-converter";
+import { currencyStore } from "@/store/currency-store";
 import { MonthlyData } from "@/shared/types";
 
 export function OverviewHeader({
@@ -7,7 +7,6 @@ export function OverviewHeader({
 }: {
   convertedMonthlyData: (MonthlyData & { convertedAmount: number })[];
 }) {
-  const { baseCurrency } = useCurrency();
   return (
     <div className="bg-primary text-primary-foreground dark:bg-muted px-4 py-6 pb-18">
       <div className="bg-background/10 dark:bg-background/50 backdrop-blur rounded-2xl p-4">
@@ -25,9 +24,9 @@ export function OverviewHeader({
             const monthData = convertedMonthlyData.find(
               (m) => m.month === currentMonthKey,
             );
-            return currencyService.formatAmount(
+            return formatAmount(
               monthData?.convertedAmount || 0,
-              baseCurrency,
+              currencyStore.baseCurrency,
             );
           })()}
         </p>

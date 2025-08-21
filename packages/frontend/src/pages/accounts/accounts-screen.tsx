@@ -4,11 +4,13 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { useLocation } from "wouter";
 import { Account, Transaction } from "../../shared/types";
-import { useCurrency } from "../../shared/currency-context";
+import { currencyStore } from "../../store/currency-store";
 import {
-  currencyService,
+  convert,
+  getCurrencySymbol,
+  formatAmount,
   SupportedCurrency,
-} from "../../shared/currency-service";
+} from "../../shared/currency-converter";
 import { PageHeader } from "../shared/page-header";
 
 export function AccountsScreen({
@@ -20,7 +22,6 @@ export function AccountsScreen({
   transactions: Transaction[];
   setSelectedAccount: (account: string) => void;
 }) {
-  const { baseCurrency } = useCurrency();
   const [, setLocation] = useLocation();
 
   return (
@@ -41,10 +42,10 @@ export function AccountsScreen({
               (t) => t.account === account.id,
             );
             const accountTotal = accountTransactions.reduce((sum, t) => {
-              const convertedAmount = currencyService.convert(
+              const convertedAmount = convert(
                 t.usd,
                 "USD",
-                baseCurrency,
+                currencyStore.baseCurrency,
               );
               return sum + convertedAmount;
             }, 0);
@@ -72,7 +73,7 @@ export function AccountsScreen({
                           {account.name}
                         </p>
                         <Badge variant="outline" className="mt-1">
-                          {currencyService.getCurrencySymbol(
+                          {getCurrencySymbol(
                             account.currency as SupportedCurrency,
                           )}
                         </Badge>
@@ -87,10 +88,7 @@ export function AccountsScreen({
                         This month
                       </p>
                       <p className="font-semibold text-lg">
-                        {currencyService.formatAmount(
-                          accountTotal,
-                          baseCurrency,
-                        )}
+                        {formatAmount(accountTotal, currencyStore.baseCurrency)}
                       </p>
                     </div>
                     <div className="text-right">
