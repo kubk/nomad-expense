@@ -1,5 +1,7 @@
 import { useEffect, useRef } from "react";
 import { useLocation } from "wouter";
+import { renderPath } from "typesafe-routes";
+import { routes } from "../../routes";
 import { currencyStore } from "../../store/currency-store";
 import { formatAmount } from "../../shared/currency-converter";
 import { expenseStore } from "@/store/expense-store";
@@ -41,7 +43,7 @@ export function MonthlyChart() {
 
     expenseStore.setDateRange({ from: startDate, to: endDate });
     expenseStore.setSelectedAccount("all");
-    setLocation("/transactions");
+    setLocation(renderPath(routes.transactions, {}));
   };
 
   return (
