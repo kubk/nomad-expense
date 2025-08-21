@@ -21,7 +21,7 @@ export function MonthlyBreakdownOverview({
             <CardTitle className="text-base">Monthly breakdown</CardTitle>
             <Link
               href="/monthly-breakdown-full"
-              className="text-primary -mr-3 active:scale-95 transition-transform duration-150 inline-flex items-center text-sm font-medium hover:underline"
+              className="text-primary/70 -mr-3 active:scale-95 transition-transform duration-150 inline-flex items-center text-sm font-medium hover:underline"
             >
               View all
               <ChevronRightIcon className="w-3 h-3 ml-1" />
