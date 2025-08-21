@@ -1,6 +1,8 @@
 import { ChevronRightIcon } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Link } from "wouter";
+import { renderPath } from "typesafe-routes";
+import { routes } from "../../routes";
 import { MonthlyChart } from "./monthly-chart";
 
 export function MonthlyBreakdownOverview() {
@@ -11,7 +13,7 @@ export function MonthlyBreakdownOverview() {
           <div className="flex justify-between items-center">
             <CardTitle className="text-base">Monthly breakdown</CardTitle>
             <Link
-              href="/monthly-breakdown-full"
+              href={renderPath(routes.monthlyBreakdownFull, {})}
               className="text-primary/70 -mr-3 active:scale-95 transition-transform duration-150 inline-flex items-center text-sm font-medium hover:underline"
             >
               View all
