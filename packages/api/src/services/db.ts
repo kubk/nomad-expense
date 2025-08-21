@@ -1,6 +1,6 @@
 import { drizzle } from "drizzle-orm/d1";
 
-type DB = ReturnType<typeof drizzle>;
+export type DB = ReturnType<typeof drizzle>;
 
 let db: DB | undefined;
 
