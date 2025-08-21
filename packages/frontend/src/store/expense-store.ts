@@ -156,27 +156,54 @@ export class ExpenseStore {
       }));
   }
 
-  // Computed: recent transactions (last 5 transactions, sorted by date desc)
+  // Computed: recent transactions for overview (3 most recent)
   get recentTransactions(): Transaction[] {
     return this.rawTransactions
       .slice()
       .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
-      .slice(0, 5);
+      .slice(0, 3);
   }
 
-  // Computed: transactions grouped by month for monthly breakdown
-  get transactionsByMonth(): { [monthKey: string]: Transaction[] } {
-    const grouped: { [monthKey: string]: Transaction[] } = {};
+  // Computed: monthly chart data with currency conversion and sorting
+  get monthlyChartData() {
+    const targetCurrency = currencyStore.baseCurrency;
 
-    this.rawTransactions.forEach((transaction) => {
-      const monthKey = transaction.month;
-      if (!grouped[monthKey]) {
-        grouped[monthKey] = [];
-      }
-      grouped[monthKey].push(transaction);
+    // Convert monthly data amounts to base currency
+    const convertedMonthlyData = this.monthlyData.map((month) => ({
+      ...month,
+      convertedAmount: convert(month.amount, "USD", targetCurrency),
+    }));
+
+    // Sort months chronologically
+    const sortedMonthlyData = [...convertedMonthlyData].sort((a, b) => {
+      if (a.year !== b.year) return a.year - b.year;
+      const monthNames = [
+        "Jan",
+        "Feb",
+        "Mar",
+        "Apr",
+        "May",
+        "Jun",
+        "Jul",
+        "Aug",
+        "Sep",
+        "Oct",
+        "Nov",
+        "Dec",
+      ];
+      return (
+        monthNames.indexOf(a.shortMonth) - monthNames.indexOf(b.shortMonth)
+      );
     });
 
-    return grouped;
+    const maxAmount = Math.max(
+      ...sortedMonthlyData.map((m) => m.convertedAmount),
+    );
+
+    return {
+      data: sortedMonthlyData,
+      maxAmount,
+    };
   }
 }
 

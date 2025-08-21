@@ -1,42 +1,14 @@
 import { useEffect, useRef } from "react";
 import { useLocation } from "wouter";
 import { currencyStore } from "../../store/currency-store";
-import { convert, formatAmount } from "../../shared/currency-converter";
+import { formatAmount } from "../../shared/currency-converter";
 import { expenseStore } from "@/store/expense-store";
 
 export function MonthlyChart() {
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const [, setLocation] = useLocation();
 
-  // Convert monthly data amounts to base currency
-  const convertedMonthlyData = expenseStore.monthlyData.map((month) => ({
-    ...month,
-    convertedAmount: convert(month.amount, "USD", currencyStore.baseCurrency),
-  }));
-
-  // Sort months chronologically with current month on the right
-  const sortedMonthlyData = [...convertedMonthlyData].sort((a, b) => {
-    if (a.year !== b.year) return a.year - b.year;
-    const monthNames = [
-      "Jan",
-      "Feb",
-      "Mar",
-      "Apr",
-      "May",
-      "Jun",
-      "Jul",
-      "Aug",
-      "Sep",
-      "Oct",
-      "Nov",
-      "Dec",
-    ];
-    return monthNames.indexOf(a.shortMonth) - monthNames.indexOf(b.shortMonth);
-  });
-
-  const maxAmount = Math.max(
-    ...sortedMonthlyData.map((m) => m.convertedAmount),
-  );
+  const { data: sortedMonthlyData, maxAmount } = expenseStore.monthlyChartData;
 
   // Scroll to the right on mount
   useEffect(() => {
