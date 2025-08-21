@@ -43,3 +43,9 @@ export type Route =
   | "monthly-breakdown-full"
   | "accounts"
   | "settings";
+
+export type MonthlyBreakdownFilters = {
+  years: number[];
+  accounts: string[];
+  months: number;
+};
