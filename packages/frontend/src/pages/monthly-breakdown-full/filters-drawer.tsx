@@ -1,4 +1,6 @@
 import { useState } from "react";
+import { useLocation } from "wouter";
+import { render } from "typesafe-routes";
 import {
   Drawer,
   DrawerClose,
@@ -12,30 +14,25 @@ import { Button } from "@/components/ui/button";
 import { CheckIcon } from "lucide-react";
 import { MonthlyData } from "../../shared/types";
 import { expenseStore } from "@/store/expense-store";
+import { routes } from "../../routes";
+
 export function FiltersDrawer({
   open,
   onOpenChange,
   monthlyData,
   appliedFilters,
-  onApplyFilters,
 }: {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   monthlyData: MonthlyData[];
   appliedFilters: { years: number[]; accounts: string[]; months: number };
-  onApplyFilters: (filters: {
-    years: number[];
-    accounts: string[];
-    months: number;
-  }) => void;
 }) {
+  const [, navigate] = useLocation();
   const [selectedYears, setSelectedYears] = useState<number[]>(
     appliedFilters.years,
   );
   const [selectedAccounts, setSelectedAccounts] = useState<string[]>(
-    appliedFilters.accounts.length === 0
-      ? expenseStore.accounts.map((a) => a.id)
-      : appliedFilters.accounts,
+    appliedFilters.accounts,
   );
   const [selectedMonths, setSelectedMonths] = useState<number>(
     appliedFilters.months,
@@ -94,28 +91,26 @@ export function FiltersDrawer({
   };
 
   const handleApply = () => {
-    // If all accounts are selected, pass empty array to indicate "all"
-    const accountsToSend =
-      selectedAccounts.length === expenseStore.accounts.length
-        ? []
-        : selectedAccounts;
-    // If all years are selected and no month filter, pass empty array to indicate "all"
-    const yearsToSend =
-      selectedYears.length === availableYears.length && selectedMonths === 0
-        ? []
-        : selectedYears;
+    const queryParams: { years?: string; accounts: string; months?: number } = {
+      accounts: selectedAccounts.join(","),
+    };
 
-    onApplyFilters({
-      years: yearsToSend,
-      accounts: accountsToSend,
-      months: selectedMonths,
-    });
+    if (selectedYears.length > 0) {
+      queryParams.years = selectedYears.join(",");
+    }
+    if (selectedMonths > 0) {
+      queryParams.months = selectedMonths;
+    }
+
+    navigate(
+      render(routes.monthlyBreakdownFull, { query: queryParams, path: {} }),
+    );
     onOpenChange(false);
   };
 
   const handleAllTime = () => {
     setSelectedMonths(0);
-    setSelectedYears([]);
+    setSelectedYears(availableYears);
   };
 
   const handleSelectAllAccounts = () => {
