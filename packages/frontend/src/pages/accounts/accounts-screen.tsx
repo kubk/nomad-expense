@@ -8,7 +8,6 @@ import { currencyStore } from "../../store/currency-store";
 import {
   convert,
   getCurrencySymbol,
-  formatAmount,
   SupportedCurrency,
 } from "../../shared/currency-converter";
 import { PageHeader } from "../shared/page-header";
@@ -40,14 +39,6 @@ export function AccountsScreen({
             const accountTransactions = transactions.filter(
               (t) => t.account === account.id,
             );
-            const accountTotal = accountTransactions.reduce((sum, t) => {
-              const convertedAmount = convert(
-                t.usd,
-                "USD",
-                currencyStore.baseCurrency,
-              );
-              return sum + convertedAmount;
-            }, 0);
 
             return (
               <Card
