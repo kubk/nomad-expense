@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Router, Route, useLocation } from "wouter";
-import { accounts, monthlyData, transactions } from "../../shared/data";
+import { monthlyData, transactions } from "../../shared/data";
 import { TransactionsScreen } from "../transactions/transactions-screen";
 import { MonthlyBreakdownFull } from "../monthly-breakdown-full/monthly-breakdown-full";
 import { AccountsScreen } from "../accounts/accounts-screen";
@@ -39,20 +39,6 @@ export function ExpenseTracker() {
             <OverviewScreen
               monthlyData={monthlyData}
               transactions={transactions}
-              accounts={accounts}
-              setDateRange={setDateRange}
-              setSelectedAccount={setSelectedAccount}
-            />
-          )}
-        />
-
-        <Route
-          path="/overview"
-          component={() => (
-            <OverviewScreen
-              monthlyData={monthlyData}
-              transactions={transactions}
-              accounts={accounts}
               setDateRange={setDateRange}
               setSelectedAccount={setSelectedAccount}
             />
@@ -63,7 +49,6 @@ export function ExpenseTracker() {
           path="/transactions"
           component={() => (
             <TransactionsScreen
-              accounts={accounts}
               filteredTransactions={filteredTransactions}
               totalInBaseCurrency={totalInBaseCurrency}
               selectedAccount={selectedAccount}
@@ -91,7 +76,6 @@ export function ExpenseTracker() {
           path="/accounts"
           component={() => (
             <AccountsScreen
-              accounts={accounts}
               transactions={transactions}
               setSelectedAccount={setSelectedAccount}
             />

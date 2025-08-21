@@ -7,7 +7,7 @@ import { MonthlyBreakdownItem } from "./monthly-breakdown-item";
 import { YearSummaryCard } from "./year-summary-card";
 import { FiltersDrawer } from "./filters-drawer";
 import { PageHeader } from "../shared/page-header";
-import { accounts, transactions } from "../../shared/data";
+import { transactions } from "../../shared/data";
 
 export function MonthlyBreakdownFull({
   monthlyData,
@@ -214,7 +214,6 @@ export function MonthlyBreakdownFull({
         open={isDrawerOpen}
         onOpenChange={setIsDrawerOpen}
         monthlyData={monthlyData}
-        accounts={accounts}
         appliedFilters={appliedFilters}
         onApplyFilters={setAppliedFilters}
       />
