@@ -88,4 +88,3 @@ export function Component({
 ### Shared Resources
 - `shared/` - Reusable functions and logic (NOT UI components)
   - API utilities, providers, routing helpers, etc.
-- `store/` - Global application state management (MobX stores). For Mobx guide refer to /docs/mobx-guide.md

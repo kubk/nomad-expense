@@ -1,24 +1,22 @@
 import { FilterIcon, CalendarIcon, Building2Icon } from "lucide-react";
 import { formatAmount } from "../../shared/currency-converter";
 import { TransactionFilters } from "api";
-import { api } from "@/api";
+import { Skeleton } from "@/components/ui/skeleton";
 
 export function SummaryCard({
   onFiltersClick,
   appliedFilters,
   totalAmount,
+  isLoading,
 }: {
   onFiltersClick: () => void;
   appliedFilters: TransactionFilters;
   totalAmount: number;
+  isLoading: boolean;
 }) {
-  const { data: accounts = [] } = api.accounts.list.useQuery();
   const hardcodedIncome = 130000; // $1,300 hardcoded as requested
 
   const getAccountsLabel = () => {
-    if (appliedFilters.accounts.length === accounts.length) {
-      return "All accounts";
-    }
     return `${appliedFilters.accounts.length} account${appliedFilters.accounts.length > 1 ? "s" : ""}`;
   };
 
@@ -67,11 +65,15 @@ export function SummaryCard({
                   Expenses
                 </span>
               </div>
-              <div className="text-2xl font-bold text-foreground">
-                {formatAmount(totalAmount, "USD", {
-                  showFractions: false,
-                })}
-              </div>
+              {isLoading ? (
+                <Skeleton className="h-8 w-22" />
+              ) : (
+                <div className="text-2xl font-bold text-foreground">
+                  {formatAmount(totalAmount, "USD", {
+                    showFractions: false,
+                  })}
+                </div>
+              )}
             </div>
 
             <div className="flex flex-col items-start">
@@ -81,12 +83,16 @@ export function SummaryCard({
                   Income
                 </span>
               </div>
-              <div className="text-2xl font-bold text-green-600">
-                +
-                {formatAmount(hardcodedIncome, "USD", {
-                  showFractions: false,
-                })}
-              </div>
+              {isLoading ? (
+                <Skeleton className="h-8 w-22" />
+              ) : (
+                <div className="text-2xl font-bold text-green-600">
+                  +
+                  {formatAmount(hardcodedIncome, "USD", {
+                    showFractions: false,
+                  })}
+                </div>
+              )}
             </div>
           </div>
         </div>

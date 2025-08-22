@@ -34,12 +34,6 @@ export function TransactionsScreen() {
   const transactions = transactionsData?.transactions || [];
   const totalInUSD = transactionsData?.totalInUSD || 0;
 
-  // Get available years from overview data for the filter
-  const { data: overviewData } = api.expenses.overview.useQuery();
-  const availableYears = overviewData
-    ? [...new Set(overviewData.data.map((m) => m.year))].sort((a, b) => b - a)
-    : [];
-
   return (
     <div className="min-h-screen pb-20">
       <PageHeader
@@ -56,6 +50,7 @@ export function TransactionsScreen() {
       />
 
       <SummaryCard
+        isLoading={isLoading}
         onFiltersClick={() => setIsDrawerOpen(true)}
         appliedFilters={filters}
         totalAmount={totalInUSD}
@@ -95,7 +90,6 @@ export function TransactionsScreen() {
       <FiltersDrawer
         open={isDrawerOpen}
         onOpenChange={setIsDrawerOpen}
-        availableYears={availableYears}
         filters={filters}
         onApply={(newFilters) => {
           navigate(
