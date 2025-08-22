@@ -1,13 +1,14 @@
 import { RecentTransactionsOverview } from "./recent-transactions-overview";
 import { OverviewHeader } from "./overview-header";
 import { MonthlyBreakdownOverview } from "./monthly-breakdown-overview";
+import { Page } from "../shared/page";
 
 export function OverviewScreen() {
   return (
-    <div className="min-h-screen pb-20">
+    <Page>
       <OverviewHeader />
       <MonthlyBreakdownOverview />
       <RecentTransactionsOverview />
-    </div>
+    </Page>
   );
 }

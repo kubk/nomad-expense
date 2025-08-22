@@ -12,6 +12,7 @@ import { routes } from "../../routes";
 import { api } from "@/api";
 import { TransactionFilters } from "api";
 import { useAccountIds } from "@/shared/hooks/use-account-ids";
+import { Page } from "../shared/page";
 
 export function TransactionsScreen() {
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
@@ -35,7 +36,7 @@ export function TransactionsScreen() {
   const totalInUSD = transactionsData?.totalInUSD || 0;
 
   return (
-    <div className="min-h-screen pb-20">
+    <Page>
       <PageHeader
         title="Transactions"
         rightSlot={
@@ -101,6 +102,6 @@ export function TransactionsScreen() {
           );
         }}
       />
-    </div>
+    </Page>
   );
 }

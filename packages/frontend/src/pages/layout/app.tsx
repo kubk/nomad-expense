@@ -11,6 +11,7 @@ import { api } from "@/api";
 
 export function App() {
   api.users.me.useQuery();
+  api.accounts.listWithStats.useQuery();
 
   return (
     <div className="max-w-md mx-auto bg-muted/100 shadow-2xl relative h-screen overflow-auto">

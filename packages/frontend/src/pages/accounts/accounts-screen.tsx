@@ -1,4 +1,4 @@
-import { PlusIcon, ChevronRightIcon } from "lucide-react";
+import { PlusIcon, ChevronRightIcon, Loader2 } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -11,6 +11,7 @@ import {
 } from "../../shared/currency-converter";
 import { PageHeader } from "../shared/page-header";
 import { api } from "@/api";
+import { Page } from "../shared/page";
 
 // @ts-expect-error
 const accountColorsPalette = [
@@ -23,10 +24,11 @@ const accountColorsPalette = [
 
 export function AccountsScreen() {
   const [, navigate] = useLocation();
-  const { data: accounts = [] } = api.accounts.listWithStats.useQuery();
+  const { data: accounts = [], isLoading } =
+    api.accounts.listWithStats.useQuery();
 
   return (
-    <div className="min-h-screen pb-20">
+    <Page>
       <PageHeader
         title="Accounts"
         rightSlot={
@@ -37,71 +39,79 @@ export function AccountsScreen() {
       />
 
       <div className="px-4 mt-4">
-        <div className="space-y-3">
-          {accounts.map((account) => {
-            return (
-              <Card
-                key={account.id}
-                className="border-0 shadow-sm cursor-pointer transition-shadow"
-                onClick={() => {
-                  navigate(
-                    render(routes.transactions, {
-                      query: {
-                        filters: {
-                          accounts: [account.id],
-                          date: { type: "months", value: 3 },
+        {isLoading ? (
+          <div className="flex justify-center items-center py-12">
+            <Loader2 className="w-8 h-8 animate-spin text-muted-foreground" />
+          </div>
+        ) : (
+          <div className="space-y-3">
+            {accounts.map((account) => {
+              return (
+                <Card
+                  key={account.id}
+                  className="border-0 shadow-sm cursor-pointer transition-shadow"
+                  onClick={() => {
+                    navigate(
+                      render(routes.transactions, {
+                        query: {
+                          filters: {
+                            accounts: [account.id],
+                            date: { type: "months", value: 3 },
+                          },
                         },
-                      },
-                      path: {},
-                    }),
-                  );
-                }}
-              >
-                <CardContent className="px-4">
-                  <div className="flex items-start justify-between mb-3">
-                    <div className="flex items-center gap-3">
-                      <div
-                        className={`w-10 h-10 rounded-full ${account.color} opacity-10`}
-                      />
-                      <div
-                        className={`w-3 h-3 rounded-full ${account.color} absolute ml-3.5`}
-                      />
-                      <div>
-                        <p className="font-medium text-foreground">
-                          {account.name}
-                        </p>
-                        <Badge variant="outline" className="mt-1">
-                          {getCurrencySymbol(
-                            account.currency as SupportedCurrency,
-                          )}
-                        </Badge>
+                        path: {},
+                      }),
+                    );
+                  }}
+                >
+                  <CardContent className="px-4">
+                    <div className="flex items-start justify-between mb-3">
+                      <div className="flex items-center gap-3">
+                        <div
+                          className={`w-10 h-10 rounded-full ${account.color} opacity-10`}
+                        />
+                        <div
+                          className={`w-3 h-3 rounded-full ${account.color} absolute ml-3.5`}
+                        />
+                        <div>
+                          <p className="font-medium text-foreground">
+                            {account.name}
+                          </p>
+                          <Badge variant="outline" className="mt-1">
+                            {getCurrencySymbol(
+                              account.currency as SupportedCurrency,
+                            )}
+                          </Badge>
+                        </div>
                       </div>
+                      <ChevronRightIcon className="w-5 h-5 text-muted-foreground" />
                     </div>
-                    <ChevronRightIcon className="w-5 h-5 text-muted-foreground" />
-                  </div>
 
-                  <div className="flex justify-between items-center pt-3 border-t">
-                    <p className="text-xs text-muted-foreground">
-                      {account.transactionCount} transactions
-                    </p>
-                    <p className="text-xs text-muted-foreground mt-1">
-                      Last: {account.lastTransactionDate || "N/A"}
-                    </p>
-                  </div>
-                </CardContent>
-              </Card>
-            );
-          })}
+                    <div className="flex justify-between items-center pt-3 border-t">
+                      <p className="text-xs text-muted-foreground">
+                        {account.transactionCount} transactions
+                      </p>
+                      <p className="text-xs text-muted-foreground mt-1">
+                        Last: {account.lastTransactionDate || "N/A"}
+                      </p>
+                    </div>
+                  </CardContent>
+                </Card>
+              );
+            })}
+          </div>
+        )}
+      </div>
+
+      {/* Add Account Button - hidden during loading */}
+      {!isLoading && (
+        <div className="px-4 mt-6">
+          <Button className="w-full" size="lg">
+            <PlusIcon className="w-5 h-5 mr-2" />
+            Add New Account
+          </Button>
         </div>
-      </div>
-
-      {/* Add Account Button */}
-      <div className="px-4 mt-6">
-        <Button className="w-full" size="lg">
-          <PlusIcon className="w-5 h-5 mr-2" />
-          Add New Account
-        </Button>
-      </div>
-    </div>
+      )}
+    </Page>
   );
 }
