@@ -4,9 +4,11 @@ import { Link } from "wouter";
 import { render } from "typesafe-routes";
 import { routes } from "../../routes";
 import { MonthlyChart } from "./monthly-chart";
-import { expenseStore } from "@/store/expense-store";
+import { useAccountIds } from "@/shared/hooks/use-account-ids";
 
 export function MonthlyBreakdownOverview() {
+  const accountIds = useAccountIds();
+
   return (
     <div className="px-4 -mt-14">
       <Card className="shadow border-0 gap-0 py-4">
@@ -17,7 +19,7 @@ export function MonthlyBreakdownOverview() {
               href={render(routes.monthlyBreakdownFull, {
                 query: {
                   filters: {
-                    accounts: expenseStore.accounts.map((a) => a.id),
+                    accounts: accountIds,
                     date: { type: "months", value: 3 },
                   },
                 },

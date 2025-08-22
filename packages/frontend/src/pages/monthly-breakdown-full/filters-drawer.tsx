@@ -12,9 +12,10 @@ import {
 } from "@/components/ui/drawer";
 import { Button } from "@/components/ui/button";
 import { CheckIcon } from "lucide-react";
-import { expenseStore } from "@/store/expense-store";
 import { routes } from "../../routes";
 import { MonthlyBreakdownFilters } from "api";
+import { useAccountIds } from "@/shared/hooks/use-account-ids";
+import { api } from "@/api";
 
 export function FiltersDrawer({
   open,
@@ -30,6 +31,8 @@ export function FiltersDrawer({
   const [, navigate] = useLocation();
   const [filters, setFilters] =
     useState<MonthlyBreakdownFilters>(appliedFilters);
+  const accountIds = useAccountIds();
+  const { data: accounts = [] } = api.accounts.list.useQuery();
 
   const handleOpenChange = (newOpen: boolean) => {
     if (newOpen) {
@@ -103,7 +106,7 @@ export function FiltersDrawer({
   const handleSelectAllAccounts = () => {
     setFilters((prev) => ({
       ...prev,
-      accounts: expenseStore.accounts.map((a) => a.id),
+      accounts: accountIds,
     }));
   };
 
@@ -186,7 +189,7 @@ export function FiltersDrawer({
                 </Button>
               </div>
               <div className="flex flex-wrap gap-2">
-                {expenseStore.accounts.map((account) => (
+                {accounts.map((account) => (
                   <Button
                     key={account.id}
                     variant={
