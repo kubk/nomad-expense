@@ -14,7 +14,7 @@ export function App() {
   api.accounts.listWithStats.useQuery();
 
   return (
-    <div className="max-w-md mx-auto bg-muted/100 shadow-2xl relative h-screen overflow-auto">
+    <div className="max-w-md mx-auto bg-muted/100 relative h-screen overflow-auto">
       <Router>
         <Switch>
           <Route path={template(routes.overview)}>
