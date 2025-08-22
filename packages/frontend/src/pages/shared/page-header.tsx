@@ -10,10 +10,12 @@ export function PageHeader({
 }) {
   return (
     <div className="bg-background border-b sticky top-0 z-10">
-      <div className="flex items-center justify-between p-4">
-        <BackButton />
+      <div className="relative flex items-center justify-center p-4">
+        <div className="absolute left-4">
+          <BackButton />
+        </div>
         <h1 className="font-semibold text-foreground">{title}</h1>
-        <div className="w-[60px] flex justify-end">{rightSlot}</div>
+        <div className="absolute right-4">{rightSlot}</div>
       </div>
     </div>
   );

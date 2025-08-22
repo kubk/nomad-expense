@@ -1,4 +1,9 @@
-import { FilterIcon, CalendarIcon, Building2Icon } from "lucide-react";
+import {
+  FilterIcon,
+  CalendarIcon,
+  Building2Icon,
+  WalletIcon,
+} from "lucide-react";
 import { formatAmount } from "../../shared/currency-converter";
 import { TransactionFilters } from "api";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -47,7 +52,7 @@ export function SummaryCard({
                 {getDateLabel()}
               </div>
               <div className="bg-muted text-muted-foreground px-3 py-1.5 rounded-full text-xs font-medium flex items-center gap-1.5">
-                <Building2Icon className="w-3 h-3" />
+                <WalletIcon className="w-3 h-3" />
                 {getAccountsLabel()}
               </div>
             </div>
