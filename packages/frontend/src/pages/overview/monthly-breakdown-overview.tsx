@@ -16,8 +16,10 @@ export function MonthlyBreakdownOverview() {
             <Link
               href={render(routes.monthlyBreakdownFull, {
                 query: {
-                  accounts: expenseStore.accounts.map((a) => a.id).join(","),
-                  months: 3,
+                  filters: {
+                    accounts: expenseStore.accounts.map((a) => a.id),
+                    date: { type: "months", value: 3 },
+                  },
                 },
                 path: {},
               })}

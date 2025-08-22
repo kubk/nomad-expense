@@ -1,14 +1,14 @@
 import { FilterIcon, CalendarIcon, Building2Icon } from "lucide-react";
-import { MonthlyBreakdownFilters, MonthlyData } from "../../shared/types";
 import { currencyStore } from "../../store/currency-store";
 import { formatAmount } from "../../shared/currency-converter";
+import { MonthlyBreakdownFilters, MonthlyBreakdownFull } from "api";
 
 export function YearSummaryCard({
   convertedMonthlyData,
   onFiltersClick,
   appliedFilters,
 }: {
-  convertedMonthlyData: (MonthlyData & { convertedAmount: number })[];
+  convertedMonthlyData: MonthlyBreakdownFull["data"];
   onFiltersClick: () => void;
   appliedFilters: MonthlyBreakdownFilters;
 }) {
@@ -31,14 +31,14 @@ export function YearSummaryCard({
             <div className="flex gap-2">
               <div className="bg-muted text-muted-foreground px-3 py-1.5 rounded-full text-xs font-medium flex items-center gap-1.5">
                 <CalendarIcon className="w-3 h-3" />
-                {appliedFilters.months > 0
-                  ? appliedFilters.months === 1
+                {appliedFilters.date.type === "months"
+                  ? appliedFilters.date.value === 1
                     ? "Last month"
-                    : appliedFilters.months === 12
+                    : appliedFilters.date.value === 12
                       ? "Last year"
-                      : `Last ${appliedFilters.months} months`
-                  : appliedFilters.years.length > 0
-                    ? `${appliedFilters.years.length} year${appliedFilters.years.length > 1 ? "s" : ""}`
+                      : `Last ${appliedFilters.date.value} months`
+                  : appliedFilters.date.type === "years"
+                    ? `${appliedFilters.date.value.length} year${appliedFilters.date.value.length > 1 ? "s" : ""}`
                     : "All time"}
               </div>
               <div className="bg-muted text-muted-foreground px-3 py-1.5 rounded-full text-xs font-medium flex items-center gap-1.5">

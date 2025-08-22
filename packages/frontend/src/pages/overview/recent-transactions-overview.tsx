@@ -4,9 +4,12 @@ import { Link } from "wouter";
 import { renderPath } from "typesafe-routes";
 import { routes } from "../../routes";
 import { TransactionItem } from "../shared/transaction-item";
-import { expenseStore } from "@/store/expense-store";
+import { api } from "../../api";
 
 export function RecentTransactionsOverview() {
+  const { data: recentTransactions, isLoading } =
+    api.expenses.recentTransactions.useQuery();
+
   return (
     <div className="px-4 mt-6">
       <div className="flex justify-between items-center mb-3">
@@ -22,19 +25,24 @@ export function RecentTransactionsOverview() {
 
       <Card className="border-0 p-0 shadow-sm">
         <CardContent className="p-0">
-          {expenseStore.recentTransactions.map((t, idx) => {
-            const account = expenseStore.accounts.find(
-              (a) => a.id === t.account,
-            );
-            return (
+          {isLoading ? (
+            <div className="p-4">
+              <div className="animate-pulse space-y-3">
+                {[...Array(3)].map((_, i) => (
+                  <div key={i} className="bg-muted h-16 rounded"></div>
+                ))}
+              </div>
+            </div>
+          ) : (
+            recentTransactions?.map((t, idx) => (
               <TransactionItem
                 key={t.id}
                 transaction={t}
-                account={account}
+                account={t.accountDetails}
                 showBorder={idx !== 2}
               />
-            );
-          })}
+            ))
+          )}
         </CardContent>
       </Card>
     </div>

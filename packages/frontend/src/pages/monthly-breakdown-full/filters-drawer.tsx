@@ -12,9 +12,10 @@ import {
 } from "@/components/ui/drawer";
 import { Button } from "@/components/ui/button";
 import { CheckIcon } from "lucide-react";
-import { MonthlyBreakdownFilters, MonthlyData } from "../../shared/types";
+import { MonthlyData } from "../../shared/types";
 import { expenseStore } from "@/store/expense-store";
 import { routes } from "../../routes";
+import { MonthlyBreakdownFilters } from "api";
 
 export function FiltersDrawer({
   open,
@@ -50,12 +51,22 @@ export function FiltersDrawer({
   ];
 
   const handleYearToggle = (year: number) => {
-    setFilters((prev) => ({
-      ...prev,
-      years: prev.years.includes(year)
-        ? prev.years.filter((y) => y !== year)
-        : [...prev.years, year],
-    }));
+    setFilters((prev) => {
+      if (prev.date.type === "years") {
+        const currentYears = prev.date.value;
+        const newYears = currentYears.includes(year)
+          ? currentYears.filter((y) => y !== year)
+          : [...currentYears, year];
+        return {
+          ...prev,
+          date: { type: "years", value: newYears },
+        };
+      }
+      return {
+        ...prev,
+        date: { type: "years", value: [year] },
+      };
+    });
   };
 
   const handleAccountToggle = (account: string) => {
@@ -70,9 +81,7 @@ export function FiltersDrawer({
   const handleMonthsChange = (months: number) => {
     setFilters((prev) => ({
       ...prev,
-      months,
-      // Clear year selection when using months filter
-      years: months > 0 ? [] : prev.years,
+      date: { type: "months", value: months },
     }));
   };
 
@@ -80,12 +89,11 @@ export function FiltersDrawer({
     navigate(
       render(routes.monthlyBreakdownFull, {
         query: {
-          accounts: filters.accounts.join(","),
-          years: filters.years.join(","),
-          months: filters.months,
+          filters: filters,
         },
         path: {},
       }),
+      { replace: true },
     );
     onOpenChange(false);
   };
@@ -93,8 +101,7 @@ export function FiltersDrawer({
   const handleAllTime = () => {
     setFilters((prev) => ({
       ...prev,
-      months: 0,
-      years: availableYears,
+      date: { type: "years", value: availableYears },
     }));
   };
 
@@ -132,19 +139,19 @@ export function FiltersDrawer({
                   <Button
                     key={period.value}
                     variant={
-                      filters.months === period.value ? "default" : "outline"
+                      filters.date.type === "months" &&
+                      filters.date.value === period.value
+                        ? "default"
+                        : "outline"
                     }
                     size="sm"
-                    onClick={() =>
-                      handleMonthsChange(
-                        filters.months === period.value ? 0 : period.value,
-                      )
-                    }
+                    onClick={() => handleMonthsChange(period.value)}
                     className="h-8 px-3 text-xs flex items-center gap-2 transition-none"
                   >
-                    {filters.months === period.value && (
-                      <CheckIcon className="size-3" />
-                    )}
+                    {filters.date.type === "months" &&
+                      filters.date.value === period.value && (
+                        <CheckIcon className="size-3" />
+                      )}
                     {period.label}
                   </Button>
                 ))}
@@ -152,20 +159,19 @@ export function FiltersDrawer({
                   <Button
                     key={year}
                     variant={
-                      filters.years.includes(year) ? "default" : "outline"
+                      filters.date.type === "years" &&
+                      filters.date.value.includes(year)
+                        ? "default"
+                        : "outline"
                     }
                     size="sm"
-                    onClick={() => {
-                      handleYearToggle(year);
-                      if (!filters.years.includes(year)) {
-                        setFilters((prev) => ({ ...prev, months: 0 }));
-                      }
-                    }}
+                    onClick={() => handleYearToggle(year)}
                     className="h-8 px-3 text-xs flex items-center gap-2"
                   >
-                    {filters.years.includes(year) && (
-                      <CheckIcon className="size-3" />
-                    )}
+                    {filters.date.type === "years" &&
+                      filters.date.value.includes(year) && (
+                        <CheckIcon className="size-3" />
+                      )}
                     {year}
                   </Button>
                 ))}

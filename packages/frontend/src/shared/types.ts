@@ -1,3 +1,5 @@
+// THIS FILE SHOULD BE ELIMINATED, WE SHOULD USE INFERRED TYPES FROM TRPC instead (shared.ts on backend)
+
 export interface Account {
   id: string;
   name: string;
@@ -43,9 +45,3 @@ export type Route =
   | "monthly-breakdown-full"
   | "accounts"
   | "settings";
-
-export type MonthlyBreakdownFilters = {
-  years: number[];
-  accounts: string[];
-  months: number;
-};
