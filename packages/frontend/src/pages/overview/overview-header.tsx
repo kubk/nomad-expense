@@ -16,10 +16,7 @@ export function OverviewHeader() {
           {isLoading ? (
             <div className="animate-pulse bg-muted h-8 w-32 rounded"></div>
           ) : (
-            formatAmount(
-              sortedMonthlyData[0]?.convertedAmount || 0,
-              (sortedMonthlyData[0]?.currency as any) || "USD",
-            )
+            formatAmount(sortedMonthlyData[0]?.amount || 0, "USD")
           )}
         </div>
       </div>

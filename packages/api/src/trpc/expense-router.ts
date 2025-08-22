@@ -1,12 +1,8 @@
 import { z } from "zod";
 import { eq, and, desc, gte, lte, inArray } from "drizzle-orm";
 import { protectedProcedure, t } from "./trpc";
-import { userTable, transactionTable, accountTable } from "../db/schema";
+import { transactionTable, accountTable } from "../db/schema";
 import { getDb } from "../services/db";
-import {
-  convert,
-  type SupportedCurrency,
-} from "../services/currency-converter";
 
 const monthlyBreakdownFiltersSchema = z.object({
   accounts: z.array(z.string()),
@@ -26,17 +22,6 @@ export const expenseRouter = t.router({
   overview: protectedProcedure.query(async ({ ctx }) => {
     const db = getDb();
     const userId = ctx.user.id;
-
-    // Get user's base currency
-    const user = await db
-      .select({ baseCurrency: userTable.baseCurrency })
-      .from(userTable)
-      .where(eq(userTable.id, userId))
-      .get();
-
-    if (!user) {
-      throw new Error("User not found");
-    }
 
     // Get all transactions for the user
     const transactions = await db
@@ -108,24 +93,16 @@ export const expenseRouter = t.router({
       })
       .map((monthKey) => {
         const monthData = monthlyTotals[monthKey];
-        // Convert to base currency
-        const convertedAmount = convert(
-          monthData.amount,
-          "USD",
-          user.baseCurrency as SupportedCurrency,
-        );
 
         return {
           month: monthKey,
           shortMonth: monthData.shortMonth,
           amount: monthData.amount,
           year: monthData.year,
-          convertedAmount,
-          currency: user.baseCurrency,
         };
       });
 
-    const maxAmount = Math.max(...monthlyData.map((m) => m.convertedAmount));
+    const maxAmount = Math.max(...monthlyData.map((m) => m.amount));
 
     return {
       data: monthlyData,
@@ -177,17 +154,6 @@ export const expenseRouter = t.router({
     .query(async ({ ctx, input }) => {
       const db = getDb();
       const userId = ctx.user.id;
-
-      // Get user's base currency
-      const user = await db
-        .select({ baseCurrency: userTable.baseCurrency })
-        .from(userTable)
-        .where(eq(userTable.id, userId))
-        .get();
-
-      if (!user) {
-        throw new Error("User not found");
-      }
 
       // Build query conditions
       const conditions = [eq(accountTable.userId, userId)];
@@ -278,18 +244,11 @@ export const expenseRouter = t.router({
       const filteredMonthlyData = Object.keys(monthlyTotals)
         .map((monthKey) => {
           const monthData = monthlyTotals[monthKey];
-          const convertedAmount = convert(
-            monthData.amount,
-            "USD",
-            user.baseCurrency as SupportedCurrency,
-          );
-
           return {
             month: monthKey,
             shortMonth: monthData.shortMonth,
             amount: Math.round(monthData.amount),
             year: monthData.year,
-            convertedAmount,
           };
         })
         .sort((a, b) => {
@@ -303,7 +262,7 @@ export const expenseRouter = t.router({
         });
 
       const maxAmount = Math.max(
-        ...filteredMonthlyData.map((m) => m.convertedAmount),
+        ...filteredMonthlyData.map((m) => m.amount),
         0,
       );
 

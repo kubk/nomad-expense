@@ -1,5 +1,4 @@
 import { FilterIcon, CalendarIcon, Building2Icon } from "lucide-react";
-import { currencyStore } from "../../store/currency-store";
 import { formatAmount } from "../../shared/currency-converter";
 import { MonthlyBreakdownFilters, MonthlyBreakdownFull } from "api";
 
@@ -13,7 +12,7 @@ export function YearSummaryCard({
   appliedFilters: MonthlyBreakdownFilters;
 }) {
   const totalAmount = convertedMonthlyData.reduce(
-    (sum, m) => sum + m.convertedAmount,
+    (sum, m) => sum + m.amount,
     0,
   );
 
@@ -63,7 +62,7 @@ export function YearSummaryCard({
                 </span>
               </div>
               <div className="text-2xl font-bold text-foreground">
-                {formatAmount(totalAmount, currencyStore.baseCurrency, {
+                {formatAmount(totalAmount, "USD", {
                   showFractions: false,
                 })}
               </div>
@@ -78,7 +77,7 @@ export function YearSummaryCard({
               </div>
               <div className="text-2xl font-bold text-green-600">
                 +
-                {formatAmount(hardcodedIncome, currencyStore.baseCurrency, {
+                {formatAmount(hardcodedIncome, "USD", {
                   showFractions: false,
                 })}
               </div>

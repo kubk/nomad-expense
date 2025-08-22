@@ -15,6 +15,20 @@
       "when": 1755782047702,
       "tag": "0001_yummy_random",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "6",
+      "when": 1755840921902,
+      "tag": "0002_tan_kronos",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "6",
+      "when": 1755841607366,
+      "tag": "0003_wooden_puff_adder",
+      "breakpoints": true
     }
   ]
 }

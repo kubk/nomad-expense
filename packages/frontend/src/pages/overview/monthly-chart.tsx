@@ -33,7 +33,7 @@ export function MonthlyChart() {
     >
       <div className="flex items-end pb-4 min-w-max">
         {sortedMonthlyData.map((month) => {
-          const heightPercentage = (month.convertedAmount / maxAmount) * 100;
+          const heightPercentage = (month.amount / maxAmount) * 100;
           const barHeight = (heightPercentage / 100) * 100; // 100px max height
 
           return (
@@ -42,7 +42,7 @@ export function MonthlyChart() {
               className="flex flex-col cursor-pointer items-center min-w-[64px] active:scale-95 transition-transform duration-150"
             >
               <div className="mb-4 text-xs font-semibold text-foreground text-center">
-                {formatAmount(month.convertedAmount, month.currency as any, {
+                {formatAmount(month.amount, "USD", {
                   showFractions: false,
                 })}
               </div>

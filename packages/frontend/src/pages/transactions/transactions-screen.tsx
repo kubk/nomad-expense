@@ -2,7 +2,6 @@ import { FilterIcon } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { TransactionItem } from "../shared/transaction-item";
-import { currencyStore } from "../../store/currency-store";
 import { formatAmount } from "../../shared/currency-converter";
 import { TransactionFilters } from "./transaction-filters";
 import { PageHeader } from "../shared/page-header";
@@ -54,10 +53,7 @@ export function TransactionsScreen() {
                     ?.name}
             </p>
             <p className="text-2xl font-bold mt-1">
-              {formatAmount(
-                expenseStore.totalInBaseCurrency,
-                currencyStore.baseCurrency,
-              )}
+              {formatAmount(expenseStore.totalInUSD, "USD")}
             </p>
           </CardContent>
         </Card>
