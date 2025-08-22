@@ -9,9 +9,11 @@ import {
 } from "../../shared/currency-converter";
 import { PageHeader } from "../shared/page-header";
 import { expenseStore } from "@/store/expense-store";
+import { api } from "@/api";
 
 export function AccountsScreen() {
   const [, setLocation] = useLocation();
+  const { data: accounts = [] } = api.accounts.listWithStats.useQuery();
 
   return (
     <div className="min-h-screen pb-20">
@@ -26,10 +28,7 @@ export function AccountsScreen() {
 
       <div className="px-4 mt-4">
         <div className="space-y-3">
-          {expenseStore.accounts.map((account) => {
-            const accountTransactions = expenseStore.transactions.filter(
-              (t) => t.account === account.id,
-            );
+          {accounts.map((account) => {
 
             return (
               <Card
@@ -65,10 +64,10 @@ export function AccountsScreen() {
 
                   <div className="flex justify-between items-center pt-3 border-t">
                     <p className="text-xs text-muted-foreground">
-                      {accountTransactions.length} transactions
+                      {account.transactionCount} transactions
                     </p>
                     <p className="text-xs text-muted-foreground mt-1">
-                      Last: {accountTransactions[0]?.date || "N/A"}
+                      Last: {account.lastTransactionDate || "N/A"}
                     </p>
                   </div>
                 </CardContent>

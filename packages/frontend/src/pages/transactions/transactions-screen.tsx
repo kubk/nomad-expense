@@ -8,9 +8,11 @@ import { TransactionFilters } from "./transaction-filters";
 import { PageHeader } from "../shared/page-header";
 import { expenseStore } from "@/store/expense-store";
 import { useState } from "react";
+import { api } from "@/api";
 
 export function TransactionsScreen() {
   const [showFilters, setShowFilters] = useState(false);
+  const { data: accounts = [] } = api.accounts.list.useQuery();
   return (
     <div className="min-h-screen pb-20">
       <PageHeader
@@ -31,7 +33,7 @@ export function TransactionsScreen() {
       {showFilters && (
         <div className="bg-background border-b">
           <TransactionFilters
-            accounts={expenseStore.accounts}
+            accounts={accounts}
             selectedAccount={expenseStore.selectedAccount}
             dateRange={expenseStore.dateRange}
             setSelectedAccount={expenseStore.setSelectedAccount}
@@ -48,9 +50,8 @@ export function TransactionsScreen() {
             <p className="text-primary-foreground/70 text-sm">
               {expenseStore.selectedAccount === "all"
                 ? "All Accounts"
-                : expenseStore.accounts.find(
-                    (a) => a.id === expenseStore.selectedAccount,
-                  )?.name}
+                : accounts.find((a) => a.id === expenseStore.selectedAccount)
+                    ?.name}
             </p>
             <p className="text-2xl font-bold mt-1">
               {formatAmount(
@@ -67,7 +68,7 @@ export function TransactionsScreen() {
         <Card className="border-0 p-0 shadow-sm">
           <CardContent className="p-0">
             {expenseStore.filteredTransactions.map((transaction, idx) => {
-              const account = expenseStore.accounts.find(
+              const account = accounts.find(
                 (a) => a.id === transaction.account,
               );
               return (
