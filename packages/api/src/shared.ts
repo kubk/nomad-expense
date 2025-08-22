@@ -1,4 +1,11 @@
 import { router } from "./trpc/router";
+export {
+  type SupportedCurrency,
+  SUPPORTED_CURRENCIES,
+  type CurrencyInfo,
+  EXCHANGE_RATES_TO_USD,
+  convert,
+} from "./services/currency-converter";
 import type { inferRouterInputs, inferRouterOutputs } from "@trpc/server";
 
 export type ApiRouter = typeof router;

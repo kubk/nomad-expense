@@ -1,4 +1,4 @@
-import { createRoutes, param } from "typesafe-routes";
+import { createRoutes, param, str } from "typesafe-routes";
 import type { TransactionFilters } from "api";
 
 const transactionFilters = param({
@@ -20,6 +20,10 @@ export const routes = createRoutes({
   },
   accounts: {
     path: ["accounts"],
+  },
+  accountForm: {
+    path: ["accounts", "form"],
+    query: [str.optional("accountId")],
   },
   settings: {
     path: ["settings"],
