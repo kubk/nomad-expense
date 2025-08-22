@@ -49,18 +49,18 @@ export function MonthlyChart() {
 
               {/* Chart container */}
               <div
-                className="relative flex items-end cursor-pointer hover:bg-muted/50 rounded-lg p-1 -m-1 transition-colors group"
+                className="relative flex items-end cursor-pointer rounded-lg p-1 -m-1"
                 style={{ height: "100px" }}
               >
                 <div
-                  className="w-10 bg-primary rounded-t-lg transition-all duration-300 group-hover:bg-primary/90"
+                  className="w-10 bg-primary rounded-t-lg transition-all duration-300"
                   style={{
                     height: `${barHeight}px`,
                   }}
                 />
               </div>
 
-              <div className="mt-2 text-xs font-medium text-foreground hover:text-primary hover:underline transition-colors cursor-pointer">
+              <div className="mt-2 text-xs font-medium text-foreground cursor-pointer">
                 {month.shortMonth}
               </div>
             </div>

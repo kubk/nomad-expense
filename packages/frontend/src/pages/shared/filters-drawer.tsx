@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   Drawer,
   DrawerClose,
@@ -33,10 +33,11 @@ export function FiltersDrawer({
   const availableYears = useAvailableYears();
   const { data: accounts = [] } = api.accounts.list.useQuery();
 
+  useEffect(() => {
+    setFilterForm(filters);
+  }, [filters]);
+
   const handleOpenChange = (newOpen: boolean) => {
-    if (newOpen) {
-      setFilterForm(filters);
-    }
     onOpenChange(newOpen);
   };
 
@@ -63,8 +64,8 @@ export function FiltersDrawer({
     }));
   };
 
-  const handleApply = () => {
-    onApply(filterForm);
+  const handleApply = (filters: TransactionFilters) => {
+    onApply(filters);
     onOpenChange(false);
   };
 
@@ -201,7 +202,7 @@ export function FiltersDrawer({
 
           {!showCustomDatePicker && (
             <DrawerFooter>
-              <Button size="lg" onClick={handleApply}>
+              <Button size="lg" onClick={() => handleApply(filterForm)}>
                 Apply Filters
               </Button>
               <DrawerClose asChild>
