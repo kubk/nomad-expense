@@ -12,7 +12,6 @@ import { cn } from "@/lib/utils";
 export function Navigation() {
   const [location] = useLocation();
 
-  // Hide navigation on certain routes
   if (
     location === template(routes.monthlyBreakdownFull) ||
     location === template(routes.settings)
