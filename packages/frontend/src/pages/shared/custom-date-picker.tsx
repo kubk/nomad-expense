@@ -5,7 +5,11 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { ChevronLeftIcon } from "lucide-react";
 import { TransactionFilters } from "api";
 import { useAvailableYears } from "@/shared/hooks/use-available-years";
-import { getFullMonthName, getMonthNumbers } from "@/shared/date-utils";
+import {
+  getFullMonthName,
+  getMonthNumbers,
+  isMonthInFuture,
+} from "@/shared/date-utils";
 
 type CustomDateValue = { year: number; month: number };
 
@@ -36,7 +40,13 @@ export function CustomDatePicker({
   };
 
   const isYearFullySelected = (year: number) => {
-    return monthNumbers.every((month) => isMonthSelected(year, month));
+    const availableMonths = monthNumbers.filter(
+      (month) => !isMonthInFuture(year, month),
+    );
+    return (
+      availableMonths.length > 0 &&
+      availableMonths.every((month) => isMonthSelected(year, month))
+    );
   };
 
   const toggleMonth = (year: number, month: number) => {
@@ -57,14 +67,17 @@ export function CustomDatePicker({
       // Remove all months for this year
       setSelectedMonths((prev) => prev.filter((m) => m.year !== year));
     } else {
-      // Add all months for this year (remove existing ones first)
+      // Add only available (non-future) months for this year
       setSelectedMonths((prev) => {
         const withoutThisYear = prev.filter((m) => m.year !== year);
-        const allMonthsForYear = monthNumbers.map((month) => ({
+        const availableMonths = monthNumbers.filter(
+          (month) => !isMonthInFuture(year, month),
+        );
+        const availableMonthsForYear = availableMonths.map((month) => ({
           year,
           month,
         }));
-        return [...withoutThisYear, ...allMonthsForYear];
+        return [...withoutThisYear, ...availableMonthsForYear];
       });
     }
   };
@@ -118,17 +131,27 @@ export function CustomDatePicker({
               <div className="grid grid-cols-2 sm:grid-cols-3">
                 {monthNumbers.map((month) => {
                   const isSelected = isMonthSelected(year, month);
+                  const isFuture = isMonthInFuture(year, month);
 
                   return (
                     <label
                       key={month}
                       htmlFor={`${year}-${month}`}
-                      className={`flex items-center gap-2 p-3 border-r border-b border-muted transition-colors cursor-pointer w-full ${isSelected ? "bg-primary/10" : ""}`}
+                      className={`flex items-center gap-2 p-3 border-r border-b border-muted transition-colors w-full ${
+                        isFuture
+                          ? "opacity-50 cursor-not-allowed"
+                          : isSelected
+                            ? "bg-primary/10 cursor-pointer"
+                            : "cursor-pointer"
+                      }`}
                     >
                       <Checkbox
                         id={`${year}-${month}`}
                         checked={isSelected}
-                        onCheckedChange={() => toggleMonth(year, month)}
+                        disabled={isFuture}
+                        onCheckedChange={() =>
+                          !isFuture && toggleMonth(year, month)
+                        }
                       />
                       <span className="text-sm select-none flex-1">
                         {getFullMonthName(month)}

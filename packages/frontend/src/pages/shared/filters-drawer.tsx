@@ -73,10 +73,11 @@ export function FiltersDrawer({
     const allMonths = availableYears.flatMap((year) =>
       Array.from({ length: 12 }, (_, i) => ({ year, month: i + 1 })),
     );
-    setFilterForm((prev) => ({
-      ...prev,
+    onApply({
+      ...filterForm,
       date: { type: "custom", value: allMonths },
-    }));
+    });
+    onOpenChange(false);
   };
 
   const handleShowCustomDatePicker = () => {
@@ -88,10 +89,11 @@ export function FiltersDrawer({
   };
 
   const handleSelectAllAccounts = () => {
-    setFilterForm((prev) => ({
-      ...prev,
+    onApply({
+      ...filterForm,
       accounts: accountIds,
-    }));
+    });
+    onOpenChange(false);
   };
 
   return (
