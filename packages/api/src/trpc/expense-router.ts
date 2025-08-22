@@ -4,7 +4,7 @@ import { protectedProcedure, t } from "./trpc";
 import { transactionTable, accountTable } from "../db/schema";
 import { getDb } from "../services/db";
 
-const monthlyBreakdownFiltersSchema = z.object({
+const transactionFilterSchema = z.object({
   accounts: z.array(z.string()),
   date: z.discriminatedUnion("type", [
     z.object({
@@ -149,8 +149,8 @@ export const expenseRouter = t.router({
     }));
   }),
 
-  transactions: protectedProcedure
-    .input(monthlyBreakdownFiltersSchema)
+  transactionsByMonth: protectedProcedure
+    .input(transactionFilterSchema)
     .query(async ({ ctx, input }) => {
       const db = getDb();
       const userId = ctx.user.id;
@@ -171,18 +171,18 @@ export const expenseRouter = t.router({
           gte(transactionTable.date, pastDate.toISOString().split("T")[0]),
         );
       } else if (input.date.type === "years") {
-        // Specific years filter
-        const yearConditions = input.date.value.map((year) =>
-          and(
-            gte(transactionTable.date, `${year}-01-01`),
-            lte(transactionTable.date, `${year}-12-31`),
-          ),
-        );
-        // Note: This is a simplified approach for single year
-        if (yearConditions.length === 1 && yearConditions[0]) {
-          conditions.push(yearConditions[0]);
+        // Specific years filter - handle multiple years with range
+        if (input.date.value.length > 0) {
+          const minYear = Math.min(...input.date.value);
+          const maxYear = Math.max(...input.date.value);
+          const yearCondition = and(
+            gte(transactionTable.date, `${minYear}-01-01`),
+            lte(transactionTable.date, `${maxYear}-12-31`),
+          );
+          if (yearCondition) {
+            conditions.push(yearCondition);
+          }
         }
-        // For multiple years, you'd need an OR condition which requires more complex SQL logic
       }
 
       const transactions = await db
@@ -219,7 +219,7 @@ export const expenseRouter = t.router({
         "Dec",
       ];
 
-      transactions.forEach((transaction: any) => {
+      transactions.forEach((transaction) => {
         // Only include expenses (negative amounts)
         if (transaction.usdAmount >= 0) return;
 
@@ -269,6 +269,90 @@ export const expenseRouter = t.router({
       return {
         data: filteredMonthlyData,
         maxAmount,
+      };
+    }),
+
+  transactionsList: protectedProcedure
+    .input(transactionFilterSchema)
+    .query(async ({ ctx, input }) => {
+      const db = getDb();
+      const userId = ctx.user.id;
+
+      // Build query conditions
+      const conditions = [eq(accountTable.userId, userId)];
+
+      // Account filter
+      conditions.push(inArray(accountTable.id, input.accounts));
+
+      // Date filter
+      if (input.date.type === "months") {
+        // Recent N months filter
+        const currentDate = new Date();
+        const pastDate = new Date();
+        pastDate.setMonth(currentDate.getMonth() - input.date.value);
+        conditions.push(
+          gte(transactionTable.date, pastDate.toISOString().split("T")[0]),
+        );
+      } else if (input.date.type === "years") {
+        // Specific years filter - handle multiple years with range
+        if (input.date.value.length > 0) {
+          const minYear = Math.min(...input.date.value);
+          const maxYear = Math.max(...input.date.value);
+          const yearCondition = and(
+            gte(transactionTable.date, `${minYear}-01-01`),
+            lte(transactionTable.date, `${maxYear}-12-31`),
+          );
+          if (yearCondition) {
+            conditions.push(yearCondition);
+          }
+        }
+      }
+
+      const transactions = await db
+        .select({
+          id: transactionTable.id,
+          description: transactionTable.description,
+          amount: transactionTable.amount,
+          currency: transactionTable.currency,
+          usdAmount: transactionTable.usdAmount,
+          date: transactionTable.date,
+          account: {
+            id: accountTable.id,
+            name: accountTable.name,
+            currency: accountTable.currency,
+            color: accountTable.color,
+          },
+        })
+        .from(transactionTable)
+        .innerJoin(
+          accountTable,
+          eq(transactionTable.accountId, accountTable.id),
+        )
+        .where(and(...conditions))
+        .orderBy(desc(transactionTable.date))
+        .all();
+
+      // Calculate total for filtered transactions (expenses only)
+      const totalInUSD = transactions.reduce((sum, t) => {
+        // Only include expenses (negative amounts) in the total
+        if (t.usdAmount >= 0) return sum; // Skip income transactions
+        // Return absolute value of expense amount in USD cents
+        return sum + Math.abs(t.usdAmount);
+      }, 0);
+
+      return {
+        transactions: transactions.map((t) => ({
+          id: t.id,
+          desc: t.description,
+          amount: t.amount,
+          currency: t.currency,
+          usd: t.usdAmount,
+          date: t.date,
+          account: t.account.id,
+          month: new Date(t.date).toLocaleString("default", { month: "long" }),
+          accountDetails: t.account,
+        })),
+        totalInUSD,
       };
     }),
 });

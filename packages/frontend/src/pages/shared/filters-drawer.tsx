@@ -1,6 +1,4 @@
 import { useState } from "react";
-import { useLocation } from "wouter";
-import { render } from "typesafe-routes";
 import {
   Drawer,
   DrawerClose,
@@ -12,8 +10,7 @@ import {
 } from "@/components/ui/drawer";
 import { Button } from "@/components/ui/button";
 import { CheckIcon } from "lucide-react";
-import { routes } from "../../routes";
-import { MonthlyBreakdownFilters } from "api";
+import { TransactionFilters } from "api";
 import { useAccountIds } from "@/shared/hooks/use-account-ids";
 import { api } from "@/api";
 
@@ -22,15 +19,15 @@ export function FiltersDrawer({
   onOpenChange,
   availableYears,
   filters,
+  onApply,
 }: {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   availableYears: number[];
-  filters: MonthlyBreakdownFilters;
+  filters: TransactionFilters;
+  onApply: (filters: TransactionFilters) => void;
 }) {
-  const [, navigate] = useLocation();
-  const [filterForm, setFilterForm] =
-    useState<MonthlyBreakdownFilters>(filters);
+  const [filterForm, setFilterForm] = useState<TransactionFilters>(filters);
   const accountIds = useAccountIds();
   const { data: accounts = [] } = api.accounts.list.useQuery();
 
@@ -84,15 +81,7 @@ export function FiltersDrawer({
   };
 
   const handleApply = () => {
-    navigate(
-      render(routes.monthlyBreakdownFull, {
-        query: {
-          filters: filterForm,
-        },
-        path: {},
-      }),
-      { replace: true },
-    );
+    onApply(filterForm);
     onOpenChange(false);
   };
 

@@ -1,9 +1,9 @@
 import { createRoutes, param } from "typesafe-routes";
-import type { MonthlyBreakdownFilters } from "api";
+import type { TransactionFilters } from "api";
 
-const monthlyBreakdownFilters = param({
-  serialize: (value: MonthlyBreakdownFilters) => JSON.stringify(value),
-  parse: (value: string) => JSON.parse(value) as MonthlyBreakdownFilters,
+const transactionFilters = param({
+  serialize: (value: TransactionFilters) => JSON.stringify(value),
+  parse: (value: string) => JSON.parse(value) as TransactionFilters,
 });
 
 export const routes = createRoutes({
@@ -12,10 +12,11 @@ export const routes = createRoutes({
   },
   transactions: {
     path: ["transactions"],
+    query: [transactionFilters("filters")],
   },
   monthlyBreakdownFull: {
     path: ["monthly-breakdown-full"],
-    query: [monthlyBreakdownFilters("filters")],
+    query: [transactionFilters("filters")],
   },
   accounts: {
     path: ["accounts"],

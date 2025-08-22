@@ -1,4 +1,4 @@
-import { Transaction, Account } from "../../shared/types";
+import { Transaction, Account } from "api";
 import {
   formatAmount,
   SupportedCurrency,

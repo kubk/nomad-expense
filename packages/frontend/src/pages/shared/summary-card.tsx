@@ -1,22 +1,38 @@
 import { FilterIcon, CalendarIcon, Building2Icon } from "lucide-react";
 import { formatAmount } from "../../shared/currency-converter";
-import { MonthlyBreakdownFilters, MonthlyBreakdownFull } from "api";
+import { TransactionFilters } from "api";
+import { api } from "@/api";
 
-export function YearSummaryCard({
-  convertedMonthlyData,
+export function SummaryCard({
   onFiltersClick,
   appliedFilters,
+  totalAmount,
 }: {
-  convertedMonthlyData: MonthlyBreakdownFull["data"];
   onFiltersClick: () => void;
-  appliedFilters: MonthlyBreakdownFilters;
+  appliedFilters: TransactionFilters;
+  totalAmount: number;
 }) {
-  const totalAmount = convertedMonthlyData.reduce(
-    (sum, m) => sum + m.amount,
-    0,
-  );
-
+  const { data: accounts = [] } = api.accounts.list.useQuery();
   const hardcodedIncome = 130000; // $1,300 hardcoded as requested
+
+  const getAccountsLabel = () => {
+    if (appliedFilters.accounts.length === accounts.length) {
+      return "All accounts";
+    }
+    return `${appliedFilters.accounts.length} account${appliedFilters.accounts.length > 1 ? "s" : ""}`;
+  };
+
+  const getDateLabel = () => {
+    if (appliedFilters.date.type === "months") {
+      if (appliedFilters.date.value === 1) return "Last month";
+      if (appliedFilters.date.value === 12) return "Last year";
+      return `Last ${appliedFilters.date.value} months`;
+    }
+    if (appliedFilters.date.type === "years") {
+      return `${appliedFilters.date.value.length} year${appliedFilters.date.value.length > 1 ? "s" : ""}`;
+    }
+    return "All time";
+  };
 
   return (
     <div className="px-4 mt-4">
@@ -30,21 +46,11 @@ export function YearSummaryCard({
             <div className="flex gap-2">
               <div className="bg-muted text-muted-foreground px-3 py-1.5 rounded-full text-xs font-medium flex items-center gap-1.5">
                 <CalendarIcon className="w-3 h-3" />
-                {appliedFilters.date.type === "months"
-                  ? appliedFilters.date.value === 1
-                    ? "Last month"
-                    : appliedFilters.date.value === 12
-                      ? "Last year"
-                      : `Last ${appliedFilters.date.value} months`
-                  : appliedFilters.date.type === "years"
-                    ? `${appliedFilters.date.value.length} year${appliedFilters.date.value.length > 1 ? "s" : ""}`
-                    : "All time"}
+                {getDateLabel()}
               </div>
               <div className="bg-muted text-muted-foreground px-3 py-1.5 rounded-full text-xs font-medium flex items-center gap-1.5">
                 <Building2Icon className="w-3 h-3" />
-                {appliedFilters.accounts.length > 0
-                  ? `${appliedFilters.accounts.length} account${appliedFilters.accounts.length > 1 ? "s" : ""}`
-                  : "All accounts"}
+                {getAccountsLabel()}
               </div>
             </div>
             <div className="p-2">

@@ -3,16 +3,17 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { useLocation } from "wouter";
+import { render } from "typesafe-routes";
+import { routes } from "../../routes";
 import {
   getCurrencySymbol,
   SupportedCurrency,
 } from "../../shared/currency-converter";
 import { PageHeader } from "../shared/page-header";
-import { expenseStore } from "@/store/expense-store";
 import { api } from "@/api";
 
 export function AccountsScreen() {
-  const [, setLocation] = useLocation();
+  const [, navigate] = useLocation();
   const { data: accounts = [] } = api.accounts.listWithStats.useQuery();
 
   return (
@@ -29,14 +30,21 @@ export function AccountsScreen() {
       <div className="px-4 mt-4">
         <div className="space-y-3">
           {accounts.map((account) => {
-
             return (
               <Card
                 key={account.id}
                 className="border-0 shadow-sm cursor-pointer hover:shadow-md transition-shadow"
                 onClick={() => {
-                  expenseStore.setSelectedAccount(account.id);
-                  setLocation("/transactions");
+                  const filters = {
+                    accounts: [account.id],
+                    date: { type: "months" as const, value: 3 },
+                  };
+                  navigate(
+                    render(routes.transactions, {
+                      query: { filters },
+                      path: {},
+                    }),
+                  );
                 }}
               >
                 <CardContent className="px-4">
