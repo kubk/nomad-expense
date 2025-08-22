@@ -3,7 +3,6 @@ import { api } from "../../api";
 
 export function OverviewHeader() {
   const { data: overviewData, isLoading } = api.expenses.overview.useQuery();
-
   const sortedMonthlyData = overviewData?.data || [];
 
   return (
@@ -14,7 +13,7 @@ export function OverviewHeader() {
         </p>
         <div className="text-3xl dark:text-foreground font-bold">
           {isLoading ? (
-            <div className="animate-pulse bg-muted h-8 w-32 rounded"></div>
+            <div className="animate-pulse bg-muted h-9 w-32 rounded"></div>
           ) : (
             formatAmount(sortedMonthlyData[0]?.amount || 0, "USD")
           )}

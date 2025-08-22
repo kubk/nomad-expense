@@ -37,7 +37,7 @@ export function TransactionItem({
       </div>
       <div className="self-start text-right">
         <p
-          className={`font-semibold text-sm ${isIncome ? "text-green-700" : ""}`}
+          className={`font-semibold text-sm ${isIncome ? "text-green-700 dark:text-green-400" : ""}`}
         >
           {isIncome ? "+ " : ""}
           {formatAmount(
@@ -47,7 +47,7 @@ export function TransactionItem({
         </p>
         {transaction.currency !== "USD" && (
           <p
-            className={`text-xs ${isIncome ? "text-green-600" : "text-muted-foreground"}`}
+            className={`text-xs ${isIncome ? "text-green-600 dark:text-green-400" : "text-muted-foreground"}`}
           >
             {isIncome ? "+ " : ""}
             {formatAmount(displayAmountInUSD, "USD")}
