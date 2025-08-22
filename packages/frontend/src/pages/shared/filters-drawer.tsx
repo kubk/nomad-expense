@@ -14,6 +14,7 @@ import { TransactionFilters } from "api";
 import { useAccountIds } from "@/shared/hooks/use-account-ids";
 import { useAvailableYears } from "@/shared/hooks/use-available-years";
 import { api } from "@/api";
+import { CustomDatePicker } from "./custom-date-picker";
 
 export function FiltersDrawer({
   open,
@@ -27,6 +28,7 @@ export function FiltersDrawer({
   onApply: (filters: TransactionFilters) => void;
 }) {
   const [filterForm, setFilterForm] = useState<TransactionFilters>(filters);
+  const [showCustomDatePicker, setShowCustomDatePicker] = useState(false);
   const accountIds = useAccountIds();
   const availableYears = useAvailableYears();
   const { data: accounts = [] } = api.accounts.list.useQuery();
@@ -44,25 +46,6 @@ export function FiltersDrawer({
     { value: 6, label: "Last 6 months" },
     { value: 12, label: "Last year" },
   ];
-
-  const handleYearToggle = (year: number) => {
-    setFilterForm((prev) => {
-      if (prev.date.type === "years") {
-        const currentYears = prev.date.value;
-        const newYears = currentYears.includes(year)
-          ? currentYears.filter((y) => y !== year)
-          : [...currentYears, year];
-        return {
-          ...prev,
-          date: { type: "years", value: newYears },
-        };
-      }
-      return {
-        ...prev,
-        date: { type: "years", value: [year] },
-      };
-    });
-  };
 
   const handleAccountToggle = (account: string) => {
     setFilterForm((prev) => ({
@@ -86,10 +69,21 @@ export function FiltersDrawer({
   };
 
   const handleAllTime = () => {
+    const allMonths = availableYears.flatMap((year) =>
+      Array.from({ length: 12 }, (_, i) => ({ year, month: i + 1 })),
+    );
     setFilterForm((prev) => ({
       ...prev,
-      date: { type: "years", value: availableYears },
+      date: { type: "custom", value: allMonths },
     }));
+  };
+
+  const handleShowCustomDatePicker = () => {
+    setShowCustomDatePicker(true);
+  };
+
+  const handleCustomDateBack = () => {
+    setShowCustomDatePicker(false);
   };
 
   const handleSelectAllAccounts = () => {
@@ -103,113 +97,119 @@ export function FiltersDrawer({
     <Drawer open={open} onOpenChange={handleOpenChange}>
       <DrawerContent>
         <div className="mx-auto w-full max-w-sm">
-          <DrawerHeader>
+          <DrawerHeader className="p-2">
             <DrawerTitle />
             <DrawerDescription />
           </DrawerHeader>
 
           <div className="p-4 pt-0 pb-0 space-y-6">
-            <div>
-              <div className="flex items-center justify-between mb-3">
-                <h3 className="font-medium">Time Period</h3>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={handleAllTime}
-                  className="text-xs h-6 px-2"
-                >
-                  All time
-                </Button>
-              </div>
-              <div className="flex flex-wrap gap-2">
-                {timePeriods.map((period) => (
-                  <Button
-                    key={period.value}
-                    variant={
-                      filterForm.date.type === "months" &&
-                      filterForm.date.value === period.value
-                        ? "default"
-                        : "outline"
-                    }
-                    size="sm"
-                    onClick={() => handleMonthsChange(period.value)}
-                    className="h-8 px-3 text-xs flex items-center gap-2 transition-none"
-                  >
-                    {filterForm.date.type === "months" &&
-                      filterForm.date.value === period.value && (
+            {showCustomDatePicker ? (
+              <CustomDatePicker
+                filters={filterForm}
+                onBack={handleCustomDateBack}
+              />
+            ) : (
+              <>
+                <div className="pt-2">
+                  <div className="flex items-center justify-between mb-3">
+                    <h3 className="font-medium">Time Period</h3>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={handleAllTime}
+                      className="text-xs h-6 px-2"
+                    >
+                      All time
+                    </Button>
+                  </div>
+                  <div className="flex flex-wrap gap-2">
+                    {timePeriods.map((period) => (
+                      <Button
+                        key={period.value}
+                        variant={
+                          filterForm.date.type === "months" &&
+                          filterForm.date.value === period.value
+                            ? "default"
+                            : "outline"
+                        }
+                        size="sm"
+                        onClick={() => handleMonthsChange(period.value)}
+                        className="h-8 px-3 text-xs flex items-center gap-2 transition-none"
+                      >
+                        {filterForm.date.type === "months" &&
+                          filterForm.date.value === period.value && (
+                            <CheckIcon className="size-3" />
+                          )}
+                        {period.label}
+                      </Button>
+                    ))}
+                    <Button
+                      variant={
+                        filterForm.date.type === "custom"
+                          ? "default"
+                          : "outline"
+                      }
+                      size="sm"
+                      onClick={handleShowCustomDatePicker}
+                      className="h-8 px-3 text-xs flex items-center gap-2"
+                    >
+                      {filterForm.date.type === "custom" && (
                         <CheckIcon className="size-3" />
                       )}
-                    {period.label}
-                  </Button>
-                ))}
-                {availableYears.map((year) => (
-                  <Button
-                    key={year}
-                    variant={
-                      filterForm.date.type === "years" &&
-                      filterForm.date.value.includes(year)
-                        ? "default"
-                        : "outline"
-                    }
-                    size="sm"
-                    onClick={() => handleYearToggle(year)}
-                    className="h-8 px-3 text-xs flex items-center gap-2"
-                  >
-                    {filterForm.date.type === "years" &&
-                      filterForm.date.value.includes(year) && (
-                        <CheckIcon className="size-3" />
-                      )}
-                    {year}
-                  </Button>
-                ))}
-              </div>
-            </div>
+                      Custom
+                    </Button>
+                  </div>
+                </div>
 
-            <div>
-              <div className="flex items-center justify-between mb-3">
-                <h3 className="font-medium">Bank Accounts</h3>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={handleSelectAllAccounts}
-                  className="text-xs h-6 px-2"
-                >
-                  All accounts
-                </Button>
-              </div>
-              <div className="flex flex-wrap gap-2">
-                {accounts.map((account) => (
-                  <Button
-                    key={account.id}
-                    variant={
-                      filterForm.accounts.includes(account.id)
-                        ? "default"
-                        : "outline"
-                    }
-                    size="sm"
-                    onClick={() => handleAccountToggle(account.id)}
-                    className="h-8 px-3 text-xs flex items-center gap-2 transition-none"
-                  >
-                    {filterForm.accounts.includes(account.id) && (
-                      <CheckIcon className="size-3" />
-                    )}
-                    {account.name}
-                  </Button>
-                ))}
-              </div>
-            </div>
+                <div>
+                  <div className="flex items-center justify-between mb-3">
+                    <h3 className="font-medium">Bank Accounts</h3>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={handleSelectAllAccounts}
+                      className="text-xs h-6 px-2"
+                    >
+                      All accounts
+                    </Button>
+                  </div>
+                  <div className="flex flex-wrap gap-2">
+                    {accounts.map((account) => (
+                      <Button
+                        key={account.id}
+                        variant={
+                          filterForm.accounts.includes(account.id)
+                            ? "default"
+                            : "outline"
+                        }
+                        size="sm"
+                        onClick={() => handleAccountToggle(account.id)}
+                        className="h-8 px-3 text-xs flex items-center gap-2 transition-none"
+                      >
+                        {filterForm.accounts.includes(account.id) && (
+                          <CheckIcon className="size-3" />
+                        )}
+                        {account.name}
+                      </Button>
+                    ))}
+                  </div>
+                </div>
+              </>
+            )}
           </div>
 
-          <DrawerFooter>
-            <Button size="lg" onClick={handleApply}>
-              Apply Filters
-            </Button>
-            <DrawerClose asChild>
-              <Button size="lg" variant="outline">
-                Cancel
+          {!showCustomDatePicker && (
+            <DrawerFooter>
+              <Button size="lg" onClick={handleApply}>
+                Apply Filters
               </Button>
-            </DrawerClose>
-          </DrawerFooter>
+              <DrawerClose asChild>
+                <Button size="lg" variant="outline">
+                  Cancel
+                </Button>
+              </DrawerClose>
+            </DrawerFooter>
+          )}
         </div>
       </DrawerContent>
     </Drawer>

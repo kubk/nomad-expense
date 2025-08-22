@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { eq, and, desc, gte, lte, inArray } from "drizzle-orm";
+import { eq, and, or, desc, gte, lte, inArray } from "drizzle-orm";
 import { protectedProcedure, t } from "./trpc";
 import { transactionTable, accountTable } from "../db/schema";
 import { getDb } from "../services/db";
@@ -12,8 +12,13 @@ const transactionFilterSchema = z.object({
       value: z.number(),
     }),
     z.object({
-      type: z.literal("years"),
-      value: z.array(z.number()),
+      type: z.literal("custom"),
+      value: z.array(
+        z.object({
+          year: z.number(),
+          month: z.number().min(1).max(12),
+        }),
+      ),
     }),
   ]),
 });
@@ -97,6 +102,7 @@ export const expenseRouter = t.router({
         return {
           month: monthKey,
           shortMonth: monthData.shortMonth,
+          monthNumber: monthNames.indexOf(monthData.shortMonth) + 1,
           amount: monthData.amount,
           year: monthData.year,
         };
@@ -170,17 +176,29 @@ export const expenseRouter = t.router({
         conditions.push(
           gte(transactionTable.date, pastDate.toISOString().split("T")[0]),
         );
-      } else if (input.date.type === "years") {
-        // Specific years filter - handle multiple years with range
+      } else if (input.date.type === "custom") {
+        // Custom year-month filter
         if (input.date.value.length > 0) {
-          const minYear = Math.min(...input.date.value);
-          const maxYear = Math.max(...input.date.value);
-          const yearCondition = and(
-            gte(transactionTable.date, `${minYear}-01-01`),
-            lte(transactionTable.date, `${maxYear}-12-31`),
-          );
-          if (yearCondition) {
-            conditions.push(yearCondition);
+          const monthConditions = input.date.value.map(({ year, month }) => {
+            const monthStr = month.toString().padStart(2, "0");
+            const lastDay = new Date(year, month, 0).getDate();
+            return and(
+              gte(transactionTable.date, `${year}-${monthStr}-01`),
+              lte(
+                transactionTable.date,
+                `${year}-${monthStr}-${lastDay.toString().padStart(2, "0")}`,
+              ),
+            )!; // Non-null assertion since we know and() will return a value
+          });
+
+          if (monthConditions.length === 1) {
+            conditions.push(monthConditions[0]);
+          } else if (monthConditions.length > 1) {
+            // Use OR to match any of the specified months
+            const orCondition = or(...monthConditions);
+            if (orCondition) {
+              conditions.push(orCondition);
+            }
           }
         }
       }
@@ -247,6 +265,7 @@ export const expenseRouter = t.router({
           return {
             month: monthKey,
             shortMonth: monthData.shortMonth,
+            monthNumber: monthNames.indexOf(monthData.shortMonth) + 1,
             amount: Math.round(monthData.amount),
             year: monthData.year,
           };
@@ -293,17 +312,29 @@ export const expenseRouter = t.router({
         conditions.push(
           gte(transactionTable.date, pastDate.toISOString().split("T")[0]),
         );
-      } else if (input.date.type === "years") {
-        // Specific years filter - handle multiple years with range
+      } else if (input.date.type === "custom") {
+        // Custom year-month filter
         if (input.date.value.length > 0) {
-          const minYear = Math.min(...input.date.value);
-          const maxYear = Math.max(...input.date.value);
-          const yearCondition = and(
-            gte(transactionTable.date, `${minYear}-01-01`),
-            lte(transactionTable.date, `${maxYear}-12-31`),
-          );
-          if (yearCondition) {
-            conditions.push(yearCondition);
+          const monthConditions = input.date.value.map(({ year, month }) => {
+            const monthStr = month.toString().padStart(2, "0");
+            const lastDay = new Date(year, month, 0).getDate();
+            return and(
+              gte(transactionTable.date, `${year}-${monthStr}-01`),
+              lte(
+                transactionTable.date,
+                `${year}-${monthStr}-${lastDay.toString().padStart(2, "0")}`,
+              ),
+            )!; // Non-null assertion since we know and() will return a value
+          });
+
+          if (monthConditions.length === 1) {
+            conditions.push(monthConditions[0]);
+          } else if (monthConditions.length > 1) {
+            // Use OR to match any of the specified months
+            const orCondition = or(...monthConditions);
+            if (orCondition) {
+              conditions.push(orCondition);
+            }
           }
         }
       }
