@@ -28,6 +28,9 @@ export function MonthlyBreakdownFull() {
 
   const filteredMonthlyData = transactionsData?.data || [];
   const maxAmount = transactionsData?.maxAmount || 0;
+  const availableYears = [...new Set(expenseStore.monthlyData.map((m) => m.year))].sort(
+    (a, b) => b - a,
+  );
 
   return (
     <div className="min-h-screen pb-20">
@@ -71,7 +74,7 @@ export function MonthlyBreakdownFull() {
       <FiltersDrawer
         open={isDrawerOpen}
         onOpenChange={setIsDrawerOpen}
-        monthlyData={expenseStore.monthlyData}
+        availableYears={availableYears}
         appliedFilters={appliedFilters}
       />
     </div>

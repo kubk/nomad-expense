@@ -12,7 +12,6 @@ import {
 } from "@/components/ui/drawer";
 import { Button } from "@/components/ui/button";
 import { CheckIcon } from "lucide-react";
-import { MonthlyData } from "../../shared/types";
 import { expenseStore } from "@/store/expense-store";
 import { routes } from "../../routes";
 import { MonthlyBreakdownFilters } from "api";
@@ -20,12 +19,12 @@ import { MonthlyBreakdownFilters } from "api";
 export function FiltersDrawer({
   open,
   onOpenChange,
-  monthlyData,
+  availableYears,
   appliedFilters,
 }: {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  monthlyData: MonthlyData[];
+  availableYears: number[];
   appliedFilters: MonthlyBreakdownFilters;
 }) {
   const [, navigate] = useLocation();
@@ -38,10 +37,6 @@ export function FiltersDrawer({
     }
     onOpenChange(newOpen);
   };
-
-  const availableYears = [...new Set(monthlyData.map((m) => m.year))].sort(
-    (a, b) => b - a,
-  );
 
   const timePeriods = [
     { value: 1, label: "Last month" },
