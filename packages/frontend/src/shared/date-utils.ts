@@ -41,3 +41,11 @@ export const getFullMonthName = (monthNumber: number): string => {
 export const getMonthNumbers = (): number[] => {
   return Array.from({ length: MONTHS_IN_YEAR }, (_, i) => i + 1);
 };
+
+export const isMonthInFuture = (year: number, month: number): boolean => {
+  const now = new Date();
+  const currentYear = now.getFullYear();
+  const currentMonth = now.getMonth() + 1;
+
+  return year > currentYear || (year === currentYear && month > currentMonth);
+};
