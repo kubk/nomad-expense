@@ -1,25 +1,23 @@
 import { useState } from "react";
-import { useLocation } from "wouter";
-import { render } from "typesafe-routes";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { ChevronLeftIcon } from "lucide-react";
 import { TransactionFilters } from "api";
 import { useAvailableYears } from "@/shared/hooks/use-available-years";
-import { routes } from "../../routes";
 
 type CustomDateValue = { year: number; month: number };
 
 export function CustomDatePicker({
   filters,
+  onApply,
   onBack,
 }: {
   filters: TransactionFilters;
+  onApply: (filters: TransactionFilters) => void;
   onBack: () => void;
 }) {
   const availableYears = useAvailableYears();
-  const [, navigate] = useLocation();
 
   const [selectedMonths, setSelectedMonths] = useState<CustomDateValue[]>(
     () => {
@@ -84,21 +82,13 @@ export function CustomDatePicker({
   };
 
   const handleApply = () => {
-    navigate(
-      render(routes.monthlyBreakdownFull, {
-        query: {
-          filters: {
-            accounts: filters.accounts,
-            date: {
-              type: "custom",
-              value: selectedMonths,
-            },
-          },
-        },
-        path: {},
-      }),
-      { replace: true },
-    );
+    onApply({
+      ...filters,
+      date: {
+        type: "custom",
+        value: selectedMonths,
+      },
+    });
   };
 
   return (

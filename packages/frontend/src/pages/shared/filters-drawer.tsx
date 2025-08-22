@@ -106,6 +106,7 @@ export function FiltersDrawer({
             {showCustomDatePicker ? (
               <CustomDatePicker
                 filters={filterForm}
+                onApply={handleApply}
                 onBack={handleCustomDateBack}
               />
             ) : (
