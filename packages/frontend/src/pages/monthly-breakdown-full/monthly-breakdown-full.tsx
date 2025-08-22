@@ -10,16 +10,18 @@ import { expenseStore } from "@/store/expense-store";
 import { routes } from "../../routes";
 import { api } from "../../api";
 import { MonthlyBreakdownFilters } from "api";
+import { useAccountIds } from "@/shared/hooks/use-account-ids";
 
 export function MonthlyBreakdownFull() {
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+  const accountIds = useAccountIds();
 
   const parsedQuery = safeParseQuery(routes.monthlyBreakdownFull, useSearch());
 
   const appliedFilters: MonthlyBreakdownFilters = parsedQuery.success
     ? parsedQuery.data.filters
     : {
-        accounts: expenseStore.accounts.map((a) => a.id),
+        accounts: accountIds,
         date: { type: "months", value: 3 },
       };
 
@@ -28,9 +30,9 @@ export function MonthlyBreakdownFull() {
 
   const filteredMonthlyData = transactionsData?.data || [];
   const maxAmount = transactionsData?.maxAmount || 0;
-  const availableYears = [...new Set(expenseStore.monthlyData.map((m) => m.year))].sort(
-    (a, b) => b - a,
-  );
+  const availableYears = [
+    ...new Set(expenseStore.monthlyData.map((m) => m.year)),
+  ].sort((a, b) => b - a);
 
   return (
     <div className="min-h-screen pb-20">

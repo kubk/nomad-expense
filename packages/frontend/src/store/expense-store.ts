@@ -1,16 +1,10 @@
 import { makeAutoObservable } from "mobx";
-import { Account, MonthlyData, Transaction, DateRange } from "@/shared/types";
+import { MonthlyData, Transaction, DateRange } from "@/shared/types";
 import { convert } from "@/shared/currency-converter";
 import { currencyStore } from "./currency-store";
-import {
-  accounts as mockAccounts,
-  transactions as mockTransactions,
-} from "@/shared/data";
+import { transactions as mockTransactions } from "@/shared/data";
 
 export class ExpenseStore {
-  // Observable data from data.ts
-  accounts: Account[] = mockAccounts;
-
   // Observable filters
   selectedAccount = "all";
   dateRange: DateRange = { from: "", to: "" };

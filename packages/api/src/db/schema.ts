@@ -1,4 +1,4 @@
-import { sqliteTable, text, integer } from "drizzle-orm/sqlite-core";
+import { sqliteTable, text, integer, index } from "drizzle-orm/sqlite-core";
 import { sql } from "drizzle-orm";
 
 const id = text("id")
@@ -19,7 +19,9 @@ export const accountTable = sqliteTable("account", {
   name: text("name").notNull(),
   currency: text("currency").notNull(),
   color: text("color").notNull(),
-});
+}, (table) => ({
+  userIdIdx: index("idx_account_user_id").on(table.userId),
+}));
 
 export const transactionTable = sqliteTable("transaction", {
   id: id,
@@ -31,4 +33,7 @@ export const transactionTable = sqliteTable("transaction", {
   currency: text("currency").notNull(),
   usdAmount: integer("usd_amount").notNull(),
   date: text("date").notNull(),
-});
+}, (table) => ({
+  accountIdIdx: index("idx_transaction_account_id").on(table.accountId),
+  accountDateIdx: index("idx_transaction_account_date").on(table.accountId, table.date),
+}));
