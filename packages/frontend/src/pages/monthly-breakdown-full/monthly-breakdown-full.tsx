@@ -1,24 +1,24 @@
 import { useState } from "react";
-import { useSearch } from "wouter";
-import { safeParseQuery } from "typesafe-routes";
+import { useSearch, useLocation } from "wouter";
+import { safeParseQuery, render } from "typesafe-routes";
 import { Card, CardContent } from "@/components/ui/card";
 import { MonthlyBreakdownItem } from "./monthly-breakdown-item";
-import { YearSummaryCard } from "./year-summary-card";
-import { FiltersDrawer } from "./filters-drawer";
+import { SummaryCard } from "../shared/summary-card";
+import { FiltersDrawer } from "../shared/filters-drawer";
 import { PageHeader } from "../shared/page-header";
-import { expenseStore } from "@/store/expense-store";
 import { routes } from "../../routes";
 import { api } from "../../api";
-import { MonthlyBreakdownFilters } from "api";
+import { TransactionFilters } from "api";
 import { useAccountIds } from "@/shared/hooks/use-account-ids";
 
 export function MonthlyBreakdownFull() {
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+  const [, navigate] = useLocation();
   const accountIds = useAccountIds();
 
   const parsedQuery = safeParseQuery(routes.monthlyBreakdownFull, useSearch());
 
-  const filters: MonthlyBreakdownFilters = parsedQuery.success
+  const filters: TransactionFilters = parsedQuery.success
     ? parsedQuery.data.filters
     : {
         accounts: accountIds,
@@ -26,22 +26,24 @@ export function MonthlyBreakdownFull() {
       };
 
   const { data: transactionsData, isLoading } =
-    api.expenses.transactions.useQuery(filters);
+    api.expenses.transactionsByMonth.useQuery(filters);
 
   const filteredMonthlyData = transactionsData?.data || [];
   const maxAmount = transactionsData?.maxAmount || 0;
-  const availableYears = [
-    ...new Set(expenseStore.monthlyData.map((m) => m.year)),
-  ].sort((a, b) => b - a);
+  // Get available years from overview data for the filter
+  const { data: overviewData } = api.expenses.overview.useQuery();
+  const availableYears = overviewData
+    ? [...new Set(overviewData.data.map((m) => m.year))].sort((a, b) => b - a)
+    : [];
 
   return (
     <div className="min-h-screen pb-20">
       <PageHeader title="Monthly breakdown" />
 
-      <YearSummaryCard
-        convertedMonthlyData={filteredMonthlyData}
+      <SummaryCard
         onFiltersClick={() => setIsDrawerOpen(true)}
         appliedFilters={filters}
+        totalAmount={filteredMonthlyData.reduce((sum, m) => sum + m.amount, 0)}
       />
 
       {/* All Months - Transaction Style List */}
@@ -57,15 +59,13 @@ export function MonthlyBreakdownFull() {
                 </div>
               </div>
             ) : (
-              filteredMonthlyData.map((month: any, index: number) => (
+              filteredMonthlyData.map((month, index) => (
                 <MonthlyBreakdownItem
                   key={month.month}
                   month={month}
                   index={index}
                   totalItems={filteredMonthlyData.length}
                   maxAmount={maxAmount}
-                  setDateRange={expenseStore.setDateRange}
-                  setSelectedAccount={expenseStore.setSelectedAccount}
                 />
               ))
             )}
@@ -78,6 +78,15 @@ export function MonthlyBreakdownFull() {
         onOpenChange={setIsDrawerOpen}
         availableYears={availableYears}
         filters={filters}
+        onApply={(newFilters) => {
+          navigate(
+            render(routes.monthlyBreakdownFull, {
+              query: { filters: newFilters },
+              path: {},
+            }),
+            { replace: true },
+          );
+        }}
       />
     </div>
   );

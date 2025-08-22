@@ -1,44 +1,23 @@
 import { useLocation } from "wouter";
-import { MonthlyData, DateRange } from "../../shared/types";
+import { render } from "typesafe-routes";
+import { MonthlyData } from "api";
 import { formatAmount } from "../../shared/currency-converter";
+import { routes } from "../../routes";
+import { useAccountIds } from "@/shared/hooks/use-account-ids";
 
 export function MonthlyBreakdownItem({
   month,
   index,
   totalItems,
   maxAmount,
-  setDateRange,
-  setSelectedAccount,
 }: {
   month: MonthlyData;
   index: number;
   totalItems: number;
   maxAmount: number;
-  setDateRange: (range: DateRange) => void;
-  setSelectedAccount: (account: string) => void;
 }) {
-  const [, setLocation] = useLocation();
-
-  const monthNames = [
-    "Jan",
-    "Feb",
-    "Mar",
-    "Apr",
-    "May",
-    "Jun",
-    "Jul",
-    "Aug",
-    "Sep",
-    "Oct",
-    "Nov",
-    "Dec",
-  ];
-
-  const monthNumber = monthNames.indexOf(month.shortMonth) + 1;
-  const startDate = `${month.year}-${String(monthNumber).padStart(2, "0")}-01`;
-  const endDate = new Date(month.year, monthNumber, 0)
-    .toISOString()
-    .split("T")[0];
+  const [, navigate] = useLocation();
+  const accountIds = useAccountIds();
 
   const widthPercentage = (month.amount / maxAmount) * 100;
   const barWidth = Math.max(widthPercentage, 2); // Minimum 2% width
@@ -48,9 +27,16 @@ export function MonthlyBreakdownItem({
       <div
         className="cursor-pointer hover:bg-muted/50 transition-colors p-4"
         onClick={() => {
-          setDateRange({ from: startDate, to: endDate });
-          setSelectedAccount("all");
-          setLocation("/transactions");
+          const filters = {
+            accounts: accountIds,
+            date: { type: "years" as const, value: [month.year] },
+          };
+          navigate(
+            render(routes.transactions, {
+              query: { filters },
+              path: {},
+            }),
+          );
         }}
       >
         <div className="space-y-3">
