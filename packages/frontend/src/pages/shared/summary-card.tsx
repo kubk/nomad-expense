@@ -87,7 +87,7 @@ export function SummaryCard({
 
             <div className="flex flex-col items-start">
               <div className="flex items-center gap-2 mb-2">
-                <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                <div className="w-2 h-2 bg-green-500 dark:bg-green-400 rounded-full"></div>
                 <span className="text-xs font-medium text-muted-foreground">
                   Income
                 </span>
@@ -95,7 +95,7 @@ export function SummaryCard({
               {isLoading ? (
                 <Skeleton className="h-8 w-22" />
               ) : (
-                <div className="text-2xl font-bold text-green-600">
+                <div className="text-2xl font-bold text-green-600 dark:text-green-400">
                   +
                   {formatAmount(hardcodedIncome, "USD", {
                     showFractions: false,

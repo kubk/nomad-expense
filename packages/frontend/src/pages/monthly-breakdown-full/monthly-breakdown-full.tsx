@@ -10,6 +10,7 @@ import { routes } from "../../routes";
 import { api } from "../../api";
 import { TransactionFilters } from "api";
 import { useAccountIds } from "@/shared/hooks/use-account-ids";
+import { Page } from "../shared/page";
 
 export function MonthlyBreakdownFull() {
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
@@ -32,7 +33,7 @@ export function MonthlyBreakdownFull() {
   const maxAmount = transactionsData?.maxAmount || 0;
 
   return (
-    <div className="min-h-screen pb-20">
+    <Page>
       <PageHeader title="Monthly breakdown" />
 
       <SummaryCard
@@ -83,6 +84,6 @@ export function MonthlyBreakdownFull() {
           );
         }}
       />
-    </div>
+    </Page>
   );
 }
