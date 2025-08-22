@@ -60,7 +60,7 @@ export function Navigation() {
                 "flex flex-col items-center gap-1 px-3 py-2 rounded-lg transition-colors",
                 isActive
                   ? "text-primary bg-primary/5 font-semibold"
-                  : "text-muted-foreground hover:text-foreground",
+                  : "text-muted-foreground",
               )}
             >
               <Icon className="w-5 h-5" />

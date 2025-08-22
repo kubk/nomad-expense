@@ -5,6 +5,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { ChevronLeftIcon } from "lucide-react";
 import { TransactionFilters } from "api";
 import { useAvailableYears } from "@/shared/hooks/use-available-years";
+import { getFullMonthName, getMonthNumbers } from "@/shared/date-utils";
 
 type CustomDateValue = { year: number; month: number };
 
@@ -28,27 +29,14 @@ export function CustomDatePicker({
     },
   );
 
-  const monthNames = [
-    "January",
-    "February",
-    "March",
-    "April",
-    "May",
-    "June",
-    "July",
-    "August",
-    "September",
-    "October",
-    "November",
-    "December",
-  ];
+  const monthNumbers = getMonthNumbers();
 
   const isMonthSelected = (year: number, month: number) => {
     return selectedMonths.some((m) => m.year === year && m.month === month);
   };
 
   const isYearFullySelected = (year: number) => {
-    return monthNames.every((_, index) => isMonthSelected(year, index + 1));
+    return monthNumbers.every((month) => isMonthSelected(year, month));
   };
 
   const toggleMonth = (year: number, month: number) => {
@@ -72,9 +60,9 @@ export function CustomDatePicker({
       // Add all months for this year (remove existing ones first)
       setSelectedMonths((prev) => {
         const withoutThisYear = prev.filter((m) => m.year !== year);
-        const allMonthsForYear = monthNames.map((_, index) => ({
+        const allMonthsForYear = monthNumbers.map((month) => ({
           year,
-          month: index + 1,
+          month,
         }));
         return [...withoutThisYear, ...allMonthsForYear];
       });
@@ -128,15 +116,14 @@ export function CustomDatePicker({
 
               {/* Months */}
               <div className="grid grid-cols-2 sm:grid-cols-3">
-                {monthNames.map((monthName, index) => {
-                  const month = index + 1;
+                {monthNumbers.map((month) => {
                   const isSelected = isMonthSelected(year, month);
 
                   return (
                     <label
                       key={month}
                       htmlFor={`${year}-${month}`}
-                      className={`flex items-center gap-2 p-3 border-r border-b border-muted hover:bg-muted/50 transition-colors cursor-pointer w-full ${isSelected ? "bg-primary/10" : ""}`}
+                      className={`flex items-center gap-2 p-3 border-r border-b border-muted transition-colors cursor-pointer w-full ${isSelected ? "bg-primary/10" : ""}`}
                     >
                       <Checkbox
                         id={`${year}-${month}`}
@@ -144,7 +131,7 @@ export function CustomDatePicker({
                         onCheckedChange={() => toggleMonth(year, month)}
                       />
                       <span className="text-sm select-none flex-1">
-                        {monthName}
+                        {getFullMonthName(month)}
                       </span>
                     </label>
                   );

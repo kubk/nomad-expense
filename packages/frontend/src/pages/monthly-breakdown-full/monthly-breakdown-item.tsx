@@ -25,7 +25,7 @@ export function MonthlyBreakdownItem({
   return (
     <div key={month.month}>
       <div
-        className="cursor-pointer hover:bg-muted/50 transition-colors p-4"
+        className="cursor-pointer transition-colors p-4"
         onClick={() => {
           navigate(
             render(routes.transactions, {

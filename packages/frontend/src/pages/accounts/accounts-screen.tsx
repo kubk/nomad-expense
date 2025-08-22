@@ -12,6 +12,15 @@ import {
 import { PageHeader } from "../shared/page-header";
 import { api } from "@/api";
 
+// @ts-expect-error
+const accountColorsPalette = [
+  "bg-blue-500",
+  "bg-green-500",
+  "bg-purple-500",
+  "bg-red-500",
+  "bg-orange-500",
+];
+
 export function AccountsScreen() {
   const [, navigate] = useLocation();
   const { data: accounts = [] } = api.accounts.listWithStats.useQuery();
@@ -33,15 +42,16 @@ export function AccountsScreen() {
             return (
               <Card
                 key={account.id}
-                className="border-0 shadow-sm cursor-pointer hover:shadow-md transition-shadow"
+                className="border-0 shadow-sm cursor-pointer transition-shadow"
                 onClick={() => {
-                  const filters = {
-                    accounts: [account.id],
-                    date: { type: "months" as const, value: 3 },
-                  };
                   navigate(
                     render(routes.transactions, {
-                      query: { filters },
+                      query: {
+                        filters: {
+                          accounts: [account.id],
+                          date: { type: "months", value: 3 },
+                        },
+                      },
                       path: {},
                     }),
                   );
