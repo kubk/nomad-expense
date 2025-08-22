@@ -1,16 +1,14 @@
 import { useEffect, useRef } from "react";
-import { useLocation } from "wouter";
-import { renderPath } from "typesafe-routes";
-import { routes } from "../../routes";
-import { currencyStore } from "../../store/currency-store";
 import { formatAmount } from "../../shared/currency-converter";
-import { expenseStore } from "@/store/expense-store";
+import { api } from "../../api";
 
 export function MonthlyChart() {
   const scrollContainerRef = useRef<HTMLDivElement>(null);
-  const [, setLocation] = useLocation();
 
-  const { data: sortedMonthlyData, maxAmount } = expenseStore.monthlyChartData;
+  const { data: overviewData, isLoading } = api.expenses.overview.useQuery();
+
+  const sortedMonthlyData = overviewData?.data || [];
+  const maxAmount = overviewData?.maxAmount || 0;
 
   // Scroll to the right on mount
   useEffect(() => {
@@ -18,33 +16,15 @@ export function MonthlyChart() {
       scrollContainerRef.current.scrollLeft =
         scrollContainerRef.current.scrollWidth;
     }
-  }, []);
+  }, [sortedMonthlyData]);
 
-  const handleMonthClick = (month: (typeof sortedMonthlyData)[0]) => {
-    const monthNames = [
-      "Jan",
-      "Feb",
-      "Mar",
-      "Apr",
-      "May",
-      "Jun",
-      "Jul",
-      "Aug",
-      "Sep",
-      "Oct",
-      "Nov",
-      "Dec",
-    ];
-    const monthNumber = monthNames.indexOf(month.shortMonth) + 1;
-    const startDate = `${month.year}-${String(monthNumber).padStart(2, "0")}-01`;
-    const endDate = new Date(month.year, monthNumber, 0)
-      .toISOString()
-      .split("T")[0];
-
-    expenseStore.setDateRange({ from: startDate, to: endDate });
-    expenseStore.setSelectedAccount("all");
-    setLocation(renderPath(routes.transactions, {}));
-  };
+  if (isLoading) {
+    return (
+      <div className="flex items-end pb-4 min-w-max">
+        <div className="animate-pulse bg-muted h-20 w-10 rounded-t-lg"></div>
+      </div>
+    );
+  }
 
   return (
     <div
@@ -60,14 +40,11 @@ export function MonthlyChart() {
             <div
               key={month.month}
               className="flex flex-col cursor-pointer items-center min-w-[64px] active:scale-95 transition-transform duration-150"
-              onClick={() => handleMonthClick(month)}
             >
               <div className="mb-4 text-xs font-semibold text-foreground text-center">
-                {formatAmount(
-                  month.convertedAmount,
-                  currencyStore.baseCurrency,
-                  { showFractions: false },
-                )}
+                {formatAmount(month.convertedAmount, month.currency as any, {
+                  showFractions: false,
+                })}
               </div>
 
               {/* Chart container */}
