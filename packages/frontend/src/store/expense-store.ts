@@ -1,7 +1,5 @@
 import { makeAutoObservable } from "mobx";
 import { MonthlyData, Transaction, DateRange } from "@/shared/types";
-import { convert } from "@/shared/currency-converter";
-import { currencyStore } from "./currency-store";
 import { transactions as mockTransactions } from "@/shared/data";
 
 export class ExpenseStore {
@@ -59,21 +57,14 @@ export class ExpenseStore {
     return this.rawTransactions;
   }
 
-  // Computed: total of filtered transactions in base currency
-  get totalInBaseCurrency(): number {
-    const targetCurrency = currencyStore.baseCurrency;
-
+  // Computed: total of filtered transactions in USD
+  get totalInUSD(): number {
     return this.filteredTransactions.reduce((sum, t) => {
       // Only include expenses (negative amounts) in the total
       if (t.usd >= 0) return sum; // Skip income transactions
 
-      // Convert from USD (stored in t.usd as cents) to the target currency
-      const convertedAmountInCents = convert(
-        Math.abs(t.usd),
-        "USD",
-        targetCurrency,
-      );
-      return sum + convertedAmountInCents;
+      // Return absolute value of expense amount in USD cents
+      return sum + Math.abs(t.usd);
     }, 0);
   }
 
@@ -158,18 +149,10 @@ export class ExpenseStore {
       .slice(0, 3);
   }
 
-  // Computed: monthly chart data with currency conversion and sorting
+  // Computed: monthly chart data with sorting
   get monthlyChartData() {
-    const targetCurrency = currencyStore.baseCurrency;
-
-    // Convert monthly data amounts to base currency
-    const convertedMonthlyData = this.monthlyData.map((month) => ({
-      ...month,
-      convertedAmount: convert(month.amount, "USD", targetCurrency),
-    }));
-
     // Sort months chronologically
-    const sortedMonthlyData = [...convertedMonthlyData].sort((a, b) => {
+    const sortedMonthlyData = [...this.monthlyData].sort((a, b) => {
       if (a.year !== b.year) return a.year - b.year;
       const monthNames = [
         "Jan",
@@ -190,9 +173,7 @@ export class ExpenseStore {
       );
     });
 
-    const maxAmount = Math.max(
-      ...sortedMonthlyData.map((m) => m.convertedAmount),
-    );
+    const maxAmount = Math.max(...sortedMonthlyData.map((m) => m.amount));
 
     return {
       data: sortedMonthlyData,

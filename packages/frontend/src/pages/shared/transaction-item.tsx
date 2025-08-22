@@ -1,7 +1,5 @@
 import { Transaction, Account } from "../../shared/types";
-import { currencyStore } from "../../store/currency-store";
 import {
-  convert,
   formatAmount,
   SupportedCurrency,
 } from "../../shared/currency-converter";
@@ -16,16 +14,9 @@ export function TransactionItem({
   account: Account | undefined;
   showBorder?: boolean;
 }) {
-  // Convert the transaction amount to base currency for comparison display
-  const amountInBaseCurrency = convert(
-    transaction.usd,
-    "USD",
-    currencyStore.baseCurrency,
-  );
-
   const isIncome = transaction.amount > 0;
   const displayAmount = Math.abs(transaction.amount);
-  const displayAmountInBaseCurrency = Math.abs(amountInBaseCurrency);
+  const displayAmountInUSD = Math.abs(transaction.usd);
 
   return (
     <div
@@ -54,15 +45,12 @@ export function TransactionItem({
             transaction.currency as SupportedCurrency,
           )}
         </p>
-        {transaction.currency !== currencyStore.baseCurrency && (
+        {transaction.currency !== "USD" && (
           <p
             className={`text-xs ${isIncome ? "text-green-600" : "text-muted-foreground"}`}
           >
             {isIncome ? "+ " : ""}
-            {formatAmount(
-              displayAmountInBaseCurrency,
-              currencyStore.baseCurrency,
-            )}
+            {formatAmount(displayAmountInUSD, "USD")}
           </p>
         )}
       </div>
