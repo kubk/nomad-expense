@@ -1,9 +1,4 @@
-import {
-  FilterIcon,
-  CalendarIcon,
-  Building2Icon,
-  WalletIcon,
-} from "lucide-react";
+import { FilterIcon, CalendarIcon, WalletIcon } from "lucide-react";
 import { formatAmount } from "../../shared/currency-converter";
 import { TransactionFilters } from "api";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -25,14 +20,40 @@ export function SummaryCard({
     return `${appliedFilters.accounts.length} account${appliedFilters.accounts.length > 1 ? "s" : ""}`;
   };
 
+  const getMonthName = (monthNumber: number) => {
+    const monthNames = [
+      "Jan",
+      "Feb",
+      "Mar",
+      "Apr",
+      "May",
+      "Jun",
+      "Jul",
+      "Aug",
+      "Sep",
+      "Oct",
+      "Nov",
+      "Dec",
+    ];
+    return monthNames[monthNumber - 1];
+  };
+
   const getDateLabel = () => {
     if (appliedFilters.date.type === "months") {
       if (appliedFilters.date.value === 1) return "Last month";
       if (appliedFilters.date.value === 12) return "Last year";
       return `Last ${appliedFilters.date.value} months`;
     }
-    if (appliedFilters.date.type === "years") {
-      return `${appliedFilters.date.value.length} year${appliedFilters.date.value.length > 1 ? "s" : ""}`;
+    if (appliedFilters.date.type === "custom") {
+      const months = appliedFilters.date.value;
+      if (months.length === 1) {
+        return `${months[0].year} ${getMonthName(months[0].month)}`;
+      }
+      const years = [...new Set(months.map((m) => m.year))];
+      if (years.length === 1) {
+        return `${years[0]} (${months.length} months)`;
+      }
+      return `Custom (${months.length} months)`;
     }
     return "All time";
   };

@@ -27,13 +27,17 @@ export function MonthlyBreakdownItem({
       <div
         className="cursor-pointer hover:bg-muted/50 transition-colors p-4"
         onClick={() => {
-          const filters = {
-            accounts: accountIds,
-            date: { type: "years" as const, value: [month.year] },
-          };
           navigate(
             render(routes.transactions, {
-              query: { filters },
+              query: {
+                filters: {
+                  accounts: accountIds,
+                  date: {
+                    type: "custom",
+                    value: [{ year: month.year, month: month.monthNumber }],
+                  },
+                },
+              },
               path: {},
             }),
           );
