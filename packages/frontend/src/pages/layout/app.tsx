@@ -9,7 +9,7 @@ import { OverviewScreen } from "../overview/overview-screen";
 import { SettingsScreen } from "../settings/settings-screen";
 import { api } from "@/api";
 
-export function ExpenseTracker() {
+export function App() {
   api.users.me.useQuery();
 
   return (

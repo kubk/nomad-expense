@@ -2,6 +2,7 @@ import { FilterIcon, CalendarIcon, WalletIcon } from "lucide-react";
 import { formatAmount } from "../../shared/currency-converter";
 import { TransactionFilters } from "api";
 import { Skeleton } from "@/components/ui/skeleton";
+import { getShortMonthName } from "../../shared/date-utils";
 
 export function SummaryCard({
   onFiltersClick,
@@ -20,24 +21,6 @@ export function SummaryCard({
     return `${appliedFilters.accounts.length} account${appliedFilters.accounts.length > 1 ? "s" : ""}`;
   };
 
-  const getMonthName = (monthNumber: number) => {
-    const monthNames = [
-      "Jan",
-      "Feb",
-      "Mar",
-      "Apr",
-      "May",
-      "Jun",
-      "Jul",
-      "Aug",
-      "Sep",
-      "Oct",
-      "Nov",
-      "Dec",
-    ];
-    return monthNames[monthNumber - 1];
-  };
-
   const getDateLabel = () => {
     if (appliedFilters.date.type === "months") {
       if (appliedFilters.date.value === 1) return "Last month";
@@ -47,7 +30,7 @@ export function SummaryCard({
     if (appliedFilters.date.type === "custom") {
       const months = appliedFilters.date.value;
       if (months.length === 1) {
-        return `${months[0].year} ${getMonthName(months[0].month)}`;
+        return `${months[0].year} ${getShortMonthName(months[0].month)}`;
       }
       const years = [...new Set(months.map((m) => m.year))];
       if (years.length === 1) {
@@ -61,7 +44,7 @@ export function SummaryCard({
   return (
     <div className="px-4 mt-4">
       <button
-        className="w-full bg-card border shadow-xs rounded-xl hover:bg-muted/50"
+        className="w-full bg-card border shadow-xs rounded-xl"
         onClick={onFiltersClick}
       >
         <div className="p-4 rounded-md">
