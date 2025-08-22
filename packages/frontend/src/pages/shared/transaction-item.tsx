@@ -1,8 +1,5 @@
-import { Transaction, Account } from "api";
-import {
-  formatAmount,
-  SupportedCurrency,
-} from "../../shared/currency-converter";
+import { Transaction, Account, SupportedCurrency } from "api";
+import { formatAmount } from "../../shared/currency-converter";
 import { formatDisplayDate } from "@/shared/utils";
 
 export function TransactionItem({

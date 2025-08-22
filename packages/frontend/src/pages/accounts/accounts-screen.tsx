@@ -3,44 +3,11 @@ import { Button } from "@/components/ui/button";
 import { useLocation } from "wouter";
 import { render } from "typesafe-routes";
 import { routes } from "../../routes";
-import {
-  getCurrencySymbol,
-  SupportedCurrency,
-} from "../../shared/currency-converter";
+import { getCurrencySymbol } from "../../shared/currency-converter";
 import { PageHeader } from "../shared/page-header";
 import { api } from "@/api";
 import { Page } from "../shared/page";
-
-// DON'T TOUCH IT
-// @ts-expect-error
-const accountColorsPalette = [
-  "bg-blue-500",
-  "bg-green-500",
-  "bg-purple-500",
-  "bg-red-500",
-  "bg-orange-500",
-  "bg-yellow-500",
-  "bg-pink-500",
-  "bg-teal-500",
-  "bg-cyan-500",
-  "bg-lime-500",
-  "bg-amber-500",
-  "bg-emerald-500",
-  "bg-rose-500",
-  "text-blue-500",
-  "text-green-500",
-  "text-purple-500",
-  "text-red-500",
-  "text-orange-500",
-  "text-yellow-500",
-  "text-pink-500",
-  "text-teal-500",
-  "text-cyan-500",
-  "text-lime-500",
-  "text-amber-500",
-  "text-emerald-500",
-  "text-rose-500",
-];
+import { SupportedCurrency } from "api";
 
 export function AccountsScreen() {
   const [, navigate] = useLocation();
@@ -61,12 +28,30 @@ export function AccountsScreen() {
     );
   };
 
+  const handleEditClick = (accountId: string) => {
+    navigate(
+      render(routes.accountForm, {
+        query: { accountId },
+        path: {},
+      }),
+    );
+  };
+
+  const handleAddAccountClick = () => {
+    navigate(
+      render(routes.accountForm, {
+        query: {},
+        path: {},
+      }),
+    );
+  };
+
   return (
     <Page>
       <PageHeader
         title="Accounts"
         rightSlot={
-          <Button variant="ghost" size="sm">
+          <Button variant="ghost" size="sm" onClick={handleAddAccountClick}>
             <PlusIcon className="w-4 h-4" />
           </Button>
         }
@@ -110,7 +95,10 @@ export function AccountsScreen() {
                   </div>
                 </div>
                 <div className="flex border-t border-border">
-                  <button className="flex-1 py-4 text-sm font-medium text-foreground hover:bg-muted active:bg-muted/80 transition-colors flex items-center justify-center gap-2">
+                  <button
+                    className="flex-1 py-4 text-sm font-medium text-foreground hover:bg-muted active:bg-muted/80 transition-colors flex items-center justify-center gap-2"
+                    onClick={() => handleEditClick(account.id)}
+                  >
                     <Edit className="w-4 h-4" />
                     Edit
                   </button>
@@ -128,7 +116,11 @@ export function AccountsScreen() {
 
             {/* Add Account Button */}
             <div className="mt-6">
-              <Button className="w-full" size="lg">
+              <Button
+                className="w-full"
+                size="lg"
+                onClick={handleAddAccountClick}
+              >
                 <PlusIcon className="w-5 h-5 mr-2" />
                 Add New Account
               </Button>
