@@ -12,23 +12,23 @@ import { Button } from "@/components/ui/button";
 import { CheckIcon } from "lucide-react";
 import { TransactionFilters } from "api";
 import { useAccountIds } from "@/shared/hooks/use-account-ids";
+import { useAvailableYears } from "@/shared/hooks/use-available-years";
 import { api } from "@/api";
 
 export function FiltersDrawer({
   open,
   onOpenChange,
-  availableYears,
   filters,
   onApply,
 }: {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  availableYears: number[];
   filters: TransactionFilters;
   onApply: (filters: TransactionFilters) => void;
 }) {
   const [filterForm, setFilterForm] = useState<TransactionFilters>(filters);
   const accountIds = useAccountIds();
+  const availableYears = useAvailableYears();
   const { data: accounts = [] } = api.accounts.list.useQuery();
 
   const handleOpenChange = (newOpen: boolean) => {
