@@ -18,7 +18,7 @@ export function MonthlyBreakdownFull() {
 
   const parsedQuery = safeParseQuery(routes.monthlyBreakdownFull, useSearch());
 
-  const appliedFilters: MonthlyBreakdownFilters = parsedQuery.success
+  const filters: MonthlyBreakdownFilters = parsedQuery.success
     ? parsedQuery.data.filters
     : {
         accounts: accountIds,
@@ -26,7 +26,7 @@ export function MonthlyBreakdownFull() {
       };
 
   const { data: transactionsData, isLoading } =
-    api.expenses.transactions.useQuery(appliedFilters);
+    api.expenses.transactions.useQuery(filters);
 
   const filteredMonthlyData = transactionsData?.data || [];
   const maxAmount = transactionsData?.maxAmount || 0;
@@ -41,7 +41,7 @@ export function MonthlyBreakdownFull() {
       <YearSummaryCard
         convertedMonthlyData={filteredMonthlyData}
         onFiltersClick={() => setIsDrawerOpen(true)}
-        appliedFilters={appliedFilters}
+        appliedFilters={filters}
       />
 
       {/* All Months - Transaction Style List */}
@@ -77,7 +77,7 @@ export function MonthlyBreakdownFull() {
         open={isDrawerOpen}
         onOpenChange={setIsDrawerOpen}
         availableYears={availableYears}
-        appliedFilters={appliedFilters}
+        filters={filters}
       />
     </div>
   );

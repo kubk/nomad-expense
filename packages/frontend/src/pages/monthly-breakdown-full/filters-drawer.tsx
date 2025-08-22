@@ -21,22 +21,22 @@ export function FiltersDrawer({
   open,
   onOpenChange,
   availableYears,
-  appliedFilters,
+  filters,
 }: {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   availableYears: number[];
-  appliedFilters: MonthlyBreakdownFilters;
+  filters: MonthlyBreakdownFilters;
 }) {
   const [, navigate] = useLocation();
-  const [filters, setFilters] =
-    useState<MonthlyBreakdownFilters>(appliedFilters);
+  const [filterForm, setFilterForm] =
+    useState<MonthlyBreakdownFilters>(filters);
   const accountIds = useAccountIds();
   const { data: accounts = [] } = api.accounts.list.useQuery();
 
   const handleOpenChange = (newOpen: boolean) => {
     if (newOpen) {
-      setFilters(appliedFilters);
+      setFilterForm(filters);
     }
     onOpenChange(newOpen);
   };
@@ -49,7 +49,7 @@ export function FiltersDrawer({
   ];
 
   const handleYearToggle = (year: number) => {
-    setFilters((prev) => {
+    setFilterForm((prev) => {
       if (prev.date.type === "years") {
         const currentYears = prev.date.value;
         const newYears = currentYears.includes(year)
@@ -68,7 +68,7 @@ export function FiltersDrawer({
   };
 
   const handleAccountToggle = (account: string) => {
-    setFilters((prev) => ({
+    setFilterForm((prev) => ({
       ...prev,
       accounts: prev.accounts.includes(account)
         ? prev.accounts.filter((a) => a !== account)
@@ -77,7 +77,7 @@ export function FiltersDrawer({
   };
 
   const handleMonthsChange = (months: number) => {
-    setFilters((prev) => ({
+    setFilterForm((prev) => ({
       ...prev,
       date: { type: "months", value: months },
     }));
@@ -87,7 +87,7 @@ export function FiltersDrawer({
     navigate(
       render(routes.monthlyBreakdownFull, {
         query: {
-          filters: filters,
+          filters: filterForm,
         },
         path: {},
       }),
@@ -97,14 +97,14 @@ export function FiltersDrawer({
   };
 
   const handleAllTime = () => {
-    setFilters((prev) => ({
+    setFilterForm((prev) => ({
       ...prev,
       date: { type: "years", value: availableYears },
     }));
   };
 
   const handleSelectAllAccounts = () => {
-    setFilters((prev) => ({
+    setFilterForm((prev) => ({
       ...prev,
       accounts: accountIds,
     }));
@@ -137,8 +137,8 @@ export function FiltersDrawer({
                   <Button
                     key={period.value}
                     variant={
-                      filters.date.type === "months" &&
-                      filters.date.value === period.value
+                      filterForm.date.type === "months" &&
+                      filterForm.date.value === period.value
                         ? "default"
                         : "outline"
                     }
@@ -146,8 +146,8 @@ export function FiltersDrawer({
                     onClick={() => handleMonthsChange(period.value)}
                     className="h-8 px-3 text-xs flex items-center gap-2 transition-none"
                   >
-                    {filters.date.type === "months" &&
-                      filters.date.value === period.value && (
+                    {filterForm.date.type === "months" &&
+                      filterForm.date.value === period.value && (
                         <CheckIcon className="size-3" />
                       )}
                     {period.label}
@@ -157,8 +157,8 @@ export function FiltersDrawer({
                   <Button
                     key={year}
                     variant={
-                      filters.date.type === "years" &&
-                      filters.date.value.includes(year)
+                      filterForm.date.type === "years" &&
+                      filterForm.date.value.includes(year)
                         ? "default"
                         : "outline"
                     }
@@ -166,8 +166,8 @@ export function FiltersDrawer({
                     onClick={() => handleYearToggle(year)}
                     className="h-8 px-3 text-xs flex items-center gap-2"
                   >
-                    {filters.date.type === "years" &&
-                      filters.date.value.includes(year) && (
+                    {filterForm.date.type === "years" &&
+                      filterForm.date.value.includes(year) && (
                         <CheckIcon className="size-3" />
                       )}
                     {year}
@@ -193,7 +193,7 @@ export function FiltersDrawer({
                   <Button
                     key={account.id}
                     variant={
-                      filters.accounts.includes(account.id)
+                      filterForm.accounts.includes(account.id)
                         ? "default"
                         : "outline"
                     }
@@ -201,7 +201,7 @@ export function FiltersDrawer({
                     onClick={() => handleAccountToggle(account.id)}
                     className="h-8 px-3 text-xs flex items-center gap-2 transition-none"
                   >
-                    {filters.accounts.includes(account.id) && (
+                    {filterForm.accounts.includes(account.id) && (
                       <CheckIcon className="size-3" />
                     )}
                     {account.name}

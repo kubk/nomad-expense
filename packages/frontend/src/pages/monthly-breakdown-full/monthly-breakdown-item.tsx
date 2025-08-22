@@ -1,6 +1,5 @@
 import { useLocation } from "wouter";
 import { MonthlyData, DateRange } from "../../shared/types";
-import { currencyStore } from "../../store/currency-store";
 import { formatAmount } from "../../shared/currency-converter";
 
 export function MonthlyBreakdownItem({
@@ -11,7 +10,7 @@ export function MonthlyBreakdownItem({
   setDateRange,
   setSelectedAccount,
 }: {
-  month: MonthlyData & { convertedAmount: number };
+  month: MonthlyData;
   index: number;
   totalItems: number;
   maxAmount: number;
@@ -41,7 +40,7 @@ export function MonthlyBreakdownItem({
     .toISOString()
     .split("T")[0];
 
-  const widthPercentage = (month.convertedAmount / maxAmount) * 100;
+  const widthPercentage = (month.amount / maxAmount) * 100;
   const barWidth = Math.max(widthPercentage, 2); // Minimum 2% width
 
   return (
@@ -60,7 +59,7 @@ export function MonthlyBreakdownItem({
               {month.shortMonth} {month.year}
             </div>
             <div className="font-semibold text-foreground">
-              {formatAmount(month.convertedAmount, currencyStore.baseCurrency)}
+              {formatAmount(month.amount, "USD")}
             </div>
           </div>
 

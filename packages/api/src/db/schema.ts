@@ -8,32 +8,42 @@ const id = text("id")
 
 export const userTable = sqliteTable("user", {
   id: id,
-  baseCurrency: text("base_currency").notNull(),
 });
 
-export const accountTable = sqliteTable("account", {
-  id: id,
-  userId: text("user_id")
-    .notNull()
-    .references(() => userTable.id, { onDelete: "cascade" }),
-  name: text("name").notNull(),
-  currency: text("currency").notNull(),
-  color: text("color").notNull(),
-}, (table) => ({
-  userIdIdx: index("idx_account_user_id").on(table.userId),
-}));
+export const accountTable = sqliteTable(
+  "account",
+  {
+    id: id,
+    userId: text("user_id")
+      .notNull()
+      .references(() => userTable.id, { onDelete: "cascade" }),
+    name: text("name").notNull(),
+    currency: text("currency").notNull(),
+    color: text("color").notNull(),
+  },
+  (table) => ({
+    userIdIdx: index("idx_account_user_id").on(table.userId),
+  }),
+);
 
-export const transactionTable = sqliteTable("transaction", {
-  id: id,
-  accountId: text("account_id")
-    .notNull()
-    .references(() => accountTable.id, { onDelete: "cascade" }),
-  description: text("description").notNull(),
-  amount: integer("amount").notNull(),
-  currency: text("currency").notNull(),
-  usdAmount: integer("usd_amount").notNull(),
-  date: text("date").notNull(),
-}, (table) => ({
-  accountIdIdx: index("idx_transaction_account_id").on(table.accountId),
-  accountDateIdx: index("idx_transaction_account_date").on(table.accountId, table.date),
-}));
+export const transactionTable = sqliteTable(
+  "transaction",
+  {
+    id: id,
+    accountId: text("account_id")
+      .notNull()
+      .references(() => accountTable.id, { onDelete: "cascade" }),
+    description: text("description").notNull(),
+    amount: integer("amount").notNull(),
+    currency: text("currency").notNull(),
+    usdAmount: integer("usd_amount").notNull(),
+    date: text("date").notNull(),
+  },
+  (table) => ({
+    accountIdIdx: index("idx_transaction_account_id").on(table.accountId),
+    accountDateIdx: index("idx_transaction_account_date").on(
+      table.accountId,
+      table.date,
+    ),
+  }),
+);
