@@ -28,7 +28,7 @@ export const accountColorsPalette = [
     text: "text-emerald-500",
   },
   { id: "rose", bg: "bg-rose-50 dark:bg-rose-950", text: "text-rose-500" },
-  { id: "gray", bg: "bg-gray-50 dark:bg-gray-800", text: "text-gray-500" },
+  { id: "gray", bg: "bg-gray-50 dark:bg-gray-800", text: "text-gray-500 dark:text-gray-300" },
 ];
 
 export const getColorById = (colorId: string) => {
