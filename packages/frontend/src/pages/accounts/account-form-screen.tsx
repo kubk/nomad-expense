@@ -129,7 +129,7 @@ export function AccountFormScreen() {
       />
 
       <div className="p-4 space-y-6 bg-background">
-        <div className="space-y-2">
+        <div className="flex flex-col gap-1.5">
           <label className="text-sm font-medium">Account Name</label>
           <Input
             placeholder="Enter account name"
@@ -143,11 +143,10 @@ export function AccountFormScreen() {
         <div className="space-y-2">
           <label className="text-sm font-medium text-foreground">Color</label>
           <div
-            className="flex gap-3 overflow-x-scroll pb-2"
-            style={{
-              scrollbarWidth: "thin",
-              scrollbarColor: "rgb(156 163 175) transparent",
-            }}
+            className={cn(
+              "flex gap-3 pb-2",
+              "overflow-x-auto scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100",
+            )}
           >
             {accountColorsPalette.map((color) => (
               <button
