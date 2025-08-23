@@ -1,16 +1,19 @@
-import { Transaction, Account, SupportedCurrency } from "api";
+import { Transaction, SupportedCurrency } from "api";
 import { formatAmount } from "../../shared/currency-converter";
 import { formatDisplayDate } from "@/shared/utils";
+import { api } from "@/api";
+import { getColorById } from "../accounts/account-colors";
 
 export function TransactionItem({
   transaction,
-  account,
   showBorder = false,
 }: {
   transaction: Transaction;
-  account: Account | undefined;
   showBorder?: boolean;
 }) {
+  const { data: accounts = [] } = api.accounts.list.useQuery();
+  const account = accounts.find((a) => a.id === transaction.accountId);
+  const colorInfo = getColorById(account?.color || "blue");
   const isIncome = transaction.amount > 0;
   const displayAmount = Math.abs(transaction.amount);
   const displayAmountInUSD = Math.abs(transaction.usd);
@@ -23,14 +26,18 @@ export function TransactionItem({
     >
       <div className="flex-1">
         <div className="flex items-center gap-2 mb-1">
-          <div className={`w-2 h-2 rounded-full ${account?.color}`} />
           <p className="font-medium text-sm text-foreground">
             {transaction.desc}
           </p>
         </div>
-        <p className="text-xs text-muted-foreground mt-1">
-          {formatDisplayDate(transaction.date)}
-        </p>
+        <div className="flex items-center gap-2 mt-1">
+          <p className="text-xs text-muted-foreground">
+            {formatDisplayDate(transaction.date)}
+          </p>
+          <div className={`flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium ${colorInfo.bg} ${colorInfo.text}`}>
+            <span>{account?.name}</span>
+          </div>
+        </div>
       </div>
       <div className="self-start text-right">
         <p

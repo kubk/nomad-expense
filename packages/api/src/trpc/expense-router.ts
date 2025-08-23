@@ -128,12 +128,7 @@ export const expenseRouter = t.router({
         currency: transactionTable.currency,
         usdAmount: transactionTable.usdAmount,
         date: transactionTable.date,
-        account: {
-          id: accountTable.id,
-          name: accountTable.name,
-          currency: accountTable.currency,
-          color: accountTable.color,
-        },
+        accountId: accountTable.id,
       })
       .from(transactionTable)
       .innerJoin(accountTable, eq(transactionTable.accountId, accountTable.id))
@@ -149,9 +144,8 @@ export const expenseRouter = t.router({
       currency: t.currency,
       usd: t.usdAmount,
       date: t.date,
-      account: t.account.id,
+      accountId: t.accountId,
       month: new Date(t.date).toLocaleString("default", { month: "long" }),
-      accountDetails: t.account,
     }));
   }),
 
@@ -347,12 +341,7 @@ export const expenseRouter = t.router({
           currency: transactionTable.currency,
           usdAmount: transactionTable.usdAmount,
           date: transactionTable.date,
-          account: {
-            id: accountTable.id,
-            name: accountTable.name,
-            currency: accountTable.currency,
-            color: accountTable.color,
-          },
+          accountId: accountTable.id,
         })
         .from(transactionTable)
         .innerJoin(
@@ -379,9 +368,8 @@ export const expenseRouter = t.router({
           currency: t.currency,
           usd: t.usdAmount,
           date: t.date,
-          account: t.account.id,
+          accountId: t.accountId,
           month: new Date(t.date).toLocaleString("default", { month: "long" }),
-          accountDetails: t.account,
         })),
         totalInUSD,
       };
