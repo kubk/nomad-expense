@@ -8,6 +8,7 @@ import { PageHeader } from "../shared/page-header";
 import { api } from "@/api";
 import { Page } from "../shared/page";
 import { SupportedCurrency } from "api";
+import { getColorById } from "./account-colors";
 
 export function AccountsScreen() {
   const [, navigate] = useLocation();
@@ -64,55 +65,58 @@ export function AccountsScreen() {
           </div>
         ) : (
           <>
-            {accounts.map((account) => (
-              <div key={account.id} className="bg-card rounded-2xl shadow-sm">
-                <div className="p-5">
-                  <div className="flex items-start gap-4">
-                    <div className="relative">
-                      <div
-                        className={`w-12 h-12 rounded-xl ${account.color} opacity-10`}
-                      />
-                      <div
-                        className={`absolute ${account.color.replace("bg-", "text-")} inset-0 w-12 h-12 rounded-xl flex items-center justify-center text-xl font-bold`}
-                      >
-                        {getCurrencySymbol(
-                          account.currency as SupportedCurrency,
-                        )}
+            {accounts.map((account) => {
+              const colorInfo = getColorById(account.color);
+              return (
+                <div key={account.id} className="bg-card rounded-2xl shadow-sm">
+                  <div className="p-5">
+                    <div className="flex items-start gap-4">
+                      <div className="relative">
+                        <div
+                          className={`w-12 h-12 rounded-xl ${colorInfo.bg}`}
+                        />
+                        <div
+                          className={`absolute ${colorInfo.text} inset-0 w-12 h-12 rounded-xl flex items-center justify-center text-xl font-bold`}
+                        >
+                          {getCurrencySymbol(
+                            account.currency as SupportedCurrency,
+                          )}
+                        </div>
                       </div>
-                    </div>
-                    <div className="flex-1">
-                      <h3 className="font-semibold text-foreground text-lg">
-                        {account.name}
-                      </h3>
-                      <div className="flex items-center gap-2 mt-1.5 text-xs text-muted-foreground">
-                        <span>{account.transactionCount} transactions</span>
-                        <span>·</span>
-                        <span>
-                          Last: {account.lastTransactionDate || "N/A"}
-                        </span>
+                      <div className="flex-1">
+                        <h3 className="font-semibold text-foreground text-lg">
+                          {account.name}
+                        </h3>
+                        <div className="flex items-center gap-2 mt-1.5 text-xs text-muted-foreground">
+                          <span>{account.transactionCount} transactions</span>
+                          <span>·</span>
+                          <span>
+                            Last: {account.lastTransactionDate || "N/A"}
+                          </span>
+                        </div>
                       </div>
                     </div>
                   </div>
+                  <div className="flex border-t border-border">
+                    <button
+                      className="flex-1 py-4 text-sm font-medium text-foreground hover:bg-muted active:bg-muted/80 transition-colors flex items-center justify-center gap-2"
+                      onClick={() => handleEditClick(account.id)}
+                    >
+                      <Edit className="w-4 h-4" />
+                      Edit
+                    </button>
+                    <div className="w-px bg-border" />
+                    <button
+                      className="flex-1 py-4 text-sm font-medium text-foreground hover:bg-muted active:bg-muted/80 transition-colors flex items-center justify-center gap-2"
+                      onClick={() => handleTransactionsClick(account.id)}
+                    >
+                      Transactions
+                      <ArrowRight className="w-4 h-4" />
+                    </button>
+                  </div>
                 </div>
-                <div className="flex border-t border-border">
-                  <button
-                    className="flex-1 py-4 text-sm font-medium text-foreground hover:bg-muted active:bg-muted/80 transition-colors flex items-center justify-center gap-2"
-                    onClick={() => handleEditClick(account.id)}
-                  >
-                    <Edit className="w-4 h-4" />
-                    Edit
-                  </button>
-                  <div className="w-px bg-border" />
-                  <button
-                    className="flex-1 py-4 text-sm font-medium text-foreground hover:bg-muted active:bg-muted/80 transition-colors flex items-center justify-center gap-2"
-                    onClick={() => handleTransactionsClick(account.id)}
-                  >
-                    Transactions
-                    <ArrowRight className="w-4 h-4" />
-                  </button>
-                </div>
-              </div>
-            ))}
+              );
+            })}
 
             {/* Add Account Button */}
             <div className="mt-6">

@@ -5,11 +5,11 @@ import { batch, isNonEmpty } from "./batch";
 export const seedUserId = "817e551c-168f-45ef-9dfd-04c1db031ca0";
 
 export const seedAccounts = [
-  { id: "1", name: "Chase Checking", currency: "USD", color: "bg-blue-500" },
-  { id: "2", name: "UK Savings", currency: "GBP", color: "bg-green-500" },
-  { id: "3", name: "Euro Account", currency: "EUR", color: "bg-purple-500" },
-  { id: "4", name: "Japan Travel", currency: "JPY", color: "bg-red-500" },
-  { id: "5", name: "Crypto Wallet", currency: "USDT", color: "bg-orange-500" },
+  { id: "1", name: "Chase Checking", currency: "USD", color: "blue" },
+  { id: "2", name: "UK Savings", currency: "GBP", color: "green" },
+  { id: "3", name: "Euro Account", currency: "EUR", color: "purple" },
+  { id: "4", name: "Japan Travel", currency: "JPY", color: "red" },
+  { id: "5", name: "Crypto Wallet", currency: "USDT", color: "orange" },
 ];
 
 const generateTransactionsForMonth = (monthsAgo: number) => {
