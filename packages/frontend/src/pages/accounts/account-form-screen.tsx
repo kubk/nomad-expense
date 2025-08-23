@@ -10,28 +10,13 @@ import { api } from "@/api";
 import { cn } from "@/lib/utils";
 import { routes } from "../../routes";
 import { SUPPORTED_CURRENCIES, type SupportedCurrency } from "api";
-
-const accountColorsPalette = [
-  { bg: "bg-blue-500", text: "text-blue-500" },
-  { bg: "bg-green-500", text: "text-green-500" },
-  { bg: "bg-purple-500", text: "text-purple-500" },
-  { bg: "bg-red-500", text: "text-red-500" },
-  { bg: "bg-orange-500", text: "text-orange-500" },
-  { bg: "bg-yellow-500", text: "text-yellow-500" },
-  { bg: "bg-pink-500", text: "text-pink-500" },
-  { bg: "bg-teal-500", text: "text-teal-500" },
-  { bg: "bg-cyan-500", text: "text-cyan-500" },
-  { bg: "bg-lime-500", text: "text-lime-500" },
-  { bg: "bg-amber-500", text: "text-amber-500" },
-  { bg: "bg-emerald-500", text: "text-emerald-500" },
-  { bg: "bg-rose-500", text: "text-rose-500" },
-];
+import { accountColorsPalette } from "./account-colors";
 
 type Form = {
   name: string;
   color: string;
   currency: SupportedCurrency;
-}
+};
 
 export function AccountFormScreen() {
   const [, navigate] = useLocation();
@@ -41,7 +26,7 @@ export function AccountFormScreen() {
 
   const [formData, setFormData] = useState<Form>({
     name: "",
-    color: accountColorsPalette[0].bg,
+    color: accountColorsPalette[0].id,
     currency: "USD",
   });
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
@@ -78,10 +63,12 @@ export function AccountFormScreen() {
         color: existingAccount.color,
         currency: existingAccount.currency as SupportedCurrency,
       });
-      
+
       // Scroll to selected color when editing
       setTimeout(() => {
-        const element = document.getElementById(`color-${existingAccount.color}`);
+        const element = document.getElementById(
+          `color-${existingAccount.color}`,
+        );
         if (element) {
           element.scrollIntoView({ inline: "center" });
         }
@@ -164,22 +151,17 @@ export function AccountFormScreen() {
           >
             {accountColorsPalette.map((color) => (
               <button
-                key={color.bg}
-                id={`color-${color.bg}`}
+                key={color.id}
+                id={`color-${color.id}`}
                 className="relative w-12 h-12 rounded-lg flex-shrink-0 flex items-center justify-center"
                 onClick={() =>
-                  setFormData((prev) => ({ ...prev, color: color.bg }))
+                  setFormData((prev) => ({ ...prev, color: color.id }))
                 }
               >
-                <div
-                  className={cn(
-                    "absolute inset-0 rounded-lg opacity-10",
-                    color.bg,
-                  )}
-                />
-                {formData.color === color.bg && (
+                <div className={cn("absolute inset-0 rounded-lg", color.bg)} />
+                {formData.color === color.id && (
                   <CheckIcon
-                    strokeWidth={3}
+                    strokeWidth={4}
                     className={cn("w-4 h-4 relative", color.text)}
                   />
                 )}
