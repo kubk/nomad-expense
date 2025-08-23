@@ -18,7 +18,6 @@ export function TransactionsScreen() {
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [, navigate] = useLocation();
   const accountIds = useAccountIds();
-  const { data: accounts = [] } = api.accounts.list.useQuery();
 
   const parsedQuery = safeParseQuery(routes.transactions, useSearch());
 
@@ -71,14 +70,10 @@ export function TransactionsScreen() {
               </div>
             ) : (
               transactions.map((transaction, idx) => {
-                const account = accounts.find(
-                  (a) => a.id === transaction.account,
-                );
                 return (
                   <TransactionItem
                     key={transaction.id}
                     transaction={transaction}
-                    account={account}
                     showBorder={idx !== transactions.length - 1}
                   />
                 );
