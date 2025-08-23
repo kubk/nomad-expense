@@ -3,7 +3,7 @@ import { CheckIcon, Trash2Icon, ChevronDownIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useLocation, useSearch } from "wouter";
-import { safeParseQuery } from "typesafe-routes";
+import { render, safeParseQuery } from "typesafe-routes";
 import { PageHeader } from "../shared/page-header";
 import { Page } from "../shared/page";
 import { api } from "@/api";
@@ -61,7 +61,7 @@ export function AccountFormScreen() {
   const deleteAccountMutation = api.accounts.delete.useMutation({
     onSuccess: () => {
       utils.accounts.listWithStats.invalidate();
-      navigate("/accounts");
+      navigate(render(routes.accounts, { path: {}, query: {} }));
     },
   });
 
@@ -90,7 +90,7 @@ export function AccountFormScreen() {
           currency: formData.currency,
         });
       }
-      navigate("/accounts");
+      navigate(render(routes.accounts, { path: {}, query: {} }));
     } catch (error) {
       console.error("Failed to save account:", error);
     }
@@ -140,7 +140,7 @@ export function AccountFormScreen() {
           />
         </div>
 
-        <div className="space-y-2">
+        <div className="flex flex-col gap-1.5">
           <label className="text-sm font-medium text-foreground">Color</label>
           <div
             className={cn(
@@ -174,7 +174,7 @@ export function AccountFormScreen() {
         </div>
 
         {!isEdit && (
-          <div className="space-y-2">
+          <div className="flex flex-col gap-1.5">
             <label className="text-sm font-medium text-foreground">
               Currency
             </label>
