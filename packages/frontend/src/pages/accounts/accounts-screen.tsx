@@ -9,6 +9,7 @@ import { api } from "@/api";
 import { Page } from "../shared/page";
 import { SupportedCurrency } from "api";
 import { getColorById } from "./account-colors";
+import { cn } from "@/lib/utils";
 
 export function AccountsScreen() {
   const [, navigate] = useLocation();
@@ -73,10 +74,10 @@ export function AccountsScreen() {
                     <div className="flex items-start gap-4">
                       <div className="relative">
                         <div
-                          className={`w-12 h-12 rounded-xl ${colorInfo.bg}`}
+                          className={cn("w-12 h-12 rounded-xl", colorInfo.bg)}
                         />
                         <div
-                          className={`absolute ${colorInfo.text} inset-0 w-12 h-12 rounded-xl flex items-center justify-center text-xl font-bold`}
+                          className={cn("absolute inset-0 w-12 h-12 rounded-xl flex items-center justify-center text-xl font-bold", colorInfo.text)}
                         >
                           {getCurrencySymbol(
                             account.currency as SupportedCurrency,
