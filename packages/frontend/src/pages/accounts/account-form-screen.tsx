@@ -1,5 +1,10 @@
 import { useState, useEffect } from "react";
-import { CheckIcon, Trash2Icon, ChevronDownIcon } from "lucide-react";
+import {
+  CheckIcon,
+  Trash2Icon,
+  ChevronDownIcon,
+  Loader2Icon,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useLocation, useSearch } from "wouter";
@@ -219,7 +224,11 @@ export function AccountFormScreen() {
             onClick={handleSave}
             disabled={!formData.name.trim() || isLoading}
           >
-            {isLoading ? "Saving..." : "Save Account"}
+            {isLoading ? (
+              <Loader2Icon className="h-4 w-4 animate-spin" />
+            ) : (
+              "Save Account"
+            )}
           </Button>
         </div>
 
@@ -247,7 +256,11 @@ export function AccountFormScreen() {
                   onClick={handleDelete}
                   disabled={isLoading}
                 >
-                  {deleteAccountMutation.isPending ? "Deleting..." : "Delete"}
+                  {deleteAccountMutation.isPending ? (
+                    <Loader2Icon className="h-4 w-4 animate-spin" />
+                  ) : (
+                    "Delete"
+                  )}
                 </Button>
               </div>
             </div>
