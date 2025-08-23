@@ -27,16 +27,22 @@ const accountColorsPalette = [
   { bg: "bg-rose-500", text: "text-rose-500" },
 ];
 
+type Form = {
+  name: string;
+  color: string;
+  currency: SupportedCurrency;
+}
+
 export function AccountFormScreen() {
   const [, navigate] = useLocation();
   const parsedQuery = safeParseQuery(routes.accountForm, useSearch());
   const accountId = parsedQuery.success ? parsedQuery.data.accountId : null;
   const isEdit = Boolean(accountId);
 
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<Form>({
     name: "",
     color: accountColorsPalette[0].bg,
-    currency: "USD" as SupportedCurrency,
+    currency: "USD",
   });
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [showCurrencyDropdown, setShowCurrencyDropdown] = useState(false);
@@ -71,6 +77,14 @@ export function AccountFormScreen() {
         name: existingAccount.name,
         color: existingAccount.color,
         currency: existingAccount.currency as SupportedCurrency,
+      });
+      
+      // Scroll to selected color when editing
+      setTimeout(() => {
+        const element = document.getElementById(`color-${existingAccount.color}`);
+        if (element) {
+          element.scrollIntoView({ inline: "center" });
+        }
       });
     }
   }, [existingAccount]);
@@ -151,6 +165,7 @@ export function AccountFormScreen() {
             {accountColorsPalette.map((color) => (
               <button
                 key={color.bg}
+                id={`color-${color.bg}`}
                 className="relative w-12 h-12 rounded-lg flex-shrink-0 flex items-center justify-center"
                 onClick={() =>
                   setFormData((prev) => ({ ...prev, color: color.bg }))
