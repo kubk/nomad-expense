@@ -18,7 +18,7 @@ export function AddTransactionFab() {
 
   return (
     <Button
-      className="fixed bottom-23 right-4 h-14 w-14 rounded-full shadow-md"
+      className="fixed bottom-23 right-4 h-14 w-14 rounded-full shadow-md active:scale-95 transition-transform"
       onClick={handleAddTransactionClick}
     >
       <PlusIcon className="size-6" />
