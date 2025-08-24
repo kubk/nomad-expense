@@ -17,12 +17,10 @@ import { ConfirmModal } from "../shared/confirm-modal";
 import { Footer } from "../shared/footer";
 import { api } from "@/api";
 import { routes } from "../../routes";
-import { SupportedCurrency } from "api";
-import { cn } from "@/lib/utils";
-import { getColorById } from "../accounts/account-colors";
-import { getCurrencySymbol } from "../../shared/currency-formatter";
+import { TransactionType } from "api";
 import { AccountPicker } from "./account-picker";
 import { DateTime } from "luxon";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 type Form = {
   description: string;
@@ -30,6 +28,7 @@ type Form = {
   amount: string;
   date: Date | undefined;
   time: string;
+  type: TransactionType;
 };
 
 type FormStep = "account" | "details";
@@ -48,6 +47,7 @@ export function TransactionFormScreen() {
     amount: "",
     date: undefined,
     time: "",
+    type: "expense",
   });
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [currentStep, setCurrentStep] = useState<FormStep>(
@@ -110,9 +110,10 @@ export function TransactionFormScreen() {
       setFormData({
         description: transaction.desc,
         accountId: transaction.accountId,
-        amount: (Math.abs(transaction.amount) / 100).toString(),
+        amount: (transaction.amount / 100).toString(),
         date: transactionDate,
         time: timeString,
+        type: transaction.type,
       });
     }
   }, [transaction]);
@@ -134,13 +135,15 @@ export function TransactionFormScreen() {
         id: transactionId,
         description: formData.description,
         amount: parseFloat(formData.amount),
-        date: isoString || new Date().toISOString(),
+        createdAt: isoString || new Date().toISOString(),
+        type: formData.type,
       });
     } else {
       await createTransactionMutation.mutateAsync({
         accountId: formData.accountId,
         description: formData.description,
         amount: parseFloat(formData.amount),
+        type: formData.type,
       });
     }
     window.history.back();
@@ -259,6 +262,25 @@ export function TransactionFormScreen() {
                   </div>
                 </div>
               )}
+
+              {/* Transaction Type Selector */}
+              <div className="flex flex-col gap-1.5">
+                <label className="text-sm font-medium">Type</label>
+                <Tabs
+                  value={formData.type}
+                  onValueChange={(value) =>
+                    setFormData((prev) => ({
+                      ...prev,
+                      type: value as TransactionType,
+                    }))
+                  }
+                >
+                  <TabsList className="grid w-full grid-cols-2">
+                    <TabsTrigger value="expense">Expense</TabsTrigger>
+                    <TabsTrigger value="income">Income</TabsTrigger>
+                  </TabsList>
+                </Tabs>
+              </div>
 
               {/* Amount input for both edit and create modes */}
               <div className="flex flex-col gap-1.5">

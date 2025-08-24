@@ -35,7 +35,9 @@ export const accountRouter = t.router({
         currency: accountTable.currency,
         color: accountTable.color,
         transactionCount: sql<number>`COALESCE(COUNT(${transactionTable.id}), 0)`,
-        lastTransactionDate: sql<string | null>`MAX(${transactionTable.date})`,
+        lastTransactionDate: sql<
+          string | null
+        >`MAX(${transactionTable.createdAt})`,
       })
       .from(accountTable)
       .leftJoin(

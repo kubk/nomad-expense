@@ -36,15 +36,14 @@ export const expenseRouter = t.router({
     const allTransactions = await db
       .select({
         usdAmount: transactionTable.usdAmount,
-        date: transactionTable.date,
+        date: transactionTable.createdAt,
       })
       .from(transactionTable)
       .innerJoin(accountTable, eq(transactionTable.accountId, accountTable.id))
       .where(
         and(
           eq(accountTable.userId, userId),
-          // Only expenses (negative amounts)
-          // Note: usdAmount is stored as negative for expenses
+          eq(transactionTable.type, "expense"),
         ),
       )
       .all();
@@ -57,13 +56,14 @@ export const expenseRouter = t.router({
         amount: transactionTable.amount,
         currency: transactionTable.currency,
         usdAmount: transactionTable.usdAmount,
-        date: transactionTable.date,
+        date: transactionTable.createdAt,
         accountId: accountTable.id,
+        type: transactionTable.type,
       })
       .from(transactionTable)
       .innerJoin(accountTable, eq(transactionTable.accountId, accountTable.id))
       .where(eq(accountTable.userId, userId))
-      .orderBy(desc(transactionTable.date))
+      .orderBy(desc(transactionTable.createdAt))
       .limit(3)
       .all();
 
@@ -88,9 +88,6 @@ export const expenseRouter = t.router({
     ];
 
     allTransactions.forEach((transaction) => {
-      // Only include expenses (negative amounts)
-      if (transaction.usdAmount >= 0) return;
-
       const date = new Date(transaction.date);
       const year = date.getFullYear();
       const month = date.getMonth() + 1;
@@ -105,8 +102,7 @@ export const expenseRouter = t.router({
         };
       }
 
-      // Add absolute value of expense (convert negative to positive)
-      monthlyTotals[monthKey].amount += Math.abs(transaction.usdAmount);
+      monthlyTotals[monthKey].amount += transaction.usdAmount;
     });
 
     // Convert to array and sort chronologically
@@ -145,6 +141,7 @@ export const expenseRouter = t.router({
         usd: t.usdAmount,
         date: t.date,
         accountId: t.accountId,
+        type: t.type,
       })),
     };
   }),
@@ -168,7 +165,7 @@ export const expenseRouter = t.router({
         const pastDate = new Date();
         pastDate.setMonth(currentDate.getMonth() - input.date.value);
         conditions.push(
-          gte(transactionTable.date, pastDate.toISOString().split("T")[0]),
+          gte(transactionTable.createdAt, pastDate.toISOString().split("T")[0]),
         );
       } else if (input.date.type === "custom") {
         // Custom year-month filter
@@ -177,9 +174,9 @@ export const expenseRouter = t.router({
             const monthStr = month.toString().padStart(2, "0");
             const lastDay = new Date(year, month, 0).getDate();
             return and(
-              gte(transactionTable.date, `${year}-${monthStr}-01`),
+              gte(transactionTable.createdAt, `${year}-${monthStr}-01`),
               lte(
-                transactionTable.date,
+                transactionTable.createdAt,
                 `${year}-${monthStr}-${lastDay.toString().padStart(2, "0")}`,
               ),
             )!; // Non-null assertion since we know and() will return a value
@@ -200,15 +197,16 @@ export const expenseRouter = t.router({
       const transactions = await db
         .select({
           usdAmount: transactionTable.usdAmount,
-          date: transactionTable.date,
+          date: transactionTable.createdAt,
           accountId: accountTable.id,
+          type: transactionTable.type,
         })
         .from(transactionTable)
         .innerJoin(
           accountTable,
           eq(transactionTable.accountId, accountTable.id),
         )
-        .where(and(...conditions))
+        .where(and(...conditions, eq(transactionTable.type, "expense")))
         .all();
 
       // Filter only expenses and group by month
@@ -232,9 +230,6 @@ export const expenseRouter = t.router({
       ];
 
       transactions.forEach((transaction) => {
-        // Only include expenses (negative amounts)
-        if (transaction.usdAmount >= 0) return;
-
         const date = new Date(transaction.date);
         const year = date.getFullYear();
         const month = date.getMonth() + 1;
@@ -249,7 +244,7 @@ export const expenseRouter = t.router({
           };
         }
 
-        monthlyTotals[monthKey].amount += Math.abs(transaction.usdAmount);
+        monthlyTotals[monthKey].amount += transaction.usdAmount;
       });
 
       // Convert to array and sort by newest first
@@ -304,7 +299,7 @@ export const expenseRouter = t.router({
         const pastDate = new Date();
         pastDate.setMonth(currentDate.getMonth() - input.date.value);
         conditions.push(
-          gte(transactionTable.date, pastDate.toISOString().split("T")[0]),
+          gte(transactionTable.createdAt, pastDate.toISOString().split("T")[0]),
         );
       } else if (input.date.type === "custom") {
         // Custom year-month filter
@@ -313,9 +308,9 @@ export const expenseRouter = t.router({
             const monthStr = month.toString().padStart(2, "0");
             const lastDay = new Date(year, month, 0).getDate();
             return and(
-              gte(transactionTable.date, `${year}-${monthStr}-01`),
+              gte(transactionTable.createdAt, `${year}-${monthStr}-01`),
               lte(
-                transactionTable.date,
+                transactionTable.createdAt,
                 `${year}-${monthStr}-${lastDay.toString().padStart(2, "0")}`,
               ),
             )!; // Non-null assertion since we know and() will return a value
@@ -340,8 +335,9 @@ export const expenseRouter = t.router({
           amount: transactionTable.amount,
           currency: transactionTable.currency,
           usdAmount: transactionTable.usdAmount,
-          date: transactionTable.date,
+          date: transactionTable.createdAt,
           accountId: accountTable.id,
+          type: transactionTable.type,
         })
         .from(transactionTable)
         .innerJoin(
@@ -349,15 +345,13 @@ export const expenseRouter = t.router({
           eq(transactionTable.accountId, accountTable.id),
         )
         .where(and(...conditions))
-        .orderBy(desc(transactionTable.date))
+        .orderBy(desc(transactionTable.createdAt))
         .all();
 
       // Calculate total for filtered transactions (expenses only)
       const totalInUSD = transactions.reduce((sum, t) => {
-        // Only include expenses (negative amounts) in the total
-        if (t.usdAmount >= 0) return sum; // Skip income transactions
-        // Return absolute value of expense amount in USD cents
-        return sum + Math.abs(t.usdAmount);
+        if (t.type !== "expense") return sum;
+        return sum + t.usdAmount;
       }, 0);
 
       return {
@@ -369,6 +363,7 @@ export const expenseRouter = t.router({
           usd: t.usdAmount,
           date: t.date,
           accountId: t.accountId,
+          type: t.type,
         })),
         totalInUSD,
       };
@@ -387,8 +382,9 @@ export const expenseRouter = t.router({
           amount: transactionTable.amount,
           currency: transactionTable.currency,
           usdAmount: transactionTable.usdAmount,
-          date: transactionTable.date,
+          date: transactionTable.createdAt,
           accountId: accountTable.id,
+          type: transactionTable.type,
         })
         .from(transactionTable)
         .innerJoin(
@@ -415,6 +411,7 @@ export const expenseRouter = t.router({
         usd: transaction.usdAmount,
         date: transaction.date,
         accountId: transaction.accountId,
+        type: transaction.type,
       };
     }),
 
@@ -424,7 +421,8 @@ export const expenseRouter = t.router({
         id: z.string(),
         description: z.string().min(1),
         amount: z.number(),
-        date: z.string(),
+        createdAt: z.string(),
+        type: z.enum(["expense", "income"]),
       }),
     )
     .mutation(async ({ ctx, input }) => {
@@ -466,7 +464,8 @@ export const expenseRouter = t.router({
         description: input.description,
         amount: amountInCents,
         usdAmount: usdAmountInCents,
-        date: input.date,
+        createdAt: input.createdAt,
+        type: input.type,
       };
 
       await db
@@ -516,6 +515,7 @@ export const expenseRouter = t.router({
         accountId: z.string(),
         description: z.string().min(1),
         amount: z.number(),
+        type: z.enum(["expense", "income"]),
       }),
     )
     .mutation(async ({ ctx, input }) => {
@@ -552,7 +552,7 @@ export const expenseRouter = t.router({
         amount: amountInCents,
         currency: account.currency,
         usdAmount: usdAmountInCents,
-        date: new Date().toISOString(),
+        type: input.type,
       });
 
       return { success: true };
