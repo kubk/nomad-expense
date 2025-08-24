@@ -12,7 +12,11 @@ import { cn } from "@/lib/utils";
 export function Navigation() {
   const [location] = useLocation();
 
-  if (location === template(routes.monthlyBreakdownFull)) {
+  if (
+    location === template(routes.monthlyBreakdownFull) ||
+    location === template(routes.transactionForm) ||
+    location === template(routes.accountForm)
+  ) {
     return null;
   }
 

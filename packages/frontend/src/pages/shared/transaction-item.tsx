@@ -3,6 +3,9 @@ import { formatAmount } from "../../shared/currency-converter";
 import { formatDisplayDate } from "@/shared/utils";
 import { AccountBadge } from "../accounts/account-badge";
 import { cn } from "@/lib/utils";
+import { useLocation } from "wouter";
+import { render } from "typesafe-routes";
+import { routes } from "../../routes";
 
 export function TransactionItem({
   transaction,
@@ -11,13 +14,27 @@ export function TransactionItem({
   transaction: Transaction;
   showBorder?: boolean;
 }) {
+  const [, navigate] = useLocation();
   const isIncome = transaction.amount > 0;
   const displayAmount = Math.abs(transaction.amount);
   const displayAmountInUSD = Math.abs(transaction.usd);
 
+  const handleClick = () => {
+    navigate(
+      render(routes.transactionForm, {
+        query: { transactionId: transaction.id },
+        path: {},
+      }),
+    );
+  };
+
   return (
     <div
-      className={cn("flex items-center justify-between p-4", showBorder && "border-b")}
+      className={cn(
+        "flex items-center justify-between p-4 cursor-pointer hover:bg-muted/50 transition-colors",
+        showBorder && "border-b",
+      )}
+      onClick={handleClick}
     >
       <div className="flex-1">
         <div className="flex items-center gap-2 mb-1">
@@ -34,7 +51,10 @@ export function TransactionItem({
       </div>
       <div className="self-start text-right">
         <p
-          className={cn("font-semibold text-sm", isIncome && "text-green-700 dark:text-green-400")}
+          className={cn(
+            "font-semibold text-sm",
+            isIncome && "text-green-700 dark:text-green-400",
+          )}
         >
           {isIncome ? "+ " : ""}
           {formatAmount(
@@ -44,7 +64,12 @@ export function TransactionItem({
         </p>
         {transaction.currency !== "USD" && (
           <p
-            className={cn("text-xs", isIncome ? "text-green-600 dark:text-green-400" : "text-muted-foreground")}
+            className={cn(
+              "text-xs",
+              isIncome
+                ? "text-green-600 dark:text-green-400"
+                : "text-muted-foreground",
+            )}
           >
             {isIncome ? "+ " : ""}
             {formatAmount(displayAmountInUSD, "USD")}

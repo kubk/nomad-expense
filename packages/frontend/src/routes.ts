@@ -25,6 +25,10 @@ export const routes = createRoutes({
     path: ["accounts", "form"],
     query: [str.optional("accountId")],
   },
+  transactionForm: {
+    path: ["transactions", "form"],
+    query: [str.optional("transactionId")],
+  },
   settings: {
     path: ["settings"],
   },

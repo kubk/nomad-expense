@@ -5,6 +5,7 @@ import { TransactionsScreen } from "../transactions/transactions-screen";
 import { MonthlyBreakdownFull } from "../monthly-breakdown-full/monthly-breakdown-full";
 import { AccountsScreen } from "../accounts/accounts-screen";
 import { AccountFormScreen } from "../accounts/account-form-screen";
+import { TransactionFormScreen } from "../transactions/transaction-form-screen";
 import { Navigation } from "./navigation";
 import { OverviewScreen } from "../overview/overview-screen";
 import { SettingsScreen } from "../settings/settings-screen";
@@ -36,6 +37,10 @@ export function App() {
 
           <Route path={template(routes.accountForm)}>
             <AccountFormScreen />
+          </Route>
+
+          <Route path={template(routes.transactionForm)}>
+            <TransactionFormScreen />
           </Route>
 
           <Route path={template(routes.settings)}>
