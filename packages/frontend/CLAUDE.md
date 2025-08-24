@@ -89,3 +89,10 @@ export function Component({
 ### Shared Resources
 - `shared/` - Reusable functions and logic (NOT UI components)
   - API utilities, providers, routing helpers, etc.
+
+## Date/Time Handling
+
+- **Library**: Use Luxon for all date/time operations
+- **Keep it simple**: Avoid complex date manipulations when possible
+- **ISO format**: Always work with ISO strings for API communication
+- **Parse once**: Convert to Luxon DateTime objects early, work with them, convert back to ISO at the end

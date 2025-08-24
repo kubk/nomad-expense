@@ -21,9 +21,7 @@ export const accountTable = sqliteTable(
     currency: text("currency").notNull(),
     color: text("color").notNull(),
   },
-  (table) => [
-    index("idx_account_user_id").on(table.userId),
-  ],
+  (table) => [index("idx_account_user_id").on(table.userId)],
 );
 
 export const transactionTable = sqliteTable(
@@ -37,13 +35,10 @@ export const transactionTable = sqliteTable(
     amount: integer("amount").notNull(),
     currency: text("currency").notNull(),
     usdAmount: integer("usd_amount").notNull(),
-    date: text("date").notNull(),
+    date: text("date").notNull(), // ISO timestamp string (YYYY-MM-DDTHH:mm:ss.sssZ)
   },
   (table) => [
     index("idx_transaction_account_id").on(table.accountId),
-    index("idx_transaction_account_date").on(
-      table.accountId,
-      table.date,
-    ),
+    index("idx_transaction_account_date").on(table.accountId, table.date),
   ],
 );
