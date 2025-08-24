@@ -3,6 +3,10 @@ import { eq, and, or, desc, gte, lte, inArray } from "drizzle-orm";
 import { protectedProcedure, t } from "./trpc";
 import { transactionTable, accountTable } from "../db/schema";
 import { getDb } from "../services/db";
+import {
+  convert,
+  type SupportedCurrency,
+} from "../services/currency-converter";
 
 const transactionFilterSchema = z.object({
   accounts: z.array(z.string()),
@@ -141,7 +145,6 @@ export const expenseRouter = t.router({
         usd: t.usdAmount,
         date: t.date,
         accountId: t.accountId,
-        month: new Date(t.date).toLocaleString("default", { month: "long" }),
       })),
     };
   }),
@@ -366,7 +369,6 @@ export const expenseRouter = t.router({
           usd: t.usdAmount,
           date: t.date,
           accountId: t.accountId,
-          month: new Date(t.date).toLocaleString("default", { month: "long" }),
         })),
         totalInUSD,
       };
@@ -421,15 +423,20 @@ export const expenseRouter = t.router({
       z.object({
         id: z.string(),
         description: z.string().min(1),
+        amount: z.number(),
+        date: z.string().optional(),
       }),
     )
     .mutation(async ({ ctx, input }) => {
       const db = getDb();
       const userId = ctx.user.id;
 
-      // Verify transaction belongs to user
+      // Verify transaction belongs to user and get account currency
       const existingTransaction = await db
-        .select({ id: transactionTable.id })
+        .select({
+          id: transactionTable.id,
+          currency: accountTable.currency,
+        })
         .from(transactionTable)
         .innerJoin(
           accountTable,
@@ -447,11 +454,27 @@ export const expenseRouter = t.router({
         throw new Error("Transaction not found");
       }
 
+      // Convert amount to cents and calculate USD amount
+      const amountInCents = Math.round(input.amount * 100);
+      const usdAmountInCents = convert(
+        amountInCents,
+        existingTransaction.currency as SupportedCurrency,
+        "USD",
+      );
+
+      const updateData: any = {
+        description: input.description,
+        amount: amountInCents,
+        usdAmount: usdAmountInCents,
+      };
+
+      if (input.date) {
+        updateData.date = input.date;
+      }
+
       await db
         .update(transactionTable)
-        .set({
-          description: input.description,
-        })
+        .set(updateData)
         .where(eq(transactionTable.id, input.id));
 
       return { success: true };
@@ -521,7 +544,11 @@ export const expenseRouter = t.router({
 
       // Convert amount to cents and calculate USD amount
       const amountInCents = Math.round(input.amount * 100);
-      const usdAmountInCents = amountInCents; // For now, assume 1:1 conversion
+      const usdAmountInCents = convert(
+        amountInCents,
+        account.currency as SupportedCurrency,
+        "USD",
+      );
 
       await db.insert(transactionTable).values({
         accountId: input.accountId,

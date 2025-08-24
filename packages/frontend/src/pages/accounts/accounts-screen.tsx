@@ -1,9 +1,9 @@
-import { PlusIcon, ArrowRight, Edit, Loader2 } from "lucide-react";
+import { PlusIcon, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useLocation } from "wouter";
 import { render } from "typesafe-routes";
 import { routes } from "../../routes";
-import { getCurrencySymbol } from "../../shared/currency-converter";
+import { getCurrencySymbol } from "../../shared/currency-formatter";
 import { PageHeader } from "../shared/page-header";
 import { api } from "@/api";
 import { Page } from "../shared/page";
@@ -16,21 +16,7 @@ export function AccountsScreen() {
   const { data: accounts = [], isLoading } =
     api.accounts.listWithStats.useQuery();
 
-  const handleTransactionsClick = (accountId: string) => {
-    navigate(
-      render(routes.transactions, {
-        query: {
-          filters: {
-            accounts: [accountId],
-            date: { type: "months", value: 3 },
-          },
-        },
-        path: {},
-      }),
-    );
-  };
-
-  const handleEditClick = (accountId: string) => {
+  const handleAccountClick = (accountId: string) => {
     navigate(
       render(routes.accountForm, {
         query: { accountId },
@@ -69,7 +55,11 @@ export function AccountsScreen() {
             {accounts.map((account) => {
               const colorInfo = getColorById(account.color);
               return (
-                <div key={account.id} className="bg-card rounded-2xl shadow-sm">
+                <button
+                  key={account.id}
+                  className="w-full bg-card rounded-2xl shadow-sm hover:bg-muted/50 active:bg-muted transition-colors text-left"
+                  onClick={() => handleAccountClick(account.id)}
+                >
                   <div className="p-5">
                     <div className="flex items-start gap-4">
                       <div className="relative">
@@ -101,24 +91,7 @@ export function AccountsScreen() {
                       </div>
                     </div>
                   </div>
-                  <div className="flex border-t border-border">
-                    <button
-                      className="flex-1 py-4 text-sm font-medium text-foreground hover:bg-muted active:bg-muted/80 transition-colors flex items-center justify-center gap-2"
-                      onClick={() => handleEditClick(account.id)}
-                    >
-                      <Edit className="w-4 h-4" />
-                      Edit
-                    </button>
-                    <div className="w-px bg-border" />
-                    <button
-                      className="flex-1 py-4 text-sm font-medium text-foreground hover:bg-muted active:bg-muted/80 transition-colors flex items-center justify-center gap-2"
-                      onClick={() => handleTransactionsClick(account.id)}
-                    >
-                      Transactions
-                      <ArrowRight className="w-4 h-4" />
-                    </button>
-                  </div>
-                </div>
+                </button>
               );
             })}
 

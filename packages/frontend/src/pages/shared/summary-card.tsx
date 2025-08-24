@@ -1,5 +1,5 @@
 import { FilterIcon, CalendarIcon, WalletIcon } from "lucide-react";
-import { formatAmount } from "../../shared/currency-converter";
+import { formatAmount } from "../../shared/currency-formatter";
 import { TransactionFilters } from "api";
 import { Skeleton } from "@/components/ui/skeleton";
 import { getShortMonthName } from "../../shared/date-utils";

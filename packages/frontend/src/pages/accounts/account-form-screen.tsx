@@ -4,6 +4,7 @@ import {
   Trash2Icon,
   ChevronDownIcon,
   Loader2Icon,
+  ArrowRight,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -114,27 +115,30 @@ export function AccountFormScreen() {
     }
   };
 
+  const handleTransactionsClick = () => {
+    if (!accountId) return;
+
+    navigate(
+      render(routes.transactions, {
+        query: {
+          filters: {
+            accounts: [accountId],
+            date: { type: "months", value: 3 },
+          },
+        },
+        path: {},
+      }),
+    );
+  };
+
   const isLoading =
     createAccountMutation.isPending ||
     updateAccountMutation.isPending ||
     deleteAccountMutation.isPending;
 
-  const deleteButton = isEdit && (
-    <button
-      onClick={() => setShowDeleteConfirm(true)}
-      disabled={isLoading}
-      className="p-2 text-red-600 hover:bg-red-50 rounded-lg disabled:opacity-50"
-    >
-      <Trash2Icon className="w-5 h-5" />
-    </button>
-  );
-
   return (
     <Page>
-      <PageHeader
-        title={isEdit ? "Edit Account" : "Add Account"}
-        rightSlot={deleteButton}
-      />
+      <PageHeader title={isEdit ? "Edit Account" : "Add Account"} />
 
       <div className="flex-1 p-4 bg-background flex flex-col">
         <div className="flex-1 space-y-6">
@@ -191,7 +195,16 @@ export function AccountFormScreen() {
                   onClick={() => setShowCurrencyDropdown(!showCurrencyDropdown)}
                   className="w-full flex items-center justify-between px-3 py-2 border border-input bg-background hover:bg-accent hover:text-accent-foreground rounded-md text-sm"
                 >
-                  <span>{formData.currency}</span>
+                  <span>
+                    {(() => {
+                      const currency = SUPPORTED_CURRENCIES.find(
+                        (c) => c.code === formData.currency,
+                      );
+                      return currency
+                        ? `(${currency.symbol}) ${currency.code}`
+                        : formData.currency;
+                    })()}
+                  </span>
                   <ChevronDownIcon className="h-4 w-4" />
                 </button>
                 {showCurrencyDropdown && (
@@ -213,11 +226,33 @@ export function AccountFormScreen() {
                             "bg-accent text-accent-foreground",
                         )}
                       >
-                        {currency.name}
+                        ({currency.symbol}) {currency.code}
                       </button>
                     ))}
                   </div>
                 )}
+              </div>
+            </div>
+          )}
+
+          {isEdit && accountId && (
+            <div className="flex flex-col gap-1.5 mt-4">
+              <div className="flex gap-3">
+                <button
+                  onClick={() => setShowDeleteConfirm(true)}
+                  disabled={isLoading}
+                  className="flex flex-1 items-center justify-center gap-2 px-4 py-3 bg-muted active:scale-95 rounded-xl transition-transform text-sm font-medium text-foreground disabled:opacity-50"
+                >
+                  <Trash2Icon className="w-4 h-4" />
+                  Delete
+                </button>
+                <button
+                  onClick={handleTransactionsClick}
+                  className="flex-1 flex items-center justify-center gap-2 px-4 py-3 bg-muted active:scale-95 rounded-xl transition-transform text-sm font-medium text-foreground"
+                >
+                  Transactions
+                  <ArrowRight className="w-4 h-4" />
+                </button>
               </div>
             </div>
           )}
