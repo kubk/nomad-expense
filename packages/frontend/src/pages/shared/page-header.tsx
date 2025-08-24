@@ -5,7 +5,7 @@ export function PageHeader({
   title,
   rightSlot,
 }: {
-  title: string;
+  title: string | ReactNode;
   rightSlot?: ReactNode;
 }) {
   return (

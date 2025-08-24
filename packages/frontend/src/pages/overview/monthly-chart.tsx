@@ -1,5 +1,5 @@
 import { useEffect, useRef } from "react";
-import { formatAmount } from "../../shared/currency-converter";
+import { formatAmount } from "../../shared/currency-formatter";
 import { api } from "../../api";
 import { cn } from "@/lib/utils";
 

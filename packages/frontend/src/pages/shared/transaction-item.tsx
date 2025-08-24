@@ -1,5 +1,5 @@
 import { Transaction, SupportedCurrency } from "api";
-import { formatAmount } from "../../shared/currency-converter";
+import { formatAmount } from "../../shared/currency-formatter";
 import { formatDisplayDate } from "@/shared/utils";
 import { AccountBadge } from "../accounts/account-badge";
 import { cn } from "@/lib/utils";

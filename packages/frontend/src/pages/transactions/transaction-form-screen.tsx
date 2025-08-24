@@ -1,7 +1,14 @@
 import { useState, useEffect } from "react";
-import { Trash2Icon, Loader2Icon } from "lucide-react";
+import { Trash2Icon, Loader2Icon, ChevronDownIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Calendar } from "@/components/ui/calendar";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 import { useLocation, useSearch } from "wouter";
 import { render, safeParseQuery } from "typesafe-routes";
 import { PageHeader } from "../shared/page-header";
@@ -10,16 +17,19 @@ import { ConfirmModal } from "../shared/confirm-modal";
 import { Footer } from "../shared/footer";
 import { api } from "@/api";
 import { routes } from "../../routes";
-import { formatDisplayDate } from "@/shared/utils";
 import { SupportedCurrency } from "api";
 import { cn } from "@/lib/utils";
 import { getColorById } from "../accounts/account-colors";
-import { getCurrencySymbol } from "../../shared/currency-converter";
+import { getCurrencySymbol } from "../../shared/currency-formatter";
+import { AccountPicker } from "./account-picker";
+import { DateTime } from "luxon";
 
 type Form = {
   description: string;
   accountId: string;
   amount: string;
+  date: Date | undefined;
+  time: string;
 };
 
 type FormStep = "account" | "details";
@@ -36,6 +46,8 @@ export function TransactionFormScreen() {
     description: "",
     accountId: "",
     amount: "",
+    date: undefined,
+    time: "",
   });
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [currentStep, setCurrentStep] = useState<FormStep>(
@@ -90,10 +102,16 @@ export function TransactionFormScreen() {
 
   useEffect(() => {
     if (transaction) {
+      // Parse YYYY-MM-DD date string using luxon
+      const transactionDate = DateTime.fromISO(transaction.date).toJSDate();
+      const timeString = "12:00"; // Default time for existing transactions
+
       setFormData({
         description: transaction.desc,
         accountId: transaction.accountId,
         amount: (Math.abs(transaction.amount) / 100).toString(),
+        date: transactionDate,
+        time: timeString,
       });
     }
   }, [transaction]);
@@ -101,9 +119,18 @@ export function TransactionFormScreen() {
   const handleSave = async () => {
     try {
       if (isEdit && transactionId) {
+        let dateString: string | undefined = undefined;
+        if (formData.date) {
+          // Format as YYYY-MM-DD for the backend using luxon
+          dateString =
+            DateTime.fromJSDate(formData.date).toISODate() || undefined;
+        }
+
         await updateTransactionMutation.mutateAsync({
           id: transactionId,
           description: formData.description,
+          amount: parseFloat(formData.amount),
+          date: dateString,
         });
       } else {
         await createTransactionMutation.mutateAsync({
@@ -113,17 +140,7 @@ export function TransactionFormScreen() {
           date: new Date().toISOString().split("T")[0],
         });
       }
-      navigate(
-        render(routes.transactions, {
-          path: {},
-          query: {
-            filters: {
-              accounts: [],
-              date: { type: "months", value: 3 },
-            },
-          },
-        }),
-      );
+      window.history.back();
     } catch (error) {
       console.error("Failed to save transaction:", error);
     }
@@ -175,142 +192,106 @@ export function TransactionFormScreen() {
         <div className="flex-1 space-y-6">
           {/* Account Selection Step */}
           {currentStep === "account" && (
-            <>
-              <div className="flex flex-col gap-4">
-                <label className="text-sm font-medium">Select Account</label>
-                {accounts.map((account) => {
-                  const colorInfo = getColorById(account.color);
-                  return (
-                    <button
-                      key={account.id}
-                      className="bg-card rounded-2xl border p-4 text-left hover:bg-muted/50 transition-colors"
-                      onClick={() => {
-                        setFormData((prev) => ({
-                          ...prev,
-                          accountId: account.id,
-                        }));
-                        setCurrentStep("details");
-                      }}
-                    >
-                      <div className="flex items-center gap-4">
-                        <div className="relative">
-                          <div
-                            className={cn("w-12 h-12 rounded-xl", colorInfo.bg)}
-                          />
-                          <div
-                            className={cn(
-                              "absolute inset-0 w-12 h-12 rounded-xl flex items-center justify-center text-xl font-bold",
-                              colorInfo.text,
-                            )}
-                          >
-                            {getCurrencySymbol(
-                              account.currency as SupportedCurrency,
-                            )}
-                          </div>
-                        </div>
-                        <div className="flex-1">
-                          <h3 className="font-semibold text-foreground text-lg">
-                            {account.name}
-                          </h3>
-                          <p className="text-sm text-muted-foreground">
-                            {account.currency}
-                          </p>
-                        </div>
-                      </div>
-                    </button>
-                  );
-                })}
-              </div>
-            </>
+            <AccountPicker
+              accounts={accounts}
+              onSelect={(accountId) => {
+                setFormData((prev) => ({
+                  ...prev,
+                  accountId,
+                }));
+                setCurrentStep("details");
+              }}
+            />
           )}
 
           {/* Transaction Details Step */}
           {currentStep === "details" && (
             <>
-              {/* Show selected account if creating */}
-              {!isEdit && selectedAccount && (
-                <div className="bg-card rounded-xl p-4">
-                  <div className="flex items-center gap-3">
-                    <div className="relative">
-                      <div
-                        className={cn(
-                          "w-10 h-10 rounded-lg",
-                          getColorById(selectedAccount.color).bg,
-                        )}
-                      />
-                      <div
-                        className={cn(
-                          "absolute inset-0 w-10 h-10 rounded-lg flex items-center justify-center text-lg font-bold",
-                          getColorById(selectedAccount.color).text,
-                        )}
+              {/* Date/Time picker for edit mode */}
+              {isEdit && transaction && (
+                <div className="flex gap-4">
+                  <div className="flex flex-col gap-3 flex-1">
+                    <Label htmlFor="date-picker" className="px-1">
+                      Date
+                    </Label>
+                    <Popover>
+                      <PopoverTrigger asChild>
+                        <Button
+                          variant="outline"
+                          id="date-picker"
+                          className="justify-between font-normal"
+                        >
+                          {formData.date
+                            ? formData.date.toLocaleDateString()
+                            : "Select date"}
+                          <ChevronDownIcon className="h-4 w-4" />
+                        </Button>
+                      </PopoverTrigger>
+                      <PopoverContent
+                        className="w-auto overflow-hidden p-0"
+                        align="start"
                       >
-                        {getCurrencySymbol(
-                          selectedAccount.currency as SupportedCurrency,
-                        )}
-                      </div>
-                    </div>
-                    <div>
-                      <p className="font-medium text-sm">
-                        {selectedAccount.name}
-                      </p>
-                      <p className="text-xs text-muted-foreground">
-                        {selectedAccount.currency}
-                      </p>
-                    </div>
+                        <Calendar
+                          mode="single"
+                          selected={formData.date}
+                          onSelect={(date) => {
+                            setFormData((prev) => ({
+                              ...prev,
+                              date,
+                            }));
+                          }}
+                        />
+                      </PopoverContent>
+                    </Popover>
                   </div>
-                </div>
-              )}
-
-              {/* Date display for edit mode */}
-              {isEdit && transaction && (
-                <div className="flex flex-col gap-1.5">
-                  <label className="text-sm font-medium">Date</label>
-                  <div className="px-3 py-2 border border-input bg-muted rounded-md text-sm text-muted-foreground">
-                    {formatDisplayDate(transaction.date)}
-                  </div>
-                </div>
-              )}
-
-              {/* Amount display for edit mode */}
-              {isEdit && transaction && (
-                <div className="flex flex-col gap-1.5">
-                  <label className="text-sm font-medium">Amount</label>
-                  <div className="px-3 py-2 border border-input bg-muted rounded-md text-sm text-muted-foreground">
-                    {(Math.abs(transaction.amount) / 100).toFixed(2)}{" "}
-                    {transaction.currency}
-                  </div>
-                </div>
-              )}
-
-              {/* Amount input for create mode */}
-              {!isEdit && (
-                <div className="flex flex-col gap-1.5">
-                  <label className="text-sm font-medium">Amount</label>
-                  <div className="flex gap-2">
+                  <div className="flex flex-col gap-3 flex-1">
+                    <Label htmlFor="time-picker" className="px-1">
+                      Time
+                    </Label>
                     <Input
-                      type="number"
-                      step="0.01"
-                      placeholder="0.00"
-                      value={formData.amount}
+                      type="time"
+                      id="time-picker"
+                      value={formData.time}
                       onChange={(e) =>
                         setFormData((prev) => ({
                           ...prev,
-                          amount: e.target.value,
+                          time: e.target.value,
                         }))
                       }
-                      className="flex-1"
+                      className="bg-background appearance-none [&::-webkit-calendar-picker-indicator]:hidden [&::-webkit-calendar-picker-indicator]:appearance-none"
                     />
-                    <div className="px-3 py-2 border border-input bg-muted rounded-md text-sm text-muted-foreground min-w-16 flex items-center justify-center">
-                      {selectedAccount?.currency}
-                    </div>
                   </div>
                 </div>
               )}
+
+              {/* Amount input for both edit and create modes */}
+              <div className="flex flex-col gap-1.5">
+                <label className="text-sm font-medium">Amount</label>
+                <div className="flex gap-2">
+                  <Input
+                    type="number"
+                    step="0.01"
+                    placeholder="0.00"
+                    value={formData.amount}
+                    onChange={(e) =>
+                      setFormData((prev) => ({
+                        ...prev,
+                        amount: e.target.value,
+                      }))
+                    }
+                    className="flex-1"
+                  />
+                  <div className="px-3 py-2 border border-input bg-muted rounded-md text-sm text-muted-foreground min-w-16 flex items-center justify-center">
+                    {isEdit && transaction
+                      ? transaction.currency
+                      : selectedAccount?.currency}
+                  </div>
+                </div>
+              </div>
 
               <div className="flex flex-col gap-1.5">
                 <label className="text-sm font-medium">Description</label>
                 <Input
-                  placeholder="Enter transaction description"
                   value={formData.description}
                   onChange={(e) =>
                     setFormData((prev) => ({
@@ -353,7 +334,8 @@ export function TransactionFormScreen() {
               onClick={handleSave}
               disabled={
                 !formData.description.trim() ||
-                (!isEdit && (!formData.amount.trim() || !formData.accountId)) ||
+                !formData.amount.trim() ||
+                (!isEdit && !formData.accountId) ||
                 isLoading
               }
             >
