@@ -1,4 +1,4 @@
-import { formatAmount } from "@/shared/currency-converter";
+import { formatAmount } from "@/shared/currency-formatter";
 import { api } from "../../api";
 
 export function OverviewHeader() {

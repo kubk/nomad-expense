@@ -1,8 +1,8 @@
 import {
-  CalendarIcon,
   ChartNoAxesColumnIcon,
-  CreditCardIcon,
+  ListPlusIcon,
   SettingsIcon,
+  WalletIcon,
 } from "lucide-react";
 import { Link, useLocation } from "wouter";
 import { template } from "typesafe-routes";
@@ -30,13 +30,13 @@ export function Navigation() {
     {
       routeKey: "transactions",
       route: routes.transactions,
-      icon: CreditCardIcon,
+      icon: ListPlusIcon,
       label: "Transactions",
     },
     {
       routeKey: "accounts",
       route: routes.accounts,
-      icon: CalendarIcon,
+      icon: WalletIcon,
       label: "Accounts",
     },
     {
