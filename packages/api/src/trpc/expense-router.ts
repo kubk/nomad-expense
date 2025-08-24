@@ -28,8 +28,8 @@ export const expenseRouter = t.router({
     const db = getDb();
     const userId = ctx.user.id;
 
-    // Get all transactions for the user
-    const transactions = await db
+    // Get all transactions for the user (for overview chart data)
+    const allTransactions = await db
       .select({
         usdAmount: transactionTable.usdAmount,
         date: transactionTable.date,
@@ -45,7 +45,25 @@ export const expenseRouter = t.router({
       )
       .all();
 
-    // Group transactions by month/year
+    // Get recent transactions
+    const recentTransactions = await db
+      .select({
+        id: transactionTable.id,
+        description: transactionTable.description,
+        amount: transactionTable.amount,
+        currency: transactionTable.currency,
+        usdAmount: transactionTable.usdAmount,
+        date: transactionTable.date,
+        accountId: accountTable.id,
+      })
+      .from(transactionTable)
+      .innerJoin(accountTable, eq(transactionTable.accountId, accountTable.id))
+      .where(eq(accountTable.userId, userId))
+      .orderBy(desc(transactionTable.date))
+      .limit(3)
+      .all();
+
+    // Group transactions by month/year for overview
     const monthlyTotals: {
       [key: string]: { amount: number; year: number; shortMonth: string };
     } = {};
@@ -65,7 +83,7 @@ export const expenseRouter = t.router({
       "Dec",
     ];
 
-    transactions.forEach((transaction) => {
+    allTransactions.forEach((transaction) => {
       // Only include expenses (negative amounts)
       if (transaction.usdAmount >= 0) return;
 
@@ -111,42 +129,21 @@ export const expenseRouter = t.router({
     const maxAmount = Math.max(...monthlyData.map((m) => m.amount));
 
     return {
-      data: monthlyData,
-      maxAmount,
+      overview: {
+        data: monthlyData,
+        maxAmount,
+      },
+      recentTransactions: recentTransactions.map((t) => ({
+        id: t.id,
+        desc: t.description,
+        amount: t.amount,
+        currency: t.currency,
+        usd: t.usdAmount,
+        date: t.date,
+        accountId: t.accountId,
+        month: new Date(t.date).toLocaleString("default", { month: "long" }),
+      })),
     };
-  }),
-
-  recentTransactions: protectedProcedure.query(async ({ ctx }) => {
-    const db = getDb();
-    const userId = ctx.user.id;
-
-    const recentTransactions = await db
-      .select({
-        id: transactionTable.id,
-        description: transactionTable.description,
-        amount: transactionTable.amount,
-        currency: transactionTable.currency,
-        usdAmount: transactionTable.usdAmount,
-        date: transactionTable.date,
-        accountId: accountTable.id,
-      })
-      .from(transactionTable)
-      .innerJoin(accountTable, eq(transactionTable.accountId, accountTable.id))
-      .where(eq(accountTable.userId, userId))
-      .orderBy(desc(transactionTable.date))
-      .limit(3)
-      .all();
-
-    return recentTransactions.map((t) => ({
-      id: t.id,
-      desc: t.description,
-      amount: t.amount,
-      currency: t.currency,
-      usd: t.usdAmount,
-      date: t.date,
-      accountId: t.accountId,
-      month: new Date(t.date).toLocaleString("default", { month: "long" }),
-    }));
   }),
 
   transactionsByMonth: protectedProcedure
@@ -373,5 +370,168 @@ export const expenseRouter = t.router({
         })),
         totalInUSD,
       };
+    }),
+
+  getTransaction: protectedProcedure
+    .input(z.object({ id: z.string() }))
+    .query(async ({ ctx, input }) => {
+      const db = getDb();
+      const userId = ctx.user.id;
+
+      const transaction = await db
+        .select({
+          id: transactionTable.id,
+          description: transactionTable.description,
+          amount: transactionTable.amount,
+          currency: transactionTable.currency,
+          usdAmount: transactionTable.usdAmount,
+          date: transactionTable.date,
+          accountId: accountTable.id,
+        })
+        .from(transactionTable)
+        .innerJoin(
+          accountTable,
+          eq(transactionTable.accountId, accountTable.id),
+        )
+        .where(
+          and(
+            eq(transactionTable.id, input.id),
+            eq(accountTable.userId, userId),
+          ),
+        )
+        .get();
+
+      if (!transaction) {
+        throw new Error("Transaction not found");
+      }
+
+      return {
+        id: transaction.id,
+        desc: transaction.description,
+        amount: transaction.amount,
+        currency: transaction.currency,
+        usd: transaction.usdAmount,
+        date: transaction.date,
+        accountId: transaction.accountId,
+      };
+    }),
+
+  updateTransaction: protectedProcedure
+    .input(
+      z.object({
+        id: z.string(),
+        description: z.string().min(1),
+      }),
+    )
+    .mutation(async ({ ctx, input }) => {
+      const db = getDb();
+      const userId = ctx.user.id;
+
+      // Verify transaction belongs to user
+      const existingTransaction = await db
+        .select({ id: transactionTable.id })
+        .from(transactionTable)
+        .innerJoin(
+          accountTable,
+          eq(transactionTable.accountId, accountTable.id),
+        )
+        .where(
+          and(
+            eq(transactionTable.id, input.id),
+            eq(accountTable.userId, userId),
+          ),
+        )
+        .get();
+
+      if (!existingTransaction) {
+        throw new Error("Transaction not found");
+      }
+
+      await db
+        .update(transactionTable)
+        .set({
+          description: input.description,
+        })
+        .where(eq(transactionTable.id, input.id));
+
+      return { success: true };
+    }),
+
+  deleteTransaction: protectedProcedure
+    .input(z.object({ id: z.string() }))
+    .mutation(async ({ ctx, input }) => {
+      const db = getDb();
+      const userId = ctx.user.id;
+
+      // Verify transaction belongs to user
+      const existingTransaction = await db
+        .select({ id: transactionTable.id })
+        .from(transactionTable)
+        .innerJoin(
+          accountTable,
+          eq(transactionTable.accountId, accountTable.id),
+        )
+        .where(
+          and(
+            eq(transactionTable.id, input.id),
+            eq(accountTable.userId, userId),
+          ),
+        )
+        .get();
+
+      if (!existingTransaction) {
+        throw new Error("Transaction not found");
+      }
+
+      await db
+        .delete(transactionTable)
+        .where(eq(transactionTable.id, input.id));
+
+      return { success: true };
+    }),
+
+  createTransaction: protectedProcedure
+    .input(
+      z.object({
+        accountId: z.string(),
+        description: z.string().min(1),
+        amount: z.number(),
+        date: z.string(),
+      }),
+    )
+    .mutation(async ({ ctx, input }) => {
+      const db = getDb();
+      const userId = ctx.user.id;
+
+      // Verify account belongs to user
+      const account = await db
+        .select({ currency: accountTable.currency })
+        .from(accountTable)
+        .where(
+          and(
+            eq(accountTable.id, input.accountId),
+            eq(accountTable.userId, userId),
+          ),
+        )
+        .get();
+
+      if (!account) {
+        throw new Error("Account not found");
+      }
+
+      // Convert amount to cents and calculate USD amount
+      const amountInCents = Math.round(input.amount * 100);
+      const usdAmountInCents = amountInCents; // For now, assume 1:1 conversion
+
+      await db.insert(transactionTable).values({
+        accountId: input.accountId,
+        description: input.description,
+        amount: amountInCents,
+        currency: account.currency,
+        usdAmount: usdAmountInCents,
+        date: input.date,
+      });
+
+      return { success: true };
     }),
 });

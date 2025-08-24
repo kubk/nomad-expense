@@ -11,6 +11,8 @@ import { useLocation, useSearch } from "wouter";
 import { render, safeParseQuery } from "typesafe-routes";
 import { PageHeader } from "../shared/page-header";
 import { Page } from "../shared/page";
+import { ConfirmModal } from "../shared/confirm-modal";
+import { Footer } from "../shared/footer";
 import { api } from "@/api";
 import { cn } from "@/lib/utils";
 import { routes } from "../../routes";
@@ -134,92 +136,119 @@ export function AccountFormScreen() {
         rightSlot={deleteButton}
       />
 
-      <div className="p-4 space-y-6 bg-background">
-        <div className="flex flex-col gap-1.5">
-          <label className="text-sm font-medium">Account Name</label>
-          <Input
-            placeholder="Enter account name"
-            value={formData.name}
-            onChange={(e) =>
-              setFormData((prev) => ({ ...prev, name: e.target.value }))
-            }
-          />
-        </div>
-
-        <div className="flex flex-col gap-1.5">
-          <label className="text-sm font-medium text-foreground">Color</label>
-          <div
-            className={cn(
-              "flex gap-3 pb-2",
-              "overflow-x-auto scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100",
-            )}
-          >
-            {accountColorsPalette.map((color) => (
-              <button
-                key={color.id}
-                id={`color-${color.id}`}
-                className="relative w-12 h-12 rounded-lg flex-shrink-0 flex items-center justify-center"
-                onClick={() =>
-                  setFormData((prev) => ({ ...prev, color: color.id }))
-                }
-              >
-                <div className={cn("absolute inset-0 rounded-lg", color.bg)} />
-                {formData.color === color.id && (
-                  <CheckIcon
-                    strokeWidth={4}
-                    className={cn("w-4 h-4 relative", color.text)}
-                  />
-                )}
-              </button>
-            ))}
-          </div>
-        </div>
-
-        {!isEdit && (
+      <div className="flex-1 p-4 bg-background flex flex-col">
+        <div className="flex-1 space-y-6">
           <div className="flex flex-col gap-1.5">
-            <label className="text-sm font-medium text-foreground">
-              Currency
-            </label>
-            <div className="relative">
-              <button
-                type="button"
-                onClick={() => setShowCurrencyDropdown(!showCurrencyDropdown)}
-                className="w-full flex items-center justify-between px-3 py-2 border border-input bg-background hover:bg-accent hover:text-accent-foreground rounded-md text-sm"
-              >
-                <span>{formData.currency}</span>
-                <ChevronDownIcon className="h-4 w-4" />
-              </button>
-              {showCurrencyDropdown && (
-                <div className="absolute z-10 w-full mt-1 bg-popover border border-border rounded-md shadow-lg max-h-60 overflow-auto">
-                  {SUPPORTED_CURRENCIES.map((currency) => (
-                    <button
-                      key={currency.code}
-                      type="button"
-                      onClick={() => {
-                        setFormData((prev) => ({
-                          ...prev,
-                          currency: currency.code,
-                        }));
-                        setShowCurrencyDropdown(false);
-                      }}
-                      className={cn(
-                        "w-full px-3 py-2 text-left text-sm hover:bg-accent hover:text-accent-foreground",
-                        formData.currency === currency.code &&
-                          "bg-accent text-accent-foreground",
-                      )}
-                    >
-                      {currency.name}
-                    </button>
-                  ))}
-                </div>
+            <label className="text-sm font-medium">Account Name</label>
+            <Input
+              placeholder="Enter account name"
+              value={formData.name}
+              onChange={(e) =>
+                setFormData((prev) => ({ ...prev, name: e.target.value }))
+              }
+            />
+          </div>
+
+          <div className="flex flex-col gap-1.5">
+            <label className="text-sm font-medium text-foreground">Color</label>
+            <div
+              className={cn(
+                "flex gap-3 pb-2",
+                "overflow-x-auto scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100",
               )}
+            >
+              {accountColorsPalette.map((color) => (
+                <button
+                  key={color.id}
+                  id={`color-${color.id}`}
+                  className="relative w-12 h-12 rounded-lg flex-shrink-0 flex items-center justify-center"
+                  onClick={() =>
+                    setFormData((prev) => ({ ...prev, color: color.id }))
+                  }
+                >
+                  <div
+                    className={cn("absolute inset-0 rounded-lg", color.bg)}
+                  />
+                  {formData.color === color.id && (
+                    <CheckIcon
+                      strokeWidth={4}
+                      className={cn("w-4 h-4 relative", color.text)}
+                    />
+                  )}
+                </button>
+              ))}
             </div>
           </div>
-        )}
 
-        <div>
+          {!isEdit && (
+            <div className="flex flex-col gap-1.5">
+              <label className="text-sm font-medium text-foreground">
+                Currency
+              </label>
+              <div className="relative">
+                <button
+                  type="button"
+                  onClick={() => setShowCurrencyDropdown(!showCurrencyDropdown)}
+                  className="w-full flex items-center justify-between px-3 py-2 border border-input bg-background hover:bg-accent hover:text-accent-foreground rounded-md text-sm"
+                >
+                  <span>{formData.currency}</span>
+                  <ChevronDownIcon className="h-4 w-4" />
+                </button>
+                {showCurrencyDropdown && (
+                  <div className="absolute z-10 w-full mt-1 bg-popover border border-border rounded-md shadow-lg max-h-60 overflow-auto">
+                    {SUPPORTED_CURRENCIES.map((currency) => (
+                      <button
+                        key={currency.code}
+                        type="button"
+                        onClick={() => {
+                          setFormData((prev) => ({
+                            ...prev,
+                            currency: currency.code,
+                          }));
+                          setShowCurrencyDropdown(false);
+                        }}
+                        className={cn(
+                          "w-full px-3 py-2 text-left text-sm hover:bg-accent hover:text-accent-foreground",
+                          formData.currency === currency.code &&
+                            "bg-accent text-accent-foreground",
+                        )}
+                      >
+                        {currency.name}
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+        </div>
+
+        <ConfirmModal
+          isOpen={showDeleteConfirm}
+          onClose={() => setShowDeleteConfirm(false)}
+          onConfirm={handleDelete}
+          title="Delete Account"
+          description="This will permanently delete the account and all its transactions. This action cannot be undone."
+          confirmText="Delete"
+          isLoading={deleteAccountMutation.isPending}
+        />
+      </div>
+
+      <Footer>
+        <div className="flex gap-2">
           <Button
-            className="w-full"
+            size="lg"
+            variant="outline"
+            className="flex-1"
+            onClick={() =>
+              navigate(render(routes.accounts, { path: {}, query: {} }))
+            }
+            disabled={isLoading}
+          >
+            Back
+          </Button>
+          <Button
+            className="flex-1"
             size="lg"
             onClick={handleSave}
             disabled={!formData.name.trim() || isLoading}
@@ -227,46 +256,11 @@ export function AccountFormScreen() {
             {isLoading ? (
               <Loader2Icon className="h-4 w-4 animate-spin" />
             ) : (
-              "Save Account"
+              "Save"
             )}
           </Button>
         </div>
-
-        {/* Delete confirmation dialog */}
-        {showDeleteConfirm && (
-          <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
-            <div className="bg-background rounded-lg p-6 w-full max-w-sm space-y-4">
-              <h3 className="font-semibold text-lg">Delete Account</h3>
-              <p className="text-sm text-muted-foreground">
-                This will permanently delete the account and all its
-                transactions. This action cannot be undone.
-              </p>
-              <div className="flex gap-2">
-                <Button
-                  variant="outline"
-                  className="flex-1"
-                  onClick={() => setShowDeleteConfirm(false)}
-                  disabled={isLoading}
-                >
-                  Cancel
-                </Button>
-                <Button
-                  variant="destructive"
-                  className="flex-1"
-                  onClick={handleDelete}
-                  disabled={isLoading}
-                >
-                  {deleteAccountMutation.isPending ? (
-                    <Loader2Icon className="h-4 w-4 animate-spin" />
-                  ) : (
-                    "Delete"
-                  )}
-                </Button>
-              </div>
-            </div>
-          </div>
-        )}
-      </div>
+      </Footer>
     </Page>
   );
 }

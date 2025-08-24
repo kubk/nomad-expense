@@ -7,8 +7,9 @@ import { TransactionItem } from "../shared/transaction-item";
 import { api } from "../../api";
 
 export function RecentTransactionsOverview() {
-  const { data: recentTransactions, isLoading } =
-    api.expenses.recentTransactions.useQuery();
+  const { data: overviewData, isLoading } = api.expenses.overview.useQuery();
+
+  const recentTransactions = overviewData?.recentTransactions;
 
   return (
     <div className="px-4 mt-6">
