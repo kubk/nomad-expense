@@ -1,6 +1,4 @@
-import { FilterIcon } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
 import { TransactionItem } from "../shared/transaction-item";
 import { SummaryCard } from "../shared/summary-card";
 import { FiltersDrawer } from "../shared/filters-drawer";
@@ -36,19 +34,7 @@ export function TransactionsScreen() {
 
   return (
     <Page>
-      <PageHeader
-        title="Transactions"
-        rightSlot={
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => setIsDrawerOpen(true)}
-          >
-            <FilterIcon className="w-4 h-4" />
-          </Button>
-        }
-      />
-
+      <PageHeader title="Transactions" />
       <SummaryCard
         isLoading={isLoading}
         onFiltersClick={() => setIsDrawerOpen(true)}

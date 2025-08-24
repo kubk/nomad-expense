@@ -3,7 +3,7 @@ import { api } from "../../api";
 
 export function OverviewHeader() {
   const { data: overviewData, isLoading } = api.expenses.overview.useQuery();
-  const sortedMonthlyData = overviewData?.data || [];
+  const sortedMonthlyData = overviewData?.overview.data || [];
 
   return (
     <div className="bg-primary text-primary-foreground dark:bg-muted px-4 py-6 pb-18">

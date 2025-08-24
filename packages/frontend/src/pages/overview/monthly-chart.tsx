@@ -8,8 +8,8 @@ export function MonthlyChart() {
 
   const { data: overviewData, isLoading } = api.expenses.overview.useQuery();
 
-  const sortedMonthlyData = overviewData?.data || [];
-  const maxAmount = overviewData?.maxAmount || 0;
+  const sortedMonthlyData = overviewData?.overview.data || [];
+  const maxAmount = overviewData?.overview.maxAmount || 0;
 
   // Scroll to the right on mount
   useEffect(() => {
