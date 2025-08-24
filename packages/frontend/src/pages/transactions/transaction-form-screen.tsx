@@ -102,9 +102,10 @@ export function TransactionFormScreen() {
 
   useEffect(() => {
     if (transaction) {
-      // Parse YYYY-MM-DD date string using luxon
-      const transactionDate = DateTime.fromISO(transaction.date).toJSDate();
-      const timeString = "12:00"; // Default time for existing transactions
+      // Parse ISO timestamp string using luxon
+      const transactionDateTime = DateTime.fromISO(transaction.date);
+      const transactionDate = transactionDateTime.toJSDate();
+      const timeString = transactionDateTime.toFormat("HH:mm");
 
       setFormData({
         description: transaction.desc,
@@ -117,43 +118,38 @@ export function TransactionFormScreen() {
   }, [transaction]);
 
   const handleSave = async () => {
-    try {
-      if (isEdit && transactionId) {
-        let dateString: string | undefined = undefined;
-        if (formData.date) {
-          // Format as YYYY-MM-DD for the backend using luxon
-          dateString =
-            DateTime.fromJSDate(formData.date).toISODate() || undefined;
-        }
-
-        await updateTransactionMutation.mutateAsync({
-          id: transactionId,
-          description: formData.description,
-          amount: parseFloat(formData.amount),
-          date: dateString,
+    if (isEdit && transactionId) {
+      let isoString: string | undefined = undefined;
+      if (formData.date && formData.time) {
+        const dateTime = DateTime.fromJSDate(formData.date).set({
+          hour: parseInt(formData.time.split(":")[0]),
+          minute: parseInt(formData.time.split(":")[1]),
+          second: 0,
+          millisecond: 0,
         });
-      } else {
-        await createTransactionMutation.mutateAsync({
-          accountId: formData.accountId,
-          description: formData.description,
-          amount: parseFloat(formData.amount),
-          date: new Date().toISOString().split("T")[0],
-        });
+        isoString = dateTime.toISO() || undefined;
       }
-      window.history.back();
-    } catch (error) {
-      console.error("Failed to save transaction:", error);
+
+      await updateTransactionMutation.mutateAsync({
+        id: transactionId,
+        description: formData.description,
+        amount: parseFloat(formData.amount),
+        date: isoString || new Date().toISOString(),
+      });
+    } else {
+      await createTransactionMutation.mutateAsync({
+        accountId: formData.accountId,
+        description: formData.description,
+        amount: parseFloat(formData.amount),
+      });
     }
+    window.history.back();
   };
 
   const handleDelete = async () => {
     if (!transactionId) return;
 
-    try {
-      await deleteTransactionMutation.mutateAsync({ id: transactionId });
-    } catch (error) {
-      console.error("Failed to delete transaction:", error);
-    }
+    await deleteTransactionMutation.mutateAsync({ id: transactionId });
   };
 
   const isLoading =

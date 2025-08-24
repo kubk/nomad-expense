@@ -424,7 +424,7 @@ export const expenseRouter = t.router({
         id: z.string(),
         description: z.string().min(1),
         amount: z.number(),
-        date: z.string().optional(),
+        date: z.string(),
       }),
     )
     .mutation(async ({ ctx, input }) => {
@@ -462,15 +462,12 @@ export const expenseRouter = t.router({
         "USD",
       );
 
-      const updateData: any = {
+      const updateData = {
         description: input.description,
         amount: amountInCents,
         usdAmount: usdAmountInCents,
+        date: input.date,
       };
-
-      if (input.date) {
-        updateData.date = input.date;
-      }
 
       await db
         .update(transactionTable)
@@ -519,7 +516,6 @@ export const expenseRouter = t.router({
         accountId: z.string(),
         description: z.string().min(1),
         amount: z.number(),
-        date: z.string(),
       }),
     )
     .mutation(async ({ ctx, input }) => {
@@ -556,7 +552,7 @@ export const expenseRouter = t.router({
         amount: amountInCents,
         currency: account.currency,
         usdAmount: usdAmountInCents,
-        date: input.date,
+        date: new Date().toISOString(),
       });
 
       return { success: true };
