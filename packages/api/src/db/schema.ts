@@ -6,8 +6,19 @@ const id = text("id")
   .notNull()
   .default(sql`(lower(hex(randomblob(16))))`);
 
+const timestamps = {
+  createdAt: text("created_at")
+    .notNull()
+    .default(sql`(datetime('now'))`),
+  updatedAt: text("updated_at")
+    .notNull()
+    .default(sql`(datetime('now'))`)
+    .$onUpdateFn(() => sql`(datetime('now'))`),
+};
+
 export const userTable = sqliteTable("user", {
   id: id,
+  ...timestamps,
 });
 
 export const accountTable = sqliteTable(
@@ -20,6 +31,7 @@ export const accountTable = sqliteTable(
     name: text("name").notNull(),
     currency: text("currency").notNull(),
     color: text("color").notNull(),
+    ...timestamps,
   },
   (table) => [index("idx_account_user_id").on(table.userId)],
 );
@@ -35,10 +47,13 @@ export const transactionTable = sqliteTable(
     amount: integer("amount").notNull(),
     currency: text("currency").notNull(),
     usdAmount: integer("usd_amount").notNull(),
-    date: text("date").notNull(), // ISO timestamp string (YYYY-MM-DDTHH:mm:ss.sssZ)
+    type: text("type", { enum: ["expense", "income"] })
+      .notNull()
+      .default("expense"),
+    ...timestamps,
   },
   (table) => [
     index("idx_transaction_account_id").on(table.accountId),
-    index("idx_transaction_account_date").on(table.accountId, table.date),
+    index("idx_transaction_type").on(table.type),
   ],
 );

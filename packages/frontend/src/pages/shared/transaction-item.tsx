@@ -15,9 +15,9 @@ export function TransactionItem({
   showBorder?: boolean;
 }) {
   const [, navigate] = useLocation();
-  const isIncome = transaction.amount > 0;
-  const displayAmount = Math.abs(transaction.amount);
-  const displayAmountInUSD = Math.abs(transaction.usd);
+  const isIncome = transaction.type === "income";
+  const displayAmount = transaction.amount;
+  const displayAmountInUSD = transaction.usd;
 
   const handleClick = () => {
     navigate(

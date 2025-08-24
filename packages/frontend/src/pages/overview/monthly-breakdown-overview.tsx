@@ -1,6 +1,5 @@
 import { ChevronRightIcon } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Link } from "wouter";
 import { render } from "typesafe-routes";
 import { routes } from "../../routes";
 import { MonthlyChart } from "./monthly-chart";

@@ -1,3 +1,4 @@
+import { DateTime } from "luxon";
 import { DB } from "../services/db";
 import { userTable, accountTable, transactionTable } from "./schema";
 import { batch, isNonEmpty } from "./batch";
@@ -12,37 +13,110 @@ export const seedAccounts = [
   { id: "5", name: "Crypto Wallet", currency: "USDT", color: "orange" },
 ];
 
-const generateTransactionsForMonth = (monthsAgo: number) => {
-  const currentDate = new Date();
-  const targetDate = new Date(
-    currentDate.getFullYear(),
-    currentDate.getMonth() - monthsAgo,
-    1,
-  );
-  const year = targetDate.getFullYear();
-  const month = targetDate.getMonth() + 1;
-  const daysInMonth = new Date(year, month, 0).getDate();
+const getRandomDateInRange = () => {
+  const now = DateTime.now().setZone("utc");
+  const sixMonthsAgo = now.minus({ months: 6 });
+  const diffInMs = now.toMillis() - sixMonthsAgo.toMillis();
+  const randomMs = Math.random() * diffInMs;
+  return sixMonthsAgo.plus({ milliseconds: randomMs });
+};
 
+const generateTransactionsForMonth = (monthsAgo: number) => {
   const transactionTemplates = [
-    { desc: "Grocery Store", account: "1", baseAmount: -120 },
-    { desc: "Gas Station", account: "1", baseAmount: -65 },
-    { desc: "Restaurant", account: "2", baseAmount: -85 },
-    { desc: "Amazon", account: "1", baseAmount: -45 },
-    { desc: "Netflix", account: "1", baseAmount: -16 },
-    { desc: "Coffee Shop", account: "3", baseAmount: -25 },
-    { desc: "Uber", account: "2", baseAmount: -35 },
-    { desc: "Pharmacy", account: "1", baseAmount: -55 },
-    { desc: "Electric Bill", account: "1", baseAmount: -120 },
-    { desc: "Phone Bill", account: "2", baseAmount: -85 },
-    { desc: "Supermarket", account: "2", baseAmount: -95 },
-    { desc: "Online Shopping", account: "1", baseAmount: -75 },
-    { desc: "Public Transport", account: "4", baseAmount: -15 },
-    { desc: "Fast Food", account: "1", baseAmount: -18 },
-    { desc: "Internet Bill", account: "1", baseAmount: -65 },
-    { desc: "Salary", account: "1", baseAmount: 3500 },
-    { desc: "Freelance Work", account: "2", baseAmount: 800 },
-    { desc: "Investment Return", account: "5", baseAmount: 150 },
-    { desc: "Cash Back", account: "1", baseAmount: 25 },
+    {
+      desc: "Grocery Store",
+      account: "1",
+      baseAmount: 120,
+      type: "expense" as const,
+    },
+    {
+      desc: "Gas Station",
+      account: "1",
+      baseAmount: 65,
+      type: "expense" as const,
+    },
+    {
+      desc: "Restaurant",
+      account: "2",
+      baseAmount: 85,
+      type: "expense" as const,
+    },
+    { desc: "Amazon", account: "1", baseAmount: 45, type: "expense" as const },
+    { desc: "Netflix", account: "1", baseAmount: 16, type: "expense" as const },
+    {
+      desc: "Coffee Shop",
+      account: "3",
+      baseAmount: 25,
+      type: "expense" as const,
+    },
+    { desc: "Uber", account: "2", baseAmount: 35, type: "expense" as const },
+    {
+      desc: "Pharmacy",
+      account: "1",
+      baseAmount: 55,
+      type: "expense" as const,
+    },
+    {
+      desc: "Electric Bill",
+      account: "1",
+      baseAmount: 120,
+      type: "expense" as const,
+    },
+    {
+      desc: "Phone Bill",
+      account: "2",
+      baseAmount: 85,
+      type: "expense" as const,
+    },
+    {
+      desc: "Supermarket",
+      account: "2",
+      baseAmount: 95,
+      type: "expense" as const,
+    },
+    {
+      desc: "Online Shopping",
+      account: "1",
+      baseAmount: 75,
+      type: "expense" as const,
+    },
+    {
+      desc: "Public Transport",
+      account: "4",
+      baseAmount: 15,
+      type: "expense" as const,
+    },
+    {
+      desc: "Fast Food",
+      account: "1",
+      baseAmount: 18,
+      type: "expense" as const,
+    },
+    {
+      desc: "Internet Bill",
+      account: "1",
+      baseAmount: 65,
+      type: "expense" as const,
+    },
+    { desc: "Salary", account: "1", baseAmount: 3500, type: "income" as const },
+    {
+      desc: "Freelance Work",
+      account: "2",
+      baseAmount: 800,
+      type: "income" as const,
+    },
+    {
+      desc: "Investment Return",
+      account: "5",
+      baseAmount: 150,
+      type: "income" as const,
+    },
+    {
+      desc: "Cash Back",
+      account: "1",
+      baseAmount: 25,
+      type: "income" as const,
+    },
   ];
 
   const numTransactions = Math.floor(Math.random() * 8) + 8;
@@ -53,12 +127,12 @@ const generateTransactionsForMonth = (monthsAgo: number) => {
       transactionTemplates[
         Math.floor(Math.random() * transactionTemplates.length)
       ];
-    const day = Math.floor(Math.random() * daysInMonth) + 1;
+
+    const transactionDate = getRandomDateInRange().toISO() || "";
+
     const baseAmount = template.baseAmount;
     const variation = (Math.random() - 0.5) * 40;
-    const amount = Math.round(
-      (baseAmount + (baseAmount > 0 ? variation : -variation)) * 100,
-    );
+    const amount = Math.round((baseAmount + variation) * 100);
 
     const account = seedAccounts.find((acc) => acc.id === template.account);
     const currency = account?.currency || "USD";
@@ -75,13 +149,15 @@ const generateTransactionsForMonth = (monthsAgo: number) => {
     }
 
     transactions.push({
-      id: `${year}-${month.toString().padStart(2, "0")}-${i}`,
+      id: `transaction-${Math.random().toString(36).substr(2, 9)}-${i}`,
       accountId: template.account,
       description: template.desc,
       amount: amount,
       currency: currency,
       usdAmount: usdAmount,
-      date: `${year}-${month.toString().padStart(2, "0")}-${day.toString().padStart(2, "0")}`,
+      type: template.type,
+      createdAt: transactionDate,
+      updatedAt: transactionDate,
     });
   }
 
@@ -89,23 +165,45 @@ const generateTransactionsForMonth = (monthsAgo: number) => {
 };
 
 const generateRecentTransactions = () => {
-  const currentDate = new Date();
-  const yesterday = new Date(currentDate.getTime() - 24 * 60 * 60 * 1000);
-
   const recentTemplates = [
-    { desc: "Coffee Shop", account: "1", amount: -450 },
-    { desc: "Uber Ride", account: "2", amount: -1825 },
-    { desc: "Lunch Spot", account: "1", amount: -1299 },
-    { desc: "Gas Station", account: "1", amount: -4500 },
-    { desc: "Grocery Run", account: "1", amount: -6743 },
-    { desc: "Part-time Work", account: "2", amount: 15000 },
-    { desc: "Refund", account: "1", amount: 2350 },
+    {
+      desc: "Coffee Shop",
+      account: "1",
+      amount: 450,
+      type: "expense" as const,
+    },
+    { desc: "Uber Ride", account: "2", amount: 1825, type: "expense" as const },
+    {
+      desc: "Lunch Spot",
+      account: "1",
+      amount: 1299,
+      type: "expense" as const,
+    },
+    {
+      desc: "Gas Station",
+      account: "1",
+      amount: 4500,
+      type: "expense" as const,
+    },
+    {
+      desc: "Grocery Run",
+      account: "1",
+      amount: 6743,
+      type: "expense" as const,
+    },
+    {
+      desc: "Part-time Work",
+      account: "2",
+      amount: 15000,
+      type: "income" as const,
+    },
+    { desc: "Refund", account: "1", amount: 2350, type: "income" as const },
   ];
 
   const transactions = [];
+  const numRecentTransactions = Math.floor(Math.random() * 5) + 3;
 
-  const todayCount = Math.floor(Math.random() * 2) + 2;
-  for (let i = 0; i < todayCount; i++) {
+  for (let i = 0; i < numRecentTransactions; i++) {
     const template =
       recentTemplates[Math.floor(Math.random() * recentTemplates.length)];
 
@@ -124,45 +222,18 @@ const generateRecentTransactions = () => {
       usdAmount = Math.round(amountInCents * (rates[currency] || 1));
     }
 
+    const transactionDate = getRandomDateInRange().toISO() || "";
+
     transactions.push({
-      id: `today-${i}`,
+      id: `recent-${Math.random().toString(36).substr(2, 9)}-${i}`,
       accountId: template.account,
       description: template.desc,
       amount: amountInCents,
       currency: currency,
       usdAmount: usdAmount,
-      date: currentDate.toISOString().split("T")[0],
-    });
-  }
-
-  const yesterdayCount = Math.floor(Math.random() * 2) + 1;
-  for (let i = 0; i < yesterdayCount; i++) {
-    const template =
-      recentTemplates[Math.floor(Math.random() * recentTemplates.length)];
-
-    const account = seedAccounts.find((acc) => acc.id === template.account);
-    const currency = account?.currency || "USD";
-    const amountInCents = template.amount;
-
-    let usdAmount = amountInCents;
-    if (currency !== "USD") {
-      const rates: { [key: string]: number } = {
-        GBP: 1.27,
-        EUR: 1.08,
-        JPY: 0.0067,
-        USDT: 1.0,
-      };
-      usdAmount = Math.round(amountInCents * (rates[currency] || 1));
-    }
-
-    transactions.push({
-      id: `yesterday-${i}`,
-      accountId: template.account,
-      description: template.desc,
-      amount: amountInCents,
-      currency: currency,
-      usdAmount: usdAmount,
-      date: yesterday.toISOString().split("T")[0],
+      type: template.type,
+      createdAt: transactionDate,
+      updatedAt: transactionDate,
     });
   }
 
@@ -171,7 +242,7 @@ const generateRecentTransactions = () => {
 
 const generateAllTransactions = () => {
   const transactions = [];
-  for (let monthsAgo = 12; monthsAgo >= 0; monthsAgo--) {
+  for (let monthsAgo = 5; monthsAgo >= 0; monthsAgo--) {
     transactions.push(...generateTransactionsForMonth(monthsAgo));
   }
   transactions.push(...generateRecentTransactions());
@@ -188,6 +259,8 @@ export const seedData = {
   accounts: seedAccounts.map((account) => ({
     ...account,
     userId: seedUserId,
+    createdAt: DateTime.now().toISO() || "",
+    updatedAt: DateTime.now().toISO() || "",
   })),
   transactions: generateAllTransactions(),
 };

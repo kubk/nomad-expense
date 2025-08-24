@@ -22,3 +22,5 @@ export type TransactionsList = RouterOutputs["expenses"]["transactionsList"];
 export type Transaction = TransactionsList["transactions"][0];
 export type Account = RouterOutputs["accounts"]["list"][0];
 export type MonthlyData = MonthlyBreakdownFull["data"][0];
+
+export type TransactionType = "expense" | "income";
