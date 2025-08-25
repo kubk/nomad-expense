@@ -119,12 +119,6 @@ export const accountRouter = t.router({
       const db = getDb();
       const userId = ctx.user.id;
 
-      // First, delete any associated transactions
-      await db
-        .delete(transactionTable)
-        .where(eq(transactionTable.accountId, input.id));
-
-      // Then delete the account
       const result = await db
         .delete(accountTable)
         .where(
