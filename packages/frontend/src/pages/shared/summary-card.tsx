@@ -8,14 +8,15 @@ export function SummaryCard({
   onFiltersClick,
   appliedFilters,
   totalAmount,
+  totalIncome,
   isLoading,
 }: {
   onFiltersClick: () => void;
   appliedFilters: TransactionFilters;
   totalAmount: number;
+  totalIncome: number;
   isLoading: boolean;
 }) {
-  const hardcodedIncome = 130000; // $1,300 hardcoded as requested
 
   const getAccountsLabel = () => {
     return `${appliedFilters.accounts.length} account${appliedFilters.accounts.length > 1 ? "s" : ""}`;
@@ -97,7 +98,7 @@ export function SummaryCard({
               ) : (
                 <div className="text-2xl font-bold text-green-600 dark:text-green-400">
                   +
-                  {formatAmount(hardcodedIncome, "USD", {
+                  {formatAmount(totalIncome, "USD", {
                     showFractions: false,
                   })}
                 </div>

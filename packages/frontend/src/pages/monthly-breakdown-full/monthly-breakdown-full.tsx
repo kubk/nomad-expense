@@ -31,6 +31,8 @@ export function MonthlyBreakdownFull() {
 
   const filteredMonthlyData = transactionsData?.data || [];
   const maxAmount = transactionsData?.maxAmount || 0;
+  const totalExpenses = transactionsData?.totalExpenses || 0;
+  const totalIncome = transactionsData?.totalIncome || 0;
 
   return (
     <Page>
@@ -40,7 +42,8 @@ export function MonthlyBreakdownFull() {
         isLoading={isLoading}
         onFiltersClick={() => setIsDrawerOpen(true)}
         appliedFilters={filters}
-        totalAmount={filteredMonthlyData.reduce((sum, m) => sum + m.amount, 0)}
+        totalAmount={totalExpenses}
+        totalIncome={totalIncome}
       />
 
       {/* All Months - Transaction Style List */}

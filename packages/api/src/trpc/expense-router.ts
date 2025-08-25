@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { eq, and, or, desc, gte, lte, inArray } from "drizzle-orm";
+import { eq, and, or, desc, gte, lte, inArray, sql } from "drizzle-orm";
 import { protectedProcedure, t } from "./trpc";
 import { transactionTable, accountTable } from "../db/schema";
 import { getDb } from "../services/db";
@@ -47,6 +47,24 @@ export const expenseRouter = t.router({
         ),
       )
       .all();
+
+    // Get last 30 days expenses total using SQLite date functions
+    const last30DaysResult = await db
+      .select({
+        total: sql<number>`COALESCE(SUM(${transactionTable.usdAmount}), 0)`,
+      })
+      .from(transactionTable)
+      .innerJoin(accountTable, eq(transactionTable.accountId, accountTable.id))
+      .where(
+        and(
+          eq(accountTable.userId, userId),
+          eq(transactionTable.type, "expense"),
+          sql`${transactionTable.createdAt} >= datetime('now', '-30 days')`,
+        ),
+      )
+      .get();
+
+    const last30DaysTotal = last30DaysResult?.total || 0;
 
     // Get recent transactions
     const recentTransactions = await db
@@ -133,6 +151,7 @@ export const expenseRouter = t.router({
         data: monthlyData,
         maxAmount,
       },
+      last30DaysTotal,
       recentTransactions: recentTransactions.map((t) => ({
         id: t.id,
         desc: t.description,
@@ -161,12 +180,17 @@ export const expenseRouter = t.router({
       // Date filter
       if (input.date.type === "months") {
         // Recent N months filter
-        const currentDate = new Date();
-        const pastDate = new Date();
-        pastDate.setMonth(currentDate.getMonth() - input.date.value);
-        conditions.push(
-          gte(transactionTable.createdAt, pastDate.toISOString().split("T")[0]),
-        );
+        let dateFilter;
+        if (input.date.value === 1) {
+          dateFilter = sql`${transactionTable.createdAt} >= datetime('now', '-1 month')`;
+        } else if (input.date.value === 3) {
+          dateFilter = sql`${transactionTable.createdAt} >= datetime('now', '-3 months')`;
+        } else if (input.date.value === 6) {
+          dateFilter = sql`${transactionTable.createdAt} >= datetime('now', '-6 months')`;
+        } else if (input.date.value === 12) {
+          dateFilter = sql`${transactionTable.createdAt} >= datetime('now', '-12 months')`;
+        }
+        if (dateFilter) conditions.push(dateFilter);
       } else if (input.date.type === "custom") {
         // Custom year-month filter
         if (input.date.value.length > 0) {
@@ -206,11 +230,14 @@ export const expenseRouter = t.router({
           accountTable,
           eq(transactionTable.accountId, accountTable.id),
         )
-        .where(and(...conditions, eq(transactionTable.type, "expense")))
+        .where(and(...conditions))
         .all();
 
-      // Filter only expenses and group by month
-      const monthlyTotals: {
+      // Group transactions by month (expenses and income separately)
+      const monthlyExpenseTotals: {
+        [key: string]: { amount: number; year: number; shortMonth: string };
+      } = {};
+      const monthlyIncomeTotals: {
         [key: string]: { amount: number; year: number; shortMonth: string };
       } = {};
 
@@ -236,21 +263,31 @@ export const expenseRouter = t.router({
         const shortMonth = monthNames[month - 1];
         const monthKey = `${shortMonth} ${year}`;
 
-        if (!monthlyTotals[monthKey]) {
-          monthlyTotals[monthKey] = {
-            amount: 0,
-            year,
-            shortMonth,
-          };
+        if (transaction.type === "expense") {
+          if (!monthlyExpenseTotals[monthKey]) {
+            monthlyExpenseTotals[monthKey] = {
+              amount: 0,
+              year,
+              shortMonth,
+            };
+          }
+          monthlyExpenseTotals[monthKey].amount += transaction.usdAmount;
+        } else if (transaction.type === "income") {
+          if (!monthlyIncomeTotals[monthKey]) {
+            monthlyIncomeTotals[monthKey] = {
+              amount: 0,
+              year,
+              shortMonth,
+            };
+          }
+          monthlyIncomeTotals[monthKey].amount += transaction.usdAmount;
         }
-
-        monthlyTotals[monthKey].amount += transaction.usdAmount;
       });
 
-      // Convert to array and sort by newest first
-      const filteredMonthlyData = Object.keys(monthlyTotals)
+      // Convert to array and sort by newest first (expenses only for main data)
+      const filteredMonthlyData = Object.keys(monthlyExpenseTotals)
         .map((monthKey) => {
-          const monthData = monthlyTotals[monthKey];
+          const monthData = monthlyExpenseTotals[monthKey];
           return {
             month: monthKey,
             shortMonth: monthData.shortMonth,
@@ -274,9 +311,22 @@ export const expenseRouter = t.router({
         0,
       );
 
+      // Calculate totals for the filtered period
+      const totalExpenses = Object.values(monthlyExpenseTotals).reduce(
+        (sum, monthData) => sum + monthData.amount,
+        0,
+      );
+
+      const totalIncome = Object.values(monthlyIncomeTotals).reduce(
+        (sum, monthData) => sum + monthData.amount,
+        0,
+      );
+
       return {
         data: filteredMonthlyData,
         maxAmount,
+        totalExpenses,
+        totalIncome,
       };
     }),
 
@@ -295,12 +345,17 @@ export const expenseRouter = t.router({
       // Date filter
       if (input.date.type === "months") {
         // Recent N months filter
-        const currentDate = new Date();
-        const pastDate = new Date();
-        pastDate.setMonth(currentDate.getMonth() - input.date.value);
-        conditions.push(
-          gte(transactionTable.createdAt, pastDate.toISOString().split("T")[0]),
-        );
+        let dateFilter;
+        if (input.date.value === 1) {
+          dateFilter = sql`${transactionTable.createdAt} >= datetime('now', '-1 month')`;
+        } else if (input.date.value === 3) {
+          dateFilter = sql`${transactionTable.createdAt} >= datetime('now', '-3 months')`;
+        } else if (input.date.value === 6) {
+          dateFilter = sql`${transactionTable.createdAt} >= datetime('now', '-6 months')`;
+        } else if (input.date.value === 12) {
+          dateFilter = sql`${transactionTable.createdAt} >= datetime('now', '-12 months')`;
+        }
+        if (dateFilter) conditions.push(dateFilter);
       } else if (input.date.type === "custom") {
         // Custom year-month filter
         if (input.date.value.length > 0) {
@@ -348,9 +403,14 @@ export const expenseRouter = t.router({
         .orderBy(desc(transactionTable.createdAt))
         .all();
 
-      // Calculate total for filtered transactions (expenses only)
-      const totalInUSD = transactions.reduce((sum, t) => {
+      // Calculate totals for filtered transactions (expenses and income separately)
+      const totalExpenses = transactions.reduce((sum, t) => {
         if (t.type !== "expense") return sum;
+        return sum + t.usdAmount;
+      }, 0);
+
+      const totalIncome = transactions.reduce((sum, t) => {
+        if (t.type !== "income") return sum;
         return sum + t.usdAmount;
       }, 0);
 
@@ -365,7 +425,8 @@ export const expenseRouter = t.router({
           accountId: t.accountId,
           type: t.type,
         })),
-        totalInUSD,
+        totalExpenses,
+        totalIncome,
       };
     }),
 

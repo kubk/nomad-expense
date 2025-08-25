@@ -30,7 +30,8 @@ export function TransactionsScreen() {
     api.expenses.transactionsList.useQuery(filters);
 
   const transactions = transactionsData?.transactions || [];
-  const totalInUSD = transactionsData?.totalInUSD || 0;
+  const totalExpenses = transactionsData?.totalExpenses || 0;
+  const totalIncome = transactionsData?.totalIncome || 0;
 
   return (
     <Page>
@@ -39,7 +40,8 @@ export function TransactionsScreen() {
         isLoading={isLoading}
         onFiltersClick={() => setIsDrawerOpen(true)}
         appliedFilters={filters}
-        totalAmount={totalInUSD}
+        totalAmount={totalExpenses}
+        totalIncome={totalIncome}
       />
 
       {/* Transactions List */}

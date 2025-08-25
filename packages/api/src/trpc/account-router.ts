@@ -60,7 +60,7 @@ export const accountRouter = t.router({
     .input(
       z.object({
         name: z.string().min(1),
-        color: z.string().min(1),
+        color: z.string(),
         currency: z.enum(supportedCurrency),
       }),
     )
@@ -87,7 +87,7 @@ export const accountRouter = t.router({
       z.object({
         id: z.string(),
         name: z.string().min(1),
-        color: z.string().min(1),
+        color: z.string(),
       }),
     )
     .mutation(async ({ ctx, input }) => {
