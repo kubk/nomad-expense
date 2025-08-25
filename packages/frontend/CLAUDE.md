@@ -45,7 +45,7 @@ npm run typecheck  # TypeScript type checking
 ## 🎨 Styling with Tailwind CSS v4
 
 ### Design System
-- Shadcn
+- Shadcn. Prefer installing missing shadcn components instead of writing shadcn code from scratch
 - **Class Names**: Always use the `cn` utility from `@/lib/utils` for combining class names instead of template literals or string concatenation
 - Avoid hardcoding colors when possible, use shadcn tokens instead
 - **Dark/Light Mode**: Always use shadcn color tokens (e.g., `bg-muted`, `text-foreground`, `bg-primary`, `text-primary-foreground`) instead of hardcoded colors to ensure proper dark/light mode support

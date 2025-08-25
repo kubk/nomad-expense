@@ -3,7 +3,7 @@ import { StrictMode } from "react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import "./index.css";
 import { api, trpcClient } from "./api";
-import { ThemeProvider } from "./components/theme-provider";
+import { ThemeProvider } from "./pages/shared/theme-provider";
 import { App } from "./pages/layout/app";
 
 const queryClient = new QueryClient({

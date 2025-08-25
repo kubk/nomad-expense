@@ -9,11 +9,11 @@ const id = text("id")
 const timestamps = {
   createdAt: text("created_at")
     .notNull()
-    .default(sql`(datetime('now'))`),
+    .$defaultFn(() => new Date().toISOString()),
   updatedAt: text("updated_at")
     .notNull()
-    .default(sql`(datetime('now'))`)
-    .$onUpdateFn(() => sql`(datetime('now'))`),
+    .$defaultFn(() => new Date().toISOString())
+    .$onUpdateFn(() => new Date().toISOString()),
 };
 
 export const userTable = sqliteTable("user", {
