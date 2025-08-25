@@ -17,7 +17,6 @@ export function SummaryCard({
   totalIncome: number;
   isLoading: boolean;
 }) {
-
   const getAccountsLabel = () => {
     return `${appliedFilters.accounts.length} account${appliedFilters.accounts.length > 1 ? "s" : ""}`;
   };
@@ -78,7 +77,7 @@ export function SummaryCard({
               {isLoading ? (
                 <Skeleton className="h-8 w-22" />
               ) : (
-                <div className="text-2xl font-bold text-foreground">
+                <div className="text-2xl font-bold text-foreground font-mono">
                   {formatAmount(totalAmount, "USD", {
                     showFractions: false,
                   })}
@@ -96,11 +95,13 @@ export function SummaryCard({
               {isLoading ? (
                 <Skeleton className="h-8 w-22" />
               ) : (
-                <div className="text-2xl font-bold text-green-600 dark:text-green-400">
-                  +
-                  {formatAmount(totalIncome, "USD", {
-                    showFractions: false,
-                  })}
+                <div className="text-2xl flex items-center gap-1 font-bold text-green-600 dark:text-green-400 font-mono">
+                  <span>+</span>
+                  <span>
+                    {formatAmount(totalIncome, "USD", {
+                      showFractions: false,
+                    })}
+                  </span>
                 </div>
               )}
             </div>
