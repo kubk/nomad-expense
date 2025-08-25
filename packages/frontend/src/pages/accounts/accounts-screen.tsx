@@ -84,12 +84,17 @@ export function AccountsScreen() {
                         </h3>
                         <div className="flex items-center gap-2 mt-1.5 text-xs text-muted-foreground">
                           <span>{account.transactionCount} transactions</span>
-                          <span>·</span>
-                          <span>
-                            Last: {account.lastTransactionDate 
-                              ? DateTime.fromISO(account.lastTransactionDate).toLocaleString(DateTime.DATE_SHORT)
-                              : "N/A"}
-                          </span>
+                          {account.lastTransactionDate && (
+                            <>
+                              <span>·</span>
+                              <span>
+                                Last:{" "}
+                                {DateTime.fromISO(
+                                  account.lastTransactionDate,
+                                ).toLocaleString(DateTime.DATE_SHORT)}
+                              </span>
+                            </>
+                          )}
                         </div>
                       </div>
                     </div>
@@ -97,17 +102,6 @@ export function AccountsScreen() {
                 </button>
               );
             })}
-
-            <div className="mt-6">
-              <Button
-                className="w-full"
-                size="lg"
-                onClick={handleAddAccountClick}
-              >
-                <PlusIcon className="w-5 h-5 mr-2" />
-                Add new account
-              </Button>
-            </div>
           </>
         )}
       </div>
