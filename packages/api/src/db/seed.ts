@@ -3,117 +3,186 @@ import { DB } from "../services/db";
 import { userTable, accountTable, transactionTable } from "./schema";
 import { batch, isNonEmpty } from "./batch";
 
-export const seedUserId = "817e551c-168f-45ef-9dfd-04c1db031ca0";
+export const seedUserId = "8461196e-9b34-44da-81f8-0b53787bd928";
+
+const accountMapping = {
+  account1: "ff99836b-f53a-4322-be2e-7622e00e370a",
+  account2: "ff99836b-f53a-4322-be2e-7622e00e371a",
+  account3: "ff99836b-f53a-4322-be2e-7622e00e372a",
+  account4: "ff99836b-f53a-4322-be2e-7622e00e373a",
+  account5: "ff99836b-f53a-4322-be2e-7622e00e374a",
+  account6: "ff99836b-f53a-4322-be2e-7622e00e375a",
+};
+
+const rates: { [key: string]: number } = {
+  GBP: 1.27,
+  EUR: 1.08,
+  JPY: 0.0067,
+  USDT: 1.0,
+  THB: 0.027,
+  RUB: 0.013,
+};
 
 export const seedAccounts = [
-  { id: "1", name: "Chase Checking", currency: "USD", color: "blue" },
-  { id: "2", name: "UK Savings", currency: "GBP", color: "green" },
-  { id: "3", name: "Euro Account", currency: "EUR", color: "purple" },
-  { id: "4", name: "Japan Travel", currency: "JPY", color: "red" },
-  { id: "5", name: "Crypto Wallet", currency: "USDT", color: "orange" },
+  {
+    id: accountMapping.account1,
+    name: "Revolut",
+    currency: "USD",
+    color: "blue",
+  },
+  {
+    id: accountMapping.account2,
+    name: "Wise",
+    currency: "GBP",
+    color: "green",
+  },
+  {
+    id: accountMapping.account3,
+    name: "Tinkoff",
+    currency: "RUB",
+    color: "yellow",
+  },
+  {
+    id: accountMapping.account4,
+    name: "Kasikorn Egor",
+    currency: "THB",
+    color: "green",
+  },
+  {
+    id: accountMapping.account5,
+    name: "Kasikorn Roxie",
+    currency: "THB",
+    color: "green",
+  },
+  {
+    id: accountMapping.account6,
+    name: "Crypto Wallet",
+    currency: "USDT",
+    color: "orange",
+  },
 ];
 
 const getRandomDateInRange = () => {
   const now = DateTime.now().setZone("utc");
-  const sixMonthsAgo = now.minus({ months: 6 });
-  const diffInMs = now.toMillis() - sixMonthsAgo.toMillis();
+  const thirteenMonthsAgo = now.minus({ months: 13 });
+  const diffInMs = now.toMillis() - thirteenMonthsAgo.toMillis();
   const randomMs = Math.random() * diffInMs;
-  return sixMonthsAgo.plus({ milliseconds: randomMs });
+  return thirteenMonthsAgo.plus({ milliseconds: randomMs });
 };
 
 const generateTransactionsForMonth = () => {
   const transactionTemplates = [
     {
       desc: "Grocery Store",
-      account: "1",
+      account: "account1",
       baseAmount: 120,
       type: "expense" as const,
     },
     {
       desc: "Gas Station",
-      account: "1",
+      account: "account1",
       baseAmount: 65,
       type: "expense" as const,
     },
     {
       desc: "Restaurant",
-      account: "2",
+      account: "account2",
       baseAmount: 85,
       type: "expense" as const,
     },
-    { desc: "Amazon", account: "1", baseAmount: 45, type: "expense" as const },
-    { desc: "Netflix", account: "1", baseAmount: 16, type: "expense" as const },
+    {
+      desc: "Amazon",
+      account: "account1",
+      baseAmount: 45,
+      type: "expense" as const,
+    },
+    {
+      desc: "Netflix",
+      account: "account1",
+      baseAmount: 16,
+      type: "expense" as const,
+    },
     {
       desc: "Coffee Shop",
-      account: "3",
+      account: "account3",
       baseAmount: 25,
       type: "expense" as const,
     },
-    { desc: "Uber", account: "2", baseAmount: 35, type: "expense" as const },
+    {
+      desc: "Uber",
+      account: "account2",
+      baseAmount: 35,
+      type: "expense" as const,
+    },
     {
       desc: "Pharmacy",
-      account: "1",
+      account: "account1",
       baseAmount: 55,
       type: "expense" as const,
     },
     {
       desc: "Electric Bill",
-      account: "1",
+      account: "account1",
       baseAmount: 120,
       type: "expense" as const,
     },
     {
       desc: "Phone Bill",
-      account: "2",
+      account: "account2",
       baseAmount: 85,
       type: "expense" as const,
     },
     {
       desc: "Supermarket",
-      account: "2",
+      account: "account2",
       baseAmount: 95,
       type: "expense" as const,
     },
     {
       desc: "Online Shopping",
-      account: "1",
+      account: "account1",
       baseAmount: 75,
       type: "expense" as const,
     },
     {
       desc: "Public Transport",
-      account: "4",
+      account: "account4",
       baseAmount: 15,
       type: "expense" as const,
     },
     {
       desc: "Fast Food",
-      account: "1",
+      account: "account1",
       baseAmount: 18,
       type: "expense" as const,
     },
     {
       desc: "Internet Bill",
-      account: "1",
+      account: "account1",
       baseAmount: 65,
       type: "expense" as const,
     },
-    { desc: "Salary", account: "1", baseAmount: 3500, type: "income" as const },
+    {
+      desc: "Salary",
+      account: "account1",
+      baseAmount: 3500,
+      type: "income" as const,
+    },
     {
       desc: "Freelance Work",
-      account: "2",
+      account: "account2",
       baseAmount: 800,
       type: "income" as const,
     },
     {
       desc: "Investment Return",
-      account: "5",
+      account: "account5",
       baseAmount: 150,
       type: "income" as const,
     },
     {
       desc: "Cash Back",
-      account: "1",
+      account: "account1",
       baseAmount: 25,
       type: "income" as const,
     },
@@ -134,23 +203,22 @@ const generateTransactionsForMonth = () => {
     const variation = (Math.random() - 0.5) * 40;
     const amount = Math.round((baseAmount + variation) * 100);
 
-    const account = seedAccounts.find((acc) => acc.id === template.account);
+    const account = seedAccounts.find(
+      (acc) =>
+        acc.id ===
+        accountMapping[template.account as keyof typeof accountMapping],
+    );
     const currency = account?.currency || "USD";
 
     let usdAmount = amount;
     if (currency !== "USD") {
-      const rates: { [key: string]: number } = {
-        GBP: 1.27,
-        EUR: 1.08,
-        JPY: 0.0067,
-        USDT: 1.0,
-      };
       usdAmount = Math.round(amount * (rates[currency] || 1));
     }
 
     transactions.push({
-      id: `transaction-${Math.random().toString(36).substr(2, 9)}-${i}`,
-      accountId: template.account,
+      id: crypto.randomUUID(),
+      accountId:
+        accountMapping[template.account as keyof typeof accountMapping],
       description: template.desc,
       amount: amount,
       currency: currency,
@@ -168,36 +236,46 @@ const generateRecentTransactions = () => {
   const recentTemplates = [
     {
       desc: "Coffee Shop",
-      account: "1",
+      account: "account1",
       amount: 450,
       type: "expense" as const,
     },
-    { desc: "Uber Ride", account: "2", amount: 1825, type: "expense" as const },
+    {
+      desc: "Uber Ride",
+      account: "account2",
+      amount: 1825,
+      type: "expense" as const,
+    },
     {
       desc: "Lunch Spot",
-      account: "1",
+      account: "account1",
       amount: 1299,
       type: "expense" as const,
     },
     {
       desc: "Gas Station",
-      account: "1",
+      account: "account1",
       amount: 4500,
       type: "expense" as const,
     },
     {
       desc: "Grocery Run",
-      account: "1",
+      account: "account1",
       amount: 6743,
       type: "expense" as const,
     },
     {
       desc: "Part-time Work",
-      account: "2",
+      account: "account2",
       amount: 15000,
       type: "income" as const,
     },
-    { desc: "Refund", account: "1", amount: 2350, type: "income" as const },
+    {
+      desc: "Refund",
+      account: "account1",
+      amount: 2350,
+      type: "income" as const,
+    },
   ];
 
   const transactions = [];
@@ -207,26 +285,25 @@ const generateRecentTransactions = () => {
     const template =
       recentTemplates[Math.floor(Math.random() * recentTemplates.length)];
 
-    const account = seedAccounts.find((acc) => acc.id === template.account);
+    const account = seedAccounts.find(
+      (acc) =>
+        acc.id ===
+        accountMapping[template.account as keyof typeof accountMapping],
+    );
     const currency = account?.currency || "USD";
     const amountInCents = template.amount;
 
     let usdAmount = amountInCents;
     if (currency !== "USD") {
-      const rates: { [key: string]: number } = {
-        GBP: 1.27,
-        EUR: 1.08,
-        JPY: 0.0067,
-        USDT: 1.0,
-      };
       usdAmount = Math.round(amountInCents * (rates[currency] || 1));
     }
 
     const transactionDate = getRandomDateInRange().toISO() || "";
 
     transactions.push({
-      id: `recent-${Math.random().toString(36).substr(2, 9)}-${i}`,
-      accountId: template.account,
+      id: crypto.randomUUID(),
+      accountId:
+        accountMapping[template.account as keyof typeof accountMapping],
       description: template.desc,
       amount: amountInCents,
       currency: currency,
@@ -242,14 +319,14 @@ const generateRecentTransactions = () => {
 
 const generateAllTransactions = () => {
   const transactions = [];
-  for (let monthsAgo = 5; monthsAgo >= 0; monthsAgo--) {
+  for (let monthsAgo = 12; monthsAgo >= 0; monthsAgo--) {
     transactions.push(...generateTransactionsForMonth());
   }
   transactions.push(...generateRecentTransactions());
   return transactions;
 };
 
-export const seedData = {
+export const getSeedData = () => ({
   users: [
     {
       id: seedUserId,
@@ -261,10 +338,12 @@ export const seedData = {
     userId: seedUserId,
   })),
   transactions: generateAllTransactions(),
-};
+});
 
 export const seedDatabase = async (db: DB) => {
   console.log("🌱 Seeding database...");
+
+  const seedData = getSeedData();
 
   const userChunks = batch(userTable, seedData.users).map((chunk) =>
     db.insert(userTable).values(chunk),
