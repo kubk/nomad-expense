@@ -9,6 +9,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
+import { Skeleton } from "@/components/ui/skeleton";
 import { useLocation, useSearch } from "wouter";
 import { render, safeParseQuery } from "typesafe-routes";
 import { PageHeader } from "../shared/page-header";
@@ -155,7 +156,7 @@ export function TransactionFormScreen() {
     await deleteTransactionMutation.mutateAsync({ id: transactionId });
   };
 
-  const isLoading =
+  const isSaving =
     updateTransactionMutation.isPending ||
     deleteTransactionMutation.isPending ||
     createTransactionMutation.isPending;
@@ -163,22 +164,14 @@ export function TransactionFormScreen() {
   const deleteButton = isEdit && (
     <button
       onClick={() => setShowDeleteConfirm(true)}
-      disabled={isLoading}
+      disabled={isSaving}
       className="p-2 text-red-600 hover:bg-red-50 rounded-lg disabled:opacity-50"
     >
       <Trash2Icon className="w-5 h-5" />
     </button>
   );
 
-  if (isEdit && !transaction) {
-    return (
-      <Page>
-        <div className="flex justify-center items-center py-12">
-          <Loader2Icon className="w-8 h-8 animate-spin text-muted-foreground" />
-        </div>
-      </Page>
-    );
-  }
+  const isTransactionLoading = isEdit && !transaction;
 
   return (
     <Page>
@@ -205,58 +198,66 @@ export function TransactionFormScreen() {
             <div className="flex-1 space-y-6">
               {/* Transaction Details Step */}
               {/* Date/Time picker for edit mode */}
-              {isEdit && transaction && (
+              {isEdit && (
                 <div className="flex gap-4">
                   <div className="flex flex-col gap-3 flex-1">
                     <Label htmlFor="date-picker" className="px-1">
                       Date
                     </Label>
-                    <Popover>
-                      <PopoverTrigger asChild>
-                        <Button
-                          variant="outline"
-                          id="date-picker"
-                          className="justify-between font-normal"
+                    {isTransactionLoading ? (
+                      <Skeleton className="h-9 w-full" />
+                    ) : (
+                      <Popover>
+                        <PopoverTrigger asChild>
+                          <Button
+                            variant="outline"
+                            id="date-picker"
+                            className="justify-between font-normal"
+                          >
+                            {formData.date
+                              ? formData.date.toLocaleDateString()
+                              : "Select date"}
+                            <ChevronDownIcon className="h-4 w-4" />
+                          </Button>
+                        </PopoverTrigger>
+                        <PopoverContent
+                          className="w-auto overflow-hidden p-0"
+                          align="start"
                         >
-                          {formData.date
-                            ? formData.date.toLocaleDateString()
-                            : "Select date"}
-                          <ChevronDownIcon className="h-4 w-4" />
-                        </Button>
-                      </PopoverTrigger>
-                      <PopoverContent
-                        className="w-auto overflow-hidden p-0"
-                        align="start"
-                      >
-                        <Calendar
-                          mode="single"
-                          selected={formData.date}
-                          onSelect={(date) => {
-                            setFormData((prev) => ({
-                              ...prev,
-                              date,
-                            }));
-                          }}
-                        />
-                      </PopoverContent>
-                    </Popover>
+                          <Calendar
+                            mode="single"
+                            selected={formData.date}
+                            onSelect={(date) => {
+                              setFormData((prev) => ({
+                                ...prev,
+                                date,
+                              }));
+                            }}
+                          />
+                        </PopoverContent>
+                      </Popover>
+                    )}
                   </div>
                   <div className="flex flex-col gap-3 flex-1">
                     <Label htmlFor="time-picker" className="px-1">
                       Time
                     </Label>
-                    <Input
-                      type="time"
-                      id="time-picker"
-                      value={formData.time}
-                      onChange={(e) =>
-                        setFormData((prev) => ({
-                          ...prev,
-                          time: e.target.value,
-                        }))
-                      }
-                      className="bg-background appearance-none [&::-webkit-calendar-picker-indicator]:hidden [&::-webkit-calendar-picker-indicator]:appearance-none"
-                    />
+                    {isTransactionLoading ? (
+                      <Skeleton className="h-9 w-full" />
+                    ) : (
+                      <Input
+                        type="time"
+                        id="time-picker"
+                        value={formData.time}
+                        onChange={(e) =>
+                          setFormData((prev) => ({
+                            ...prev,
+                            time: e.target.value,
+                          }))
+                        }
+                        className="bg-background appearance-none [&::-webkit-calendar-picker-indicator]:hidden [&::-webkit-calendar-picker-indicator]:appearance-none"
+                      />
+                    )}
                   </div>
                 </div>
               )}
@@ -264,58 +265,75 @@ export function TransactionFormScreen() {
               {/* Transaction Type Selector */}
               <div className="flex flex-col gap-1.5">
                 <label className="text-sm font-medium">Type</label>
-                <Tabs
-                  value={formData.type}
-                  onValueChange={(value) =>
-                    setFormData((prev) => ({
-                      ...prev,
-                      type: value as TransactionType,
-                    }))
-                  }
-                >
-                  <TabsList className="grid w-full grid-cols-2">
-                    <TabsTrigger value="expense">Expense</TabsTrigger>
-                    <TabsTrigger value="income">Income</TabsTrigger>
-                  </TabsList>
-                </Tabs>
+                {isTransactionLoading ? (
+                  <Skeleton className="h-9 rounded-md w-full" />
+                ) : (
+                  <Tabs
+                    value={formData.type}
+                    onValueChange={(value) =>
+                      setFormData((prev) => ({
+                        ...prev,
+                        type: value as TransactionType,
+                      }))
+                    }
+                  >
+                    <TabsList className="grid w-full grid-cols-2">
+                      <TabsTrigger value="expense">Expense</TabsTrigger>
+                      <TabsTrigger value="income">Income</TabsTrigger>
+                    </TabsList>
+                  </Tabs>
+                )}
               </div>
 
               {/* Amount input for both edit and create modes */}
               <div className="flex flex-col gap-1.5">
                 <label className="text-sm font-medium">Amount</label>
                 <div className="flex gap-2">
-                  <Input
-                    type="number"
-                    step="0.01"
-                    placeholder="0.00"
-                    value={formData.amount}
-                    onChange={(e) =>
-                      setFormData((prev) => ({
-                        ...prev,
-                        amount: e.target.value,
-                      }))
-                    }
-                    className="flex-1"
-                  />
-                  <div className="px-3 py-2 border border-input bg-muted rounded-md text-sm text-muted-foreground min-w-16 flex items-center justify-center">
-                    {isEdit && transaction
-                      ? transaction.currency
-                      : selectedAccount?.currency}
-                  </div>
+                  {isTransactionLoading ? (
+                    <>
+                      <Skeleton className="h-9.5 flex-1" />
+                      <Skeleton className="h-9.5 w-16" />
+                    </>
+                  ) : (
+                    <>
+                      <Input
+                        type="number"
+                        step="0.01"
+                        placeholder="0.00"
+                        value={formData.amount}
+                        onChange={(e) =>
+                          setFormData((prev) => ({
+                            ...prev,
+                            amount: e.target.value,
+                          }))
+                        }
+                        className="flex-1"
+                      />
+                      <div className="px-3 py-2 border border-input bg-muted rounded-md text-sm text-muted-foreground min-w-16 flex items-center justify-center">
+                        {isEdit && transaction
+                          ? transaction.currency
+                          : selectedAccount?.currency}
+                      </div>
+                    </>
+                  )}
                 </div>
               </div>
 
               <div className="flex flex-col gap-1.5">
                 <label className="text-sm font-medium">Description</label>
-                <Input
-                  value={formData.description}
-                  onChange={(e) =>
-                    setFormData((prev) => ({
-                      ...prev,
-                      description: e.target.value,
-                    }))
-                  }
-                />
+                {isTransactionLoading ? (
+                  <Skeleton className="h-9 w-full" />
+                ) : (
+                  <Input
+                    value={formData.description}
+                    onChange={(e) =>
+                      setFormData((prev) => ({
+                        ...prev,
+                        description: e.target.value,
+                      }))
+                    }
+                  />
+                )}
               </div>
             </div>
 
@@ -336,7 +354,7 @@ export function TransactionFormScreen() {
                 variant="outline"
                 className="flex-1"
                 onClick={() => setCurrentStep("account")}
-                disabled={isLoading}
+                disabled={isSaving || isTransactionLoading}
               >
                 Back
               </Button>
@@ -348,10 +366,11 @@ export function TransactionFormScreen() {
                   !formData.description.trim() ||
                   !formData.amount.trim() ||
                   (!isEdit && !formData.accountId) ||
-                  isLoading
+                  isSaving ||
+                  isTransactionLoading
                 }
               >
-                {isLoading ? (
+                {isSaving ? (
                   <Loader2Icon className="h-4 w-4 animate-spin" />
                 ) : (
                   "Save"
