@@ -10,6 +10,7 @@ import { Page } from "../shared/page";
 import { SupportedCurrency } from "api";
 import { getColorById } from "./account-colors";
 import { cn } from "@/lib/utils";
+import { DateTime } from "luxon";
 
 export function AccountsScreen() {
   const [, navigate] = useLocation();
@@ -85,7 +86,9 @@ export function AccountsScreen() {
                           <span>{account.transactionCount} transactions</span>
                           <span>·</span>
                           <span>
-                            Last: {account.lastTransactionDate || "N/A"}
+                            Last: {account.lastTransactionDate 
+                              ? DateTime.fromISO(account.lastTransactionDate).toLocaleString(DateTime.DATE_SHORT)
+                              : "N/A"}
                           </span>
                         </div>
                       </div>

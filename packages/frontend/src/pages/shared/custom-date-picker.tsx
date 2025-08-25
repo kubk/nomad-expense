@@ -168,7 +168,7 @@ export function CustomDatePicker({
       {/* Actions */}
       <div className="flex flex-col gap-2 py-4">
         <Button size="lg" onClick={handleApply}>
-          Apply Filters
+          Apply filters
         </Button>
         <Button size="lg" variant="outline" onClick={onBack}>
           Back

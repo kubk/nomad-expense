@@ -21,7 +21,7 @@ const getRandomDateInRange = () => {
   return sixMonthsAgo.plus({ milliseconds: randomMs });
 };
 
-const generateTransactionsForMonth = (monthsAgo: number) => {
+const generateTransactionsForMonth = () => {
   const transactionTemplates = [
     {
       desc: "Grocery Store",
@@ -243,7 +243,7 @@ const generateRecentTransactions = () => {
 const generateAllTransactions = () => {
   const transactions = [];
   for (let monthsAgo = 5; monthsAgo >= 0; monthsAgo--) {
-    transactions.push(...generateTransactionsForMonth(monthsAgo));
+    transactions.push(...generateTransactionsForMonth());
   }
   transactions.push(...generateRecentTransactions());
   return transactions;
@@ -259,8 +259,6 @@ export const seedData = {
   accounts: seedAccounts.map((account) => ({
     ...account,
     userId: seedUserId,
-    createdAt: DateTime.now().toISO() || "",
-    updatedAt: DateTime.now().toISO() || "",
   })),
   transactions: generateAllTransactions(),
 };
