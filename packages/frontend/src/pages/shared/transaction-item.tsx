@@ -44,7 +44,7 @@ export function TransactionItem({
         </div>
         <div className="flex items-center gap-2 mt-1">
           <p className="text-xs text-muted-foreground">
-            {formatDisplayDate(transaction.date)}
+            {formatDisplayDate(transaction.createdAt)}
           </p>
           <AccountBadge accountId={transaction.accountId} />
         </div>

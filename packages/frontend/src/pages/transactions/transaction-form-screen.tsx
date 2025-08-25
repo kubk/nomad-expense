@@ -103,7 +103,7 @@ export function TransactionFormScreen() {
   useEffect(() => {
     if (transaction) {
       // Parse ISO timestamp string using luxon
-      const transactionDateTime = DateTime.fromISO(transaction.date);
+      const transactionDateTime = DateTime.fromISO(transaction.createdAt);
       const transactionDate = transactionDateTime.toJSDate();
       const timeString = transactionDateTime.toFormat("HH:mm");
 
@@ -189,7 +189,6 @@ export function TransactionFormScreen() {
 
       {currentStep === "account" && (
         <AccountPicker
-          accounts={accounts}
           onSelect={(accountId) => {
             setFormData((prev) => ({
               ...prev,
