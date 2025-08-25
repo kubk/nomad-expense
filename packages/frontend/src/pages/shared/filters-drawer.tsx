@@ -42,8 +42,8 @@ export function FiltersDrawer({
   };
 
   const timePeriods = [
-    { value: 1, label: "Last month" },
-    { value: 3, label: "Last 3 months" },
+    { value: 1, label: "Last 30 days" },
+    { value: 3, label: "Last 90 days" },
     { value: 6, label: "Last 6 months" },
     { value: 12, label: "Last year" },
   ];
@@ -205,7 +205,7 @@ export function FiltersDrawer({
           {!showCustomDatePicker && (
             <DrawerFooter>
               <Button size="lg" onClick={() => handleApply(filterForm)}>
-                Apply Filters
+                Apply filters
               </Button>
               <DrawerClose asChild>
                 <Button size="lg" variant="outline">

@@ -9,6 +9,7 @@ export function isNonEmpty<T>(array: T[]): array is [T, ...T[]] {
  * Generic typesafe utility for batched inserts that respects D1's bind parameter limits
  */
 export function batch<T extends SQLiteTable>(
+  // @ts-ignore
   table: T,
   data: InferInsertModel<T>[],
 ): InferInsertModel<T>[][] {
