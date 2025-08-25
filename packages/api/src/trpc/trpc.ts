@@ -10,6 +10,7 @@ export async function createContext({
   let user = null;
   if (getEnv().STAGE === "local") {
     const userId = req.headers.get("x-user-id");
+    await new Promise((resolve) => setTimeout(resolve, 1000));
     if (userId) {
       user = await getUserById(userId);
     }
