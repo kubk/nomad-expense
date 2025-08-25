@@ -13,7 +13,7 @@ export function OverviewHeader() {
             <p className="text-primary-foreground/70 dark:text-foreground/70 text-sm mb-1">
               Expenses · Last 30 days
             </p>
-            <div className="text-3xl dark:text-foreground font-bold">
+            <div className="text-3xl dark:text-foreground font-bold font-mono">
               {isLoading ? (
                 <div className="animate-pulse bg-muted h-9 w-32 rounded"></div>
               ) : (
