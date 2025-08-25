@@ -13,7 +13,6 @@
     "cf-typegen": "wrangler types",
     "db:generate-migrations": "dotenvx run -f .dev.vars -- npx drizzle-kit generate",
     "db:migrate": "wrangler d1 migrations apply expense-tracker --local",
-    "db:seed": "dotenvx run -f .dev.vars -- tsx src/bin/seed.ts",
     "db:studio": "dotenvx run -f .dev.vars -- npx drizzle-kit studio",
     "--- production ---": "",
     "production:env:encrypt": "dotenvx encrypt -f .env.production",
