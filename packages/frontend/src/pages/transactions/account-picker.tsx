@@ -2,23 +2,17 @@ import { cn } from "@/lib/utils";
 import { getColorById } from "../accounts/account-colors";
 import { getCurrencySymbol } from "../../shared/currency-formatter";
 import { SupportedCurrency } from "api";
+import { api } from "@/api";
 
-type Account = {
-  id: string;
-  name: string;
-  color: string;
-  currency: string;
-};
-
-type AccountPickerProps = {
-  accounts: Account[];
+export function AccountPicker({
+  onSelect,
+}: {
   onSelect: (accountId: string) => void;
-};
-
-export function AccountPicker({ accounts, onSelect }: AccountPickerProps) {
+}) {
+  const { data: accounts = [] } = api.accounts.listWithStats.useQuery();
   return (
-    <div className="flex flex-col gap-4">
-      <label className="text-sm font-medium">Select Account</label>
+    <div className="flex flex-col gap-2 p-4">
+      <label className="text-sm font-medium pl-1">Select Account</label>
       {accounts.map((account) => {
         const colorInfo = getColorById(account.color);
         return (

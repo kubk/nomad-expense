@@ -1,6 +1,6 @@
 import { Label } from "@/components/ui/label";
 import { PageHeader } from "../shared/page-header";
-import { ModeToggle } from "../../components/mode-toggle";
+import { ModeToggle } from "./mode-toggle";
 import { Page } from "../shared/page";
 
 export function SettingsScreen() {
