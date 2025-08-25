@@ -50,7 +50,7 @@ export function MonthlyChart() {
                     key={month.month}
                     className="flex flex-col cursor-pointer items-center min-w-[64px]"
                   >
-                    <div className="mb-4 text-xs font-semibold text-foreground text-center">
+                    <div className="mb-4 text-xs font-semibold text-foreground text-center font-mono">
                       {formatAmount(month.amount, "USD", {
                         showFractions: false,
                       })}

@@ -48,7 +48,7 @@ export function MonthlyBreakdownItem({
             <div className="font-medium text-foreground">
               {month.shortMonth} {month.year}
             </div>
-            <div className="font-semibold text-foreground">
+            <div className="font-semibold text-foreground font-mono">
               {formatAmount(month.amount, "USD")}
             </div>
           </div>

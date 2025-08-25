@@ -37,43 +37,45 @@ export function TransactionItem({
       onClick={handleClick}
     >
       <div className="flex-1">
-        <div className="flex items-center gap-2 mb-1">
+        <div className="flex items-center gap-2">
           <p className="font-medium text-sm text-foreground">
             {transaction.desc}
           </p>
         </div>
-        <div className="flex items-center gap-2 mt-1">
+        <div className="flex items-center gap-2">
           <p className="text-xs text-muted-foreground">
             {formatDisplayDate(transaction.createdAt)}
           </p>
           <AccountBadge accountId={transaction.accountId} />
         </div>
       </div>
-      <div className="self-start text-right">
-        <p
+      <div className="self-start flex flex-col gap-1 text-right">
+        <div
           className={cn(
-            "font-semibold text-sm",
+            "flex items-center gap-1 font-semibold text-sm font-mono",
             isIncome && "text-green-700 dark:text-green-400",
           )}
         >
-          {isIncome ? "+ " : ""}
-          {formatAmount(
-            displayAmount,
-            transaction.currency as SupportedCurrency,
-          )}
-        </p>
+          <span>{isIncome ? "+" : ""}</span>
+          <span>
+            {formatAmount(
+              displayAmount,
+              transaction.currency as SupportedCurrency,
+            )}
+          </span>
+        </div>
         {transaction.currency !== "USD" && (
-          <p
+          <div
             className={cn(
-              "text-xs",
+              "flex items-center gap-1 text-xs font-mono",
               isIncome
                 ? "text-green-600 dark:text-green-400"
                 : "text-muted-foreground",
             )}
           >
-            {isIncome ? "+ " : ""}
-            {formatAmount(displayAmountInUSD, "USD")}
-          </p>
+            <span>{isIncome ? "+" : ""}</span>
+            <span>{formatAmount(displayAmountInUSD, "USD")}</span>
+          </div>
         )}
       </div>
     </div>
