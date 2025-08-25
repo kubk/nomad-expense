@@ -187,25 +187,24 @@ export function TransactionFormScreen() {
         rightSlot={deleteButton}
       />
 
-      <div className="flex-1 p-4 bg-background flex flex-col">
-        <div className="flex-1 space-y-6">
-          {/* Account Selection Step */}
-          {currentStep === "account" && (
-            <AccountPicker
-              accounts={accounts}
-              onSelect={(accountId) => {
-                setFormData((prev) => ({
-                  ...prev,
-                  accountId,
-                }));
-                setCurrentStep("details");
-              }}
-            />
-          )}
+      {currentStep === "account" && (
+        <AccountPicker
+          accounts={accounts}
+          onSelect={(accountId) => {
+            setFormData((prev) => ({
+              ...prev,
+              accountId,
+            }));
+            setCurrentStep("details");
+          }}
+        />
+      )}
 
-          {/* Transaction Details Step */}
-          {currentStep === "details" && (
-            <>
+      {currentStep === "details" && (
+        <>
+          <div className="flex-1 p-4 bg-background flex flex-col">
+            <div className="flex-1 space-y-6">
+              {/* Transaction Details Step */}
               {/* Date/Time picker for edit mode */}
               {isEdit && transaction && (
                 <div className="flex gap-4">
@@ -319,52 +318,49 @@ export function TransactionFormScreen() {
                   }
                 />
               </div>
-            </>
-          )}
-        </div>
+            </div>
 
-        <ConfirmModal
-          isOpen={showDeleteConfirm}
-          onClose={() => setShowDeleteConfirm(false)}
-          onConfirm={handleDelete}
-          title="Delete Transaction"
-          description="This will permanently delete this transaction. This action cannot be undone."
-          confirmText="Delete"
-          isLoading={deleteTransactionMutation.isPending}
-        />
-      </div>
-
-      {currentStep === "details" && (
-        <Footer>
-          <div className="flex gap-2">
-            <Button
-              size={"lg"}
-              variant="outline"
-              className="flex-1"
-              onClick={() => setCurrentStep("account")}
-              disabled={isLoading}
-            >
-              Back
-            </Button>
-            <Button
-              className="flex-1"
-              size="lg"
-              onClick={handleSave}
-              disabled={
-                !formData.description.trim() ||
-                !formData.amount.trim() ||
-                (!isEdit && !formData.accountId) ||
-                isLoading
-              }
-            >
-              {isLoading ? (
-                <Loader2Icon className="h-4 w-4 animate-spin" />
-              ) : (
-                "Save"
-              )}
-            </Button>
+            <ConfirmModal
+              isOpen={showDeleteConfirm}
+              onClose={() => setShowDeleteConfirm(false)}
+              onConfirm={handleDelete}
+              title="Delete Transaction"
+              description="This will permanently delete this transaction. This action cannot be undone."
+              confirmText="Delete"
+              isLoading={deleteTransactionMutation.isPending}
+            />
           </div>
-        </Footer>
+          <Footer>
+            <div className="flex gap-2">
+              <Button
+                size={"lg"}
+                variant="outline"
+                className="flex-1"
+                onClick={() => setCurrentStep("account")}
+                disabled={isLoading}
+              >
+                Back
+              </Button>
+              <Button
+                className="flex-1"
+                size="lg"
+                onClick={handleSave}
+                disabled={
+                  !formData.description.trim() ||
+                  !formData.amount.trim() ||
+                  (!isEdit && !formData.accountId) ||
+                  isLoading
+                }
+              >
+                {isLoading ? (
+                  <Loader2Icon className="h-4 w-4 animate-spin" />
+                ) : (
+                  "Save"
+                )}
+              </Button>
+            </div>
+          </Footer>
+        </>
       )}
     </Page>
   );
