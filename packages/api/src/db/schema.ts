@@ -1,12 +1,10 @@
 import { sqliteTable, text, integer, index } from "drizzle-orm/sqlite-core";
-import { sql } from "drizzle-orm";
 
-const id = text("id")
-  .primaryKey()
-  .notNull()
-  .default(sql`(lower(hex(randomblob(16))))`);
-
-const timestamps = {
+const sharedColumns = {
+  id: text("id")
+    .primaryKey()
+    .notNull()
+    .$defaultFn(() => crypto.randomUUID()),
   createdAt: text("created_at")
     .notNull()
     .$defaultFn(() => new Date().toISOString()),
@@ -17,21 +15,19 @@ const timestamps = {
 };
 
 export const userTable = sqliteTable("user", {
-  id: id,
-  ...timestamps,
+  ...sharedColumns,
 });
 
 export const accountTable = sqliteTable(
   "account",
   {
-    id: id,
+    ...sharedColumns,
     userId: text("user_id")
       .notNull()
       .references(() => userTable.id, { onDelete: "cascade" }),
     name: text("name").notNull(),
     currency: text("currency").notNull(),
     color: text("color").notNull(),
-    ...timestamps,
   },
   (table) => [index("idx_account_user_id").on(table.userId)],
 );
@@ -39,7 +35,7 @@ export const accountTable = sqliteTable(
 export const transactionTable = sqliteTable(
   "transaction",
   {
-    id: id,
+    ...sharedColumns,
     accountId: text("account_id")
       .notNull()
       .references(() => accountTable.id, { onDelete: "cascade" }),
@@ -50,7 +46,6 @@ export const transactionTable = sqliteTable(
     type: text("type", { enum: ["expense", "income"] })
       .notNull()
       .default("expense"),
-    ...timestamps,
   },
   (table) => [
     index("idx_transaction_account_id").on(table.accountId),
