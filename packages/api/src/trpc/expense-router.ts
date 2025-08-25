@@ -36,7 +36,7 @@ export const expenseRouter = t.router({
     const allTransactions = await db
       .select({
         usdAmount: transactionTable.usdAmount,
-        date: transactionTable.createdAt,
+        createdAt: transactionTable.createdAt,
       })
       .from(transactionTable)
       .innerJoin(accountTable, eq(transactionTable.accountId, accountTable.id))
@@ -74,7 +74,7 @@ export const expenseRouter = t.router({
         amount: transactionTable.amount,
         currency: transactionTable.currency,
         usdAmount: transactionTable.usdAmount,
-        date: transactionTable.createdAt,
+        createdAt: transactionTable.createdAt,
         accountId: accountTable.id,
         type: transactionTable.type,
       })
@@ -106,7 +106,7 @@ export const expenseRouter = t.router({
     ];
 
     allTransactions.forEach((transaction) => {
-      const date = new Date(transaction.date);
+      const date = new Date(transaction.createdAt);
       const year = date.getFullYear();
       const month = date.getMonth() + 1;
       const shortMonth = monthNames[month - 1];
@@ -158,7 +158,7 @@ export const expenseRouter = t.router({
         amount: t.amount,
         currency: t.currency,
         usd: t.usdAmount,
-        date: t.date,
+        createdAt: t.createdAt,
         accountId: t.accountId,
         type: t.type,
       })),
@@ -221,7 +221,7 @@ export const expenseRouter = t.router({
       const transactions = await db
         .select({
           usdAmount: transactionTable.usdAmount,
-          date: transactionTable.createdAt,
+          createdAt: transactionTable.createdAt,
           accountId: accountTable.id,
           type: transactionTable.type,
         })
@@ -257,7 +257,7 @@ export const expenseRouter = t.router({
       ];
 
       transactions.forEach((transaction) => {
-        const date = new Date(transaction.date);
+        const date = new Date(transaction.createdAt);
         const year = date.getFullYear();
         const month = date.getMonth() + 1;
         const shortMonth = monthNames[month - 1];
@@ -390,7 +390,7 @@ export const expenseRouter = t.router({
           amount: transactionTable.amount,
           currency: transactionTable.currency,
           usdAmount: transactionTable.usdAmount,
-          date: transactionTable.createdAt,
+          createdAt: transactionTable.createdAt,
           accountId: accountTable.id,
           type: transactionTable.type,
         })
@@ -421,7 +421,7 @@ export const expenseRouter = t.router({
           amount: t.amount,
           currency: t.currency,
           usd: t.usdAmount,
-          date: t.date,
+          createdAt: t.createdAt,
           accountId: t.accountId,
           type: t.type,
         })),
@@ -443,7 +443,7 @@ export const expenseRouter = t.router({
           amount: transactionTable.amount,
           currency: transactionTable.currency,
           usdAmount: transactionTable.usdAmount,
-          date: transactionTable.createdAt,
+          createdAt: transactionTable.createdAt,
           accountId: accountTable.id,
           type: transactionTable.type,
         })
@@ -470,7 +470,7 @@ export const expenseRouter = t.router({
         amount: transaction.amount,
         currency: transaction.currency,
         usd: transaction.usdAmount,
-        date: transaction.date,
+        createdAt: transaction.createdAt,
         accountId: transaction.accountId,
         type: transaction.type,
       };
