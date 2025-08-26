@@ -5,11 +5,7 @@ import { template } from "typesafe-routes";
 import { routes } from "../../routes";
 import { useLocation } from "wouter";
 
-export function InviteError({
-  errorMessage,
-}: {
-  errorMessage: string;
-}) {
+export function InviteError({ errorMessage }: { errorMessage: string }) {
   const [, setLocation] = useLocation();
 
   return (
@@ -24,11 +20,12 @@ export function InviteError({
               <h1 className="text-2xl font-semibold text-foreground">
                 Invalid Invite
               </h1>
-              <p className="text-muted-foreground">
-                {errorMessage}
-              </p>
+              <p className="text-muted-foreground">{errorMessage}</p>
             </div>
-            <Button onClick={() => setLocation(template(routes.overview))} className="w-full">
+            <Button
+              onClick={() => setLocation(template(routes.overview))}
+              className="w-full"
+            >
               Go to Overview
             </Button>
           </div>
