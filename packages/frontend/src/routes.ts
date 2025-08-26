@@ -32,8 +32,11 @@ export const routes = createRoutes({
   settings: {
     path: ["settings"],
   },
+  family: {
+    path: ["family"],
+  },
   invite: {
     path: ["invite"],
-    query: [str("familyId")],
+    query: [str("code")],
   },
 });

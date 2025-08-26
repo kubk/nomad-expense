@@ -4,6 +4,11 @@ import { userTable, accountTable, transactionTable } from "./schema";
 import { batch, isNonEmpty } from "./batch";
 
 export const seedUserId = "8461196e-9b34-44da-81f8-0b53787bd928";
+export const seedUser2Id = "8461196e-9b34-44da-81f8-0b53787bd929";
+export const seedUser3Id = "8461196e-9b34-44da-81f8-0b53787bd930";
+
+export const family1Id = "ff99836b-f53a-4322-be2e-7622e00e380a";
+export const family2Id = "ff99836b-f53a-4322-be2e-7622e00e380b";
 
 const accountMapping = {
   account1: "ff99836b-f53a-4322-be2e-7622e00e370a",
@@ -330,13 +335,46 @@ export const getSeedData = () => ({
   users: [
     {
       id: seedUserId,
-      baseCurrency: "USD",
+      familyId: family1Id,
+      firstName: "John",
+      lastName: "Doe", 
+      username: "johndoe",
+    },
+    {
+      id: seedUser2Id,
+      familyId: family1Id,
+      firstName: "Jane",
+      lastName: "Doe",
+      username: "janedoe",
+    },
+    {
+      id: seedUser3Id,
+      familyId: family2Id,
+      firstName: "Bob",
+      lastName: "Smith",
+      username: "bobsmith",
     },
   ],
-  accounts: seedAccounts.map((account) => ({
-    ...account,
-    userId: seedUserId,
-  })),
+  accounts: [
+    ...seedAccounts.map((account) => ({
+      ...account,
+      familyId: family1Id,
+    })),
+    {
+      id: "ff99836b-f53a-4322-be2e-7622e00e376a",
+      name: "Chase Bank",
+      currency: "USD",
+      color: "blue",
+      familyId: family2Id,
+    },
+    {
+      id: "ff99836b-f53a-4322-be2e-7622e00e377a",
+      name: "Wells Fargo",
+      currency: "USD",
+      color: "red",
+      familyId: family2Id,
+    },
+  ],
   transactions: generateAllTransactions(),
 });
 

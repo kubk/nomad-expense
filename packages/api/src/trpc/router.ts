@@ -4,6 +4,7 @@ import { t } from "./trpc";
 import { userRouter } from "./user-router";
 import { expenseRouter } from "./expense-router";
 import { accountRouter } from "./account-router";
+import { familyRouter } from "./family-router";
 import { getDb } from "../services/db";
 import { seedDatabase } from "../db/seed";
 
@@ -24,6 +25,7 @@ export const router = t.router({
   users: userRouter,
   expenses: expenseRouter,
   accounts: accountRouter,
+  family: familyRouter,
 });
 
 export type AppRouter = typeof router;

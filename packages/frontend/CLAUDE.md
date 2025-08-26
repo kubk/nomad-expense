@@ -63,6 +63,7 @@ export function Component({
 - **Icons**: Lucide React (use for all icons), import them ending with "Icon", so "XIcon" is good, "X" is bad
 - Don't add any screen reader code
 - It's Vite SPA, never use 'use client'
+- **UI Copy**: Use sentence case for titles and labels, not Title Case
 
 ## 📁 Frontend Folder Structure
 

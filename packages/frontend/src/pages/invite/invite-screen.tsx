@@ -1,27 +1,47 @@
-import { useState, useEffect } from "react";
-import { useLocation } from "wouter";
+import { useEffect } from "react";
+import { useLocation, useSearch } from "wouter";
 import { CheckCircleIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { template } from "typesafe-routes";
+import { template, safeParseQuery } from "typesafe-routes";
 import { routes } from "../../routes";
 import { InviteLoader } from "./invite-loader";
+import { InviteError } from "./invite-error";
+import { api } from "@/api";
+import { getUserDisplayNameWithUsername } from "@/shared/user-display";
 
 export function InviteScreen() {
-  const [isLoading, setIsLoading] = useState(true);
   const [, setLocation] = useLocation();
+  const search = useSearch();
+  
+  const parsedQuery = safeParseQuery(routes.invite, search);
+  const inviteCode = parsedQuery.success ? parsedQuery.data.code : null;
+
+  const joinFamilyMutation = api.family.joinFamily.useMutation();
 
   useEffect(() => {
-    const timer = setTimeout(() => {
-      setIsLoading(false);
-    }, 2000);
+    if (!inviteCode) {
+      return;
+    }
 
-    return () => clearTimeout(timer);
-  }, []);
+    joinFamilyMutation.mutate({ code: inviteCode });
+  }, [inviteCode]);
 
-  if (isLoading) {
+  if (joinFamilyMutation.isPending) {
     return <InviteLoader />;
   }
+
+  if (joinFamilyMutation.isError || !inviteCode) {
+    const errorMessage = !inviteCode 
+      ? "No invite code provided"
+      : joinFamilyMutation.error?.message || "Failed to join family";
+      
+    return <InviteError errorMessage={errorMessage} />;
+  }
+
+  // Handle success case
+  const inviter = joinFamilyMutation.data?.inviter;
+  const inviterName = inviter ? getUserDisplayNameWithUsername(inviter) : "Someone";
 
   return (
     <div className="min-h-screen bg-background flex items-center justify-center p-4">
@@ -38,10 +58,10 @@ export function InviteScreen() {
               <div className="space-y-2">
                 <p className="text-muted-foreground">
                   Shared access with{" "}
-                  <span className="font-medium text-foreground">John Doe</span>
+                  <span className="font-medium text-foreground">{inviterName}</span>
                 </p>
                 <p className="text-sm text-muted-foreground">
-                  You can change this in settings
+                  You can manage this in settings
                 </p>
               </div>
             </div>
