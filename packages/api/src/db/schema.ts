@@ -16,20 +16,25 @@ const sharedColumns = {
 
 export const userTable = sqliteTable("user", {
   ...sharedColumns,
+  familyId: text("family_id")
+    .notNull()
+    .$defaultFn(() => crypto.randomUUID()),
+  firstName: text("first_name"),
+  lastName: text("last_name"),
+  username: text("username"),
+  avatarUrl: text("avatar_url"),
 });
 
 export const accountTable = sqliteTable(
   "account",
   {
     ...sharedColumns,
-    userId: text("user_id")
-      .notNull()
-      .references(() => userTable.id, { onDelete: "cascade" }),
+    familyId: text("family_id").notNull(),
     name: text("name").notNull(),
     currency: text("currency").notNull(),
     color: text("color").notNull(),
   },
-  (table) => [index("idx_account_user_id").on(table.userId)],
+  (table) => [index("idx_account_family_id").on(table.familyId)],
 );
 
 export const transactionTable = sqliteTable(
@@ -50,5 +55,24 @@ export const transactionTable = sqliteTable(
   (table) => [
     index("idx_transaction_account_id").on(table.accountId),
     index("idx_transaction_type").on(table.type),
+  ],
+);
+
+export const inviteTable = sqliteTable(
+  "invite",
+  {
+    ...sharedColumns,
+    familyId: text("family_id").notNull(),
+    invitedByUserId: text("invited_by_user_id")
+      .notNull()
+      .references(() => userTable.id, { onDelete: "cascade" }),
+    code: text("code").notNull().unique(),
+    expiresAt: text("expires_at").notNull(),
+    usedAt: text("used_at"),
+    usedByUserId: text("used_by_user_id").references(() => userTable.id),
+  },
+  (table) => [
+    index("idx_invite_code").on(table.code),
+    index("idx_invite_family_id").on(table.familyId),
   ],
 );

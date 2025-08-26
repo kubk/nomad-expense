@@ -1,9 +1,10 @@
 import { formatAmount } from "@/shared/currency-formatter";
-import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
+import { UserAvatar } from "@/components/user-avatar";
 import { api } from "../../api";
 
 export function OverviewHeader() {
   const { data: overviewData, isLoading } = api.expenses.overview.useQuery();
+  const { data: familyMembers } = api.family.listMembers.useQuery();
 
   return (
     <div className="bg-primary text-primary-foreground dark:bg-muted px-4 py-6 pb-18">
@@ -23,22 +24,19 @@ export function OverviewHeader() {
               )}
             </div>
           </div>
-          <div className="self-center *:data-[slot=avatar]:ring-background dark:*:data-[slot=avatar]:ring-foreground flex -space-x-2 *:data-[slot=avatar]:ring-2 *:data-[slot=avatar]:w-10 *:data-[slot=avatar]:h-10">
-            <Avatar>
-              <AvatarImage src="https://github.com/kubk.png" alt="User 1" />
-              <AvatarFallback className="bg-background/20 text-primary-foreground text-xs">
-                EG
-              </AvatarFallback>
-            </Avatar>
-            <Avatar>
-              <AvatarImage
-                src="https://t.me/i/userpic/160/RoxieFly.jpg"
-                alt="User 2"
-              />
-              <AvatarFallback className="bg-background/20 text-primary-foreground text-xs">
-                U2
-              </AvatarFallback>
-            </Avatar>
+          <div className="self-center flex -space-x-2">
+            {familyMembers?.map((member, index) => (
+              <div 
+                key={member.id} 
+                className="ring-background dark:ring-foreground ring-2 rounded-full bg-background"
+                style={{ zIndex: familyMembers.length - index }}
+              >
+                <UserAvatar
+                  user={member}
+                  className="[&>div]:bg-background/20 [&>div]:text-primary-foreground [&>div]:text-xs"
+                />
+              </div>
+            ))}
           </div>
         </div>
       </div>
