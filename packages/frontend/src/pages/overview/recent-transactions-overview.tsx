@@ -11,6 +11,10 @@ export function RecentTransactionsOverview() {
 
   const recentTransactions = overviewData?.recentTransactions;
 
+  if (!isLoading && recentTransactions?.length === 0) {
+    return null;
+  }
+
   return (
     <div className="px-4 mt-6">
       <div className="flex justify-between items-center mb-3">
