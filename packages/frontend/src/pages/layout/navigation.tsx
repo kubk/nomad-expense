@@ -15,7 +15,8 @@ export function Navigation() {
   if (
     location === template(routes.monthlyBreakdownFull) ||
     location === template(routes.transactionForm) ||
-    location === template(routes.accountForm)
+    location === template(routes.accountForm) ||
+    location === template(routes.invite)
   ) {
     return null;
   }
