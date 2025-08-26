@@ -1,4 +1,3 @@
-import { eq, sql } from "drizzle-orm";
 import { t } from "./trpc";
 import { publicProcedure, protectedProcedure } from "./trpc";
 import { getDb } from "../services/db";
@@ -10,20 +9,6 @@ export const userRouter = t.router({
     return users;
   }),
   me: protectedProcedure.query(async ({ ctx }) => {
-    const db = getDb();
-    const familyId = ctx.user.familyId;
-
-    // Get family member count
-    const memberCountResult = await db
-      .select({
-        count: sql<number>`COUNT(*)`,
-      })
-      .from(userTable)
-      .where(eq(userTable.familyId, familyId))
-      .get();
-
-    const memberCount = memberCountResult?.count || 1;
-
     return {
       id: ctx.user.id,
       familyId: ctx.user.familyId,
@@ -33,7 +18,6 @@ export const userRouter = t.router({
       avatarUrl: ctx.user.avatarUrl,
       createdAt: ctx.user.createdAt,
       updatedAt: ctx.user.updatedAt,
-      familyMemberCount: memberCount,
     };
   }),
 });

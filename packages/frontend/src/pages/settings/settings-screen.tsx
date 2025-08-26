@@ -1,6 +1,7 @@
 import { UsersIcon, ChevronRightIcon } from "lucide-react";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
+import { Skeleton } from "@/components/ui/skeleton";
 import { PageHeader } from "../shared/page-header";
 import { ModeToggle } from "./mode-toggle";
 import { Page } from "../shared/page";
@@ -11,7 +12,7 @@ import { api } from "@/api";
 
 export function SettingsScreen() {
   const [, setLocation] = useLocation();
-  const { data: user } = api.users.me.useQuery();
+  const { data: familyMembers } = api.family.listMembers.useQuery();
 
   return (
     <Page>
@@ -33,10 +34,14 @@ export function SettingsScreen() {
                 <span>Manage Family</span>
               </div>
               <div className="flex items-center gap-2 text-muted-foreground">
-                <span className="text-sm">
-                  {user?.familyMemberCount || 1} member
-                  {(user?.familyMemberCount || 1) !== 1 ? "s" : ""}
-                </span>
+                {familyMembers ? (
+                  <span className="text-sm">
+                    {familyMembers.length} member
+                    {familyMembers.length !== 1 ? "s" : ""}
+                  </span>
+                ) : (
+                  <Skeleton className="h-4 w-16" />
+                )}
                 <ChevronRightIcon className="size-4" />
               </div>
             </Button>
