@@ -577,6 +577,7 @@ export const expenseRouter = t.router({
         description: z.string().min(1),
         amount: z.number(),
         type: z.enum(["expense", "income"]),
+        createdAt: z.string().optional(),
       }),
     )
     .mutation(async ({ ctx, input }) => {
@@ -614,6 +615,7 @@ export const expenseRouter = t.router({
         currency: account.currency,
         usdAmount: usdAmountInCents,
         type: input.type,
+        createdAt: input.createdAt,
       });
 
       return { success: true };

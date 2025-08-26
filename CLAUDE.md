@@ -16,3 +16,8 @@ Always install dependencies in their respective workspace package.json files, no
 - Prefer typescript types over interfaces
 - Run `npm run typecheck` to check types after you finished with task
 
+### Testing
+- NEVER start servers or build anything when testing
+- ONLY use `npm run typecheck` for testing/validation
+- TypeScript checking is sufficient to verify implementation
+
