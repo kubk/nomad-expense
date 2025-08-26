@@ -1,4 +1,4 @@
-import { Router, Route, Switch } from "wouter";
+import { Router, Route, Switch, useLocation } from "wouter";
 import { template } from "typesafe-routes";
 import { routes } from "../../routes";
 import { TransactionsScreen } from "../transactions/transactions-screen";
@@ -9,6 +9,7 @@ import { TransactionFormScreen } from "../transactions/transaction-form-screen";
 import { Navigation } from "./navigation";
 import { OverviewScreen } from "../overview/overview-screen";
 import { SettingsScreen } from "../settings/settings-screen";
+import { InviteScreen } from "../invite/invite-screen";
 import { api } from "@/api";
 
 export function App() {
@@ -45,6 +46,10 @@ export function App() {
 
           <Route path={template(routes.settings)}>
             <SettingsScreen />
+          </Route>
+
+          <Route path={template(routes.invite)}>
+            <InviteScreen />
           </Route>
         </Switch>
       </Router>
