@@ -13,7 +13,6 @@ export function FamilyMemberItem({
     avatarUrl?: string | null;
   };
 }) {
-
   return (
     <Card className="py-4 bg-muted/50">
       <CardContent className="py-0 px-4">

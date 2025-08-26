@@ -13,7 +13,7 @@ import { getUserDisplayNameWithUsername } from "@/shared/user-display";
 export function InviteScreen() {
   const [, setLocation] = useLocation();
   const search = useSearch();
-  
+
   const parsedQuery = safeParseQuery(routes.invite, search);
   const inviteCode = parsedQuery.success ? parsedQuery.data.code : null;
 
@@ -32,16 +32,18 @@ export function InviteScreen() {
   }
 
   if (joinFamilyMutation.isError || !inviteCode) {
-    const errorMessage = !inviteCode 
+    const errorMessage = !inviteCode
       ? "No invite code provided"
       : joinFamilyMutation.error?.message || "Failed to join family";
-      
+
     return <InviteError errorMessage={errorMessage} />;
   }
 
   // Handle success case
   const inviter = joinFamilyMutation.data?.inviter;
-  const inviterName = inviter ? getUserDisplayNameWithUsername(inviter) : "Someone";
+  const inviterName = inviter
+    ? getUserDisplayNameWithUsername(inviter)
+    : "Someone";
 
   return (
     <div className="min-h-screen bg-background flex items-center justify-center p-4">
@@ -58,14 +60,19 @@ export function InviteScreen() {
               <div className="space-y-2">
                 <p className="text-muted-foreground">
                   Shared access with{" "}
-                  <span className="font-medium text-foreground">{inviterName}</span>
+                  <span className="font-medium text-foreground">
+                    {inviterName}
+                  </span>
                 </p>
                 <p className="text-sm text-muted-foreground">
                   You can manage this in settings
                 </p>
               </div>
             </div>
-            <Button onClick={() => setLocation(template(routes.overview))} className="w-full">
+            <Button
+              onClick={() => setLocation(template(routes.overview))}
+              className="w-full"
+            >
               OK
             </Button>
           </div>
