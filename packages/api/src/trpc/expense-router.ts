@@ -30,7 +30,7 @@ const transactionFilterSchema = z.object({
 export const expenseRouter = t.router({
   overview: protectedProcedure.query(async ({ ctx }) => {
     const db = getDb();
-    const userId = ctx.user.id;
+    const familyId = ctx.user.familyId;
 
     // Get all transactions for the user (for overview chart data)
     const allTransactions = await db
@@ -42,7 +42,7 @@ export const expenseRouter = t.router({
       .innerJoin(accountTable, eq(transactionTable.accountId, accountTable.id))
       .where(
         and(
-          eq(accountTable.userId, userId),
+          eq(accountTable.familyId, familyId),
           eq(transactionTable.type, "expense"),
         ),
       )
@@ -57,7 +57,7 @@ export const expenseRouter = t.router({
       .innerJoin(accountTable, eq(transactionTable.accountId, accountTable.id))
       .where(
         and(
-          eq(accountTable.userId, userId),
+          eq(accountTable.familyId, familyId),
           eq(transactionTable.type, "expense"),
           sql`${transactionTable.createdAt} >= datetime('now', '-30 days')`,
         ),
@@ -80,7 +80,7 @@ export const expenseRouter = t.router({
       })
       .from(transactionTable)
       .innerJoin(accountTable, eq(transactionTable.accountId, accountTable.id))
-      .where(eq(accountTable.userId, userId))
+      .where(eq(accountTable.familyId, familyId))
       .orderBy(desc(transactionTable.createdAt))
       .limit(3)
       .all();
@@ -169,10 +169,10 @@ export const expenseRouter = t.router({
     .input(transactionFilterSchema)
     .query(async ({ ctx, input }) => {
       const db = getDb();
-      const userId = ctx.user.id;
+      const familyId = ctx.user.familyId;
 
       // Build query conditions
-      const conditions = [eq(accountTable.userId, userId)];
+      const conditions = [eq(accountTable.familyId, familyId)];
 
       // Account filter
       conditions.push(inArray(accountTable.id, input.accounts));
@@ -334,10 +334,10 @@ export const expenseRouter = t.router({
     .input(transactionFilterSchema)
     .query(async ({ ctx, input }) => {
       const db = getDb();
-      const userId = ctx.user.id;
+      const familyId = ctx.user.familyId;
 
       // Build query conditions
-      const conditions = [eq(accountTable.userId, userId)];
+      const conditions = [eq(accountTable.familyId, familyId)];
 
       // Account filter
       conditions.push(inArray(accountTable.id, input.accounts));
@@ -434,7 +434,7 @@ export const expenseRouter = t.router({
     .input(z.object({ id: z.string() }))
     .query(async ({ ctx, input }) => {
       const db = getDb();
-      const userId = ctx.user.id;
+      const familyId = ctx.user.familyId;
 
       const transaction = await db
         .select({
@@ -455,7 +455,7 @@ export const expenseRouter = t.router({
         .where(
           and(
             eq(transactionTable.id, input.id),
-            eq(accountTable.userId, userId),
+            eq(accountTable.familyId, familyId),
           ),
         )
         .get();
@@ -488,7 +488,7 @@ export const expenseRouter = t.router({
     )
     .mutation(async ({ ctx, input }) => {
       const db = getDb();
-      const userId = ctx.user.id;
+      const familyId = ctx.user.familyId;
 
       // Verify transaction belongs to user and get account currency
       const existingTransaction = await db
@@ -504,7 +504,7 @@ export const expenseRouter = t.router({
         .where(
           and(
             eq(transactionTable.id, input.id),
-            eq(accountTable.userId, userId),
+            eq(accountTable.familyId, familyId),
           ),
         )
         .get();
@@ -541,7 +541,7 @@ export const expenseRouter = t.router({
     .input(z.object({ id: z.string() }))
     .mutation(async ({ ctx, input }) => {
       const db = getDb();
-      const userId = ctx.user.id;
+      const familyId = ctx.user.familyId;
 
       // Verify transaction belongs to user
       const existingTransaction = await db
@@ -554,7 +554,7 @@ export const expenseRouter = t.router({
         .where(
           and(
             eq(transactionTable.id, input.id),
-            eq(accountTable.userId, userId),
+            eq(accountTable.familyId, familyId),
           ),
         )
         .get();
@@ -581,7 +581,7 @@ export const expenseRouter = t.router({
     )
     .mutation(async ({ ctx, input }) => {
       const db = getDb();
-      const userId = ctx.user.id;
+      const familyId = ctx.user.familyId;
 
       // Verify account belongs to user
       const account = await db
@@ -590,7 +590,7 @@ export const expenseRouter = t.router({
         .where(
           and(
             eq(accountTable.id, input.accountId),
-            eq(accountTable.userId, userId),
+            eq(accountTable.familyId, familyId),
           ),
         )
         .get();

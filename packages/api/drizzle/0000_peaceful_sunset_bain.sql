@@ -2,14 +2,13 @@ CREATE TABLE `account` (
 	`id` text PRIMARY KEY NOT NULL,
 	`created_at` text NOT NULL,
 	`updated_at` text NOT NULL,
-	`user_id` text NOT NULL,
+	`family_id` text NOT NULL,
 	`name` text NOT NULL,
 	`currency` text NOT NULL,
-	`color` text NOT NULL,
-	FOREIGN KEY (`user_id`) REFERENCES `user`(`id`) ON UPDATE no action ON DELETE cascade
+	`color` text NOT NULL
 );
 --> statement-breakpoint
-CREATE INDEX `idx_account_user_id` ON `account` (`user_id`);--> statement-breakpoint
+CREATE INDEX `idx_account_family_id` ON `account` (`family_id`);--> statement-breakpoint
 CREATE TABLE `transaction` (
 	`id` text PRIMARY KEY NOT NULL,
 	`created_at` text NOT NULL,
@@ -28,5 +27,6 @@ CREATE INDEX `idx_transaction_type` ON `transaction` (`type`);--> statement-brea
 CREATE TABLE `user` (
 	`id` text PRIMARY KEY NOT NULL,
 	`created_at` text NOT NULL,
-	`updated_at` text NOT NULL
+	`updated_at` text NOT NULL,
+	`family_id` text NOT NULL
 );

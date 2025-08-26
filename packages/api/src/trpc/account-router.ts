@@ -8,7 +8,7 @@ import { supportedCurrency } from "../services/currency-converter";
 export const accountRouter = t.router({
   list: protectedProcedure.query(async ({ ctx }) => {
     const db = getDb();
-    const userId = ctx.user.id;
+    const familyId = ctx.user.familyId;
 
     const accounts = await db
       .select({
@@ -18,7 +18,7 @@ export const accountRouter = t.router({
         color: accountTable.color,
       })
       .from(accountTable)
-      .where(eq(accountTable.userId, userId))
+      .where(eq(accountTable.familyId, familyId))
       .all();
 
     return accounts;
@@ -26,7 +26,7 @@ export const accountRouter = t.router({
 
   listWithStats: protectedProcedure.query(async ({ ctx }) => {
     const db = getDb();
-    const userId = ctx.user.id;
+    const familyId = ctx.user.familyId;
 
     const accountsWithStats = await db
       .select({
@@ -44,7 +44,7 @@ export const accountRouter = t.router({
         transactionTable,
         eq(accountTable.id, transactionTable.accountId),
       )
-      .where(eq(accountTable.userId, userId))
+      .where(eq(accountTable.familyId, familyId))
       .groupBy(
         accountTable.id,
         accountTable.name,
@@ -66,12 +66,12 @@ export const accountRouter = t.router({
     )
     .mutation(async ({ ctx, input }) => {
       const db = getDb();
-      const userId = ctx.user.id;
+      const familyId = ctx.user.familyId;
 
       const result = await db
         .insert(accountTable)
         .values({
-          userId,
+          familyId,
           name: input.name,
           color: input.color,
           currency: input.currency,
@@ -92,7 +92,7 @@ export const accountRouter = t.router({
     )
     .mutation(async ({ ctx, input }) => {
       const db = getDb();
-      const userId = ctx.user.id;
+      const familyId = ctx.user.familyId;
 
       const result = await db
         .update(accountTable)
@@ -101,7 +101,7 @@ export const accountRouter = t.router({
           color: input.color,
         })
         .where(
-          and(eq(accountTable.userId, userId), eq(accountTable.id, input.id)),
+          and(eq(accountTable.familyId, familyId), eq(accountTable.id, input.id)),
         )
         .returning({ id: accountTable.id })
         .get();
@@ -117,12 +117,12 @@ export const accountRouter = t.router({
     )
     .mutation(async ({ ctx, input }) => {
       const db = getDb();
-      const userId = ctx.user.id;
+      const familyId = ctx.user.familyId;
 
       const result = await db
         .delete(accountTable)
         .where(
-          and(eq(accountTable.userId, userId), eq(accountTable.id, input.id)),
+          and(eq(accountTable.familyId, familyId), eq(accountTable.id, input.id)),
         )
         .returning({ id: accountTable.id })
         .get();
