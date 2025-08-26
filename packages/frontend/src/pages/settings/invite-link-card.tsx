@@ -39,14 +39,11 @@ export function InviteLinkCard({
           <h3 className="font-medium text-foreground">Active invite</h3>
           <div className="flex items-center gap-1 text-xs text-muted-foreground">
             <ClockIcon className="size-3" />
-            <span>
-              Expires {expiresAt.toRelative()}
-            </span>
+            <span>Expires {expiresAt.toRelative()}</span>
           </div>
         </div>
 
         <div className="space-y-2">
-          
           <Button
             onClick={copyToClipboard}
             variant="outline"

@@ -26,8 +26,8 @@ export function OverviewHeader() {
           </div>
           <div className="self-center flex -space-x-2">
             {familyMembers?.map((member, index) => (
-              <div 
-                key={member.id} 
+              <div
+                key={member.id}
                 className="ring-background dark:ring-foreground ring-2 rounded-full bg-background"
                 style={{ zIndex: familyMembers.length - index }}
               >

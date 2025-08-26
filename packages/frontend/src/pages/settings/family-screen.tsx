@@ -7,9 +7,11 @@ import { InviteLinkCard } from "./invite-link-card";
 import { api } from "@/api";
 
 export function FamilyScreen() {
-  const { data: members, isLoading: isMembersLoading } = api.family.listMembers.useQuery();
-  const { data: activeInvite, refetch: refetchActiveInvite } = api.family.getActiveInvite.useQuery();
-  
+  const { data: members, isLoading: isMembersLoading } =
+    api.family.listMembers.useQuery();
+  const { data: activeInvite, refetch: refetchActiveInvite } =
+    api.family.getActiveInvite.useQuery();
+
   const generateInviteMutation = api.family.generateInvite.useMutation({
     onSuccess: () => {
       refetchActiveInvite();
@@ -33,9 +35,11 @@ export function FamilyScreen() {
               <h2 className="text-lg font-semibold text-foreground">
                 Family members
               </h2>
-              {!isMembersLoading && <span className="text-sm text-muted-foreground">
-                ({members?.length || 0})
-              </span>}
+              {!isMembersLoading && (
+                <span className="text-sm text-muted-foreground">
+                  ({members?.length || 0})
+                </span>
+              )}
             </div>
 
             {isMembersLoading ? (
@@ -64,14 +68,13 @@ export function FamilyScreen() {
               </h2>
             </div>
 
-            {activeInvite && (
-              <InviteLinkCard invite={activeInvite} />
-            )}
+            {activeInvite && <InviteLinkCard invite={activeInvite} />}
 
             {!activeInvite && (
               <div className="bg-muted/30 rounded-lg p-4 text-center space-y-3">
                 <p className="text-muted-foreground text-sm">
-                  No active invite. Generate one to invite someone to your family.
+                  No active invite. Generate one to invite someone to your
+                  family.
                 </p>
                 <Button
                   onClick={handleGenerateInvite}
@@ -79,7 +82,9 @@ export function FamilyScreen() {
                   disabled={generateInviteMutation.isPending}
                 >
                   <PlusIcon className="size-4 mr-2" />
-                  {generateInviteMutation.isPending ? "Generating..." : "Generate Invite"}
+                  {generateInviteMutation.isPending
+                    ? "Generating..."
+                    : "Generate Invite"}
                 </Button>
               </div>
             )}

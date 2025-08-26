@@ -34,7 +34,8 @@ export function SettingsScreen() {
               </div>
               <div className="flex items-center gap-2 text-muted-foreground">
                 <span className="text-sm">
-                  {user?.familyMemberCount || 1} member{(user?.familyMemberCount || 1) !== 1 ? 's' : ''}
+                  {user?.familyMemberCount || 1} member
+                  {(user?.familyMemberCount || 1) !== 1 ? "s" : ""}
                 </span>
                 <ChevronRightIcon className="size-4" />
               </div>

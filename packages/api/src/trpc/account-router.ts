@@ -101,7 +101,10 @@ export const accountRouter = t.router({
           color: input.color,
         })
         .where(
-          and(eq(accountTable.familyId, familyId), eq(accountTable.id, input.id)),
+          and(
+            eq(accountTable.familyId, familyId),
+            eq(accountTable.id, input.id),
+          ),
         )
         .returning({ id: accountTable.id })
         .get();
@@ -122,7 +125,10 @@ export const accountRouter = t.router({
       const result = await db
         .delete(accountTable)
         .where(
-          and(eq(accountTable.familyId, familyId), eq(accountTable.id, input.id)),
+          and(
+            eq(accountTable.familyId, familyId),
+            eq(accountTable.id, input.id),
+          ),
         )
         .returning({ id: accountTable.id })
         .get();

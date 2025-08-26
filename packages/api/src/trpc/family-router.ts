@@ -52,8 +52,8 @@ export const familyRouter = t.router({
         and(
           eq(inviteTable.familyId, familyId),
           sql`${inviteTable.usedAt} IS NULL`,
-          sql`${inviteTable.expiresAt} > datetime('now')`
-        )
+          sql`${inviteTable.expiresAt} > datetime('now')`,
+        ),
       );
 
     // Generate new invite
@@ -90,8 +90,8 @@ export const familyRouter = t.router({
         and(
           eq(inviteTable.familyId, familyId),
           sql`${inviteTable.usedAt} IS NULL`,
-          sql`${inviteTable.expiresAt} > datetime('now')`
-        )
+          sql`${inviteTable.expiresAt} > datetime('now')`,
+        ),
       )
       .get();
 
@@ -102,7 +102,7 @@ export const familyRouter = t.router({
     .input(
       z.object({
         code: z.string().min(6).max(6),
-      })
+      }),
     )
     .mutation(async ({ ctx, input }) => {
       const db = getDb();
@@ -130,7 +130,7 @@ export const familyRouter = t.router({
 
       if (invite.usedAt) {
         throw new TRPCError({
-          code: "BAD_REQUEST", 
+          code: "BAD_REQUEST",
           message: "This invite has already been used",
         });
       }
