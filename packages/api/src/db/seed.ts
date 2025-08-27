@@ -336,6 +336,7 @@ export const getSeedData = () => ({
     {
       id: seedUserId,
       familyId: family1Id,
+      initialFamilyId: family1Id,
       firstName: "George",
       lastName: "Doe",
       username: "johndoe",
@@ -343,6 +344,7 @@ export const getSeedData = () => ({
     {
       id: seedUser2Id,
       familyId: family1Id,
+      initialFamilyId: "2c1f7a1a-8231-4101-9f65-3ac011ed800d",
       firstName: "Jane",
       lastName: "Doe",
       username: "janedoe",
@@ -350,6 +352,7 @@ export const getSeedData = () => ({
     {
       id: seedUser3Id,
       familyId: family2Id,
+      initialFamilyId: family2Id,
       firstName: "Bob",
       lastName: "Smith",
       username: "bobsmith",
