@@ -13,7 +13,7 @@ export const formatDisplayDate = (dateString: string): string => {
   } else if (transactionDate.getTime() === yesterday.getTime()) {
     return "Yesterday";
   } else {
-    return new Date(dateString).toLocaleDateString("en-US", {
+    return new Date(dateString).toLocaleDateString(undefined, {
       month: "short",
       day: "numeric",
     });
