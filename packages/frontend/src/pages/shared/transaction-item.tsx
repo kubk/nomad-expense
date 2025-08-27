@@ -1,6 +1,6 @@
 import { Transaction, SupportedCurrency } from "api";
 import { formatAmount } from "../../shared/currency-formatter";
-import { formatDisplayDate } from "@/shared/utils";
+import { formatDisplayDate } from "@/shared/format-display-date";
 import { AccountBadge } from "../accounts/account-badge";
 import { cn } from "@/lib/utils";
 import { useLocation } from "wouter";

@@ -3,8 +3,8 @@ import { CopyIcon, CheckIcon, ClockIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { DateTime } from "luxon";
-import { render } from "typesafe-routes";
-import { routes } from "../../routes";
+import { generateInviteUrl } from "../../shared/generate-invite-url";
+import { copyToClipboard } from "../../shared/copy-to-clipboard";
 
 export function InviteLinkCard({
   invite,
@@ -16,20 +16,14 @@ export function InviteLinkCard({
 }) {
   const [copied, setCopied] = useState(false);
 
-  const inviteUrl = `${window.location.origin}${render(routes.invite, {
-    path: {},
-    query: { code: invite.code },
-  })}`;
+  const inviteUrl = generateInviteUrl(invite.code);
   const expiresAt = DateTime.fromISO(invite.expiresAt);
 
-  const copyToClipboard = async () => {
-    try {
-      await navigator.clipboard.writeText(inviteUrl);
+  const handleCopy = () => {
+    copyToClipboard(inviteUrl, () => {
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
-    } catch (error) {
-      console.error("Failed to copy:", error);
-    }
+    });
   };
 
   return (
@@ -45,7 +39,7 @@ export function InviteLinkCard({
 
         <div className="space-y-2">
           <Button
-            onClick={copyToClipboard}
+            onClick={handleCopy}
             variant="outline"
             size="sm"
             className="w-full"
