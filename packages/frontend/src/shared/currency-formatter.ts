@@ -31,7 +31,7 @@ export function formatAmount(
   }
 
   // Use Intl.NumberFormat for all standard currencies
-  return new Intl.NumberFormat("en-US", {
+  return new Intl.NumberFormat(undefined, {
     style: "currency",
     currency: currency,
     minimumFractionDigits: showFractions ? 2 : 0,
