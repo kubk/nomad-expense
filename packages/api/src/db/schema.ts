@@ -16,9 +16,8 @@ const sharedColumns = {
 
 export const userTable = sqliteTable("user", {
   ...sharedColumns,
-  familyId: text("family_id")
-    .notNull()
-    .$defaultFn(() => crypto.randomUUID()),
+  familyId: text("family_id").notNull(),
+  initialFamilyId: text("initial_family_id").notNull(),
   firstName: text("first_name"),
   lastName: text("last_name"),
   username: text("username"),
