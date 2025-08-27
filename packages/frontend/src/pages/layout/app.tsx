@@ -1,6 +1,6 @@
 import { Router, Route, Switch } from "wouter";
 import { template } from "typesafe-routes";
-import { routes } from "../../routes";
+import { routes } from "../../shared/routes";
 import { TransactionsScreen } from "../transactions/transactions-screen";
 import { MonthlyBreakdownFull } from "../monthly-breakdown-full/monthly-breakdown-full";
 import { AccountsScreen } from "../accounts/accounts-screen";
@@ -11,7 +11,7 @@ import { OverviewScreen } from "../overview/overview-screen";
 import { SettingsScreen } from "../settings/settings-screen";
 import { FamilyScreen } from "../settings/family-screen";
 import { InviteScreen } from "../invite/invite-screen";
-import { api } from "@/api";
+import { api } from "@/shared/api";
 
 export function App() {
   api.users.me.useQuery();

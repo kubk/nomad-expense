@@ -14,9 +14,9 @@ import { PageHeader } from "../shared/page-header";
 import { Page } from "../shared/page";
 import { ConfirmModal } from "../shared/confirm-modal";
 import { Footer } from "../shared/footer";
-import { api } from "@/api";
+import { api } from "@/shared/api";
 import { cn } from "@/lib/utils";
-import { routes } from "../../routes";
+import { routes } from "../../shared/routes";
 import { SUPPORTED_CURRENCIES, type SupportedCurrency } from "api";
 import { accountColorsPalette } from "./account-colors";
 

@@ -6,7 +6,7 @@ import {
 } from "lucide-react";
 import { Link, useLocation } from "wouter";
 import { template } from "typesafe-routes";
-import { routes } from "../../routes";
+import { routes } from "../../shared/routes";
 import { cn } from "@/lib/utils";
 
 export function Navigation() {

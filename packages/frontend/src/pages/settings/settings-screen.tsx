@@ -6,9 +6,9 @@ import { PageHeader } from "../shared/page-header";
 import { ModeToggle } from "./mode-toggle";
 import { Page } from "../shared/page";
 import { template } from "typesafe-routes";
-import { routes } from "../../routes";
+import { routes } from "../../shared/routes";
 import { useLocation } from "wouter";
-import { api } from "@/api";
+import { api } from "@/shared/api";
 
 export function SettingsScreen() {
   const [, setLocation] = useLocation();

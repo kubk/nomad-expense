@@ -2,7 +2,7 @@ import { XCircleIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { template } from "typesafe-routes";
-import { routes } from "../../routes";
+import { routes } from "../../shared/routes";
 import { useLocation } from "wouter";
 
 export function InviteError({ errorMessage }: { errorMessage: string }) {
