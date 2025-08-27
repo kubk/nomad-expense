@@ -2,7 +2,7 @@ import { PlusIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useLocation } from "wouter";
 import { render } from "typesafe-routes";
-import { routes } from "../../routes";
+import { routes } from "../../shared/routes";
 
 export function AddTransactionFab() {
   const [, navigate] = useLocation();

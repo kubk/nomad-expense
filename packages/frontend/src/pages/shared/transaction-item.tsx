@@ -5,7 +5,7 @@ import { AccountBadge } from "../accounts/account-badge";
 import { cn } from "@/lib/utils";
 import { useLocation } from "wouter";
 import { render } from "typesafe-routes";
-import { routes } from "../../routes";
+import { routes } from "../../shared/routes";
 
 export function TransactionItem({
   transaction,

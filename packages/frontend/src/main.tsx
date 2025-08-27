@@ -2,7 +2,7 @@ import { createRoot } from "react-dom/client";
 import { StrictMode } from "react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import "./index.css";
-import { api, trpcClient } from "./api";
+import { api, trpcClient } from "./shared/api";
 import { ThemeProvider } from "./pages/shared/theme-provider";
 import { App } from "./pages/layout/app";
 

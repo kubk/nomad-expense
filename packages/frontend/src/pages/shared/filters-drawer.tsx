@@ -13,7 +13,7 @@ import { CheckIcon } from "lucide-react";
 import { TransactionFilters } from "api";
 import { useAccountIds } from "@/shared/hooks/use-account-ids";
 import { useAvailableYears } from "@/shared/hooks/use-available-years";
-import { api } from "@/api";
+import { api } from "@/shared/api";
 import { CustomDatePicker } from "./custom-date-picker";
 
 export function FiltersDrawer({

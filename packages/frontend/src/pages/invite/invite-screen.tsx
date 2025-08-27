@@ -4,10 +4,10 @@ import { CheckCircleIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { template, safeParseQuery } from "typesafe-routes";
-import { routes } from "../../routes";
+import { routes } from "../../shared/routes";
 import { InviteLoader } from "./invite-loader";
 import { InviteError } from "./invite-error";
-import { api } from "@/api";
+import { api } from "@/shared/api";
 import { getUserDisplayNameWithUsername } from "@/shared/user-display";
 
 export function InviteScreen() {

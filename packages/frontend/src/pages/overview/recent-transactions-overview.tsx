@@ -2,9 +2,9 @@ import { ChevronRightIcon } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Link } from "wouter";
 import { renderPath } from "typesafe-routes";
-import { routes } from "../../routes";
+import { routes } from "../../shared/routes";
 import { TransactionItem } from "../shared/transaction-item";
-import { api } from "../../api";
+import { api } from "../../shared/api";
 
 export function RecentTransactionsOverview() {
   const { data: overviewData, isLoading } = api.expenses.overview.useQuery();

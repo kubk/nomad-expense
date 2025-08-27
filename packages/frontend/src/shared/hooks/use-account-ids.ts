@@ -1,4 +1,4 @@
-import { api } from "@/api";
+import { api } from "@/shared/api";
 
 export function useAccountIds() {
   const { data: accounts } = api.accounts.list.useQuery();

@@ -1,6 +1,6 @@
 import { formatAmount } from "@/shared/currency-formatter";
 import { UserAvatar } from "@/components/user-avatar";
-import { api } from "../../api";
+import { api } from "../../shared/api";
 
 export function OverviewHeader() {
   const { data: overviewData, isLoading } = api.expenses.overview.useQuery();

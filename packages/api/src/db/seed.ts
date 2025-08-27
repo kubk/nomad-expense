@@ -336,7 +336,7 @@ export const getSeedData = () => ({
     {
       id: seedUserId,
       familyId: family1Id,
-      firstName: "John",
+      firstName: "George",
       lastName: "Doe",
       username: "johndoe",
     },
