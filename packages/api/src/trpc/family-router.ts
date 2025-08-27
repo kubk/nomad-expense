@@ -1,4 +1,4 @@
-import { eq, and, sql } from "drizzle-orm";
+import { eq, and, sql, asc } from "drizzle-orm";
 import { TRPCError } from "@trpc/server";
 import { protectedProcedure, t } from "./trpc";
 import { userTable, inviteTable } from "../db/schema";
@@ -31,6 +31,7 @@ export const familyRouter = t.router({
       })
       .from(userTable)
       .where(eq(userTable.familyId, familyId))
+      .orderBy(asc(userTable.createdAt))
       .all();
 
     return members;

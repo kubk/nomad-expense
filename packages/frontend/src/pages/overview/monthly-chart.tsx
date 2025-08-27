@@ -1,6 +1,6 @@
 import { useEffect, useRef } from "react";
 import { formatAmount } from "../../shared/currency-formatter";
-import { api } from "../../api";
+import { api } from "../../shared/api";
 import { cn } from "@/lib/utils";
 import { MonthlyChartEmptyState } from "./monthly-chart-empty-state";
 import { MonthlyChartLoader } from "./monthly-chart-loader";

@@ -1,7 +1,7 @@
 import { ChevronRightIcon } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { render } from "typesafe-routes";
-import { routes } from "../../routes";
+import { routes } from "../../shared/routes";
 import { MonthlyChart } from "./monthly-chart";
 import { useAccountIds } from "@/shared/hooks/use-account-ids";
 import { useLocation } from "wouter";

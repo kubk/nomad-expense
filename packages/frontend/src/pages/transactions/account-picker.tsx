@@ -2,7 +2,7 @@ import { cn } from "@/lib/utils";
 import { getColorById } from "../accounts/account-colors";
 import { getCurrencySymbol } from "../../shared/currency-formatter";
 import { SupportedCurrency } from "api";
-import { api } from "@/api";
+import { api } from "@/shared/api";
 
 export function AccountPicker({
   onSelect,

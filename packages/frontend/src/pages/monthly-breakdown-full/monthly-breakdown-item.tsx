@@ -2,7 +2,7 @@ import { useLocation } from "wouter";
 import { render } from "typesafe-routes";
 import { MonthlyData } from "api";
 import { formatAmount } from "../../shared/currency-formatter";
-import { routes } from "../../routes";
+import { routes } from "../../shared/routes";
 import { useAccountIds } from "@/shared/hooks/use-account-ids";
 
 export function MonthlyBreakdownItem({

@@ -4,7 +4,7 @@ import { PageHeader } from "../shared/page-header";
 import { Page } from "../shared/page";
 import { FamilyMemberItem } from "./family-member-item";
 import { InviteLinkCard } from "./invite-link-card";
-import { api } from "@/api";
+import { api } from "@/shared/api";
 
 export function FamilyScreen() {
   const { data: members, isLoading: isMembersLoading } =
@@ -71,7 +71,7 @@ export function FamilyScreen() {
             {activeInvite && <InviteLinkCard invite={activeInvite} />}
 
             {!activeInvite && (
-              <div className="bg-muted/30 rounded-lg p-4 text-center space-y-3">
+              <div className="bg-muted/30 rounded-xl p-4 text-center space-y-3">
                 <p className="text-muted-foreground text-sm">
                   No active invite. Generate one to invite someone to your
                   family.

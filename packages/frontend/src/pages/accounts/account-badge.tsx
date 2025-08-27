@@ -1,4 +1,4 @@
-import { api } from "@/api";
+import { api } from "@/shared/api";
 import { cn } from "@/lib/utils";
 import { getColorById } from "./account-colors";
 

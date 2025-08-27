@@ -1,4 +1,4 @@
-import { api } from "@/api";
+import { api } from "@/shared/api";
 
 export function useAvailableYears() {
   const { data: overviewData } = api.expenses.overview.useQuery();
