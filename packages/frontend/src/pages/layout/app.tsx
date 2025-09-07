@@ -8,17 +8,18 @@ import { OverviewScreen } from "../overview/overview-screen";
 import { SettingsScreen } from "../settings/settings-screen";
 import { FamilyScreen } from "../settings/family-screen";
 import { InviteScreen } from "../invite/invite-screen";
-import { api } from "@/shared/api";
+import { trpc } from "@/shared/api";
 import { AnimatePresence } from "framer-motion";
 import { useRouter } from "@/shared/stacked-router/router";
 import { useCallback } from "react";
 import { Route } from "@/shared/stacked-router/routes";
 import { AnimatedScreen } from "@/shared/stacked-router/animated-screen";
 import { AccountPickerScreen } from "../transactions/account-picker-screen";
+import { useQuery } from "@tanstack/react-query";
 
 export function App() {
-  api.users.me.useQuery();
-  api.accounts.listWithStats.useQuery();
+  useQuery(trpc.users.me.queryOptions());
+  useQuery(trpc.accounts.listWithStats.queryOptions());
 
   const { navigationStack, navigate, pop } = useRouter();
 

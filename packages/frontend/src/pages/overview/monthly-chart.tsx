@@ -1,6 +1,7 @@
 import { useEffect, useRef } from "react";
 import { formatAmount } from "../../shared/currency-formatter";
-import { api } from "../../shared/api";
+import { trpc } from "../../shared/api";
+import { useQuery } from "@tanstack/react-query";
 import { cn } from "@/lib/utils";
 import { MonthlyChartEmptyState } from "./monthly-chart-empty-state";
 import { MonthlyChartLoader } from "./monthly-chart-loader";
@@ -8,7 +9,9 @@ import { MonthlyChartLoader } from "./monthly-chart-loader";
 export function MonthlyChart() {
   const scrollContainerRef = useRef<HTMLDivElement>(null);
 
-  const { data: overviewData, isLoading } = api.expenses.overview.useQuery();
+  const { data: overviewData, isLoading } = useQuery(
+    trpc.expenses.overview.queryOptions(),
+  );
 
   const sortedMonthlyData = overviewData?.overview.data || [];
   const maxAmount = overviewData?.overview.maxAmount || 0;

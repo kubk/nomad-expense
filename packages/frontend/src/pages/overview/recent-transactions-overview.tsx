@@ -1,12 +1,15 @@
 import { ChevronRightIcon } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { TransactionItem } from "../shared/transaction-item";
-import { api } from "../../shared/api";
+import { trpc } from "../../shared/api";
+import { useQuery } from "@tanstack/react-query";
 import { useRouter } from "@/shared/stacked-router/router";
 
 export function RecentTransactionsOverview() {
   const { navigate } = useRouter();
-  const { data: overviewData, isLoading } = api.expenses.overview.useQuery();
+  const { data: overviewData, isLoading } = useQuery(
+    trpc.expenses.overview.queryOptions(),
+  );
 
   const recentTransactions = overviewData?.recentTransactions;
 

@@ -13,9 +13,9 @@ import { Input } from "@/components/ui/input";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { CheckIcon } from "lucide-react";
 import { TransactionFilters } from "api";
-import { useAccountIds } from "@/shared/hooks/use-account-ids";
 import { useAvailableYears } from "@/shared/hooks/use-available-years";
-import { api } from "@/shared/api";
+import { trpc } from "@/shared/api";
+import { useQuery } from "@tanstack/react-query";
 import { CustomDatePicker } from "./custom-date-picker";
 
 export function FiltersDrawer({
@@ -31,9 +31,8 @@ export function FiltersDrawer({
 }) {
   const [filterForm, setFilterForm] = useState<TransactionFilters>(filters);
   const [showCustomDatePicker, setShowCustomDatePicker] = useState(false);
-  const accountIds = useAccountIds();
   const availableYears = useAvailableYears();
-  const { data: accounts = [] } = api.accounts.list.useQuery();
+  const { data: accounts = [] } = useQuery(trpc.accounts.list.queryOptions());
 
   useEffect(() => {
     setFilterForm(filters);

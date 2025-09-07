@@ -1,11 +1,19 @@
-import { createTRPCReact } from "@trpc/react-query";
-import { httpBatchLink } from "@trpc/client";
 import { env } from "./env";
 import type { ApiRouter } from "api";
+import { QueryClient } from "@tanstack/react-query";
+import { createTRPCClient, httpBatchLink } from "@trpc/client";
+import { createTRPCOptionsProxy } from "@trpc/tanstack-react-query";
 
-export const api = createTRPCReact<ApiRouter>();
+export const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      staleTime: 1000 * 60 * 5, // 5 minutes
+      gcTime: 1000 * 60 * 10, // 10 minutes
+    },
+  },
+});
 
-export const trpcClient = api.createClient({
+const trpcClient = createTRPCClient<ApiRouter>({
   links: [
     httpBatchLink({
       url: env.VITE_API_URL,
@@ -17,4 +25,9 @@ export const trpcClient = api.createClient({
           : undefined,
     }),
   ],
+});
+
+export const trpc = createTRPCOptionsProxy<ApiRouter>({
+  client: trpcClient,
+  queryClient,
 });

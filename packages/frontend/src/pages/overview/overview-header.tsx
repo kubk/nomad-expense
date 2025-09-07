@@ -1,10 +1,15 @@
 import { formatAmount } from "@/shared/currency-formatter";
 import { UserAvatar } from "@/components/user-avatar";
-import { api } from "../../shared/api";
+import { trpc } from "../../shared/api";
+import { useQuery } from "@tanstack/react-query";
 
 export function OverviewHeader() {
-  const { data: overviewData, isLoading } = api.expenses.overview.useQuery();
-  const { data: familyMembers } = api.family.listMembers.useQuery();
+  const { data: overviewData, isLoading } = useQuery(
+    trpc.expenses.overview.queryOptions(),
+  );
+  const { data: familyMembers } = useQuery(
+    trpc.family.listMembers.queryOptions(),
+  );
 
   return (
     <div className="bg-primary text-primary-foreground dark:bg-muted px-4 py-6 pb-18">
