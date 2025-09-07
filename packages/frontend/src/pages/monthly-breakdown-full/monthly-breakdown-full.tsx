@@ -3,7 +3,6 @@ import { Card, CardContent } from "@/components/ui/card";
 import { MonthlyBreakdownItem } from "./monthly-breakdown-item";
 import { SummaryCard } from "../shared/summary-card";
 import { FiltersDrawer } from "../shared/filters-drawer";
-import { PageHeader } from "../shared/page-header";
 import { api } from "../../shared/api";
 import { TransactionFilters } from "api";
 import { useAccountIds } from "@/shared/hooks/use-account-ids";
