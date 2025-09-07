@@ -36,6 +36,7 @@
   "dependencies": {
     "@dotenvx/dotenvx": "^1.39.1",
     "@neondatabase/serverless": "^0.10.4",
+    "@nerdfolio/drizzle-d1-helpers": "^0.1.4",
     "@trpc/client": "^11.4.3",
     "@trpc/server": "^11.4.3",
     "better-sqlite3": "^12.2.0",
