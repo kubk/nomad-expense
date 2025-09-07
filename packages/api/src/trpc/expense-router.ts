@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { eq, and, or, desc, gte, lte, inArray, sql } from "drizzle-orm";
+import { eq, and, or, desc, gte, lte, inArray, sql, like } from "drizzle-orm";
 import { protectedProcedure, t } from "./trpc";
 import { transactionTable, accountTable } from "../db/schema";
 import { getDb } from "../services/db";
@@ -10,6 +10,12 @@ import {
 
 const transactionFilterSchema = z.object({
   accounts: z.array(z.string()),
+  description: z.optional(
+    z.object({
+      input: z.string(),
+      type: z.enum(["includes", "exact"]),
+    }),
+  ),
   date: z.discriminatedUnion("type", [
     z.object({
       type: z.literal("months"),
@@ -177,6 +183,19 @@ export const expenseRouter = t.router({
       // Account filter
       conditions.push(inArray(accountTable.id, input.accounts));
 
+      // Description filter
+      if (input.description) {
+        if (input.description.type === "exact") {
+          conditions.push(
+            eq(transactionTable.description, input.description.input),
+          );
+        } else if (input.description.type === "includes") {
+          conditions.push(
+            like(transactionTable.description, `%${input.description.input}%`),
+          );
+        }
+      }
+
       // Date filter
       if (input.date.type === "months") {
         // Recent N months filter
@@ -341,6 +360,19 @@ export const expenseRouter = t.router({
 
       // Account filter
       conditions.push(inArray(accountTable.id, input.accounts));
+
+      // Description filter
+      if (input.description) {
+        if (input.description.type === "exact") {
+          conditions.push(
+            eq(transactionTable.description, input.description.input),
+          );
+        } else if (input.description.type === "includes") {
+          conditions.push(
+            like(transactionTable.description, `%${input.description.input}%`),
+          );
+        }
+      }
 
       // Date filter
       if (input.date.type === "months") {

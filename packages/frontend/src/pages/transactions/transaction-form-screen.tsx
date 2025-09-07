@@ -182,7 +182,7 @@ export function TransactionFormScreen({
         <div className="flex-1 flex flex-col">
           <div className="flex-1 space-y-6">
             {/* Transaction Type Selector */}
-            <div className="flex flex-col gap-1.5">
+            <div className="flex flex-col gap-2">
               {isTransactionLoading ? (
                 <Skeleton className="h-9 rounded-md w-full" />
               ) : (
@@ -269,7 +269,7 @@ export function TransactionFormScreen({
             </div>
 
             {/* Amount input for both edit and create modes */}
-            <div className="flex flex-col gap-1.5">
+            <div className="flex flex-col gap-2">
               <label className="text-sm font-medium">Amount</label>
               <div className="flex gap-2">
                 {isTransactionLoading ? (
@@ -302,7 +302,7 @@ export function TransactionFormScreen({
               </div>
             </div>
 
-            <div className="flex flex-col gap-1.5">
+            <div className="flex flex-col gap-2">
               <label className="text-sm font-medium">Description</label>
               {isTransactionLoading ? (
                 <Skeleton className="h-9 w-full" />
