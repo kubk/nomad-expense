@@ -1,7 +1,8 @@
-import { api } from "@/shared/api";
+import { trpc } from "@/shared/api";
+import { useQuery } from "@tanstack/react-query";
 
 export function useAccountIds() {
-  const { data: accounts } = api.accounts.list.useQuery();
+  const { data: accounts } = useQuery(trpc.accounts.list.queryOptions());
 
   return accounts?.map((account) => account.id) ?? [];
 }

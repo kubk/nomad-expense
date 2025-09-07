@@ -2,7 +2,6 @@ import { createRoot } from "react-dom/client";
 import { StrictMode } from "react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import "./index.css";
-import { api, trpcClient } from "./shared/api";
 import { ThemeProvider } from "./pages/shared/theme-provider";
 import { App } from "./pages/layout/app";
 import { RouterProvider } from "./shared/stacked-router/router";
@@ -19,13 +18,11 @@ const queryClient = new QueryClient({
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
     <ThemeProvider>
-      <api.Provider client={trpcClient} queryClient={queryClient}>
-        <QueryClientProvider client={queryClient}>
-          <RouterProvider>
-            <App />
-          </RouterProvider>
-        </QueryClientProvider>
-      </api.Provider>
+      <QueryClientProvider client={queryClient}>
+        <RouterProvider>
+          <App />
+        </RouterProvider>
+      </QueryClientProvider>
     </ThemeProvider>
   </StrictMode>,
 );

@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useLayoutEffect } from "react";
 import {
   CheckIcon,
   Trash2Icon,
@@ -11,7 +11,8 @@ import { Input } from "@/components/ui/input";
 import { Page } from "../shared/page";
 import { ConfirmModal } from "../shared/confirm-modal";
 import { Footer } from "../shared/footer";
-import { api } from "@/shared/api";
+import { trpc } from "@/shared/api";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { cn } from "@/lib/utils";
 import { SUPPORTED_CURRENCIES, type SupportedCurrency } from "api";
 import { accountColorsPalette } from "./account-colors";
@@ -40,30 +41,44 @@ export function AccountFormScreen({
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [showCurrencyDropdown, setShowCurrencyDropdown] = useState(false);
 
-  const { data: accounts = [] } = api.accounts.listWithStats.useQuery();
+  const { data: accounts = [] } = useQuery(
+    trpc.accounts.listWithStats.queryOptions(),
+  );
   const existingAccount = accounts.find((account) => account.id === accountId);
 
-  const utils = api.useUtils();
+  const queryClient = useQueryClient();
 
-  const createAccountMutation = api.accounts.create.useMutation({
-    onSuccess: () => {
-      utils.accounts.listWithStats.invalidate();
-    },
-  });
+  const createAccountMutation = useMutation(
+    trpc.accounts.create.mutationOptions({
+      onSuccess: () => {
+        queryClient.invalidateQueries({
+          queryKey: trpc.accounts.listWithStats.queryKey(),
+        });
+      },
+    }),
+  );
 
-  const updateAccountMutation = api.accounts.update.useMutation({
-    onSuccess: () => {
-      utils.accounts.listWithStats.invalidate();
-    },
-  });
+  const updateAccountMutation = useMutation(
+    trpc.accounts.update.mutationOptions({
+      onSuccess: () => {
+        queryClient.invalidateQueries({
+          queryKey: trpc.accounts.listWithStats.queryKey(),
+        });
+      },
+    }),
+  );
 
-  const deleteAccountMutation = api.accounts.delete.useMutation({
-    onSuccess: () => {
-      utils.accounts.listWithStats.invalidate();
-      navigate({ type: "accounts" });
-      setShowDeleteConfirm(false);
-    },
-  });
+  const deleteAccountMutation = useMutation(
+    trpc.accounts.delete.mutationOptions({
+      onSuccess: () => {
+        queryClient.invalidateQueries({
+          queryKey: trpc.accounts.listWithStats.queryKey(),
+        });
+        navigate({ type: "accounts" });
+        setShowDeleteConfirm(false);
+      },
+    }),
+  );
 
   useEffect(() => {
     if (existingAccount) {
@@ -81,7 +96,7 @@ export function AccountFormScreen({
         if (element) {
           element.scrollIntoView({ inline: "center" });
         }
-      });
+      }, 300);
     }
   }, [existingAccount]);
 
