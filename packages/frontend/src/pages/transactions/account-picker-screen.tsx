@@ -6,6 +6,7 @@ import { trpc } from "@/shared/api";
 import { useQuery } from "@tanstack/react-query";
 import { Page } from "../shared/page";
 import { useRouter } from "@/shared/stacked-router/router";
+import { NoAccountsEmptyState } from "../shared/no-accounts-empty-state";
 
 export function AccountPickerScreen() {
   const { data: accounts = [] } = useQuery(
@@ -16,6 +17,12 @@ export function AccountPickerScreen() {
   return (
     <Page title="Select account" bg="secondary">
       <div className="flex flex-col gap-4">
+        {accounts.length === 0 && (
+          <div className="mt-[35%]">
+            <NoAccountsEmptyState />
+          </div>
+        )}
+
         {accounts.map((account) => {
           const colorInfo = getColorById(account.color);
           return (
