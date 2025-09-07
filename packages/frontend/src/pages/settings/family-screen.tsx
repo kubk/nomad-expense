@@ -81,10 +81,10 @@ export function FamilyScreen() {
                 size="sm"
                 disabled={generateInviteMutation.isPending}
               >
-                <PlusIcon className="size-4 mr-2" />
+                <PlusIcon className="size-4" />
                 {generateInviteMutation.isPending
                   ? "Generating..."
-                  : "Generate Invite"}
+                  : "Generate invite"}
               </Button>
             </div>
           )}

@@ -1,4 +1,4 @@
-import { PlusIcon, Loader2 } from "lucide-react";
+import { PlusIcon, Loader2, Wallet } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { getCurrencySymbol } from "../../shared/currency-formatter";
 import { PageHeader } from "../shared/page-header";
@@ -10,6 +10,7 @@ import { getColorById } from "./account-colors";
 import { cn } from "@/lib/utils";
 import { DateTime } from "luxon";
 import { useRouter } from "@/shared/stacked-router/router";
+import { NoAccountsEmptyState } from "../shared/no-accounts-empty-state";
 
 export function AccountsScreen() {
   const { navigate } = useRouter();
@@ -45,6 +46,12 @@ export function AccountsScreen() {
         </div>
       ) : (
         <div className="flex flex-col gap-4">
+          {accounts.length === 0 && (
+            <div className="mt-[35%]">
+              <NoAccountsEmptyState />
+            </div>
+          )}
+
           {accounts.map((account) => {
             const colorInfo = getColorById(account.color);
             return (
