@@ -11,7 +11,6 @@ export function MonthlyChartEmptyState() {
             />
           ))}
         </div>
-        <div className="border-t border-muted mt-2" />
       </div>
       <h3 className="text-md font-semibold text-foreground">No transactions</h3>
       <p className="text-xs text-muted-foreground text-center mt-1">

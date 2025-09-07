@@ -209,7 +209,7 @@ export function TransactionFormScreen({
     <Page
       title={
         <PageHeader
-          title={isEdit ? "Edit Transaction" : "Add Transaction"}
+          title={isEdit ? "Edit transaction" : "Add transaction"}
           rightSlot={deleteButton}
         />
       }
