@@ -49,16 +49,23 @@ export function SummaryCard({
       >
         <div className="p-4 rounded-md">
           {/* Pills and Filter Button Row */}
-          <div className="flex items-center justify-between mb-5">
-            <div className="flex gap-2">
-              <div className="bg-muted text-muted-foreground px-3 py-1.5 rounded-full text-xs font-medium flex items-center gap-1.5">
+          <div className="flex items-start justify-between mb-5">
+            <div className="flex flex-wrap gap-2">
+              <div className="bg-muted whitespace-nowrap text-muted-foreground px-3 py-1.5 rounded-full text-xs font-medium flex items-center gap-1.5">
                 <CalendarIcon className="w-3 h-3" />
                 {getDateLabel()}
               </div>
-              <div className="bg-muted text-muted-foreground px-3 py-1.5 rounded-full text-xs font-medium flex items-center gap-1.5">
+              <div className="bg-muted whitespace-nowrap text-muted-foreground px-3 py-1.5 rounded-full text-xs font-medium flex items-center gap-1.5">
                 <WalletIcon className="w-3 h-3" />
                 {getAccountsLabel()}
               </div>
+              {appliedFilters.description && (
+                <div className="bg-muted whitespace-nowrap text-muted-foreground px-3 py-1.5 rounded-full text-xs font-medium">
+                  {appliedFilters.description.type === "exact"
+                    ? `Description is '${appliedFilters.description.input}'`
+                    : `Description contains '${appliedFilters.description.input}'`}
+                </div>
+              )}
             </div>
             <div className="p-2">
               <FilterIcon className="w-4 h-4 text-muted-foreground" />
