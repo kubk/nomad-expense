@@ -27,7 +27,7 @@ export function SettingsScreen() {
           >
             <div className="flex items-center gap-3">
               <UsersIcon className="size-4" />
-              <span>Manage Family</span>
+              <span>Manage family</span>
             </div>
             <div className="flex items-center gap-2 text-muted-foreground">
               {familyMembers ? (
