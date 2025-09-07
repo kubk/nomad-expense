@@ -2,11 +2,15 @@ import { formatAmount } from "@/shared/currency-formatter";
 import { UserAvatar } from "@/components/user-avatar";
 import { trpc } from "../../shared/api";
 import { useQuery } from "@tanstack/react-query";
+import { useRouter } from "@/shared/stacked-router/router";
 
 export function OverviewHeader() {
+  const { navigate } = useRouter();
+
   const { data: overviewData, isLoading } = useQuery(
     trpc.expenses.overview.queryOptions(),
   );
+
   const { data: familyMembers } = useQuery(
     trpc.family.listMembers.queryOptions(),
   );
@@ -29,7 +33,12 @@ export function OverviewHeader() {
               )}
             </div>
           </div>
-          <div className="self-center flex -space-x-2">
+          <div
+            className="self-center flex -space-x-2 cursor-pointer"
+            onClick={() => {
+              navigate({ type: "family" });
+            }}
+          >
             {familyMembers?.map((member, index) => (
               <div
                 key={member.id}
