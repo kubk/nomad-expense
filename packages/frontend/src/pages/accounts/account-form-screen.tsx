@@ -4,7 +4,7 @@ import {
   Trash2Icon,
   ChevronDownIcon,
   Loader2Icon,
-  ArrowRight,
+  ListPlusIcon,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -28,7 +28,7 @@ export function AccountFormScreen({
 }: {
   route: RouteByType<"accountForm">;
 }) {
-  const { navigate } = useRouter();
+  const { navigate, pop } = useRouter();
   const accountId = route.accountId;
   const isEdit = Boolean(accountId);
 
@@ -61,6 +61,7 @@ export function AccountFormScreen({
     onSuccess: () => {
       utils.accounts.listWithStats.invalidate();
       navigate({ type: "accounts" });
+      setShowDeleteConfirm(false);
     },
   });
 
@@ -84,7 +85,8 @@ export function AccountFormScreen({
     }
   }, [existingAccount]);
 
-  const handleSave = async () => {
+  const handleSave = async (e: React.FormEvent) => {
+    e.preventDefault();
     try {
       if (isEdit && accountId) {
         await updateAccountMutation.mutateAsync({
@@ -99,7 +101,7 @@ export function AccountFormScreen({
           currency: formData.currency,
         });
       }
-      navigate({ type: "accounts" });
+      pop();
     } catch (error) {
       console.error("Failed to save account:", error);
     }
@@ -134,7 +136,7 @@ export function AccountFormScreen({
 
   return (
     <Page title={isEdit ? "Edit account" : "Add account"}>
-      <>
+      <form onSubmit={handleSave}>
         <div className="flex-1 space-y-6">
           <div className="flex flex-col gap-1.5">
             <label className="text-sm font-medium">Account Name</label>
@@ -157,8 +159,10 @@ export function AccountFormScreen({
             >
               {accountColorsPalette.map((color) => (
                 <button
+                  tabIndex={-1}
                   key={color.id}
                   id={`color-${color.id}`}
+                  type="button"
                   className="relative w-12 h-12 rounded-lg flex-shrink-0 flex items-center justify-center"
                   onClick={() =>
                     setFormData((prev) => ({ ...prev, color: color.id }))
@@ -234,6 +238,7 @@ export function AccountFormScreen({
               <div className="flex gap-3">
                 <button
                   onClick={() => setShowDeleteConfirm(true)}
+                  type="button"
                   disabled={isLoading}
                   className="flex flex-1 items-center justify-center gap-2 px-4 py-3 bg-muted active:scale-95 rounded-xl transition-transform text-sm font-medium text-foreground disabled:opacity-50"
                 >
@@ -242,10 +247,11 @@ export function AccountFormScreen({
                 </button>
                 <button
                   onClick={handleTransactionsClick}
+                  type="button"
                   className="flex-1 flex items-center justify-center gap-2 px-4 py-3 bg-muted active:scale-95 rounded-xl transition-transform text-sm font-medium text-foreground"
                 >
+                  <ListPlusIcon className="w-4 h-4" />
                   Transactions
-                  <ArrowRight className="w-4 h-4" />
                 </button>
               </div>
             </div>
@@ -256,7 +262,7 @@ export function AccountFormScreen({
           isOpen={showDeleteConfirm}
           onClose={() => setShowDeleteConfirm(false)}
           onConfirm={handleDelete}
-          title="Delete Account"
+          title="Delete account"
           description="This will permanently delete the account and all its transactions. This action cannot be undone."
           confirmText="Delete"
           isLoading={deleteAccountMutation.isPending}
@@ -267,8 +273,9 @@ export function AccountFormScreen({
             <Button
               size="lg"
               variant="outline"
+              type="button"
               className="flex-1"
-              onClick={() => navigate({ type: "accounts" })}
+              onClick={pop}
               disabled={isLoading}
             >
               Back
@@ -276,7 +283,7 @@ export function AccountFormScreen({
             <Button
               className="flex-1"
               size="lg"
-              onClick={handleSave}
+              type="submit"
               disabled={!formData.name.trim() || isLoading}
             >
               {isLoading ? (
@@ -287,7 +294,7 @@ export function AccountFormScreen({
             </Button>
           </div>
         </Footer>
-      </>
+      </form>
     </Page>
   );
 }
