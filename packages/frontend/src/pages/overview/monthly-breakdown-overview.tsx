@@ -1,31 +1,25 @@
 import { ChevronRightIcon } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { render } from "typesafe-routes";
-import { routes } from "../../shared/routes";
 import { MonthlyChart } from "./monthly-chart";
 import { useAccountIds } from "@/shared/hooks/use-account-ids";
-import { useLocation } from "wouter";
+import { useRouter } from "@/shared/stacked-router/router";
 
 export function MonthlyBreakdownOverview() {
   const accountIds = useAccountIds();
-  const [, navigate] = useLocation();
+  const { navigate } = useRouter();
 
   return (
     <div className="px-4 -mt-14">
       <Card
         className="shadow border-0 gap-0 py-4 cursor-pointer"
         onClick={() =>
-          navigate(
-            render(routes.monthlyBreakdownFull, {
-              query: {
-                filters: {
-                  accounts: accountIds,
-                  date: { type: "months", value: 3 },
-                },
-              },
-              path: {},
-            }),
-          )
+          navigate({
+            type: "monthlyBreakdownFull",
+            filters: {
+              accounts: accountIds,
+              date: { type: "months", value: 3 },
+            },
+          })
         }
       >
         <CardHeader className="pb-3">

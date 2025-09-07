@@ -9,7 +9,7 @@ export function PageHeader({
   rightSlot?: ReactNode;
 }) {
   return (
-    <div className="bg-background border-b sticky top-0 z-10">
+    <div className="bg-background border-b sticky top-0">
       <div className="relative flex items-center justify-center p-4">
         <div className="absolute left-4">
           <BackButton />

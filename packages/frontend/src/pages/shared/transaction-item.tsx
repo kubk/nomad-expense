@@ -3,9 +3,7 @@ import { formatAmount } from "../../shared/currency-formatter";
 import { formatDisplayDate } from "@/shared/format-display-date";
 import { AccountBadge } from "../accounts/account-badge";
 import { cn } from "@/lib/utils";
-import { useLocation } from "wouter";
-import { render } from "typesafe-routes";
-import { routes } from "../../shared/routes";
+import { useRouter } from "@/shared/stacked-router/router";
 
 export function TransactionItem({
   transaction,
@@ -14,18 +12,13 @@ export function TransactionItem({
   transaction: Transaction;
   showBorder?: boolean;
 }) {
-  const [, navigate] = useLocation();
+  const { navigate } = useRouter();
   const isIncome = transaction.type === "income";
   const displayAmount = transaction.amount;
   const displayAmountInUSD = transaction.usd;
 
   const handleClick = () => {
-    navigate(
-      render(routes.transactionForm, {
-        query: { transactionId: transaction.id },
-        path: {},
-      }),
-    );
+    navigate({ type: "transactionForm", transactionId: transaction.id });
   };
 
   return (
@@ -49,7 +42,7 @@ export function TransactionItem({
           <AccountBadge accountId={transaction.accountId} />
         </div>
       </div>
-      <div className="self-start flex flex-col gap-1 text-right">
+      <div className="self-start flex items-end flex-col gap-1 text-right">
         <div
           className={cn(
             "flex items-center gap-1 font-semibold text-sm font-mono",

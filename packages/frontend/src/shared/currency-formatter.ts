@@ -30,8 +30,11 @@ export function formatAmount(
     return `${symbol}${formattedAmount}`;
   }
 
+  // non Russian locales don't know about the RUB symbol
+  const locale = currency === "RUB" ? "ru-RU" : undefined;
+
   // Use Intl.NumberFormat for all standard currencies
-  return new Intl.NumberFormat(undefined, {
+  return new Intl.NumberFormat(locale, {
     style: "currency",
     currency: currency,
     minimumFractionDigits: showFractions ? 2 : 0,

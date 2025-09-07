@@ -1,12 +1,11 @@
 import { ChevronRightIcon } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
-import { Link } from "wouter";
-import { renderPath } from "typesafe-routes";
-import { routes } from "../../shared/routes";
 import { TransactionItem } from "../shared/transaction-item";
 import { api } from "../../shared/api";
+import { useRouter } from "@/shared/stacked-router/router";
 
 export function RecentTransactionsOverview() {
+  const { navigate } = useRouter();
   const { data: overviewData, isLoading } = api.expenses.overview.useQuery();
 
   const recentTransactions = overviewData?.recentTransactions;
@@ -19,13 +18,13 @@ export function RecentTransactionsOverview() {
     <div className="px-4 mt-6">
       <div className="flex justify-between items-center mb-3">
         <h2 className="font-semibold pl-4 text-foreground">Recent</h2>
-        <Link
-          href={renderPath(routes.transactions, {})}
+        <button
+          onClick={() => navigate({ type: "transactions" })}
           className="text-primary/70 active:scale-95 transition-transform duration-150 inline-flex items-center text-sm font-medium"
         >
           See all
           <ChevronRightIcon className="w-4 h-4 ml-1" />
-        </Link>
+        </button>
       </div>
 
       <Card className="border-0 p-0 shadow-sm">
