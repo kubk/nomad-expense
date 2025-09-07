@@ -7,7 +7,7 @@ export function AddTransactionFab() {
 
   return (
     <Button
-      className="fixed bottom-23 right-4 h-14 w-14 rounded-full shadow-md active:scale-95 transition-transform"
+      className="fixed bottom-23 right-4 h-14 w-14 rounded-full shadow-md"
       onClick={() => navigate({ type: "accountPicker" })}
     >
       <PlusIcon className="size-6" />

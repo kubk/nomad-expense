@@ -34,7 +34,7 @@ export function OverviewHeader() {
             </div>
           </div>
           <div
-            className="self-center flex -space-x-2 cursor-pointer"
+            className="self-center flex -space-x-2 cursor-pointer active:scale-95 transition-transform"
             onClick={() => {
               navigate({ type: "family" });
             }}
