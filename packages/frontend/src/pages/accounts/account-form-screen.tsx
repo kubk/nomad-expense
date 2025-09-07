@@ -8,17 +8,14 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { useLocation, useSearch } from "wouter";
-import { render, safeParseQuery } from "typesafe-routes";
-import { PageHeader } from "../shared/page-header";
 import { Page } from "../shared/page";
 import { ConfirmModal } from "../shared/confirm-modal";
 import { Footer } from "../shared/footer";
 import { api } from "@/shared/api";
 import { cn } from "@/lib/utils";
-import { routes } from "../../shared/routes";
 import { SUPPORTED_CURRENCIES, type SupportedCurrency } from "api";
 import { accountColorsPalette } from "./account-colors";
+import { RouteByType, useRouter } from "@/shared/stacked-router/router";
 
 type Form = {
   name: string;
@@ -26,10 +23,13 @@ type Form = {
   currency: SupportedCurrency;
 };
 
-export function AccountFormScreen() {
-  const [, navigate] = useLocation();
-  const parsedQuery = safeParseQuery(routes.accountForm, useSearch());
-  const accountId = parsedQuery.success ? parsedQuery.data.accountId : null;
+export function AccountFormScreen({
+  route,
+}: {
+  route: RouteByType<"accountForm">;
+}) {
+  const { navigate } = useRouter();
+  const accountId = route.accountId;
   const isEdit = Boolean(accountId);
 
   const [formData, setFormData] = useState<Form>({
@@ -60,7 +60,7 @@ export function AccountFormScreen() {
   const deleteAccountMutation = api.accounts.delete.useMutation({
     onSuccess: () => {
       utils.accounts.listWithStats.invalidate();
-      navigate(render(routes.accounts, { path: {}, query: {} }));
+      navigate({ type: "accounts" });
     },
   });
 
@@ -99,7 +99,7 @@ export function AccountFormScreen() {
           currency: formData.currency,
         });
       }
-      navigate(render(routes.accounts, { path: {}, query: {} }));
+      navigate({ type: "accounts" });
     } catch (error) {
       console.error("Failed to save account:", error);
     }
@@ -118,17 +118,13 @@ export function AccountFormScreen() {
   const handleTransactionsClick = () => {
     if (!accountId) return;
 
-    navigate(
-      render(routes.transactions, {
-        query: {
-          filters: {
-            accounts: [accountId],
-            date: { type: "months", value: 3 },
-          },
-        },
-        path: {},
-      }),
-    );
+    navigate({
+      type: "transactions",
+      filters: {
+        accounts: [accountId],
+        date: { type: "months", value: 3 },
+      },
+    });
   };
 
   const isLoading =
@@ -137,10 +133,8 @@ export function AccountFormScreen() {
     deleteAccountMutation.isPending;
 
   return (
-    <Page>
-      <PageHeader title={isEdit ? "Edit Account" : "Add Account"} />
-
-      <div className="flex-1 p-4 bg-background flex flex-col">
+    <Page title={isEdit ? "Edit account" : "Add account"}>
+      <>
         <div className="flex-1 space-y-6">
           <div className="flex flex-col gap-1.5">
             <label className="text-sm font-medium">Account Name</label>
@@ -267,35 +261,33 @@ export function AccountFormScreen() {
           confirmText="Delete"
           isLoading={deleteAccountMutation.isPending}
         />
-      </div>
 
-      <Footer>
-        <div className="flex gap-2">
-          <Button
-            size="lg"
-            variant="outline"
-            className="flex-1"
-            onClick={() =>
-              navigate(render(routes.accounts, { path: {}, query: {} }))
-            }
-            disabled={isLoading}
-          >
-            Back
-          </Button>
-          <Button
-            className="flex-1"
-            size="lg"
-            onClick={handleSave}
-            disabled={!formData.name.trim() || isLoading}
-          >
-            {isLoading ? (
-              <Loader2Icon className="h-4 w-4 animate-spin" />
-            ) : (
-              "Save"
-            )}
-          </Button>
-        </div>
-      </Footer>
+        <Footer>
+          <div className="flex gap-2">
+            <Button
+              size="lg"
+              variant="outline"
+              className="flex-1"
+              onClick={() => navigate({ type: "accounts" })}
+              disabled={isLoading}
+            >
+              Back
+            </Button>
+            <Button
+              className="flex-1"
+              size="lg"
+              onClick={handleSave}
+              disabled={!formData.name.trim() || isLoading}
+            >
+              {isLoading ? (
+                <Loader2Icon className="h-4 w-4 animate-spin" />
+              ) : (
+                "Save"
+              )}
+            </Button>
+          </div>
+        </Footer>
+      </>
     </Page>
   );
 }

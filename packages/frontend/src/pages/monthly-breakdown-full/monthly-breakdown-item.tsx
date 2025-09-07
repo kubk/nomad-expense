@@ -1,9 +1,7 @@
-import { useLocation } from "wouter";
-import { render } from "typesafe-routes";
 import { MonthlyData } from "api";
 import { formatAmount } from "../../shared/currency-formatter";
-import { routes } from "../../shared/routes";
 import { useAccountIds } from "@/shared/hooks/use-account-ids";
+import { useRouter } from "@/shared/stacked-router/router";
 
 export function MonthlyBreakdownItem({
   month,
@@ -16,7 +14,7 @@ export function MonthlyBreakdownItem({
   totalItems: number;
   maxAmount: number;
 }) {
-  const [, navigate] = useLocation();
+  const { navigate } = useRouter();
   const accountIds = useAccountIds();
 
   const widthPercentage = (month.amount / maxAmount) * 100;
@@ -27,20 +25,16 @@ export function MonthlyBreakdownItem({
       <div
         className="cursor-pointer transition-colors p-4"
         onClick={() => {
-          navigate(
-            render(routes.transactions, {
-              query: {
-                filters: {
-                  accounts: accountIds,
-                  date: {
-                    type: "custom",
-                    value: [{ year: month.year, month: month.monthNumber }],
-                  },
-                },
+          navigate({
+            type: "transactions",
+            filters: {
+              accounts: accountIds,
+              date: {
+                type: "custom",
+                value: [{ year: month.year, month: month.monthNumber }],
               },
-              path: {},
-            }),
-          );
+            },
+          });
         }}
       >
         <div className="space-y-3">

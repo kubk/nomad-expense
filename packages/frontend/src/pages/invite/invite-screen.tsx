@@ -1,23 +1,19 @@
 import { useEffect } from "react";
-import { useLocation, useSearch } from "wouter";
 import { CheckCircleIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { template, safeParseQuery } from "typesafe-routes";
-import { routes } from "../../shared/routes";
 import { InviteLoader } from "./invite-loader";
 import { InviteError } from "./invite-error";
 import { api } from "@/shared/api";
 import { getUserDisplayNameWithUsername } from "@/shared/user-display";
+import { RouteByType } from "@/shared/stacked-router/router";
+import { useRouter } from "@/shared/stacked-router/router";
 
-export function InviteScreen() {
-  const [, setLocation] = useLocation();
-  const search = useSearch();
-
-  const parsedQuery = safeParseQuery(routes.invite, search);
-  const inviteCode = parsedQuery.success ? parsedQuery.data.code : null;
-
+export function InviteScreen({ route }: { route: RouteByType<"invite"> }) {
+  const { navigate } = useRouter();
   const joinFamilyMutation = api.family.joinFamily.useMutation();
+
+  const inviteCode = route.code;
 
   useEffect(() => {
     if (!inviteCode) {
@@ -46,7 +42,7 @@ export function InviteScreen() {
     : "Someone";
 
   return (
-    <div className="min-h-screen bg-background flex items-center justify-center p-4">
+    <div className="min-h-screen flex items-center justify-center p-4">
       <Card className="w-full max-w-md">
         <CardContent className="pt-8 pb-8">
           <div className="text-center space-y-6">
@@ -70,7 +66,7 @@ export function InviteScreen() {
               </div>
             </div>
             <Button
-              onClick={() => setLocation(template(routes.overview))}
+              onClick={() => navigate({ type: "main" })}
               className="w-full"
             >
               OK
