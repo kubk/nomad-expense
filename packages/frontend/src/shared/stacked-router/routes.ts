@@ -4,6 +4,12 @@ const toNumberSchema = v.pipe(v.unknown(), v.transform(Number), v.number());
 
 const transactionFiltersSchema = v.object({
   accounts: v.array(v.string()),
+  description: v.optional(
+    v.object({
+      input: v.string(),
+      type: v.union([v.literal("includes"), v.literal("exact")]),
+    }),
+  ),
   date: v.variant("type", [
     v.object({
       type: v.literal("months"),

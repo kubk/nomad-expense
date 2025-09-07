@@ -9,6 +9,8 @@ import {
   DrawerTitle,
 } from "@/components/ui/drawer";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { CheckIcon } from "lucide-react";
 import { TransactionFilters } from "api";
 import { useAccountIds } from "@/shared/hooks/use-account-ids";
@@ -88,12 +90,23 @@ export function FiltersDrawer({
     setShowCustomDatePicker(false);
   };
 
-  const handleSelectAllAccounts = () => {
-    onApply({
-      ...filterForm,
-      accounts: accountIds,
-    });
-    onOpenChange(false);
+  const handleDescriptionChange = (value: string) => {
+    setFilterForm((prev) => ({
+      ...prev,
+      description: value.trim()
+        ? {
+            input: value.trim(),
+            type: prev.description?.type || "includes",
+          }
+        : undefined,
+    }));
+  };
+
+  const handleDescriptionTypeChange = (type: "includes" | "exact") => {
+    setFilterForm((prev) => ({
+      ...prev,
+      description: prev.description ? { ...prev.description, type } : undefined,
+    }));
   };
 
   return (
@@ -105,7 +118,7 @@ export function FiltersDrawer({
             <DrawerDescription />
           </DrawerHeader>
 
-          <div className="p-4 pt-0 pb-6 space-y-6">
+          <div className="p-4 pt-0 pb-6 space-y-5">
             {showCustomDatePicker ? (
               <CustomDatePicker
                 filters={filterForm}
@@ -114,8 +127,38 @@ export function FiltersDrawer({
               />
             ) : (
               <>
+                <div>
+                  <h3 className="font-medium mb-2">Description</h3>
+                  <div className="flex gap-2">
+                    <Input
+                      placeholder="Search transactions..."
+                      value={filterForm.description?.input || ""}
+                      onChange={(e) => handleDescriptionChange(e.target.value)}
+                    />
+                    {filterForm.description && (
+                      <Tabs
+                        value={filterForm.description.type}
+                        onValueChange={(value) =>
+                          handleDescriptionTypeChange(
+                            value as "includes" | "exact",
+                          )
+                        }
+                      >
+                        <TabsList className="w-full">
+                          <TabsTrigger value="includes" className="flex-1">
+                            Contains
+                          </TabsTrigger>
+                          <TabsTrigger value="exact" className="flex-1">
+                            Exact
+                          </TabsTrigger>
+                        </TabsList>
+                      </Tabs>
+                    )}
+                  </div>
+                </div>
+
                 <div className="pt-2">
-                  <div className="flex items-center justify-between mb-3">
+                  <div className="flex items-center justify-between mb-2">
                     <h3 className="font-medium">Time period</h3>
                     <Button
                       variant="ghost"
@@ -126,7 +169,7 @@ export function FiltersDrawer({
                       All time
                     </Button>
                   </div>
-                  <div className="flex flex-wrap gap-2">
+                  <div className="flex overflow-x-auto pb-3 gap-2">
                     {timePeriods.map((period) => (
                       <Button
                         key={period.value}
@@ -166,18 +209,10 @@ export function FiltersDrawer({
                 </div>
 
                 <div>
-                  <div className="flex items-center justify-between mb-3">
+                  <div className="flex items-center justify-between mb-2">
                     <h3 className="font-medium">Bank accounts</h3>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={handleSelectAllAccounts}
-                      className="text-xs h-6 px-2"
-                    >
-                      All accounts
-                    </Button>
                   </div>
-                  <div className="flex flex-wrap gap-2">
+                  <div className="flex overflow-x-auto pb-3 gap-2">
                     {accounts.map((account) => (
                       <Button
                         key={account.id}
