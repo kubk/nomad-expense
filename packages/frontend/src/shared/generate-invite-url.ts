@@ -1,9 +1,8 @@
-import { render } from "typesafe-routes";
-import { routes } from "./routes";
+import { routeToUrl } from "./stacked-router/url-convert";
 
 export const generateInviteUrl = (code: string): string => {
-  return `${window.location.origin}${render(routes.invite, {
-    path: {},
-    query: { code },
+  return `${window.location.origin}${routeToUrl({
+    type: "invite",
+    code,
   })}`;
 };

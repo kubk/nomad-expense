@@ -124,3 +124,13 @@
     cursor: pointer;
   }
 }
+
+.app-container {
+  @apply h-screen;
+}
+
+@supports (-webkit-touch-callout: none) {
+  .app-container {
+    height: -webkit-fill-available;
+  }
+}

@@ -2,25 +2,24 @@ import { Card, CardContent } from "@/components/ui/card";
 import { TransactionItem } from "../shared/transaction-item";
 import { SummaryCard } from "../shared/summary-card";
 import { FiltersDrawer } from "../shared/filters-drawer";
-import { PageHeader } from "../shared/page-header";
 import { useState } from "react";
-import { useSearch, useLocation } from "wouter";
-import { safeParseQuery, render } from "typesafe-routes";
-import { routes } from "../../shared/routes";
 import { api } from "@/shared/api";
 import { TransactionFilters } from "api";
 import { useAccountIds } from "@/shared/hooks/use-account-ids";
 import { Page } from "../shared/page";
+import { RouteByType, useRouter } from "@/shared/stacked-router/router";
 
-export function TransactionsScreen() {
+export function TransactionsScreen({
+  route,
+}: {
+  route: RouteByType<"transactions">;
+}) {
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
-  const [, navigate] = useLocation();
+  const { navigate } = useRouter();
   const accountIds = useAccountIds();
 
-  const parsedQuery = safeParseQuery(routes.transactions, useSearch());
-
-  const filters: TransactionFilters = parsedQuery.success
-    ? parsedQuery.data.filters
+  const filters: TransactionFilters = route.filters
+    ? route.filters
     : {
         accounts: accountIds,
         date: { type: "months", value: 3 },
@@ -34,8 +33,7 @@ export function TransactionsScreen() {
   const totalIncome = transactionsData?.totalIncome || 0;
 
   return (
-    <Page>
-      <PageHeader title="Transactions" />
+    <Page title="Transactions" bg="secondary">
       <SummaryCard
         isLoading={isLoading}
         onFiltersClick={() => setIsDrawerOpen(true)}
@@ -45,7 +43,7 @@ export function TransactionsScreen() {
       />
 
       {/* Transactions List */}
-      <div className="px-4 mt-4">
+      <div className="mt-4">
         <Card className="border-0 p-0 shadow-sm">
           <CardContent className="p-0">
             {isLoading ? (
@@ -77,10 +75,7 @@ export function TransactionsScreen() {
         filters={filters}
         onApply={(newFilters) => {
           navigate(
-            render(routes.transactions, {
-              query: { filters: newFilters },
-              path: {},
-            }),
+            { type: "transactions", filters: newFilters },
             { replace: true },
           );
         }}

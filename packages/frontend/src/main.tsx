@@ -5,6 +5,7 @@ import "./index.css";
 import { api, trpcClient } from "./shared/api";
 import { ThemeProvider } from "./pages/shared/theme-provider";
 import { App } from "./pages/layout/app";
+import { RouterProvider } from "./shared/stacked-router/router";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -20,7 +21,9 @@ createRoot(document.getElementById("root")!).render(
     <ThemeProvider>
       <api.Provider client={trpcClient} queryClient={queryClient}>
         <QueryClientProvider client={queryClient}>
-          <App />
+          <RouterProvider>
+            <App />
+          </RouterProvider>
         </QueryClientProvider>
       </api.Provider>
     </ThemeProvider>

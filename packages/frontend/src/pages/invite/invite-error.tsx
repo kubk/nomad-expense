@@ -1,12 +1,10 @@
 import { XCircleIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { template } from "typesafe-routes";
-import { routes } from "../../shared/routes";
-import { useLocation } from "wouter";
+import { useRouter } from "@/shared/stacked-router/router";
 
 export function InviteError({ errorMessage }: { errorMessage: string }) {
-  const [, setLocation] = useLocation();
+  const { navigate } = useRouter();
 
   return (
     <div className="min-h-screen bg-background flex items-center justify-center p-4">
@@ -23,7 +21,7 @@ export function InviteError({ errorMessage }: { errorMessage: string }) {
               <p className="text-muted-foreground">{errorMessage}</p>
             </div>
             <Button
-              onClick={() => setLocation(template(routes.overview))}
+              onClick={() => navigate({ type: "main" })}
               className="w-full"
             >
               Go to Overview
