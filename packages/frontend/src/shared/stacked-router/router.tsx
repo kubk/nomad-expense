@@ -7,7 +7,7 @@ export type RouteByType<T extends Route["type"]> = Extract<Route, { type: T }>;
 
 type RouterState = {
   navigationStack: Route[];
-  navigate: (route: Route, { replace }?: { replace: boolean }) => void;
+  navigate: (route: Route, params?: { replace: boolean }) => void;
   pop: () => void;
   currentRoute: Route;
 };
