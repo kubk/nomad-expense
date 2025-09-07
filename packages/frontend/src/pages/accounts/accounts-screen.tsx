@@ -50,7 +50,7 @@ export function AccountsScreen() {
             return (
               <button
                 key={account.id}
-                className="w-full bg-card rounded-2xl shadow-sm hover:bg-muted/50 active:bg-muted transition-colors text-left"
+                className="w-full bg-card rounded-2xl shadow-sm transition-colors text-left active:scale-95 transition-transform"
                 onClick={() => handleAccountClick(account.id)}
               >
                 <div className="p-5">
