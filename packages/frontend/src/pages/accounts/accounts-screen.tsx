@@ -2,7 +2,8 @@ import { PlusIcon, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { getCurrencySymbol } from "../../shared/currency-formatter";
 import { PageHeader } from "../shared/page-header";
-import { api } from "@/shared/api";
+import { trpc } from "@/shared/api";
+import { useQuery } from "@tanstack/react-query";
 import { Page } from "../shared/page";
 import { SupportedCurrency } from "api";
 import { getColorById } from "./account-colors";
@@ -12,8 +13,9 @@ import { useRouter } from "@/shared/stacked-router/router";
 
 export function AccountsScreen() {
   const { navigate } = useRouter();
-  const { data: accounts = [], isLoading } =
-    api.accounts.listWithStats.useQuery();
+  const { data: accounts = [], isLoading } = useQuery(
+    trpc.accounts.listWithStats.queryOptions(),
+  );
 
   const handleAccountClick = (accountId: string) => {
     navigate({ type: "accountForm", accountId });

@@ -3,7 +3,8 @@ import { Card, CardContent } from "@/components/ui/card";
 import { MonthlyBreakdownItem } from "./monthly-breakdown-item";
 import { SummaryCard } from "../shared/summary-card";
 import { FiltersDrawer } from "../shared/filters-drawer";
-import { api } from "../../shared/api";
+import { trpc } from "../../shared/api";
+import { useQuery } from "@tanstack/react-query";
 import { TransactionFilters } from "api";
 import { useAccountIds } from "@/shared/hooks/use-account-ids";
 import { Page } from "../shared/page";
@@ -26,8 +27,9 @@ export function MonthlyBreakdownFull({
         date: { type: "months", value: 3 },
       };
 
-  const { data: transactionsData, isLoading } =
-    api.expenses.transactionsByMonth.useQuery(filters);
+  const { data: transactionsData, isLoading } = useQuery(
+    trpc.expenses.transactionsByMonth.queryOptions(filters),
+  );
 
   const filteredMonthlyData = transactionsData?.data || [];
   const maxAmount = transactionsData?.maxAmount || 0;

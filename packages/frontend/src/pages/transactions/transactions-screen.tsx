@@ -3,7 +3,8 @@ import { TransactionItem } from "../shared/transaction-item";
 import { SummaryCard } from "../shared/summary-card";
 import { FiltersDrawer } from "../shared/filters-drawer";
 import { useState } from "react";
-import { api } from "@/shared/api";
+import { trpc } from "@/shared/api";
+import { useQuery } from "@tanstack/react-query";
 import { TransactionFilters } from "api";
 import { useAccountIds } from "@/shared/hooks/use-account-ids";
 import { Page } from "../shared/page";
@@ -25,8 +26,9 @@ export function TransactionsScreen({
         date: { type: "months", value: 3 },
       };
 
-  const { data: transactionsData, isLoading } =
-    api.expenses.transactionsList.useQuery(filters);
+  const { data: transactionsData, isLoading } = useQuery(
+    trpc.expenses.transactionsList.queryOptions(filters),
+  );
 
   const transactions = transactionsData?.transactions || [];
   const totalExpenses = transactionsData?.totalExpenses || 0;

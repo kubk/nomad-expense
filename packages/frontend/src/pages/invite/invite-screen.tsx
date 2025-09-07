@@ -4,14 +4,17 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { InviteLoader } from "./invite-loader";
 import { InviteError } from "./invite-error";
-import { api } from "@/shared/api";
+import { trpc } from "@/shared/api";
+import { useMutation } from "@tanstack/react-query";
 import { getUserDisplayNameWithUsername } from "@/shared/user-display";
 import { RouteByType } from "@/shared/stacked-router/router";
 import { useRouter } from "@/shared/stacked-router/router";
 
 export function InviteScreen({ route }: { route: RouteByType<"invite"> }) {
   const { navigate } = useRouter();
-  const joinFamilyMutation = api.family.joinFamily.useMutation();
+  const joinFamilyMutation = useMutation(
+    trpc.family.joinFamily.mutationOptions(),
+  );
 
   const inviteCode = route.code;
 
@@ -42,7 +45,7 @@ export function InviteScreen({ route }: { route: RouteByType<"invite"> }) {
     : "Someone";
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4">
+    <div className="min-h-screen flex items-center bg-muted justify-center p-4">
       <Card className="w-full max-w-md">
         <CardContent className="pt-8 pb-8">
           <div className="text-center space-y-6">

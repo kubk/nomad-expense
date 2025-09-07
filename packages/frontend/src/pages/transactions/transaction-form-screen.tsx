@@ -15,7 +15,8 @@ import { PageHeader } from "../shared/page-header";
 import { Page } from "../shared/page";
 import { ConfirmModal } from "../shared/confirm-modal";
 import { Footer } from "../shared/footer";
-import { api } from "@/shared/api";
+import { trpc } from "@/shared/api";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { TransactionType } from "api";
 import { DateTime } from "luxon";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -48,41 +49,71 @@ export function TransactionFormScreen({
   });
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
-  const { data: transaction } = api.expenses.getTransaction.useQuery(
-    { id: transactionId! },
-    { enabled: Boolean(transactionId) },
+  const { data: transaction } = useQuery(
+    trpc.expenses.getTransaction.queryOptions(
+      { id: transactionId! },
+      { enabled: Boolean(transactionId) },
+    ),
   );
 
-  const { data: accounts = [] } = api.accounts.listWithStats.useQuery();
+  const { data: accounts = [] } = useQuery(
+    trpc.accounts.listWithStats.queryOptions(),
+  );
   const selectedAccount = accounts.find((acc) => acc.id === formData.accountId);
 
-  const utils = api.useUtils();
+  const queryClient = useQueryClient();
 
-  const updateTransactionMutation = api.expenses.updateTransaction.useMutation({
-    onSuccess: () => {
-      utils.expenses.transactionsList.invalidate();
-      utils.expenses.overview.invalidate();
-      utils.expenses.transactionsByMonth.invalidate();
-    },
-  });
+  const updateTransactionMutation = useMutation(
+    trpc.expenses.updateTransaction.mutationOptions({
+      onSuccess: () => {
+        queryClient.invalidateQueries({
+          queryKey: trpc.expenses.transactionsList.queryKey(),
+        });
+        queryClient.invalidateQueries({
+          queryKey: trpc.expenses.overview.queryKey(),
+        });
+        queryClient.invalidateQueries({
+          queryKey: trpc.expenses.transactionsByMonth.queryKey(),
+        });
+      },
+    }),
+  );
 
-  const createTransactionMutation = api.expenses.createTransaction.useMutation({
-    onSuccess: () => {
-      utils.expenses.transactionsList.invalidate();
-      utils.expenses.overview.invalidate();
-      utils.expenses.transactionsByMonth.invalidate();
-      utils.accounts.listWithStats.invalidate();
-    },
-  });
+  const createTransactionMutation = useMutation(
+    trpc.expenses.createTransaction.mutationOptions({
+      onSuccess: () => {
+        queryClient.invalidateQueries({
+          queryKey: trpc.expenses.transactionsList.queryKey(),
+        });
+        queryClient.invalidateQueries({
+          queryKey: trpc.expenses.overview.queryKey(),
+        });
+        queryClient.invalidateQueries({
+          queryKey: trpc.expenses.transactionsByMonth.queryKey(),
+        });
+        queryClient.invalidateQueries({
+          queryKey: trpc.accounts.listWithStats.queryKey(),
+        });
+      },
+    }),
+  );
 
-  const deleteTransactionMutation = api.expenses.deleteTransaction.useMutation({
-    onSuccess: () => {
-      utils.expenses.transactionsList.invalidate();
-      utils.expenses.overview.invalidate();
-      utils.expenses.transactionsByMonth.invalidate();
-      pop();
-    },
-  });
+  const deleteTransactionMutation = useMutation(
+    trpc.expenses.deleteTransaction.mutationOptions({
+      onSuccess: () => {
+        queryClient.invalidateQueries({
+          queryKey: trpc.expenses.transactionsList.queryKey(),
+        });
+        queryClient.invalidateQueries({
+          queryKey: trpc.expenses.overview.queryKey(),
+        });
+        queryClient.invalidateQueries({
+          queryKey: trpc.expenses.transactionsByMonth.queryKey(),
+        });
+        pop();
+      },
+    }),
+  );
 
   useEffect(() => {
     if (transaction) {

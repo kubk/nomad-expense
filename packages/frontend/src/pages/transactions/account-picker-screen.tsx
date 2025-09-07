@@ -2,12 +2,15 @@ import { cn } from "@/lib/utils";
 import { getColorById } from "../accounts/account-colors";
 import { getCurrencySymbol } from "../../shared/currency-formatter";
 import { SupportedCurrency } from "api";
-import { api } from "@/shared/api";
+import { trpc } from "@/shared/api";
+import { useQuery } from "@tanstack/react-query";
 import { Page } from "../shared/page";
 import { useRouter } from "@/shared/stacked-router/router";
 
 export function AccountPickerScreen() {
-  const { data: accounts = [] } = api.accounts.listWithStats.useQuery();
+  const { data: accounts = [] } = useQuery(
+    trpc.accounts.listWithStats.queryOptions(),
+  );
   const { navigate } = useRouter();
 
   return (

@@ -24,6 +24,7 @@
     "@tailwindcss/vite": "^4.1.11",
     "@trpc/client": "^11.4.3",
     "@trpc/react-query": "^11.4.3",
+    "@trpc/tanstack-react-query": "^11.5.1",
     "@types/luxon": "^3.7.1",
     "api": "^0.0.0",
     "class-variance-authority": "^0.7.1",

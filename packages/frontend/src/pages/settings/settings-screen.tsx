@@ -4,12 +4,15 @@ import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ModeToggle } from "./mode-toggle";
 import { Page } from "../shared/page";
-import { api } from "@/shared/api";
+import { trpc } from "@/shared/api";
+import { useQuery } from "@tanstack/react-query";
 import { useRouter } from "@/shared/stacked-router/router";
 
 export function SettingsScreen() {
   const { navigate } = useRouter();
-  const { data: familyMembers } = api.family.listMembers.useQuery();
+  const { data: familyMembers } = useQuery(
+    trpc.family.listMembers.queryOptions(),
+  );
 
   return (
     <Page title="Settings">

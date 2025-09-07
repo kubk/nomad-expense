@@ -3,19 +3,24 @@ import { Button } from "@/components/ui/button";
 import { Page } from "../shared/page";
 import { FamilyMemberItem } from "./family-member-item";
 import { InviteLinkCard } from "./invite-link-card";
-import { api } from "@/shared/api";
+import { trpc } from "@/shared/api";
+import { useQuery, useMutation } from "@tanstack/react-query";
 
 export function FamilyScreen() {
-  const { data: members, isLoading: isMembersLoading } =
-    api.family.listMembers.useQuery();
-  const { data: activeInvite, refetch: refetchActiveInvite } =
-    api.family.getActiveInvite.useQuery();
+  const { data: members, isLoading: isMembersLoading } = useQuery(
+    trpc.family.listMembers.queryOptions(),
+  );
+  const { data: activeInvite, refetch: refetchActiveInvite } = useQuery(
+    trpc.family.getActiveInvite.queryOptions(),
+  );
 
-  const generateInviteMutation = api.family.generateInvite.useMutation({
-    onSuccess: () => {
-      refetchActiveInvite();
-    },
-  });
+  const generateInviteMutation = useMutation(
+    trpc.family.generateInvite.mutationOptions({
+      onSuccess: () => {
+        refetchActiveInvite();
+      },
+    }),
+  );
 
   const handleGenerateInvite = () => {
     generateInviteMutation.mutate();
