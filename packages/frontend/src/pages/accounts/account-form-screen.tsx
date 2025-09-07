@@ -5,6 +5,7 @@ import {
   ChevronDownIcon,
   Loader2Icon,
   ListPlusIcon,
+  ArrowLeftIcon,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -293,6 +294,7 @@ export function AccountFormScreen({
               onClick={pop}
               disabled={isLoading}
             >
+              <ArrowLeftIcon className="w-4 h-4" />
               Back
             </Button>
             <Button

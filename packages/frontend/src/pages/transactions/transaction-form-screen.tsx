@@ -1,5 +1,10 @@
 import { useState, useEffect } from "react";
-import { Trash2Icon, Loader2Icon, ChevronDownIcon } from "lucide-react";
+import {
+  Trash2Icon,
+  Loader2Icon,
+  ChevronDownIcon,
+  ArrowLeftIcon,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -372,6 +377,7 @@ export function TransactionFormScreen({
               onClick={pop}
               disabled={isSaving || isTransactionLoading}
             >
+              <ArrowLeftIcon className="w-4 h-4" />
               Back
             </Button>
             <Button
