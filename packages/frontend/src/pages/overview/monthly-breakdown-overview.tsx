@@ -25,7 +25,7 @@ export function MonthlyBreakdownOverview() {
         <CardHeader className="pb-3">
           <div className="flex justify-between items-center">
             <CardTitle className="text-base">Monthly breakdown</CardTitle>
-            <span className="text-primary/70 -mr-3 inline-flex items-center text-sm font-medium">
+            <span className="text-primary/70 -mr-3 inline-flex items-center text-sm font-medium cursor-pointer active:scale-95 transition-transform">
               View all
               <ChevronRightIcon className="w-3 h-3 ml-1" />
             </span>
