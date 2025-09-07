@@ -21,5 +21,10 @@ export function urlToRoute(url: string): Route | null {
   const params = qs.parse(urlObj.search, { ignoreQueryPrefix: true });
 
   const result = v.safeParse(routeSchema, params);
+
+  if (!result.success) {
+    console.warn("Failed to parse route params", result.issues, params);
+  }
+
   return result.success ? result.output : null;
 }

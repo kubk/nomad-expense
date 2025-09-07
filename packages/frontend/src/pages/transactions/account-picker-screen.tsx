@@ -19,9 +19,9 @@ export function AccountPickerScreen() {
             <button
               key={account.id}
               className="bg-card rounded-2xl border p-4 text-left hover:bg-muted/50 transition-colors"
-              onClick={() =>
-                navigate({ type: "transactionForm", accountId: account.id })
-              }
+              onClick={() => {
+                navigate({ type: "transactionForm", accountId: account.id });
+              }}
             >
               <div className="flex items-center gap-4">
                 <div className="relative">

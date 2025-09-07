@@ -31,14 +31,18 @@ export function ConfirmModal({
             className="flex-1"
             onClick={onClose}
             disabled={isLoading}
+            size={"lg"}
+            type={"button"}
           >
             Cancel
           </Button>
           <Button
             variant="destructive"
             className="flex-1"
+            size={"lg"}
             onClick={onConfirm}
             disabled={isLoading}
+            type={"button"}
           >
             {isLoading ? (
               <Loader2Icon className="h-4 w-4 animate-spin" />

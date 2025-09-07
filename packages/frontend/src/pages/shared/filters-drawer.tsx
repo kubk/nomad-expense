@@ -105,7 +105,7 @@ export function FiltersDrawer({
             <DrawerDescription />
           </DrawerHeader>
 
-          <div className="p-4 pt-0 pb-0 space-y-6">
+          <div className="p-4 pt-0 pb-6 space-y-6">
             {showCustomDatePicker ? (
               <CustomDatePicker
                 filters={filterForm}
@@ -116,7 +116,7 @@ export function FiltersDrawer({
               <>
                 <div className="pt-2">
                   <div className="flex items-center justify-between mb-3">
-                    <h3 className="font-medium">Time Period</h3>
+                    <h3 className="font-medium">Time period</h3>
                     <Button
                       variant="ghost"
                       size="sm"
@@ -167,7 +167,7 @@ export function FiltersDrawer({
 
                 <div>
                   <div className="flex items-center justify-between mb-3">
-                    <h3 className="font-medium">Bank Accounts</h3>
+                    <h3 className="font-medium">Bank accounts</h3>
                     <Button
                       variant="ghost"
                       size="sm"

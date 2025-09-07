@@ -34,7 +34,7 @@ export function TransactionFormScreen({
 }: {
   route: RouteByType<"transactionForm">;
 }) {
-  const { navigate, pop } = useRouter();
+  const { pop } = useRouter();
   const transactionId = route.transactionId;
   const isEdit = Boolean(transactionId);
 
@@ -80,13 +80,7 @@ export function TransactionFormScreen({
       utils.expenses.transactionsList.invalidate();
       utils.expenses.overview.invalidate();
       utils.expenses.transactionsByMonth.invalidate();
-      navigate({
-        type: "transactions",
-        filters: {
-          accounts: [],
-          date: { type: "months", value: 3 },
-        },
-      });
+      pop();
     },
   });
 
@@ -108,7 +102,8 @@ export function TransactionFormScreen({
     }
   }, [transaction]);
 
-  const handleSave = async () => {
+  const handleSave = async (e: React.FormEvent) => {
+    e.preventDefault();
     if (isEdit && transactionId) {
       let isoString: string | undefined = undefined;
       if (formData.date && formData.time) {
@@ -148,7 +143,7 @@ export function TransactionFormScreen({
         createdAt: isoString || new Date().toISOString(),
       });
     }
-    window.history.back();
+    pop();
   };
 
   const handleDelete = async () => {
@@ -183,188 +178,192 @@ export function TransactionFormScreen({
         />
       }
     >
-      <div className="flex-1 flex flex-col">
-        <div className="flex-1 space-y-6">
-          {/* Transaction Type Selector */}
-          <div className="flex flex-col gap-1.5">
-            {isTransactionLoading ? (
-              <Skeleton className="h-9 rounded-md w-full" />
-            ) : (
-              <Tabs
-                value={formData.type}
-                onValueChange={(value) =>
-                  setFormData((prev) => ({
-                    ...prev,
-                    type: value as TransactionType,
-                  }))
-                }
-              >
-                <TabsList className="grid w-full grid-cols-2">
-                  <TabsTrigger value="expense">Expense</TabsTrigger>
-                  <TabsTrigger value="income">Income</TabsTrigger>
-                </TabsList>
-              </Tabs>
-            )}
-          </div>
-
-          {/* Transaction Details Step */}
-          {/* Date/Time picker for both create and edit mode */}
-          <div className="flex gap-4">
-            <div className="flex flex-col gap-3 flex-1">
-              <Label htmlFor="date-picker" className="px-1">
-                Date
-              </Label>
+      <form onSubmit={handleSave}>
+        <div className="flex-1 flex flex-col">
+          <div className="flex-1 space-y-6">
+            {/* Transaction Type Selector */}
+            <div className="flex flex-col gap-1.5">
               {isTransactionLoading ? (
-                <Skeleton className="h-9 w-full" />
+                <Skeleton className="h-9 rounded-md w-full" />
               ) : (
-                <Popover>
-                  <PopoverTrigger asChild>
-                    <Button
-                      variant="outline"
-                      id="date-picker"
-                      className="justify-between font-normal"
-                    >
-                      {formData.date
-                        ? formData.date.toLocaleDateString()
-                        : "Select date"}
-                      <ChevronDownIcon className="h-4 w-4" />
-                    </Button>
-                  </PopoverTrigger>
-                  <PopoverContent
-                    className="w-auto overflow-hidden p-0"
-                    align="start"
-                  >
-                    <Calendar
-                      mode="single"
-                      selected={formData.date}
-                      onSelect={(date) => {
-                        setFormData((prev) => ({
-                          ...prev,
-                          date,
-                        }));
-                      }}
-                    />
-                  </PopoverContent>
-                </Popover>
+                <Tabs
+                  value={formData.type}
+                  onValueChange={(value) =>
+                    setFormData((prev) => ({
+                      ...prev,
+                      type: value as TransactionType,
+                    }))
+                  }
+                >
+                  <TabsList className="grid w-full grid-cols-2">
+                    <TabsTrigger value="expense">Expense</TabsTrigger>
+                    <TabsTrigger value="income">Income</TabsTrigger>
+                  </TabsList>
+                </Tabs>
               )}
             </div>
-            <div className="flex flex-col gap-3 flex-1">
-              <Label htmlFor="time-picker" className="px-1">
-                Time
-              </Label>
+
+            {/* Transaction Details Step */}
+            {/* Date/Time picker for both create and edit mode */}
+            <div className="flex gap-4">
+              <div className="flex flex-col gap-3 flex-1">
+                <Label htmlFor="date-picker" className="px-1">
+                  Date
+                </Label>
+                {isTransactionLoading ? (
+                  <Skeleton className="h-9 w-full" />
+                ) : (
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <Button
+                        variant="outline"
+                        id="date-picker"
+                        type="button"
+                        className="justify-between font-normal"
+                      >
+                        {formData.date
+                          ? formData.date.toLocaleDateString()
+                          : "Select date"}
+                        <ChevronDownIcon className="h-4 w-4" />
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent
+                      className="w-auto overflow-hidden p-0"
+                      align="start"
+                    >
+                      <Calendar
+                        mode="single"
+                        selected={formData.date}
+                        onSelect={(date) => {
+                          setFormData((prev) => ({
+                            ...prev,
+                            date,
+                          }));
+                        }}
+                      />
+                    </PopoverContent>
+                  </Popover>
+                )}
+              </div>
+              <div className="flex flex-col gap-3 flex-1">
+                <Label htmlFor="time-picker" className="px-1">
+                  Time
+                </Label>
+                {isTransactionLoading ? (
+                  <Skeleton className="h-9 w-full" />
+                ) : (
+                  <Input
+                    type="time"
+                    id="time-picker"
+                    value={formData.time}
+                    onChange={(e) =>
+                      setFormData((prev) => ({
+                        ...prev,
+                        time: e.target.value,
+                      }))
+                    }
+                    className="bg-background appearance-none [&::-webkit-calendar-picker-indicator]:hidden [&::-webkit-calendar-picker-indicator]:appearance-none"
+                  />
+                )}
+              </div>
+            </div>
+
+            {/* Amount input for both edit and create modes */}
+            <div className="flex flex-col gap-1.5">
+              <label className="text-sm font-medium">Amount</label>
+              <div className="flex gap-2">
+                {isTransactionLoading ? (
+                  <>
+                    <Skeleton className="h-9.5 flex-1" />
+                    <Skeleton className="h-9.5 w-16" />
+                  </>
+                ) : (
+                  <>
+                    <Input
+                      type="number"
+                      step="0.01"
+                      placeholder="0.00"
+                      value={formData.amount}
+                      onChange={(e) =>
+                        setFormData((prev) => ({
+                          ...prev,
+                          amount: e.target.value,
+                        }))
+                      }
+                      className="flex-1"
+                    />
+                    <div className="px-3 py-2 border border-input bg-muted rounded-md text-sm text-muted-foreground min-w-16 flex items-center justify-center">
+                      {isEdit && transaction
+                        ? transaction.currency
+                        : selectedAccount?.currency}
+                    </div>
+                  </>
+                )}
+              </div>
+            </div>
+
+            <div className="flex flex-col gap-1.5">
+              <label className="text-sm font-medium">Description</label>
               {isTransactionLoading ? (
                 <Skeleton className="h-9 w-full" />
               ) : (
                 <Input
-                  type="time"
-                  id="time-picker"
-                  value={formData.time}
+                  placeholder="Groceries"
+                  value={formData.description}
                   onChange={(e) =>
                     setFormData((prev) => ({
                       ...prev,
-                      time: e.target.value,
+                      description: e.target.value,
                     }))
                   }
-                  className="bg-background appearance-none [&::-webkit-calendar-picker-indicator]:hidden [&::-webkit-calendar-picker-indicator]:appearance-none"
                 />
               )}
             </div>
           </div>
 
-          {/* Amount input for both edit and create modes */}
-          <div className="flex flex-col gap-1.5">
-            <label className="text-sm font-medium">Amount</label>
-            <div className="flex gap-2">
-              {isTransactionLoading ? (
-                <>
-                  <Skeleton className="h-9.5 flex-1" />
-                  <Skeleton className="h-9.5 w-16" />
-                </>
+          <ConfirmModal
+            isOpen={showDeleteConfirm}
+            onClose={() => setShowDeleteConfirm(false)}
+            onConfirm={handleDelete}
+            title="Delete Transaction"
+            description="This will permanently delete this transaction. This action cannot be undone."
+            confirmText="Delete"
+            isLoading={deleteTransactionMutation.isPending}
+          />
+        </div>
+        <Footer>
+          <div className="flex gap-2">
+            <Button
+              size={"lg"}
+              variant="outline"
+              type="button"
+              className="flex-1"
+              onClick={pop}
+              disabled={isSaving || isTransactionLoading}
+            >
+              Back
+            </Button>
+            <Button
+              className="flex-1"
+              size="lg"
+              type="submit"
+              disabled={
+                !formData.description.trim() ||
+                !formData.amount.trim() ||
+                (!isEdit && !formData.accountId) ||
+                isSaving ||
+                isTransactionLoading
+              }
+            >
+              {isSaving ? (
+                <Loader2Icon className="h-4 w-4 animate-spin" />
               ) : (
-                <>
-                  <Input
-                    type="number"
-                    step="0.01"
-                    placeholder="0.00"
-                    value={formData.amount}
-                    onChange={(e) =>
-                      setFormData((prev) => ({
-                        ...prev,
-                        amount: e.target.value,
-                      }))
-                    }
-                    className="flex-1"
-                  />
-                  <div className="px-3 py-2 border border-input bg-muted rounded-md text-sm text-muted-foreground min-w-16 flex items-center justify-center">
-                    {isEdit && transaction
-                      ? transaction.currency
-                      : selectedAccount?.currency}
-                  </div>
-                </>
+                "Save"
               )}
-            </div>
+            </Button>
           </div>
-
-          <div className="flex flex-col gap-1.5">
-            <label className="text-sm font-medium">Description</label>
-            {isTransactionLoading ? (
-              <Skeleton className="h-9 w-full" />
-            ) : (
-              <Input
-                placeholder="Groceries"
-                value={formData.description}
-                onChange={(e) =>
-                  setFormData((prev) => ({
-                    ...prev,
-                    description: e.target.value,
-                  }))
-                }
-              />
-            )}
-          </div>
-        </div>
-
-        <ConfirmModal
-          isOpen={showDeleteConfirm}
-          onClose={() => setShowDeleteConfirm(false)}
-          onConfirm={handleDelete}
-          title="Delete Transaction"
-          description="This will permanently delete this transaction. This action cannot be undone."
-          confirmText="Delete"
-          isLoading={deleteTransactionMutation.isPending}
-        />
-      </div>
-      <Footer>
-        <div className="flex gap-2">
-          <Button
-            size={"lg"}
-            variant="outline"
-            className="flex-1"
-            onClick={pop}
-            disabled={isSaving || isTransactionLoading}
-          >
-            Back
-          </Button>
-          <Button
-            className="flex-1"
-            size="lg"
-            onClick={handleSave}
-            disabled={
-              !formData.description.trim() ||
-              !formData.amount.trim() ||
-              (!isEdit && !formData.accountId) ||
-              isSaving ||
-              isTransactionLoading
-            }
-          >
-            {isSaving ? (
-              <Loader2Icon className="h-4 w-4 animate-spin" />
-            ) : (
-              "Save"
-            )}
-          </Button>
-        </div>
-      </Footer>
+        </Footer>
+      </form>
     </Page>
   );
 }
