@@ -41,7 +41,7 @@ export function InviteLinkCard({
           <Button
             onClick={handleCopy}
             variant="outline"
-            size="sm"
+            size="lg"
             className="w-full"
             disabled={copied}
           >
@@ -53,7 +53,7 @@ export function InviteLinkCard({
             ) : (
               <>
                 <CopyIcon className="size-4 mr-2" />
-                Copy Link
+                Copy link
               </>
             )}
           </Button>
