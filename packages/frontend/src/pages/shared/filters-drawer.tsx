@@ -163,7 +163,7 @@ export function FiltersDrawer({
                       variant="ghost"
                       size="sm"
                       onClick={handleAllTime}
-                      className="text-xs h-6 px-2"
+                      className="text-sm h-6 px-2"
                     >
                       All time
                     </Button>
@@ -211,7 +211,7 @@ export function FiltersDrawer({
                   <div className="flex items-center justify-between mb-2">
                     <h3 className="font-medium">Bank accounts</h3>
                   </div>
-                  <div className="flex overflow-x-auto pb-3 gap-2">
+                  <div className="flex overflow-x-visible pb-3 gap-2">
                     {accounts.map((account) => (
                       <Button
                         key={account.id}
@@ -237,15 +237,15 @@ export function FiltersDrawer({
           </div>
 
           {!showCustomDatePicker && (
-            <DrawerFooter>
-              <Button size="lg" onClick={() => handleApply(filterForm)}>
-                Apply filters
-              </Button>
+            <DrawerFooter className="flex-row [&_button]:flex-1">
               <DrawerClose asChild>
                 <Button size="lg" variant="outline">
                   Cancel
                 </Button>
               </DrawerClose>
+              <Button size="lg" onClick={() => handleApply(filterForm)}>
+                Apply filters
+              </Button>
             </DrawerFooter>
           )}
         </div>

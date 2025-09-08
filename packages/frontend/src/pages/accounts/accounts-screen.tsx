@@ -1,4 +1,4 @@
-import { PlusIcon, Loader2, Wallet } from "lucide-react";
+import { PlusIcon, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { getCurrencySymbol } from "../../shared/currency-formatter";
 import { PageHeader } from "../shared/page-header";
