@@ -2,13 +2,19 @@ import { useState, useEffect } from "react";
 import {
   CheckIcon,
   Trash2Icon,
-  ChevronDownIcon,
   Loader2Icon,
   ListPlusIcon,
   ArrowLeftIcon,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Page } from "../shared/page";
 import { ConfirmModal } from "../shared/confirm-modal";
 import { Footer } from "../shared/footer";
@@ -18,6 +24,7 @@ import { cn } from "@/lib/utils";
 import { SUPPORTED_CURRENCIES, type SupportedCurrency } from "api";
 import { accountColorsPalette } from "./account-colors";
 import { RouteByType, useRouter } from "@/shared/stacked-router/router";
+import { Label } from "@/components/ui/label";
 
 type Form = {
   name: string;
@@ -40,7 +47,6 @@ export function AccountFormScreen({
     currency: "USD",
   });
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
-  const [showCurrencyDropdown, setShowCurrencyDropdown] = useState(false);
 
   const { data: accounts = [] } = useQuery(
     trpc.accounts.listWithStats.queryOptions(),
@@ -154,8 +160,8 @@ export function AccountFormScreen({
     <Page title={isEdit ? "Edit account" : "Add account"}>
       <form onSubmit={handleSave}>
         <div className="flex-1 space-y-6">
-          <div className="flex flex-col gap-1.5">
-            <label className="text-sm font-medium">Account Name</label>
+          <div className="flex flex-col gap-2">
+            <Label>Account Name</Label>
             <Input
               placeholder="Enter account name"
               value={formData.name}
@@ -165,8 +171,8 @@ export function AccountFormScreen({
             />
           </div>
 
-          <div className="flex flex-col gap-1.5">
-            <label className="text-sm font-medium text-foreground">Color</label>
+          <div className="flex flex-col gap-2">
+            <Label>Color</Label>
             <div
               className={cn(
                 "flex gap-3 pb-2",
@@ -179,7 +185,7 @@ export function AccountFormScreen({
                   key={color.id}
                   id={`color-${color.id}`}
                   type="button"
-                  className="relative w-12 h-12 rounded-lg flex-shrink-0 flex items-center justify-center"
+                  className="relative w-14 h-14 rounded-lg flex-shrink-0 flex items-center justify-center"
                   onClick={() =>
                     setFormData((prev) => ({ ...prev, color: color.id }))
                   }
@@ -199,17 +205,19 @@ export function AccountFormScreen({
           </div>
 
           {!isEdit && (
-            <div className="flex flex-col gap-1.5">
-              <label className="text-sm font-medium text-foreground">
-                Currency
-              </label>
-              <div className="relative">
-                <button
-                  type="button"
-                  onClick={() => setShowCurrencyDropdown(!showCurrencyDropdown)}
-                  className="w-full flex items-center justify-between px-3 py-2 border border-input bg-background hover:bg-accent hover:text-accent-foreground rounded-md text-sm"
-                >
-                  <span>
+            <div className="flex flex-col gap-3">
+              <Label>Currency</Label>
+              <Select
+                value={formData.currency}
+                onValueChange={(value) =>
+                  setFormData((prev) => ({
+                    ...prev,
+                    currency: value as SupportedCurrency,
+                  }))
+                }
+              >
+                <SelectTrigger className="w-full">
+                  <SelectValue>
                     {(() => {
                       const currency = SUPPORTED_CURRENCIES.find(
                         (c) => c.code === formData.currency,
@@ -218,34 +226,16 @@ export function AccountFormScreen({
                         ? `(${currency.symbol}) ${currency.code}`
                         : formData.currency;
                     })()}
-                  </span>
-                  <ChevronDownIcon className="h-4 w-4" />
-                </button>
-                {showCurrencyDropdown && (
-                  <div className="absolute z-10 w-full mt-1 bg-popover border border-border rounded-md shadow-lg max-h-60 overflow-auto">
-                    {SUPPORTED_CURRENCIES.map((currency) => (
-                      <button
-                        key={currency.code}
-                        type="button"
-                        onClick={() => {
-                          setFormData((prev) => ({
-                            ...prev,
-                            currency: currency.code,
-                          }));
-                          setShowCurrencyDropdown(false);
-                        }}
-                        className={cn(
-                          "w-full px-3 py-2 text-left text-sm hover:bg-accent hover:text-accent-foreground",
-                          formData.currency === currency.code &&
-                            "bg-accent text-accent-foreground",
-                        )}
-                      >
-                        ({currency.symbol}) {currency.code}
-                      </button>
-                    ))}
-                  </div>
-                )}
-              </div>
+                  </SelectValue>
+                </SelectTrigger>
+                <SelectContent>
+                  {SUPPORTED_CURRENCIES.map((currency) => (
+                    <SelectItem key={currency.code} value={currency.code}>
+                      ({currency.symbol}) {currency.code}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
           )}
 
