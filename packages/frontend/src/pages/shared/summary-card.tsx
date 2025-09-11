@@ -24,7 +24,6 @@ export function SummaryCard({
   const getDateLabel = () => {
     if (appliedFilters.date.type === "months") {
       if (appliedFilters.date.value === 1) return "Last month";
-      if (appliedFilters.date.value === 12) return "Last year";
       return `Last ${appliedFilters.date.value} months`;
     }
     if (appliedFilters.date.type === "custom") {
