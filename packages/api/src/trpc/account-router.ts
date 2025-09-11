@@ -1,13 +1,9 @@
 import { eq, sql, and } from "drizzle-orm";
 import { protectedProcedure, t } from "./trpc";
-import {
-  accountColorSchema,
-  accountTable,
-  currencySchema,
-  transactionTable,
-} from "../db/schema";
+import { accountTable, transactionTable } from "../db/schema";
 import { getDb } from "../services/db";
 import { z } from "zod";
+import { accountColorSchema, currencySchema } from "../db/enums";
 
 export const accountRouter = t.router({
   list: protectedProcedure.query(async ({ ctx }) => {
