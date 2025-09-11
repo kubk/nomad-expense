@@ -18,6 +18,7 @@ export function MonthlyBreakdownOverview() {
             filters: {
               accounts: accountIds,
               date: { type: "months", value: 3 },
+              order: { field: "createdAt", direction: "desc" },
             },
           })
         }
