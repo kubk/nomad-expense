@@ -417,6 +417,7 @@ export const expenseRouter = t.router({
           createdAt: transactionTable.createdAt,
           accountId: accountTable.id,
           type: transactionTable.type,
+          isCountable: transactionTable.isCountable,
         })
         .from(transactionTable)
         .innerJoin(
@@ -444,6 +445,7 @@ export const expenseRouter = t.router({
         createdAt: transaction.createdAt,
         accountId: transaction.accountId,
         type: transaction.type,
+        isCountable: transaction.isCountable,
       };
     }),
 
@@ -455,6 +457,7 @@ export const expenseRouter = t.router({
         amount: z.number(),
         createdAt: z.string(),
         type: z.enum(["expense", "income"]),
+        isCountable: z.boolean(),
       }),
     )
     .mutation(async ({ ctx, input }) => {
@@ -498,6 +501,7 @@ export const expenseRouter = t.router({
         usdAmount: usdAmountInCents,
         createdAt: input.createdAt,
         type: input.type,
+        isCountable: input.isCountable,
       };
 
       await db
