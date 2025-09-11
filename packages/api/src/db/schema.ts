@@ -4,6 +4,8 @@ import { z } from "zod";
 const transactionSource = ["imported", "manual"] as const;
 const transactionSourceSchema = z.enum(transactionSource);
 
+const transactionImportRuleType = ["MakeUncountable", "FilterTransactionName"] as const;
+
 const accountColor = [
   "blue",
   "green",
@@ -20,6 +22,8 @@ const accountColor = [
   "rose",
   "gray",
 ] as const;
+
+const bank = ["Wise", "YapiKredi", "Kasikorn"] as const;
 
 const sharedColumns = {
   id: text("id")
@@ -52,6 +56,7 @@ export const accountTable = sqliteTable(
     name: text("name").notNull(),
     currency: text("currency").notNull(),
     color: text("color", { enum: accountColor }).notNull(),
+    bankType: text("bank_type", { enum: bank }),
   },
   (table) => [index("idx_account_family_id").on(table.familyId)],
 );
@@ -66,6 +71,7 @@ export const transactionTable = sqliteTable(
     description: text("description").notNull(),
     amount: integer("amount").notNull(),
     currency: text("currency").notNull(),
+    info: text("info"), // Optional payload
     source: text("source", { enum: transactionSource })
       .notNull()
       .default(transactionSourceSchema.enum.manual),
@@ -99,5 +105,20 @@ export const inviteTable = sqliteTable(
   (table) => [
     index("idx_invite_code").on(table.code),
     index("idx_invite_family_id").on(table.familyId),
+  ],
+);
+
+export const transactionImportRuleTable = sqliteTable(
+  "transaction_import_rule",
+  {
+    name: text("name").notNull(),
+    accountId: text("account_id")
+      .notNull()
+      .references(() => accountTable.id, { onDelete: "cascade" }),
+    type: text("type", { enum: transactionImportRuleType })
+      .notNull(),
+  },
+  (table) => [
+    index("idx_transaction_import_rule_account_id").on(table.accountId),
   ],
 );
