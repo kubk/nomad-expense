@@ -5,7 +5,6 @@ import { PageHeader } from "../shared/page-header";
 import { trpc } from "@/shared/api";
 import { useQuery } from "@tanstack/react-query";
 import { Page } from "../shared/page";
-import { SupportedCurrency } from "api";
 import { getColorById } from "./account-colors";
 import { cn } from "@/lib/utils";
 import { DateTime } from "luxon";
@@ -72,9 +71,7 @@ export function AccountsScreen() {
                           colorInfo.text,
                         )}
                       >
-                        {getCurrencySymbol(
-                          account.currency as SupportedCurrency,
-                        )}
+                        {getCurrencySymbol(account.currency)}
                       </div>
                     </div>
                     <div className="flex-1">

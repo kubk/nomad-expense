@@ -1,7 +1,6 @@
 import { cn } from "@/lib/utils";
 import { getColorById } from "../accounts/account-colors";
 import { getCurrencySymbol } from "../../shared/currency-formatter";
-import { SupportedCurrency } from "api";
 import { trpc } from "@/shared/api";
 import { useQuery } from "@tanstack/react-query";
 import { Page } from "../shared/page";
@@ -42,7 +41,7 @@ export function AccountPickerScreen() {
                       colorInfo.text,
                     )}
                   >
-                    {getCurrencySymbol(account.currency as SupportedCurrency)}
+                    {getCurrencySymbol(account.currency)}
                   </div>
                 </div>
                 <div className="flex-1">
