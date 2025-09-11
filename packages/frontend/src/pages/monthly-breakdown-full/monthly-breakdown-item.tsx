@@ -33,6 +33,7 @@ export function MonthlyBreakdownItem({
                 type: "custom",
                 value: [{ year: month.year, month: month.monthNumber }],
               },
+              order: { field: "createdAt", direction: "desc" },
             },
           });
         }}

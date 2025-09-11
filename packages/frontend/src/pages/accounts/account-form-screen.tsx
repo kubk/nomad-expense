@@ -151,6 +151,7 @@ export function AccountFormScreen({
       filters: {
         accounts: [accountId],
         date: { type: "months", value: 3 },
+        order: { field: "createdAt", direction: "desc" },
       },
     });
   };

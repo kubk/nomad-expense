@@ -30,6 +30,10 @@ const transactionFilterSchema = z.object({
       ),
     }),
   ]),
+  order: z.object({
+    field: z.enum(["createdAt", "amount"]),
+    direction: z.enum(["asc", "desc"]),
+  }),
 });
 
 const getFilteredTransactions = async (
@@ -298,7 +302,7 @@ export const expenseRouter = t.router({
         }
       });
 
-      // Convert to array and sort by newest first (expenses only for main data)
+      // Convert to array and sort based on order filter (expenses only for main data)
       const filteredMonthlyData = Object.values(monthlyExpenseTotals)
         .map((monthData) => ({
           month: `${monthData.shortMonth} ${monthData.year}`,
@@ -308,11 +312,20 @@ export const expenseRouter = t.router({
           year: monthData.year,
         }))
         .sort((a, b) => {
-          // Sort by year first (descending), then by month (descending)
-          if (a.year !== b.year) {
-            return b.year - a.year;
+          let comparison = 0;
+
+          if (input.order.field === "createdAt") {
+            // Sort by year first, then by month
+            if (a.year !== b.year) {
+              comparison = a.year - b.year;
+            } else {
+              comparison = a.monthNumber - b.monthNumber;
+            }
+          } else if (input.order.field === "amount") {
+            comparison = a.amount - b.amount;
           }
-          return b.monthNumber - a.monthNumber;
+
+          return input.order.direction === "desc" ? -comparison : comparison;
         });
 
       const maxAmount = Math.max(
@@ -347,10 +360,19 @@ export const expenseRouter = t.router({
 
       const transactions = (
         await getFilteredTransactions(input, familyId, db)
-      ).sort(
-        (a, b) =>
-          new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
-      );
+      ).sort((a, b) => {
+        let comparison = 0;
+
+        if (input.order.field === "createdAt") {
+          const dateA = new Date(a.createdAt).getTime();
+          const dateB = new Date(b.createdAt).getTime();
+          comparison = dateA - dateB;
+        } else if (input.order.field === "amount") {
+          comparison = a.usdAmount - b.usdAmount;
+        }
+
+        return input.order.direction === "desc" ? -comparison : comparison;
+      });
 
       // Calculate totals for filtered transactions (expenses and income separately)
       const totalExpenses = transactions.reduce((sum, t) => {

@@ -24,6 +24,7 @@ export function TransactionsScreen({
     : {
         accounts: accountIds,
         date: { type: "months", value: 3 },
+        order: { field: "createdAt", direction: "desc" },
       };
 
   const { data: transactionsData, isLoading } = useQuery(

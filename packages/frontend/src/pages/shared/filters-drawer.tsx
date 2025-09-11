@@ -11,7 +11,14 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { CheckIcon } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import {
+  CheckIcon,
+  SearchIcon,
+  CalendarIcon,
+  CreditCardIcon,
+  ArrowUpDownIcon,
+} from "lucide-react";
 import { TransactionFilters } from "api";
 import { useAvailableYears } from "@/shared/hooks/use-available-years";
 import { trpc } from "@/shared/api";
@@ -108,6 +115,26 @@ export function FiltersDrawer({
     }));
   };
 
+  const handleBadgeOrderChange = (
+    field: "createdAt" | "amount",
+    direction: "asc" | "desc",
+  ) => {
+    setFilterForm((prev) => ({
+      ...prev,
+      order: { field, direction },
+    }));
+  };
+
+  const isOrderActive = (
+    field: "createdAt" | "amount",
+    direction: "asc" | "desc",
+  ) => {
+    return (
+      filterForm.order.field === field &&
+      filterForm.order.direction === direction
+    );
+  };
+
   return (
     <Drawer open={open} onOpenChange={handleOpenChange}>
       <DrawerContent>
@@ -127,7 +154,10 @@ export function FiltersDrawer({
             ) : (
               <>
                 <div>
-                  <h3 className="font-medium mb-2">Description</h3>
+                  <div className="flex items-center gap-2 mb-2">
+                    <SearchIcon className="size-4 text-muted-foreground" />
+                    <h3 className="font-medium">Description</h3>
+                  </div>
                   <div className="flex gap-2">
                     <Input
                       placeholder="Search transactions..."
@@ -158,7 +188,10 @@ export function FiltersDrawer({
 
                 <div className="pt-2">
                   <div className="flex items-center justify-between mb-2">
-                    <h3 className="font-medium">Time period</h3>
+                    <div className="flex items-center gap-2">
+                      <CalendarIcon className="size-4 text-muted-foreground" />
+                      <h3 className="font-medium">Time period</h3>
+                    </div>
                     <Button
                       variant="ghost"
                       size="sm"
@@ -209,7 +242,10 @@ export function FiltersDrawer({
 
                 <div>
                   <div className="flex items-center justify-between mb-2">
-                    <h3 className="font-medium">Bank accounts</h3>
+                    <div className="flex items-center gap-2">
+                      <CreditCardIcon className="size-4 text-muted-foreground" />
+                      <h3 className="font-medium">Bank accounts</h3>
+                    </div>
                   </div>
                   <div className="flex overflow-auto pb-3 gap-2">
                     {accounts.map((account) => (
@@ -230,6 +266,61 @@ export function FiltersDrawer({
                         {account.name}
                       </Button>
                     ))}
+                  </div>
+                </div>
+
+                <div>
+                  <div className="flex items-center justify-between mb-2">
+                    <div className="flex items-center gap-2">
+                      <ArrowUpDownIcon className="size-4 text-muted-foreground" />
+                      <h3 className="font-medium">Sort by</h3>
+                    </div>
+                  </div>
+                  <div className="flex overflow-x-auto gap-2 pb-3">
+                    <Badge
+                      variant={
+                        isOrderActive("createdAt", "desc")
+                          ? "default"
+                          : "secondary"
+                      }
+                      className="cursor-pointer px-3 py-1.5 text-sm whitespace-nowrap flex-shrink-0"
+                      onClick={() =>
+                        handleBadgeOrderChange("createdAt", "desc")
+                      }
+                    >
+                      Newest first
+                    </Badge>
+                    <Badge
+                      variant={
+                        isOrderActive("createdAt", "asc")
+                          ? "default"
+                          : "secondary"
+                      }
+                      className="cursor-pointer px-3 py-1.5 text-sm whitespace-nowrap flex-shrink-0"
+                      onClick={() => handleBadgeOrderChange("createdAt", "asc")}
+                    >
+                      Oldest first
+                    </Badge>
+                    <Badge
+                      variant={
+                        isOrderActive("amount", "desc")
+                          ? "default"
+                          : "secondary"
+                      }
+                      className="cursor-pointer px-3 py-1.5 text-sm whitespace-nowrap flex-shrink-0"
+                      onClick={() => handleBadgeOrderChange("amount", "desc")}
+                    >
+                      Highest amount
+                    </Badge>
+                    <Badge
+                      variant={
+                        isOrderActive("amount", "asc") ? "default" : "secondary"
+                      }
+                      className="cursor-pointer px-3 py-1.5 text-sm whitespace-nowrap flex-shrink-0"
+                      onClick={() => handleBadgeOrderChange("amount", "asc")}
+                    >
+                      Lowest amount
+                    </Badge>
                   </div>
                 </div>
               </>

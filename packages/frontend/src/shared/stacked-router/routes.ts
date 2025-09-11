@@ -25,6 +25,10 @@ const transactionFiltersSchema = v.object({
       ),
     }),
   ]),
+  order: v.object({
+    field: v.union([v.literal("createdAt"), v.literal("amount")]),
+    direction: v.union([v.literal("asc"), v.literal("desc")]),
+  }),
 });
 
 export const routeSchema = v.variant("type", [
