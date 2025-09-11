@@ -7,6 +7,7 @@ import {
   inviteTable,
 } from "./schema";
 import { batch, isNonEmpty } from "./batch";
+import { EXCHANGE_RATES_TO_USD } from "../services/currency-converter";
 
 export const seedUserId = "8461196e-9b34-44da-81f8-0b53787bd928";
 export const seedUser2Id = "8461196e-9b34-44da-81f8-0b53787bd929";
@@ -22,15 +23,6 @@ const accountMapping = {
   account4: "ff99836b-f53a-4322-be2e-7622e00e373a",
   account5: "ff99836b-f53a-4322-be2e-7622e00e374a",
   account6: "ff99836b-f53a-4322-be2e-7622e00e375a",
-};
-
-const rates: { [key: string]: number } = {
-  GBP: 1.27,
-  EUR: 1.08,
-  JPY: 0.0067,
-  USDT: 1.0,
-  THB: 0.027,
-  RUB: 0.013,
 };
 
 export const seedAccounts = [
@@ -222,7 +214,7 @@ const generateTransactionsForMonth = () => {
 
     let usdAmount = amount;
     if (currency !== "USD") {
-      usdAmount = Math.round(amount * (rates[currency] || 1));
+      usdAmount = Math.round(amount / EXCHANGE_RATES_TO_USD[currency]);
     }
 
     transactions.push({
@@ -305,7 +297,7 @@ const generateRecentTransactions = () => {
 
     let usdAmount = amountInCents;
     if (currency !== "USD") {
-      usdAmount = Math.round(amountInCents * (rates[currency] || 1));
+      usdAmount = Math.round(amountInCents / EXCHANGE_RATES_TO_USD[currency]);
     }
 
     const transactionDate = getRandomDateInRange().toISO() || "";
