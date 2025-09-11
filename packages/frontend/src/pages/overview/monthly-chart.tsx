@@ -14,7 +14,7 @@ export function MonthlyChart() {
   );
 
   const sortedMonthlyData = overviewData?.overview.data || [];
-  const maxAmount = overviewData?.overview.maxAmount || 0;
+  const maxAmount = overviewData?.overview.maxAmountUsd || 0;
 
   useEffect(() => {
     // Scroll to the right on mount
