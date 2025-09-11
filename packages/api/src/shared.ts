@@ -24,3 +24,19 @@ export type Account = RouterOutputs["accounts"]["list"][0];
 export type MonthlyData = MonthlyBreakdownFull["data"][0];
 
 export type TransactionType = "expense" | "income";
+
+export type AccountColor =
+  | "blue"
+  | "green"
+  | "purple"
+  | "red"
+  | "orange"
+  | "yellow"
+  | "pink"
+  | "teal"
+  | "cyan"
+  | "lime"
+  | "amber"
+  | "emerald"
+  | "rose"
+  | "gray";

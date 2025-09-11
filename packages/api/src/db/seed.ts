@@ -1,6 +1,11 @@
 import { DateTime } from "luxon";
 import { DB } from "../services/db";
-import { userTable, accountTable, transactionTable } from "./schema";
+import {
+  userTable,
+  accountTable,
+  transactionTable,
+  inviteTable,
+} from "./schema";
 import { batch, isNonEmpty } from "./batch";
 
 export const seedUserId = "8461196e-9b34-44da-81f8-0b53787bd928";
@@ -33,37 +38,37 @@ export const seedAccounts = [
     id: accountMapping.account1,
     name: "Revolut",
     currency: "USD",
-    color: "blue",
+    color: "blue" as const,
   },
   {
     id: accountMapping.account2,
     name: "Wise",
     currency: "GBP",
-    color: "green",
+    color: "green" as const,
   },
   {
     id: accountMapping.account3,
     name: "Tinkoff",
     currency: "RUB",
-    color: "yellow",
+    color: "yellow" as const,
   },
   {
     id: accountMapping.account4,
     name: "Kasikorn Egor",
     currency: "THB",
-    color: "green",
+    color: "green" as const,
   },
   {
     id: accountMapping.account5,
     name: "Kasikorn Roxie",
     currency: "THB",
-    color: "green",
+    color: "green" as const,
   },
   {
     id: accountMapping.account6,
     name: "Crypto Wallet",
     currency: "USDT",
-    color: "orange",
+    color: "orange" as const,
   },
 ];
 
@@ -337,24 +342,21 @@ export const getSeedData = () => ({
       id: seedUserId,
       familyId: family1Id,
       initialFamilyId: family1Id,
-      firstName: "George",
-      lastName: "Doe",
+      name: "George Doe",
       username: "johndoe",
     },
     {
       id: seedUser2Id,
       familyId: family1Id,
       initialFamilyId: "2c1f7a1a-8231-4101-9f65-3ac011ed800d",
-      firstName: "Jane",
-      lastName: "Doe",
+      name: "Jane Doe",
       username: "janedoe",
     },
     {
       id: seedUser3Id,
       familyId: family2Id,
       initialFamilyId: family2Id,
-      firstName: "Bob",
-      lastName: "Smith",
+      name: "Bob Smith",
       username: "bobsmith",
     },
   ],
@@ -367,14 +369,14 @@ export const getSeedData = () => ({
       id: "ff99836b-f53a-4322-be2e-7622e00e376a",
       name: "Chase Bank",
       currency: "USD",
-      color: "blue",
+      color: "blue" as const,
       familyId: family2Id,
     },
     {
       id: "ff99836b-f53a-4322-be2e-7622e00e377a",
       name: "Wells Fargo",
       currency: "USD",
-      color: "red",
+      color: "red" as const,
       familyId: family2Id,
     },
   ],
@@ -383,6 +385,13 @@ export const getSeedData = () => ({
 
 export const seedDatabase = async (db: DB) => {
   console.log("🌱 Seeding database...");
+
+  // Clear all tables first
+  const tables = [transactionTable, inviteTable, accountTable, userTable];
+  for (const table of tables) {
+    await db.delete(table);
+  }
+  console.log("🗑️ Cleared all existing data");
 
   const seedData = getSeedData();
 

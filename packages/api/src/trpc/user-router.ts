@@ -12,8 +12,7 @@ export const userRouter = t.router({
     return {
       id: ctx.user.id,
       familyId: ctx.user.familyId,
-      firstName: ctx.user.firstName,
-      lastName: ctx.user.lastName,
+      name: ctx.user.name,
       username: ctx.user.username,
       avatarUrl: ctx.user.avatarUrl,
       createdAt: ctx.user.createdAt,

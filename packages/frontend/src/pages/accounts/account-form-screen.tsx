@@ -21,14 +21,18 @@ import { Footer } from "../shared/footer";
 import { trpc } from "@/shared/api";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { cn } from "@/lib/utils";
-import { SUPPORTED_CURRENCIES, type SupportedCurrency } from "api";
+import {
+  SUPPORTED_CURRENCIES,
+  type SupportedCurrency,
+  type AccountColor,
+} from "api";
 import { accountColorsPalette } from "./account-colors";
 import { RouteByType, useRouter } from "@/shared/stacked-router/router";
 import { Label } from "@/components/ui/label";
 
 type Form = {
   name: string;
-  color: string;
+  color: AccountColor;
   currency: SupportedCurrency;
 };
 
@@ -187,7 +191,10 @@ export function AccountFormScreen({
                   type="button"
                   className="relative w-14 h-14 rounded-lg flex-shrink-0 flex items-center justify-center"
                   onClick={() =>
-                    setFormData((prev) => ({ ...prev, color: color.id }))
+                    setFormData((prev) => ({
+                      ...prev,
+                      color: color.id,
+                    }))
                   }
                 >
                   <div
