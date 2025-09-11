@@ -7,10 +7,7 @@ import {
   transactionTypeSchema,
 } from "../db/schema";
 import { getDb } from "../services/db";
-import {
-  convert,
-  type SupportedCurrency,
-} from "../services/currency-converter";
+import { convert } from "../services/currency-converter";
 
 const transactionFilterSchema = z.object({
   accounts: z.array(z.string()),
@@ -553,7 +550,7 @@ export const expenseRouter = t.router({
       const amountInCents = Math.round(input.amount * 100);
       const usdAmountInCents = convert(
         amountInCents,
-        existingTransaction.currency as SupportedCurrency,
+        existingTransaction.currency,
         "USD",
       );
 
@@ -638,11 +635,7 @@ export const expenseRouter = t.router({
 
       // Convert amount to cents and calculate USD amount
       const amountInCents = Math.round(input.amount * 100);
-      const usdAmountInCents = convert(
-        amountInCents,
-        account.currency as SupportedCurrency,
-        "USD",
-      );
+      const usdAmountInCents = convert(amountInCents, account.currency, "USD");
 
       await db.insert(transactionTable).values({
         accountId: input.accountId,
