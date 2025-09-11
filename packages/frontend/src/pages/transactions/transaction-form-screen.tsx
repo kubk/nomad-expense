@@ -4,9 +4,12 @@ import {
   Loader2Icon,
   ChevronDownIcon,
   ArrowLeftIcon,
+  CircleQuestionMarkIcon,
+  ArrowRightLeftIcon,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Calendar } from "@/components/ui/calendar";
 import {
@@ -25,6 +28,14 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { TransactionType } from "api";
 import { DateTime } from "luxon";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Switch } from "@/components/ui/switch";
+import {
+  Drawer,
+  DrawerContent,
+  DrawerDescription,
+  DrawerHeader,
+  DrawerTitle,
+} from "@/components/ui/drawer";
 
 type Form = {
   description: string;
@@ -33,6 +44,7 @@ type Form = {
   date: Date | undefined;
   time: string;
   type: TransactionType;
+  isCountable: boolean;
 };
 
 export function TransactionFormScreen({
@@ -51,8 +63,10 @@ export function TransactionFormScreen({
     date: new Date(),
     time: DateTime.now().toFormat("HH:mm"),
     type: "expense",
+    isCountable: true,
   });
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [isHelpOpen, setIsHelpOpen] = useState(false);
 
   const { data: transaction } = useQuery(
     trpc.expenses.getTransaction.queryOptions(
@@ -134,6 +148,7 @@ export function TransactionFormScreen({
         date: transactionDate,
         time: timeString,
         type: transaction.type,
+        isCountable: transaction.isCountable,
       });
     }
   }, [transaction]);
@@ -158,6 +173,7 @@ export function TransactionFormScreen({
         amount: parseFloat(formData.amount),
         createdAt: isoString || new Date().toISOString(),
         type: formData.type,
+        isCountable: formData.isCountable,
       });
     } else {
       let isoString: string | undefined = undefined;
@@ -341,20 +357,55 @@ export function TransactionFormScreen({
             <div className="flex flex-col gap-2">
               <label className="text-sm font-medium">Description</label>
               {isTransactionLoading ? (
-                <Skeleton className="h-9 w-full" />
+                <Skeleton className="h-16 w-full" />
               ) : (
-                <Input
+                <Textarea
                   placeholder="Groceries"
                   value={formData.description}
-                  onChange={(e) =>
+                  onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) =>
                     setFormData((prev) => ({
                       ...prev,
                       description: e.target.value,
                     }))
                   }
+                  rows={2}
                 />
               )}
             </div>
+
+            {/* Countable switch - only show in edit mode */}
+            {isEdit && (
+              <div className="flex flex-col gap-2 pl-0.5">
+                <div className="flex items-center gap-2">
+                  <label className="flex items-center gap-2 cursor-pointer">
+                    {isTransactionLoading ? (
+                      <Skeleton className="h-5 w-8" />
+                    ) : (
+                      <Switch
+                        checked={!formData.isCountable}
+                        onCheckedChange={(checked) =>
+                          setFormData((prev) => ({
+                            ...prev,
+                            isCountable: !checked,
+                          }))
+                        }
+                      />
+                    )}
+                    <span className="text-sm text-muted-foreground">
+                      Exclude from totals
+                    </span>
+                  </label>
+                  <CircleQuestionMarkIcon
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      setIsHelpOpen(true);
+                    }}
+                    className="size-4 text-muted-foreground active:scale-95 transition-transform cursor-pointer flex-shrink-0"
+                  />
+                </div>
+              </div>
+            )}
           </div>
 
           <ConfirmModal
@@ -401,6 +452,45 @@ export function TransactionFormScreen({
           </div>
         </Footer>
       </form>
+
+      <Drawer open={isHelpOpen} onOpenChange={setIsHelpOpen}>
+        <DrawerContent>
+          <DrawerHeader className="pb-6">
+            <DrawerTitle className="self-start">
+              Why exclude transactions?
+            </DrawerTitle>
+            <DrawerDescription />
+          </DrawerHeader>
+
+          <div className="px-4 pb-6 space-y-6">
+            <div className="flex items-start gap-3">
+              <div className="flex-shrink-0 w-8 h-8 bg-primary/10 rounded-full flex items-center justify-center mt-0.5">
+                <ArrowRightLeftIcon className="size-4 text-primary" />
+              </div>
+              <div>
+                <p className="text-md font-medium text-foreground mb-0.5">
+                  Moving money between accounts
+                </p>
+                <p className="text-sm text-muted-foreground">
+                  When you transfer money between your accounts, it's not really
+                  spending - it's just moving money. Mark these transactions as
+                  "excluded" so they don't affect your spending totals.
+                </p>
+              </div>
+            </div>
+
+            <div className="pt-2">
+              <Button
+                onClick={() => setIsHelpOpen(false)}
+                className="w-full"
+                size="lg"
+              >
+                Got it
+              </Button>
+            </div>
+          </div>
+        </DrawerContent>
+      </Drawer>
     </Page>
   );
 }

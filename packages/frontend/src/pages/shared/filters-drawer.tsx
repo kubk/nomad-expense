@@ -53,7 +53,6 @@ export function FiltersDrawer({
     { value: 1, label: "Last 30 days" },
     { value: 3, label: "Last 90 days" },
     { value: 6, label: "Last 6 months" },
-    { value: 12, label: "Last year" },
   ];
 
   const handleAccountToggle = (account: string) => {
