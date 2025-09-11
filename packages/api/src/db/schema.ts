@@ -30,6 +30,8 @@ export const userTable = sqliteTable("user", {
   name: text("name"),
   username: text("username"),
   avatarUrl: text("avatar_url"),
+  telegramId: text("telegram_id"),
+  isAdmin: integer("is_admin", { mode: "boolean" }).notNull().default(false),
 });
 
 export const accountTable = sqliteTable(

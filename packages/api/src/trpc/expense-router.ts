@@ -1,8 +1,9 @@
 import { z } from "zod";
 import { eq, and, or, desc, gte, lte, inArray, sql, like } from "drizzle-orm";
+import { DateTime } from "luxon";
 import { protectedProcedure, t } from "./trpc";
 import { transactionTable, accountTable } from "../db/schema";
-import { getDb } from "../services/db";
+import { getDb, type DB } from "../services/db";
 import { convert } from "../services/currency-converter";
 import { transactionTypeSchema } from "../db/enums";
 
@@ -31,6 +32,89 @@ const transactionFilterSchema = z.object({
   ]),
 });
 
+const getFilteredTransactions = async (
+  input: z.infer<typeof transactionFilterSchema>,
+  familyId: string,
+  db: DB,
+) => {
+  // Build query conditions
+  const conditions = [eq(accountTable.familyId, familyId)];
+
+  // Account filter
+  conditions.push(inArray(accountTable.id, input.accounts));
+
+  // Description filter
+  if (input.description) {
+    if (input.description.type === "exact") {
+      conditions.push(
+        eq(transactionTable.description, input.description.input),
+      );
+    } else if (input.description.type === "includes") {
+      conditions.push(
+        like(transactionTable.description, `%${input.description.input}%`),
+      );
+    }
+  }
+
+  // Date filter
+  if (input.date.type === "months") {
+    // Recent N months filter
+    let dateFilter;
+    if (input.date.value === 1) {
+      dateFilter = sql`${transactionTable.createdAt} >= datetime('now', '-1 month')`;
+    } else if (input.date.value === 3) {
+      dateFilter = sql`${transactionTable.createdAt} >= datetime('now', '-3 months')`;
+    } else if (input.date.value === 6) {
+      dateFilter = sql`${transactionTable.createdAt} >= datetime('now', '-6 months')`;
+    } else if (input.date.value === 12) {
+      dateFilter = sql`${transactionTable.createdAt} >= datetime('now', '-12 months')`;
+    }
+    if (dateFilter) conditions.push(dateFilter);
+  } else if (input.date.type === "custom") {
+    // Custom year-month filter
+    if (input.date.value.length > 0) {
+      const monthConditions = input.date.value.map(({ year, month }) => {
+        const monthStr = month.toString().padStart(2, "0");
+        const lastDay = new Date(year, month, 0).getDate();
+        return and(
+          gte(transactionTable.createdAt, `${year}-${monthStr}-01`),
+          lte(
+            transactionTable.createdAt,
+            `${year}-${monthStr}-${lastDay.toString().padStart(2, "0")}`,
+          ),
+        )!; // Non-null assertion since we know and() will return a value
+      });
+
+      if (monthConditions.length === 1) {
+        conditions.push(monthConditions[0]);
+      } else if (monthConditions.length > 1) {
+        // Use OR to match any of the specified months
+        const orCondition = or(...monthConditions);
+        if (orCondition) {
+          conditions.push(orCondition);
+        }
+      }
+    }
+  }
+
+  return await db
+    .select({
+      id: transactionTable.id,
+      description: transactionTable.description,
+      amount: transactionTable.amount,
+      currency: transactionTable.currency,
+      usdAmount: transactionTable.usdAmount,
+      createdAt: transactionTable.createdAt,
+      accountId: accountTable.id,
+      type: transactionTable.type,
+      isCountable: transactionTable.isCountable,
+    })
+    .from(transactionTable)
+    .innerJoin(accountTable, eq(transactionTable.accountId, accountTable.id))
+    .where(and(...conditions))
+    .all();
+};
+
 export const expenseRouter = t.router({
   overview: protectedProcedure.query(async ({ ctx }) => {
     const db = getDb();
@@ -48,6 +132,7 @@ export const expenseRouter = t.router({
         and(
           eq(accountTable.familyId, familyId),
           eq(transactionTable.type, "expense"),
+          eq(transactionTable.isCountable, true),
         ),
       )
       .all();
@@ -63,6 +148,7 @@ export const expenseRouter = t.router({
         and(
           eq(accountTable.familyId, familyId),
           eq(transactionTable.type, "expense"),
+          eq(transactionTable.isCountable, true),
           sql`${transactionTable.createdAt} >= datetime('now', '-30 days')`,
         ),
       )
@@ -91,35 +177,26 @@ export const expenseRouter = t.router({
 
     // Group transactions by month/year for overview
     const monthlyTotals: {
-      [key: string]: { amount: number; year: number; shortMonth: string };
+      [key: string]: {
+        amount: number;
+        year: number;
+        month: number;
+        shortMonth: string;
+      };
     } = {};
 
-    const monthNames = [
-      "Jan",
-      "Feb",
-      "Mar",
-      "Apr",
-      "May",
-      "Jun",
-      "Jul",
-      "Aug",
-      "Sep",
-      "Oct",
-      "Nov",
-      "Dec",
-    ];
-
     allTransactions.forEach((transaction) => {
-      const date = new Date(transaction.createdAt);
-      const year = date.getFullYear();
-      const month = date.getMonth() + 1;
-      const shortMonth = monthNames[month - 1];
-      const monthKey = `${shortMonth} ${year}`;
+      const dt = DateTime.fromISO(transaction.createdAt);
+      const monthKey = dt.toFormat("MMM yyyy");
+      const shortMonth = dt.toFormat("MMM");
+      const year = dt.year;
+      const month = dt.month;
 
       if (!monthlyTotals[monthKey]) {
         monthlyTotals[monthKey] = {
           amount: 0,
           year,
+          month,
           shortMonth,
         };
       }
@@ -128,32 +205,26 @@ export const expenseRouter = t.router({
     });
 
     // Convert to array and sort chronologically
-    const monthlyData = Object.keys(monthlyTotals)
+    const monthlyData = Object.values(monthlyTotals)
       .sort((a, b) => {
-        const [monthA, yearA] = a.split(" ");
-        const [monthB, yearB] = b.split(" ");
-        const yearDiff = parseInt(yearA) - parseInt(yearB);
+        const yearDiff = a.year - b.year;
         if (yearDiff !== 0) return yearDiff;
-        return monthNames.indexOf(monthA) - monthNames.indexOf(monthB);
+        return a.month - b.month;
       })
-      .map((monthKey) => {
-        const monthData = monthlyTotals[monthKey];
+      .map((monthData) => ({
+        month: `${monthData.shortMonth} ${monthData.year}`,
+        shortMonth: monthData.shortMonth,
+        monthNumber: monthData.month,
+        amount: monthData.amount,
+        year: monthData.year,
+      }));
 
-        return {
-          month: monthKey,
-          shortMonth: monthData.shortMonth,
-          monthNumber: monthNames.indexOf(monthData.shortMonth) + 1,
-          amount: monthData.amount,
-          year: monthData.year,
-        };
-      });
-
-    const maxAmount = Math.max(...monthlyData.map((m) => m.amount));
+    const maxAmountUsd = Math.max(...monthlyData.map((m) => m.amount));
 
     return {
       overview: {
         data: monthlyData,
-        maxAmount,
+        maxAmountUsd,
       },
       last30DaysTotal,
       recentTransactions: recentTransactions.map((t) => ({
@@ -175,116 +246,41 @@ export const expenseRouter = t.router({
       const db = getDb();
       const familyId = ctx.user.familyId;
 
-      // Build query conditions
-      const conditions = [eq(accountTable.familyId, familyId)];
-
-      // Account filter
-      conditions.push(inArray(accountTable.id, input.accounts));
-
-      // Description filter
-      if (input.description) {
-        if (input.description.type === "exact") {
-          conditions.push(
-            eq(transactionTable.description, input.description.input),
-          );
-        } else if (input.description.type === "includes") {
-          conditions.push(
-            like(transactionTable.description, `%${input.description.input}%`),
-          );
-        }
-      }
-
-      // Date filter
-      if (input.date.type === "months") {
-        // Recent N months filter
-        let dateFilter;
-        if (input.date.value === 1) {
-          dateFilter = sql`${transactionTable.createdAt} >= datetime('now', '-1 month')`;
-        } else if (input.date.value === 3) {
-          dateFilter = sql`${transactionTable.createdAt} >= datetime('now', '-3 months')`;
-        } else if (input.date.value === 6) {
-          dateFilter = sql`${transactionTable.createdAt} >= datetime('now', '-6 months')`;
-        } else if (input.date.value === 12) {
-          dateFilter = sql`${transactionTable.createdAt} >= datetime('now', '-12 months')`;
-        }
-        if (dateFilter) conditions.push(dateFilter);
-      } else if (input.date.type === "custom") {
-        // Custom year-month filter
-        if (input.date.value.length > 0) {
-          const monthConditions = input.date.value.map(({ year, month }) => {
-            const monthStr = month.toString().padStart(2, "0");
-            const lastDay = new Date(year, month, 0).getDate();
-            return and(
-              gte(transactionTable.createdAt, `${year}-${monthStr}-01`),
-              lte(
-                transactionTable.createdAt,
-                `${year}-${monthStr}-${lastDay.toString().padStart(2, "0")}`,
-              ),
-            )!; // Non-null assertion since we know and() will return a value
-          });
-
-          if (monthConditions.length === 1) {
-            conditions.push(monthConditions[0]);
-          } else if (monthConditions.length > 1) {
-            // Use OR to match any of the specified months
-            const orCondition = or(...monthConditions);
-            if (orCondition) {
-              conditions.push(orCondition);
-            }
-          }
-        }
-      }
-
-      const transactions = await db
-        .select({
-          usdAmount: transactionTable.usdAmount,
-          createdAt: transactionTable.createdAt,
-          accountId: accountTable.id,
-          type: transactionTable.type,
-        })
-        .from(transactionTable)
-        .innerJoin(
-          accountTable,
-          eq(transactionTable.accountId, accountTable.id),
-        )
-        .where(and(...conditions))
-        .all();
+      const transactions = await getFilteredTransactions(input, familyId, db);
 
       // Group transactions by month (expenses and income separately)
       const monthlyExpenseTotals: {
-        [key: string]: { amount: number; year: number; shortMonth: string };
+        [key: string]: {
+          amount: number;
+          year: number;
+          month: number;
+          shortMonth: string;
+        };
       } = {};
       const monthlyIncomeTotals: {
-        [key: string]: { amount: number; year: number; shortMonth: string };
+        [key: string]: {
+          amount: number;
+          year: number;
+          month: number;
+          shortMonth: string;
+        };
       } = {};
 
-      const monthNames = [
-        "Jan",
-        "Feb",
-        "Mar",
-        "Apr",
-        "May",
-        "Jun",
-        "Jul",
-        "Aug",
-        "Sep",
-        "Oct",
-        "Nov",
-        "Dec",
-      ];
-
       transactions.forEach((transaction) => {
-        const date = new Date(transaction.createdAt);
-        const year = date.getFullYear();
-        const month = date.getMonth() + 1;
-        const shortMonth = monthNames[month - 1];
-        const monthKey = `${shortMonth} ${year}`;
+        if (!transaction.isCountable) return;
+
+        const dt = DateTime.fromISO(transaction.createdAt);
+        const monthKey = dt.toFormat("MMM yyyy");
+        const shortMonth = dt.toFormat("MMM");
+        const year = dt.year;
+        const month = dt.month;
 
         if (transaction.type === "expense") {
           if (!monthlyExpenseTotals[monthKey]) {
             monthlyExpenseTotals[monthKey] = {
               amount: 0,
               year,
+              month,
               shortMonth,
             };
           }
@@ -294,6 +290,7 @@ export const expenseRouter = t.router({
             monthlyIncomeTotals[monthKey] = {
               amount: 0,
               year,
+              month,
               shortMonth,
             };
           }
@@ -302,25 +299,20 @@ export const expenseRouter = t.router({
       });
 
       // Convert to array and sort by newest first (expenses only for main data)
-      const filteredMonthlyData = Object.keys(monthlyExpenseTotals)
-        .map((monthKey) => {
-          const monthData = monthlyExpenseTotals[monthKey];
-          return {
-            month: monthKey,
-            shortMonth: monthData.shortMonth,
-            monthNumber: monthNames.indexOf(monthData.shortMonth) + 1,
-            amount: Math.round(monthData.amount),
-            year: monthData.year,
-          };
-        })
+      const filteredMonthlyData = Object.values(monthlyExpenseTotals)
+        .map((monthData) => ({
+          month: `${monthData.shortMonth} ${monthData.year}`,
+          shortMonth: monthData.shortMonth,
+          monthNumber: monthData.month,
+          amount: Math.round(monthData.amount),
+          year: monthData.year,
+        }))
         .sort((a, b) => {
           // Sort by year first (descending), then by month (descending)
           if (a.year !== b.year) {
             return b.year - a.year;
           }
-          const aMonthIndex = monthNames.indexOf(a.shortMonth);
-          const bMonthIndex = monthNames.indexOf(b.shortMonth);
-          return bMonthIndex - aMonthIndex;
+          return b.monthNumber - a.monthNumber;
         });
 
       const maxAmount = Math.max(
@@ -353,94 +345,21 @@ export const expenseRouter = t.router({
       const db = getDb();
       const familyId = ctx.user.familyId;
 
-      // Build query conditions
-      const conditions = [eq(accountTable.familyId, familyId)];
-
-      // Account filter
-      conditions.push(inArray(accountTable.id, input.accounts));
-
-      // Description filter
-      if (input.description) {
-        if (input.description.type === "exact") {
-          conditions.push(
-            eq(transactionTable.description, input.description.input),
-          );
-        } else if (input.description.type === "includes") {
-          conditions.push(
-            like(transactionTable.description, `%${input.description.input}%`),
-          );
-        }
-      }
-
-      // Date filter
-      if (input.date.type === "months") {
-        // Recent N months filter
-        let dateFilter;
-        if (input.date.value === 1) {
-          dateFilter = sql`${transactionTable.createdAt} >= datetime('now', '-1 month')`;
-        } else if (input.date.value === 3) {
-          dateFilter = sql`${transactionTable.createdAt} >= datetime('now', '-3 months')`;
-        } else if (input.date.value === 6) {
-          dateFilter = sql`${transactionTable.createdAt} >= datetime('now', '-6 months')`;
-        } else if (input.date.value === 12) {
-          dateFilter = sql`${transactionTable.createdAt} >= datetime('now', '-12 months')`;
-        }
-        if (dateFilter) conditions.push(dateFilter);
-      } else if (input.date.type === "custom") {
-        // Custom year-month filter
-        if (input.date.value.length > 0) {
-          const monthConditions = input.date.value.map(({ year, month }) => {
-            const monthStr = month.toString().padStart(2, "0");
-            const lastDay = new Date(year, month, 0).getDate();
-            return and(
-              gte(transactionTable.createdAt, `${year}-${monthStr}-01`),
-              lte(
-                transactionTable.createdAt,
-                `${year}-${monthStr}-${lastDay.toString().padStart(2, "0")}`,
-              ),
-            )!; // Non-null assertion since we know and() will return a value
-          });
-
-          if (monthConditions.length === 1) {
-            conditions.push(monthConditions[0]);
-          } else if (monthConditions.length > 1) {
-            // Use OR to match any of the specified months
-            const orCondition = or(...monthConditions);
-            if (orCondition) {
-              conditions.push(orCondition);
-            }
-          }
-        }
-      }
-
-      const transactions = await db
-        .select({
-          id: transactionTable.id,
-          description: transactionTable.description,
-          amount: transactionTable.amount,
-          currency: transactionTable.currency,
-          usdAmount: transactionTable.usdAmount,
-          createdAt: transactionTable.createdAt,
-          accountId: accountTable.id,
-          type: transactionTable.type,
-        })
-        .from(transactionTable)
-        .innerJoin(
-          accountTable,
-          eq(transactionTable.accountId, accountTable.id),
-        )
-        .where(and(...conditions))
-        .orderBy(desc(transactionTable.createdAt))
-        .all();
+      const transactions = (
+        await getFilteredTransactions(input, familyId, db)
+      ).sort(
+        (a, b) =>
+          new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
+      );
 
       // Calculate totals for filtered transactions (expenses and income separately)
       const totalExpenses = transactions.reduce((sum, t) => {
-        if (t.type !== "expense") return sum;
+        if (t.type !== "expense" || !t.isCountable) return sum;
         return sum + t.usdAmount;
       }, 0);
 
       const totalIncome = transactions.reduce((sum, t) => {
-        if (t.type !== "income") return sum;
+        if (t.type !== "income" || !t.isCountable) return sum;
         return sum + t.usdAmount;
       }, 0);
 
