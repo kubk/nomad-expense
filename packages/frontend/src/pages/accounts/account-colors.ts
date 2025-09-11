@@ -1,4 +1,10 @@
-export const accountColorsPalette = [
+import type { AccountColor } from "api";
+
+export const accountColorsPalette: Array<{
+  id: AccountColor;
+  bg: string;
+  text: string;
+}> = [
   { id: "blue", bg: "bg-blue-50 dark:bg-blue-950", text: "text-blue-500" },
   { id: "green", bg: "bg-green-50 dark:bg-green-950", text: "text-green-500" },
   {
@@ -35,7 +41,7 @@ export const accountColorsPalette = [
   },
 ];
 
-export const getColorById = (colorId: string) => {
+export const getColorById = (colorId: AccountColor) => {
   return (
     accountColorsPalette.find((color) => color.id === colorId) ||
     accountColorsPalette[0]

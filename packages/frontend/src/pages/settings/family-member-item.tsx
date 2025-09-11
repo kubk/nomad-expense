@@ -7,8 +7,7 @@ export function FamilyMemberItem({
 }: {
   member: {
     id: string;
-    firstName: string | null;
-    lastName: string | null;
+    name: string | null;
     username: string | null;
     avatarUrl?: string | null;
   };

@@ -1,4 +1,25 @@
 import { sqliteTable, text, integer, index } from "drizzle-orm/sqlite-core";
+import { z } from "zod";
+
+const transactionSource = ["imported", "manual"] as const;
+const transactionSourceSchema = z.enum(transactionSource);
+
+const accountColor = [
+  "blue",
+  "green",
+  "purple",
+  "red",
+  "orange",
+  "yellow",
+  "pink",
+  "teal",
+  "cyan",
+  "lime",
+  "amber",
+  "emerald",
+  "rose",
+  "gray",
+] as const;
 
 const sharedColumns = {
   id: text("id")
@@ -18,8 +39,7 @@ export const userTable = sqliteTable("user", {
   ...sharedColumns,
   familyId: text("family_id").notNull(),
   initialFamilyId: text("initial_family_id").notNull(),
-  firstName: text("first_name"),
-  lastName: text("last_name"),
+  name: text("name"),
   username: text("username"),
   avatarUrl: text("avatar_url"),
 });
@@ -31,7 +51,7 @@ export const accountTable = sqliteTable(
     familyId: text("family_id").notNull(),
     name: text("name").notNull(),
     currency: text("currency").notNull(),
-    color: text("color").notNull(),
+    color: text("color", { enum: accountColor }).notNull(),
   },
   (table) => [index("idx_account_family_id").on(table.familyId)],
 );
@@ -46,6 +66,12 @@ export const transactionTable = sqliteTable(
     description: text("description").notNull(),
     amount: integer("amount").notNull(),
     currency: text("currency").notNull(),
+    source: text("source", { enum: transactionSource })
+      .notNull()
+      .default(transactionSourceSchema.enum.manual),
+    isCountable: integer("is_countable", { mode: "boolean" })
+      .notNull()
+      .default(true),
     usdAmount: integer("usd_amount").notNull(),
     type: text("type", { enum: ["expense", "income"] })
       .notNull()
