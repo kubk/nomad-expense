@@ -1,13 +1,10 @@
 import { z } from "zod";
 import { eq, and, or, desc, gte, lte, inArray, sql, like } from "drizzle-orm";
 import { protectedProcedure, t } from "./trpc";
-import {
-  transactionTable,
-  accountTable,
-  transactionTypeSchema,
-} from "../db/schema";
+import { transactionTable, accountTable } from "../db/schema";
 import { getDb } from "../services/db";
 import { convert } from "../services/currency-converter";
+import { transactionTypeSchema } from "../db/enums";
 
 const transactionFilterSchema = z.object({
   accounts: z.array(z.string()),
