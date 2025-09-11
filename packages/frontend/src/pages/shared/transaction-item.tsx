@@ -1,4 +1,4 @@
-import { Transaction, SupportedCurrency } from "api";
+import { Transaction } from "api";
 import { formatAmount } from "../../shared/currency-formatter";
 import { formatDisplayDate } from "@/shared/format-display-date";
 import { AccountBadge } from "../accounts/account-badge";
@@ -50,12 +50,7 @@ export function TransactionItem({
           )}
         >
           <span>{isIncome ? "+" : ""}</span>
-          <span>
-            {formatAmount(
-              displayAmount,
-              transaction.currency as SupportedCurrency,
-            )}
-          </span>
+          <span>{formatAmount(displayAmount, transaction.currency)}</span>
         </div>
         {transaction.currency !== "USD" && (
           <div

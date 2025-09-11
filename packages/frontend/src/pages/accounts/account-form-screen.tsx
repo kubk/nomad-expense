@@ -96,7 +96,7 @@ export function AccountFormScreen({
       setFormData({
         name: existingAccount.name,
         color: existingAccount.color,
-        currency: existingAccount.currency as SupportedCurrency,
+        currency: existingAccount.currency,
       });
 
       // Scroll to selected color when editing
