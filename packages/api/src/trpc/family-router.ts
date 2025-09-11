@@ -23,8 +23,7 @@ export const familyRouter = t.router({
     const members = await db
       .select({
         id: userTable.id,
-        firstName: userTable.firstName,
-        lastName: userTable.lastName,
+        name: userTable.name,
         username: userTable.username,
         avatarUrl: userTable.avatarUrl,
         createdAt: userTable.createdAt,
@@ -146,8 +145,7 @@ export const familyRouter = t.router({
       // Get inviter info
       const inviter = await db
         .select({
-          firstName: userTable.firstName,
-          lastName: userTable.lastName,
+          name: userTable.name,
           username: userTable.username,
         })
         .from(userTable)

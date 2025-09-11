@@ -1,26 +1,23 @@
 export type UserLike = {
-  firstName: string | null;
-  lastName: string | null;
+  name: string | null;
   username: string | null;
   avatarUrl?: string | null;
 };
 
 export function getUserDisplayName(user: UserLike): string {
-  if (user.firstName && user.lastName) {
-    return `${user.firstName} ${user.lastName}`;
-  }
-  if (user.firstName) {
-    return user.firstName;
+  if (user.name) {
+    return user.name;
   }
   return user.username || "Unknown User";
 }
 
 export function getUserInitials(user: UserLike): string {
-  if (user.firstName && user.lastName) {
-    return `${user.firstName[0]}${user.lastName[0]}`.toUpperCase();
-  }
-  if (user.firstName) {
-    return user.firstName[0].toUpperCase();
+  if (user.name) {
+    const names = user.name.trim().split(" ");
+    if (names.length >= 2) {
+      return `${names[0][0]}${names[names.length - 1][0]}`.toUpperCase();
+    }
+    return names[0][0].toUpperCase();
   }
   if (user.username) {
     return user.username[0].toUpperCase();
