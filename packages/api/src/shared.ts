@@ -1,3 +1,5 @@
+import z from "zod";
+import { accountColorSchema, currencySchema, transactionSourceSchema, transactionTypeSchema } from "./db/schema";
 import { router } from "./trpc/router";
 export {
   type SupportedCurrency,
@@ -18,25 +20,11 @@ export type MonthlyBreakdownFull =
   RouterOutputs["expenses"]["transactionsByMonth"];
 export type TransactionsList = RouterOutputs["expenses"]["transactionsList"];
 
-// Inferred types from API responses
 export type Transaction = TransactionsList["transactions"][0];
 export type Account = RouterOutputs["accounts"]["list"][0];
 export type MonthlyData = MonthlyBreakdownFull["data"][0];
 
-export type TransactionType = "expense" | "income";
-
-export type AccountColor =
-  | "blue"
-  | "green"
-  | "purple"
-  | "red"
-  | "orange"
-  | "yellow"
-  | "pink"
-  | "teal"
-  | "cyan"
-  | "lime"
-  | "amber"
-  | "emerald"
-  | "rose"
-  | "gray";
+export type AccountColor = z.infer<typeof accountColorSchema>;
+export type Currency = z.infer<typeof currencySchema>;
+export type TransactionType = z.infer<typeof transactionTypeSchema>;
+export type TransactionSource = z.infer<typeof transactionSourceSchema>;

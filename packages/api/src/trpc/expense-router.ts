@@ -1,7 +1,11 @@
 import { z } from "zod";
 import { eq, and, or, desc, gte, lte, inArray, sql, like } from "drizzle-orm";
 import { protectedProcedure, t } from "./trpc";
-import { transactionTable, accountTable } from "../db/schema";
+import {
+  transactionTable,
+  accountTable,
+  transactionTypeSchema,
+} from "../db/schema";
 import { getDb } from "../services/db";
 import {
   convert,
@@ -608,7 +612,7 @@ export const expenseRouter = t.router({
         accountId: z.string(),
         description: z.string().min(1),
         amount: z.number(),
-        type: z.enum(["expense", "income"]),
+        type: transactionTypeSchema,
         createdAt: z.string().optional(),
       }),
     )

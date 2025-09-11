@@ -1,40 +1,12 @@
+import { currency } from "../db/schema";
+
 export type CurrencyInfo = {
   code: SupportedCurrency;
   name: string;
   symbol: string;
 };
 
-export const supportedCurrency = [
-  "USD",
-  "EUR",
-  "GBP",
-  "JPY",
-  "CNY",
-  "CAD",
-  "AUD",
-  "CHF",
-  "SEK",
-  "NOK",
-  "DKK",
-  "PLN",
-  "CZK",
-  "HUF",
-  "RUB",
-  "INR",
-  "KRW",
-  "SGD",
-  "HKD",
-  "NZD",
-  "MXN",
-  "BRL",
-  "ZAR",
-  "THB",
-  "USDT",
-  "BTC",
-  "ETH",
-] as const;
-
-export type SupportedCurrency = (typeof supportedCurrency)[number];
+export type SupportedCurrency = (typeof currency)[number];
 
 export const SUPPORTED_CURRENCIES: CurrencyInfo[] = [
   { code: "USD", name: "US Dollar", symbol: "$" },

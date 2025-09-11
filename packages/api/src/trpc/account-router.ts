@@ -1,10 +1,13 @@
 import { eq, sql, and } from "drizzle-orm";
 import { protectedProcedure, t } from "./trpc";
-import { accountTable, transactionTable } from "../db/schema";
+import {
+  accountColorSchema,
+  accountTable,
+  currencySchema,
+  transactionTable,
+} from "../db/schema";
 import { getDb } from "../services/db";
 import { z } from "zod";
-import { supportedCurrency } from "../services/currency-converter";
-import type { AccountColor } from "../shared";
 
 export const accountRouter = t.router({
   list: protectedProcedure.query(async ({ ctx }) => {
@@ -61,8 +64,8 @@ export const accountRouter = t.router({
     .input(
       z.object({
         name: z.string().min(1),
-        color: z.custom<AccountColor>(),
-        currency: z.enum(supportedCurrency),
+        color: accountColorSchema,
+        currency: currencySchema,
       }),
     )
     .mutation(async ({ ctx, input }) => {
@@ -88,7 +91,7 @@ export const accountRouter = t.router({
       z.object({
         id: z.string(),
         name: z.string().min(1),
-        color: z.custom<AccountColor>(),
+        color: accountColorSchema,
       }),
     )
     .mutation(async ({ ctx, input }) => {
