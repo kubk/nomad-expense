@@ -1,4 +1,4 @@
-import { currency } from "../db/schema";
+import { currency } from "../db/enums";
 
 export type CurrencyInfo = {
   code: SupportedCurrency;

@@ -1,5 +1,4 @@
 import z from "zod";
-import { accountColorSchema, currencySchema, transactionSourceSchema, transactionTypeSchema } from "./db/schema";
 import { router } from "./trpc/router";
 export {
   type SupportedCurrency,
@@ -9,6 +8,12 @@ export {
   convert,
 } from "./services/currency-converter";
 import type { inferRouterInputs, inferRouterOutputs } from "@trpc/server";
+import {
+  accountColorSchema,
+  currencySchema,
+  transactionSourceSchema,
+  transactionTypeSchema,
+} from "./db/enums";
 
 export type ApiRouter = typeof router;
 export type RouterInputs = inferRouterInputs<ApiRouter>;
