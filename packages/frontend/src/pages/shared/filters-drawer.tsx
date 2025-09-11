@@ -211,7 +211,7 @@ export function FiltersDrawer({
                   <div className="flex items-center justify-between mb-2">
                     <h3 className="font-medium">Bank accounts</h3>
                   </div>
-                  <div className="flex overflow-x-visible pb-3 gap-2">
+                  <div className="flex overflow-auto pb-3 gap-2">
                     {accounts.map((account) => (
                       <Button
                         key={account.id}
