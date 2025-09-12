@@ -14,7 +14,7 @@ import { NoAccountsEmptyState } from "../shared/no-accounts-empty-state";
 export function AccountsScreen() {
   const { navigate } = useRouter();
   const { data: accounts = [], isLoading } = useQuery(
-    trpc.accounts.listWithStats.queryOptions(),
+    trpc.accounts.list.queryOptions(),
   );
 
   const handleAccountClick = (accountId: string) => {
@@ -79,17 +79,13 @@ export function AccountsScreen() {
                         {account.name}
                       </h3>
                       <div className="flex items-center gap-2 mt-1.5 text-xs text-muted-foreground">
-                        <span>{account.transactionCount} transactions</span>
                         {account.lastTransactionDate && (
-                          <>
-                            <span>·</span>
-                            <span>
-                              Last:{" "}
-                              {DateTime.fromISO(
-                                account.lastTransactionDate,
-                              ).toLocaleString(DateTime.DATE_SHORT)}
-                            </span>
-                          </>
+                          <span>
+                            Last transaction:{" "}
+                            {DateTime.fromISO(
+                              account.lastTransactionDate,
+                            ).toLocaleString(DateTime.DATE_SHORT)}
+                          </span>
                         )}
                       </div>
                     </div>
