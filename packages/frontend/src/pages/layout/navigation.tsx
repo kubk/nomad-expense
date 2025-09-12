@@ -17,6 +17,7 @@ export function Navigation() {
     currentRoute.type === "transactionForm" ||
     currentRoute.type === "accountPicker" ||
     currentRoute.type === "accountForm" ||
+    currentRoute.type === "auth" ||
     currentRoute.type === "invite";
 
   const navItems: Array<{
