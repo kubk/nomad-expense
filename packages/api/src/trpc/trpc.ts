@@ -2,17 +2,23 @@ import { initTRPC, TRPCError } from "@trpc/server";
 import { FetchCreateContextFnOptions } from "@trpc/server/adapters/fetch";
 import { getUserById } from "../db/user/get-user-by-id";
 import { getEnv } from "../services/env";
+import { validateTelegramLoginWidgetData } from "../services/validate-telegram-login-widget";
+import { upsertUserByTelegramData } from "../db/user/upsert-user-by-telegram-data";
 
 export async function createContext({
   req,
   resHeaders,
 }: FetchCreateContextFnOptions) {
   let user = null;
-  if (getEnv().STAGE === "local") {
-    const userId = req.headers.get("x-user-id");
-    await new Promise((resolve) => setTimeout(resolve, 500));
-    if (userId) {
-      user = await getUserById(userId);
+  // if (getEnv().STAGE === "local") {
+  //   await new Promise((resolve) => setTimeout(resolve, 500));
+  // }
+
+  const authQuery = req.headers.get("Authorization");
+  if (authQuery) {
+    const result = validateTelegramLoginWidgetData(authQuery);
+    if (result) {
+      user = await upsertUserByTelegramData(result);
     }
   }
 

@@ -23,16 +23,20 @@ const sharedColumns = {
     .$onUpdateFn(() => new Date().toISOString()),
 };
 
-export const userTable = sqliteTable("user", {
-  ...sharedColumns,
-  familyId: text("family_id").notNull(),
-  initialFamilyId: text("initial_family_id").notNull(),
-  name: text("name"),
-  username: text("username"),
-  avatarUrl: text("avatar_url"),
-  telegramId: text("telegram_id"),
-  isAdmin: integer("is_admin", { mode: "boolean" }).notNull().default(false),
-});
+export const userTable = sqliteTable(
+  "user",
+  {
+    ...sharedColumns,
+    familyId: text("family_id").notNull(),
+    initialFamilyId: text("initial_family_id").notNull(),
+    name: text("name"),
+    username: text("username"),
+    avatarUrl: text("avatar_url"),
+    telegramId: text("telegram_id").unique(),
+    isAdmin: integer("is_admin", { mode: "boolean" }).notNull().default(false),
+  },
+  (table) => [index("idx_user_telegram_id").on(table.telegramId)],
+);
 
 export const accountTable = sqliteTable(
   "account",

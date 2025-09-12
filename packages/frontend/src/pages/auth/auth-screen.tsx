@@ -3,14 +3,17 @@ import { RouteByType } from "@/shared/stacked-router/router";
 import { ReceiptIcon } from "lucide-react";
 import { LoginButton } from "@telegram-auth/react";
 import { env } from "@/shared/env";
-import { authQueryKey } from "@/shared/api";
+import { saveAuthToken } from "@/shared/auth-token";
+import { useRouter } from "@/shared/stacked-router/router";
 
 export function AuthScreen({}: { route: RouteByType<"auth"> }) {
+  const { navigate } = useRouter();
+
   return (
     <div className="min-h-screen flex items-center bg-muted justify-center p-4">
       <Card className="w-full max-w-md">
         <CardContent className="pt-2 pb-2">
-          <div className="flex flex-col text-center space-y-4">
+          <div className="flex flex-col items-center text-center space-y-4">
             <div className="space-y-2">
               <div className="flex items-center justify-center gap-3 mb-2">
                 <div className="flex-shrink-0 w-10 h-10 bg-primary/10 rounded-full flex items-center justify-center">
@@ -27,11 +30,11 @@ export function AuthScreen({}: { route: RouteByType<"auth"> }) {
             <LoginButton
               showAvatar={false}
               cornerRadius={8}
-              buttonSize="medium"
+              buttonSize="large"
               botUsername={env.VITE_TELEGRAM_BOT_USERNAME}
               onAuthCallback={(data) => {
-                localStorage.setItem(authQueryKey, JSON.stringify(data));
-                window.location.href = "/";
+                saveAuthToken(JSON.stringify(data));
+                navigate({ type: "main" });
               }}
             />
             <p className="text-sm text-muted-foreground">
