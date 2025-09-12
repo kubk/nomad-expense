@@ -1,7 +1,5 @@
 import { initTRPC, TRPCError } from "@trpc/server";
 import { FetchCreateContextFnOptions } from "@trpc/server/adapters/fetch";
-import { getUserById } from "../db/user/get-user-by-id";
-import { getEnv } from "../services/env";
 import { validateTelegramLoginWidgetData } from "../services/validate-telegram-login-widget";
 import { upsertUserByTelegramData } from "../db/user/upsert-user-by-telegram-data";
 
