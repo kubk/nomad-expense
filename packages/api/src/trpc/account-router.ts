@@ -16,25 +16,6 @@ export const accountRouter = t.router({
         name: accountTable.name,
         currency: accountTable.currency,
         color: accountTable.color,
-      })
-      .from(accountTable)
-      .where(eq(accountTable.familyId, familyId))
-      .all();
-
-    return accounts;
-  }),
-
-  listWithStats: protectedProcedure.query(async ({ ctx }) => {
-    const db = getDb();
-    const familyId = ctx.user.familyId;
-
-    const accountsWithStats = await db
-      .select({
-        id: accountTable.id,
-        name: accountTable.name,
-        currency: accountTable.currency,
-        color: accountTable.color,
-        transactionCount: sql<number>`COALESCE(COUNT(${transactionTable.id}), 0)`,
         lastTransactionDate: sql<
           string | null
         >`MAX(${transactionTable.createdAt})`,
@@ -53,7 +34,7 @@ export const accountRouter = t.router({
       )
       .all();
 
-    return accountsWithStats;
+    return accounts;
   }),
 
   create: protectedProcedure

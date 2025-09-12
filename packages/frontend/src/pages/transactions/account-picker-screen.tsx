@@ -9,7 +9,7 @@ import { NoAccountsEmptyState } from "../shared/no-accounts-empty-state";
 
 export function AccountPickerScreen() {
   const { data: accounts = [], isLoading } = useQuery(
-    trpc.accounts.listWithStats.queryOptions(),
+    trpc.accounts.list.queryOptions(),
   );
   const { navigate } = useRouter();
 
