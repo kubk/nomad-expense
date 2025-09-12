@@ -20,7 +20,6 @@ import {
   ArrowUpDownIcon,
 } from "lucide-react";
 import { TransactionFilters } from "api";
-import { useAvailableYears } from "@/shared/hooks/use-available-years";
 import { trpc } from "@/shared/api";
 import { useQuery } from "@tanstack/react-query";
 import { CustomDatePicker } from "./custom-date-picker";
@@ -38,7 +37,6 @@ export function FiltersDrawer({
 }) {
   const [filterForm, setFilterForm] = useState<TransactionFilters>(filters);
   const [showCustomDatePicker, setShowCustomDatePicker] = useState(false);
-  const availableYears = useAvailableYears();
   const { data: accounts = [] } = useQuery(trpc.accounts.list.queryOptions());
 
   useEffect(() => {
@@ -73,17 +71,6 @@ export function FiltersDrawer({
 
   const handleApply = (filters: TransactionFilters) => {
     onApply(filters);
-    onOpenChange(false);
-  };
-
-  const handleAllTime = () => {
-    const allMonths = availableYears.flatMap((year) =>
-      Array.from({ length: 12 }, (_, i) => ({ year, month: i + 1 })),
-    );
-    onApply({
-      ...filterForm,
-      date: { type: "custom", value: allMonths },
-    });
     onOpenChange(false);
   };
 
@@ -191,14 +178,6 @@ export function FiltersDrawer({
                       <CalendarIcon className="size-4 text-muted-foreground" />
                       <h3 className="font-medium">Time period</h3>
                     </div>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={handleAllTime}
-                      className="text-sm h-6 px-2"
-                    >
-                      All time
-                    </Button>
                   </div>
                   <div className="flex overflow-x-auto pb-3 gap-2">
                     {timePeriods.map((period) => (
