@@ -52,9 +52,7 @@ export function AccountFormScreen({
   });
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
-  const { data: accounts = [] } = useQuery(
-    trpc.accounts.listWithStats.queryOptions(),
-  );
+  const { data: accounts = [] } = useQuery(trpc.accounts.list.queryOptions());
   const existingAccount = accounts.find((account) => account.id === accountId);
 
   const queryClient = useQueryClient();
@@ -63,7 +61,7 @@ export function AccountFormScreen({
     trpc.accounts.create.mutationOptions({
       onSuccess: () => {
         queryClient.invalidateQueries({
-          queryKey: trpc.accounts.listWithStats.queryKey(),
+          queryKey: trpc.accounts.list.queryKey(),
         });
       },
     }),
@@ -73,7 +71,7 @@ export function AccountFormScreen({
     trpc.accounts.update.mutationOptions({
       onSuccess: () => {
         queryClient.invalidateQueries({
-          queryKey: trpc.accounts.listWithStats.queryKey(),
+          queryKey: trpc.accounts.list.queryKey(),
         });
       },
     }),
@@ -83,7 +81,7 @@ export function AccountFormScreen({
     trpc.accounts.delete.mutationOptions({
       onSuccess: () => {
         queryClient.invalidateQueries({
-          queryKey: trpc.accounts.listWithStats.queryKey(),
+          queryKey: trpc.accounts.list.queryKey(),
         });
         navigate({ type: "accounts" });
         setShowDeleteConfirm(false);

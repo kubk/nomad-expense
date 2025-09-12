@@ -75,9 +75,7 @@ export function TransactionFormScreen({
     ),
   );
 
-  const { data: accounts = [] } = useQuery(
-    trpc.accounts.listWithStats.queryOptions(),
-  );
+  const { data: accounts = [] } = useQuery(trpc.accounts.list.queryOptions());
   const selectedAccount = accounts.find((acc) => acc.id === formData.accountId);
 
   const queryClient = useQueryClient();
@@ -111,7 +109,7 @@ export function TransactionFormScreen({
           queryKey: trpc.expenses.transactionsByMonth.queryKey(),
         });
         queryClient.invalidateQueries({
-          queryKey: trpc.accounts.listWithStats.queryKey(),
+          queryKey: trpc.accounts.list.queryKey(),
         });
       },
     }),
