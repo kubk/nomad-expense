@@ -7,6 +7,7 @@ const envSchema = z
     D1_DB_ID: z.string(),
     STAGE: z.enum(["local", "production"]),
     FRONTEND_URL: z.string(),
+    TELEGRAM_BOT_TOKEN: z.string(),
   })
   .required();
 

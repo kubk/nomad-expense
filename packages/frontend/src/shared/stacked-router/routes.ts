@@ -68,6 +68,9 @@ export const routeSchema = v.variant("type", [
     type: v.literal("invite"),
     code: v.string(),
   }),
+  v.object({
+    type: v.literal("auth"),
+  }),
 ]);
 
 export type Route = v.InferOutput<typeof routeSchema>;

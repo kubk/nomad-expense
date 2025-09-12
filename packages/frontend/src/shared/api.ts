@@ -13,16 +13,21 @@ export const queryClient = new QueryClient({
   },
 });
 
+export const authQueryKey = "authQuery";
+
 const trpcClient = createTRPCClient<ApiRouter>({
   links: [
     httpBatchLink({
       url: env.VITE_API_URL,
-      headers:
-        env.VITE_USER_ID && env.VITE_STAGE === "local"
-          ? {
-              "x-user-id": env.VITE_USER_ID,
-            }
+      headers: {
+        "x-user-id":
+          env.VITE_USER_ID && env.VITE_STAGE === "local"
+            ? env.VITE_USER_ID
+            : undefined,
+        Authorization: localStorage.getItem(authQueryKey)
+          ? localStorage.getItem(authQueryKey) || ""
           : undefined,
+      },
     }),
   ],
 });
