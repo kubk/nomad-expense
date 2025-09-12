@@ -455,10 +455,8 @@ export function TransactionFormScreen({
 
       <Drawer open={isHelpOpen} onOpenChange={setIsHelpOpen}>
         <DrawerContent>
-          <DrawerHeader className="pb-6">
-            <DrawerTitle className="self-start">
-              Why exclude transactions?
-            </DrawerTitle>
+          <DrawerHeader>
+            <DrawerTitle />
             <DrawerDescription />
           </DrawerHeader>
 
@@ -469,7 +467,7 @@ export function TransactionFormScreen({
               </div>
               <div>
                 <p className="text-md font-medium text-foreground mb-0.5">
-                  Moving money between accounts
+                  Why exclude transactions?
                 </p>
                 <p className="text-sm text-muted-foreground">
                   When you transfer money between your accounts, it's not really
