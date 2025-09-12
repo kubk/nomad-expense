@@ -3,6 +3,7 @@ import type { ApiRouter } from "api";
 import { QueryClient } from "@tanstack/react-query";
 import { createTRPCClient, httpBatchLink } from "@trpc/client";
 import { createTRPCOptionsProxy } from "@trpc/tanstack-react-query";
+import { getAuthToken } from "./auth-token";
 
 export const queryClient = new QueryClient({
   defaultOptions: {
@@ -13,21 +14,13 @@ export const queryClient = new QueryClient({
   },
 });
 
-export const authQueryKey = "authQuery";
-
 const trpcClient = createTRPCClient<ApiRouter>({
   links: [
     httpBatchLink({
       url: env.VITE_API_URL,
-      headers: {
-        "x-user-id":
-          env.VITE_USER_ID && env.VITE_STAGE === "local"
-            ? env.VITE_USER_ID
-            : undefined,
-        Authorization: localStorage.getItem(authQueryKey)
-          ? localStorage.getItem(authQueryKey) || ""
-          : undefined,
-      },
+      headers: () => ({
+        Authorization: getAuthToken(),
+      }),
     }),
   ],
 });
