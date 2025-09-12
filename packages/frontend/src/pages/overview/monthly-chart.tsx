@@ -5,9 +5,13 @@ import { useQuery } from "@tanstack/react-query";
 import { cn } from "@/lib/utils";
 import { MonthlyChartEmptyState } from "./monthly-chart-empty-state";
 import { MonthlyChartLoader } from "./monthly-chart-loader";
+import { useAccountIds } from "@/shared/hooks/use-account-ids";
+import { useRouter } from "@/shared/stacked-router/router";
 
 export function MonthlyChart() {
   const scrollContainerRef = useRef<HTMLDivElement>(null);
+  const { navigate } = useRouter();
+  const accountIds = useAccountIds();
 
   const { data: overviewData, isLoading } = useQuery(
     trpc.expenses.overview.queryOptions(),
@@ -52,6 +56,21 @@ export function MonthlyChart() {
                   <div
                     key={month.month}
                     className="flex flex-col cursor-pointer items-center min-w-[64px]"
+                    onClick={() => {
+                      navigate({
+                        type: "transactions",
+                        filters: {
+                          accounts: accountIds,
+                          date: {
+                            type: "custom",
+                            value: [
+                              { year: month.year, month: month.monthNumber },
+                            ],
+                          },
+                          order: { field: "createdAt", direction: "desc" },
+                        },
+                      });
+                    }}
                   >
                     <div className="mb-4 text-xs font-semibold text-foreground text-center font-mono">
                       {formatAmount(month.amount, "USD", {
@@ -62,7 +81,7 @@ export function MonthlyChart() {
                     {/* Chart container */}
                     <div className="relative h-[100px] flex items-end cursor-pointer rounded-lg p-1 -m-1">
                       <div
-                        className="w-10 bg-primary rounded-t-lg transition-all duration-300"
+                        className="w-10 bg-primary rounded-t-lg transition-all duration-300 hover:scale-105"
                         style={{
                           height: `${barHeight}px`,
                         }}
