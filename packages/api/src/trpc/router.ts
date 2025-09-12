@@ -24,15 +24,15 @@ export const router = t.router({
     return { success: true };
   }),
   migrateFromCsv: publicProcedure.query(async () => {
-    if (getEnv().STAGE === "local") {
-      const db = getDb();
-      await migrateFromCsv(db);
-      return { success: true };
-    }
-    return {
-      success: false,
-      error: "Migration only available in local environment",
-    };
+    // if (getEnv().STAGE === "local") {
+    const db = getDb();
+    await migrateFromCsv(db);
+    return { success: true };
+    // }
+    // return {
+    //   success: false,
+    //   error: "Migration only available in local environment",
+    // };
   }),
   users: userRouter,
   expenses: expenseRouter,
