@@ -8,6 +8,7 @@ import { OverviewScreen } from "../overview/overview-screen";
 import { SettingsScreen } from "../settings/settings-screen";
 import { FamilyScreen } from "../settings/family-screen";
 import { InviteScreen } from "../invite/invite-screen";
+import { AuthScreen } from "../auth/auth-screen";
 import { trpc } from "@/shared/api";
 import { useQuery } from "@tanstack/react-query";
 import { AnimatePresence } from "framer-motion";
@@ -58,6 +59,9 @@ export function App() {
           break;
         case "accounts":
           ScreenComponent = <AccountsScreen {...props} />;
+          break;
+        case "auth":
+          ScreenComponent = <AuthScreen {...props} />;
           break;
         default:
           return type satisfies never;
