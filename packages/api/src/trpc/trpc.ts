@@ -1,29 +1,22 @@
 import { initTRPC, TRPCError } from "@trpc/server";
 import { FetchCreateContextFnOptions } from "@trpc/server/adapters/fetch";
-import { validateTelegramLoginWidgetData } from "../services/validate-telegram-login-widget";
-import { upsertUserByTelegramData } from "../db/user/upsert-user-by-telegram-data";
+import { authenticate } from "../services/authenticate";
 
 export async function createContext({
   req,
   resHeaders,
 }: FetchCreateContextFnOptions) {
-  let user = null;
   // if (getEnv().STAGE === "local") {
   //   await new Promise((resolve) => setTimeout(resolve, 500));
   // }
 
-  const authQuery = req.headers.get("Authorization");
-  if (authQuery) {
-    const result = validateTelegramLoginWidgetData(authQuery);
-    if (result) {
-      user = await upsertUserByTelegramData(result);
-    }
-  }
+  const authResult = await authenticate(req);
 
   return {
     req,
     resHeaders,
-    user,
+    userId: authResult?.userId || null,
+    familyId: authResult?.familyId || null,
   };
 }
 
@@ -32,14 +25,15 @@ export type Context = Awaited<ReturnType<typeof createContext>>;
 export const t = initTRPC.context<Context>().create();
 
 const isAuthed = t.middleware(async ({ ctx, next }) => {
-  if (!ctx.user) {
+  if (!ctx.userId || !ctx.familyId) {
     throw new TRPCError({ code: "UNAUTHORIZED" });
   }
 
   return next({
     ctx: {
       ...ctx,
-      user: ctx.user,
+      userId: ctx.userId,
+      familyId: ctx.familyId,
     },
   });
 });

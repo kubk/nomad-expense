@@ -23,9 +23,21 @@
 		  "migrations_dir": "drizzle"
 		}
 	],
+	"kv_namespaces": [
+		{
+			"binding": "KV",
+			"id": "4f8c4ec03b6e4854983ae91786c62fc4"
+		}
+	],
 	"env": {
 		"production": {
 			"name": "expense-tracker-api",
+			"kv_namespaces": [
+				{
+					"binding": "KV",
+					"id": "4f8c4ec03b6e4854983ae91786c62fc4"
+				}
+			],
 			"d1_databases": [
 				{
 				  "binding": "DB",

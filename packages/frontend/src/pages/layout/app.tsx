@@ -19,7 +19,6 @@ import { AnimatedScreen } from "@/shared/stacked-router/animated-screen";
 import { AccountPickerScreen } from "../transactions/account-picker-screen";
 
 export function App() {
-  useQuery(trpc.users.me.queryOptions());
   useQuery(trpc.accounts.list.queryOptions());
   const { navigationStack, navigate, pop } = useRouter();
 
