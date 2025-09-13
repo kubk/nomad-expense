@@ -64,13 +64,6 @@
       "when": 1757743660256,
       "tag": "0008_open_franklin_storm",
       "breakpoints": true
-    },
-    {
-      "idx": 9,
-      "version": "6",
-      "when": 1757751306026,
-      "tag": "0009_smart_machine_man",
-      "breakpoints": true
     }
   ]
 }
