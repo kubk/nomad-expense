@@ -74,6 +74,10 @@ export const transactionTable = sqliteTable(
   },
   (table) => [
     index("idx_transaction_account_id").on(table.accountId),
+    index("idx_transaction_account_id_created_at").on(
+      table.accountId,
+      table.createdAt,
+    ),
     index("idx_transaction_type").on(table.type),
   ],
 );

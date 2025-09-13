@@ -1,0 +1,1 @@
+CREATE INDEX `idx_transaction_account_id_created_at` ON `transaction` (`account_id`,`created_at`);
