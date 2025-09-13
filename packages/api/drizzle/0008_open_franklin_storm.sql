@@ -1,0 +1,1 @@
+ALTER TABLE `account` ADD `sort` integer DEFAULT 0 NOT NULL;

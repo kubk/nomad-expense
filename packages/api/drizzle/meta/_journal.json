@@ -57,6 +57,13 @@
       "when": 1757686076355,
       "tag": "0007_flawless_silvermane",
       "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "6",
+      "when": 1757743660256,
+      "tag": "0008_open_franklin_storm",
+      "breakpoints": true
     }
   ]
 }
