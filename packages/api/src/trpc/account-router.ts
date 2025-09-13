@@ -1,4 +1,4 @@
-import { eq, sql, and, asc, max } from "drizzle-orm";
+import { eq, and, asc, desc, max } from "drizzle-orm";
 import { protectedProcedure, t } from "./trpc";
 import { accountTable, transactionTable } from "../db/schema";
 import { getDb } from "../services/db";
@@ -18,27 +18,33 @@ export const accountRouter = t.router({
         currency: accountTable.currency,
         color: accountTable.color,
         sort: accountTable.sort,
-        lastTransactionDate: sql<
-          string | null
-        >`MAX(${transactionTable.createdAt})`,
       })
       .from(accountTable)
-      .leftJoin(
-        transactionTable,
-        eq(accountTable.id, transactionTable.accountId),
-      )
       .where(eq(accountTable.familyId, familyId))
-      .groupBy(
-        accountTable.id,
-        accountTable.name,
-        accountTable.currency,
-        accountTable.color,
-        accountTable.sort,
-      )
       .orderBy(asc(accountTable.sort), asc(accountTable.createdAt))
       .all();
 
-    return accounts;
+    const transactionQueries = accounts.map((account) =>
+      db
+        .select({
+          createdAt: transactionTable.createdAt,
+        })
+        .from(transactionTable)
+        .where(eq(transactionTable.accountId, account.id))
+        .orderBy(desc(transactionTable.createdAt))
+        .limit(1),
+    );
+
+    const lastTransactions = isNonEmpty(transactionQueries)
+      ? await db.batch(transactionQueries)
+      : [];
+
+    const accountsWithLastTransaction = accounts.map((account, index) => ({
+      ...account,
+      lastTransactionDate: lastTransactions[index]?.[0]?.createdAt || null,
+    }));
+
+    return accountsWithLastTransaction;
   }),
 
   create: protectedProcedure
