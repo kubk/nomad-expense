@@ -1,22 +1,21 @@
 import { t } from "./trpc";
-import { publicProcedure, protectedProcedure } from "./trpc";
-import { getDb } from "../services/db";
-import { userTable } from "../db/schema";
+import { protectedProcedure } from "./trpc";
+import { getUserById } from "../db/user/get-user-by-id";
 
 export const userRouter = t.router({
-  list: publicProcedure.query(async () => {
-    const users = await getDb().select().from(userTable);
-    return users;
-  }),
   me: protectedProcedure.query(async ({ ctx }) => {
+    const user = await getUserById(ctx.userId);
+    if (!user) {
+      throw new Error("User not found");
+    }
     return {
-      id: ctx.user.id,
-      familyId: ctx.user.familyId,
-      name: ctx.user.name,
-      username: ctx.user.username,
-      avatarUrl: ctx.user.avatarUrl,
-      createdAt: ctx.user.createdAt,
-      updatedAt: ctx.user.updatedAt,
+      id: user.id,
+      familyId: user.familyId,
+      name: user.name,
+      username: user.username,
+      avatarUrl: user.avatarUrl,
+      createdAt: user.createdAt,
+      updatedAt: user.updatedAt,
     };
   }),
 });

@@ -3,22 +3,16 @@ import { TRPCError } from "@trpc/server";
 import { protectedProcedure, t } from "./trpc";
 import { userTable, inviteTable } from "../db/schema";
 import { getDb } from "../services/db";
+import { getUserById } from "../db/user/get-user-by-id";
+import { userCacheSet } from "../services/user-cache";
 import { z } from "zod";
 import { DateTime } from "luxon";
-
-function generateInviteCode(): string {
-  const chars = "ABCDEFGHIJKLMNPQRSTUVWXYZ123456789";
-  let result = "";
-  for (let i = 0; i < 6; i++) {
-    result += chars.charAt(Math.floor(Math.random() * chars.length));
-  }
-  return result;
-}
+import { generateInviteCode } from "../services/generate-invoice-code";
 
 export const familyRouter = t.router({
   listMembers: protectedProcedure.query(async ({ ctx }) => {
     const db = getDb();
-    const familyId = ctx.user.familyId;
+    const familyId = ctx.familyId;
 
     const members = await db
       .select({
@@ -38,8 +32,8 @@ export const familyRouter = t.router({
 
   generateInvite: protectedProcedure.mutation(async ({ ctx }) => {
     const db = getDb();
-    const userId = ctx.user.id;
-    const familyId = ctx.user.familyId;
+    const familyId = ctx.familyId;
+    const userId = ctx.userId;
 
     // Invalidate any existing active invites
     await db
@@ -76,7 +70,7 @@ export const familyRouter = t.router({
 
   getActiveInvite: protectedProcedure.query(async ({ ctx }) => {
     const db = getDb();
-    const familyId = ctx.user.familyId;
+    const familyId = ctx.familyId;
 
     const activeInvite = await db
       .select({
@@ -106,7 +100,7 @@ export const familyRouter = t.router({
     )
     .mutation(async ({ ctx, input }) => {
       const db = getDb();
-      const userId = ctx.user.id;
+      const userId = ctx.userId;
 
       // Find valid invite
       const invite = await db
@@ -168,6 +162,15 @@ export const familyRouter = t.router({
           })
           .where(eq(inviteTable.id, invite.id)),
       ]);
+
+      const user = await getUserById(userId);
+      // Update cache with new familyId
+      if (user?.telegramId) {
+        await userCacheSet(user.telegramId, {
+          userId,
+          familyId: invite.familyId,
+        });
+      }
 
       return {
         success: true,

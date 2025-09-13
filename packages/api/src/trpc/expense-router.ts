@@ -101,7 +101,7 @@ const getFilteredTransactions = async (
     }
   }
 
-  return await db
+  return db
     .select({
       id: transactionTable.id,
       description: transactionTable.description,
@@ -122,7 +122,7 @@ const getFilteredTransactions = async (
 export const expenseRouter = t.router({
   overview: protectedProcedure.query(async ({ ctx }) => {
     const db = getDb();
-    const familyId = ctx.user.familyId;
+    const familyId = ctx.familyId;
 
     // Get all transactions for the user (for overview chart data)
     const allTransactions = await db
@@ -248,7 +248,7 @@ export const expenseRouter = t.router({
     .input(transactionFilterSchema)
     .query(async ({ ctx, input }) => {
       const db = getDb();
-      const familyId = ctx.user.familyId;
+      const familyId = ctx.familyId;
 
       const transactions = await getFilteredTransactions(input, familyId, db);
 
@@ -356,7 +356,7 @@ export const expenseRouter = t.router({
     .input(transactionFilterSchema)
     .query(async ({ ctx, input }) => {
       const db = getDb();
-      const familyId = ctx.user.familyId;
+      const familyId = ctx.familyId;
 
       const transactions = (
         await getFilteredTransactions(input, familyId, db)
@@ -405,7 +405,7 @@ export const expenseRouter = t.router({
     .input(z.object({ id: z.string() }))
     .query(async ({ ctx, input }) => {
       const db = getDb();
-      const familyId = ctx.user.familyId;
+      const familyId = ctx.familyId;
 
       const transaction = await db
         .select({
@@ -462,7 +462,7 @@ export const expenseRouter = t.router({
     )
     .mutation(async ({ ctx, input }) => {
       const db = getDb();
-      const familyId = ctx.user.familyId;
+      const familyId = ctx.familyId;
 
       // Verify transaction belongs to user and get account currency
       const existingTransaction = await db
@@ -516,7 +516,7 @@ export const expenseRouter = t.router({
     .input(z.object({ id: z.string() }))
     .mutation(async ({ ctx, input }) => {
       const db = getDb();
-      const familyId = ctx.user.familyId;
+      const familyId = ctx.familyId;
 
       // Verify transaction belongs to user
       const existingTransaction = await db
@@ -557,7 +557,7 @@ export const expenseRouter = t.router({
     )
     .mutation(async ({ ctx, input }) => {
       const db = getDb();
-      const familyId = ctx.user.familyId;
+      const familyId = ctx.familyId;
 
       // Verify account belongs to user
       const account = await db
