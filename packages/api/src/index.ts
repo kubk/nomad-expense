@@ -4,11 +4,13 @@ import { addCorsHeaders } from "./lib/cloudflare/cors";
 import { setEnv } from "./services/env";
 import { router } from "./trpc/router";
 import { setDb } from "./services/db";
+import { setKv } from "./services/kv";
 
 export default {
   async fetch(request, env) {
     setEnv(env);
     setDb(env.DB);
+    setKv(env.KV);
 
     if (request.method === "OPTIONS") {
       return addCorsHeaders();

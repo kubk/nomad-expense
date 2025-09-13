@@ -9,7 +9,7 @@ import { isNonEmpty } from "../db/batch";
 export const accountRouter = t.router({
   list: protectedProcedure.query(async ({ ctx }) => {
     const db = getDb();
-    const familyId = ctx.user.familyId;
+    const familyId = ctx.familyId;
 
     const accounts = await db
       .select({
@@ -51,7 +51,7 @@ export const accountRouter = t.router({
     )
     .mutation(async ({ ctx, input }) => {
       const db = getDb();
-      const familyId = ctx.user.familyId;
+      const familyId = ctx.familyId;
 
       const maxSortResult = await db
         .select({ maxSort: max(accountTable.sort) })
@@ -86,7 +86,7 @@ export const accountRouter = t.router({
     )
     .mutation(async ({ ctx, input }) => {
       const db = getDb();
-      const familyId = ctx.user.familyId;
+      const familyId = ctx.familyId;
 
       const result = await db
         .update(accountTable)
@@ -114,7 +114,7 @@ export const accountRouter = t.router({
     )
     .mutation(async ({ ctx, input }) => {
       const db = getDb();
-      const familyId = ctx.user.familyId;
+      const familyId = ctx.familyId;
 
       const result = await db
         .delete(accountTable)
@@ -138,7 +138,7 @@ export const accountRouter = t.router({
     )
     .mutation(async ({ ctx, input }) => {
       const db = getDb();
-      const familyId = ctx.user.familyId;
+      const familyId = ctx.familyId;
 
       const updateStatements = input.accountIds.map((accountId, index) =>
         db
