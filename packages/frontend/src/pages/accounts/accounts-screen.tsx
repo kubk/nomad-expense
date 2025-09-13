@@ -1,23 +1,56 @@
-import { PlusIcon, Loader2 } from "lucide-react";
+import {
+  PlusIcon,
+  Loader2,
+  MoreVerticalIcon,
+  ChevronUpIcon,
+  ChevronDownIcon,
+  ArrowUpDownIcon,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
+import {
+  DropDrawer,
+  DropDrawerContent,
+  DropDrawerItem,
+  DropDrawerTrigger,
+} from "@/components/ui/dropdrawer";
 import { getCurrencySymbol } from "../../shared/currency-formatter";
 import { PageHeader } from "../shared/page-header";
 import { trpc } from "@/shared/api";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Page } from "../shared/page";
 import { getColorById } from "./account-colors";
 import { cn } from "@/lib/utils";
 import { DateTime } from "luxon";
 import { useRouter } from "@/shared/stacked-router/router";
 import { NoAccountsEmptyState } from "../shared/no-accounts-empty-state";
+import { useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 
 export function AccountsScreen() {
   const { navigate } = useRouter();
+  const queryClient = useQueryClient();
+  const [reorderedAccounts, setReorderedAccounts] = useState<
+    typeof accounts | null
+  >(null);
+
   const { data: accounts = [], isLoading } = useQuery(
     trpc.accounts.list.queryOptions(),
   );
 
+  const reorderMutation = useMutation(
+    trpc.accounts.reorder.mutationOptions({
+      onSuccess: () => {
+        const queryKey = trpc.accounts.list.queryKey();
+        queryClient.invalidateQueries({ queryKey });
+        setReorderedAccounts(null);
+      },
+    }),
+  );
+
+  const isReorderMode = reorderedAccounts !== null;
+
   const handleAccountClick = (accountId: string) => {
+    if (isReorderMode) return; // Don't navigate in reorder mode
     navigate({ type: "accountForm", accountId });
   };
 
@@ -25,77 +58,223 @@ export function AccountsScreen() {
     navigate({ type: "accountForm" });
   };
 
-  return (
-    <Page
-      bg="secondary"
-      title={
-        <PageHeader
-          title="Accounts"
-          rightSlot={
-            <Button variant="ghost" size="sm" onClick={handleAddAccountClick}>
-              <PlusIcon className="w-4 h-4" />
-            </Button>
-          }
-        />
-      }
-    >
-      {isLoading ? (
-        <div className="flex justify-center items-center py-12">
-          <Loader2 className="w-8 h-8 animate-spin text-muted-foreground" />
-        </div>
-      ) : (
-        <div className="flex flex-col gap-4">
-          {accounts.length === 0 && (
-            <div className="mt-[35%]">
-              <NoAccountsEmptyState />
-            </div>
-          )}
+  const handleReorderClick = () => {
+    setReorderedAccounts([...accounts]);
+  };
 
-          {accounts.map((account) => {
-            const colorInfo = getColorById(account.color);
-            return (
-              <button
-                key={account.id}
-                className="w-full bg-card rounded-2xl shadow-sm transition-colors text-left active:scale-95 transition-transform"
-                onClick={() => handleAccountClick(account.id)}
-              >
-                <div className="p-5">
-                  <div className="flex items-start gap-4">
-                    <div className="relative">
-                      <div
-                        className={cn("w-12 h-12 rounded-xl", colorInfo.bg)}
-                      />
-                      <div
-                        className={cn(
-                          "absolute inset-0 w-12 h-12 rounded-xl flex items-center justify-center text-xl font-bold",
-                          colorInfo.text,
-                        )}
-                      >
-                        {getCurrencySymbol(account.currency)}
+  const handleCancelReorder = () => {
+    setReorderedAccounts(null);
+  };
+
+  const handleSaveReorder = () => {
+    if (!reorderedAccounts) return;
+    const accountIds = reorderedAccounts.map((account) => account.id);
+    reorderMutation.mutate({ accountIds });
+  };
+
+  const moveAccount = (index: number, direction: "up" | "down") => {
+    if (!reorderedAccounts) return;
+    const newAccounts = [...reorderedAccounts];
+    const targetIndex = direction === "up" ? index - 1 : index + 1;
+
+    if (targetIndex < 0 || targetIndex >= newAccounts.length) return;
+
+    [newAccounts[index], newAccounts[targetIndex]] = [
+      newAccounts[targetIndex],
+      newAccounts[index],
+    ];
+    setReorderedAccounts(newAccounts);
+  };
+
+  const displayAccounts = reorderedAccounts ?? accounts;
+  const showDropdown = accounts.length >= 2;
+
+  return (
+    <>
+      <Page
+        bg="secondary"
+        title={
+          <PageHeader
+            title="Accounts"
+            rightSlot={
+              !isReorderMode && showDropdown ? (
+                <DropDrawer>
+                  <DropDrawerTrigger asChild>
+                    <Button variant="ghost" size="sm">
+                      <MoreVerticalIcon className="w-4 h-4" />
+                    </Button>
+                  </DropDrawerTrigger>
+                  <DropDrawerContent align="end">
+                    <DropDrawerItem
+                      className="cursor-pointer"
+                      icon={<PlusIcon className="h-4 w-4" />}
+                      onClick={handleAddAccountClick}
+                    >
+                      Create account
+                    </DropDrawerItem>
+                    <DropDrawerItem
+                      className="cursor-pointer"
+                      icon={<ArrowUpDownIcon className="h-4 w-4" />}
+                      onClick={handleReorderClick}
+                    >
+                      Reorder accounts
+                    </DropDrawerItem>
+                  </DropDrawerContent>
+                </DropDrawer>
+              ) : !isReorderMode ? (
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={handleAddAccountClick}
+                >
+                  <PlusIcon className="w-4 h-4" />
+                </Button>
+              ) : null
+            }
+          />
+        }
+      >
+        {isLoading ? (
+          <div className="flex justify-center items-center py-12">
+            <Loader2 className="w-8 h-8 animate-spin text-muted-foreground" />
+          </div>
+        ) : (
+          <div className="flex flex-col gap-4">
+            {displayAccounts.length === 0 && !isReorderMode && (
+              <div className="mt-[35%]">
+                <NoAccountsEmptyState />
+              </div>
+            )}
+
+            {displayAccounts.map((account, index) => {
+              const colorInfo = getColorById(account.color);
+              const AccountCard = isReorderMode ? motion.div : "div";
+
+              return (
+                <AccountCard
+                  key={account.id}
+                  layout={isReorderMode}
+                  className="w-full bg-card rounded-2xl shadow-sm transition-colors"
+                >
+                  <div className="flex items-center">
+                    <button
+                      className={cn(
+                        "flex-1 text-left p-5 transition-transform",
+                        !isReorderMode && "active:scale-95",
+                      )}
+                      onClick={() => handleAccountClick(account.id)}
+                      disabled={isReorderMode}
+                    >
+                      <div className="flex items-start gap-4">
+                        <div className="relative">
+                          <div
+                            className={cn("w-12 h-12 rounded-xl", colorInfo.bg)}
+                          />
+                          <div
+                            className={cn(
+                              "absolute inset-0 w-12 h-12 rounded-xl flex items-center justify-center text-xl font-bold",
+                              colorInfo.text,
+                            )}
+                          >
+                            {getCurrencySymbol(account.currency)}
+                          </div>
+                        </div>
+                        <div className="flex-1">
+                          <h3 className="font-semibold text-foreground text-lg">
+                            {account.name}
+                          </h3>
+                          <div className="flex items-center gap-2 mt-1.5 text-xs text-muted-foreground">
+                            {account.lastTransactionDate && (
+                              <span>
+                                Last transaction:{" "}
+                                {DateTime.fromISO(
+                                  account.lastTransactionDate,
+                                ).toLocaleString(DateTime.DATE_SHORT)}
+                              </span>
+                            )}
+                          </div>
+                        </div>
                       </div>
-                    </div>
-                    <div className="flex-1">
-                      <h3 className="font-semibold text-foreground text-lg">
-                        {account.name}
-                      </h3>
-                      <div className="flex items-center gap-2 mt-1.5 text-xs text-muted-foreground">
-                        {account.lastTransactionDate && (
-                          <span>
-                            Last transaction:{" "}
-                            {DateTime.fromISO(
-                              account.lastTransactionDate,
-                            ).toLocaleString(DateTime.DATE_SHORT)}
-                          </span>
-                        )}
-                      </div>
-                    </div>
+                    </button>
+
+                    <AnimatePresence>
+                      {isReorderMode && (
+                        <motion.div
+                          initial={{ opacity: 0 }}
+                          animate={{ opacity: 1 }}
+                          exit={{ opacity: 0 }}
+                          transition={{
+                            delay: index * 0.05,
+                          }}
+                          className="flex flex-col gap-1 py-2 px-3"
+                        >
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => moveAccount(index, "up")}
+                            disabled={index === 0}
+                            className="h-8 w-8 p-0"
+                          >
+                            <ChevronUpIcon className="w-4 h-4" />
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => moveAccount(index, "down")}
+                            disabled={index === displayAccounts.length - 1}
+                            className="h-8 w-8 p-0"
+                          >
+                            <ChevronDownIcon className="w-4 h-4" />
+                          </Button>
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
                   </div>
-                </div>
-              </button>
-            );
-          })}
-        </div>
-      )}
-    </Page>
+                </AccountCard>
+              );
+            })}
+          </div>
+        )}
+      </Page>
+
+      {/* Bottom action buttons for reorder mode */}
+      <AnimatePresence>
+        {isReorderMode && (
+          <motion.div
+            initial={{ y: "100%" }}
+            animate={{ y: 0 }}
+            exit={{ y: "100%" }}
+            transition={{
+              ease: "easeInOut",
+            }}
+            className="fixed z-50 bottom-0 left-0 right-0 bg-background border-t border-border px-4 py-5"
+          >
+            <div className="flex gap-3 max-w-sm mx-auto">
+              <Button
+                variant="outline"
+                className="flex-1"
+                size="lg"
+                onClick={handleCancelReorder}
+              >
+                Cancel
+              </Button>
+              <Button
+                variant="default"
+                className="flex-1"
+                size="lg"
+                onClick={handleSaveReorder}
+                disabled={reorderMutation.isPending}
+              >
+                {reorderMutation.isPending ? (
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                ) : (
+                  "Save"
+                )}
+              </Button>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </>
   );
 }
