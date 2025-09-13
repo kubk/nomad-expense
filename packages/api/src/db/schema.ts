@@ -47,6 +47,7 @@ export const accountTable = sqliteTable(
     currency: text("currency", { enum: currency }).notNull(),
     color: text("color", { enum: accountColor }).notNull(),
     bankType: text("bank_type", { enum: bank }),
+    sort: integer("sort").notNull().default(0),
   },
   (table) => [index("idx_account_family_id").on(table.familyId)],
 );
