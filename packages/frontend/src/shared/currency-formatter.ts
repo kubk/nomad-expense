@@ -30,12 +30,10 @@ export function formatAmount(
     return `${symbol}${formattedAmount}`;
   }
 
-  let locale: string | undefined;
-  if (currency === "RUB") locale = "ru-RU";
-
-  return new Intl.NumberFormat(locale, {
+  return new Intl.NumberFormat(undefined, {
     style: "currency",
     currency: currency,
+    currencyDisplay: "narrowSymbol",
     minimumFractionDigits: showFractions ? 2 : 0,
     maximumFractionDigits: showFractions ? 2 : 0,
   }).format(decimalAmount);
