@@ -15,7 +15,7 @@ export function AccountPickerScreen() {
 
   return (
     <Page title="Select account" bg="secondary">
-      <div className="flex flex-col gap-4">
+      <div className="flex flex-col gap-2">
         {accounts.length === 0 && !isLoading ? (
           <div className="mt-[35%]">
             <NoAccountsEmptyState />
