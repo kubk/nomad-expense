@@ -27,6 +27,7 @@ import { trpc } from "@/shared/api";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { TransactionType } from "api";
 import { DateTime } from "luxon";
+import { getCurrencySymbol } from "@/shared/currency-formatter";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Switch } from "@/components/ui/switch";
 import {
@@ -325,7 +326,7 @@ export function TransactionFormScreen({
                 {isTransactionLoading ? (
                   <>
                     <Skeleton className="h-9.5 flex-1" />
-                    <Skeleton className="h-9.5 w-16" />
+                    <Skeleton className="h-9.5 w-18" />
                   </>
                 ) : (
                   <>
@@ -343,9 +344,15 @@ export function TransactionFormScreen({
                       className="flex-1"
                     />
                     <div className="px-3 py-2 border border-input bg-muted rounded-md text-sm text-muted-foreground min-w-16 flex items-center justify-center">
-                      {isEdit && transaction
-                        ? transaction.currency
-                        : selectedAccount?.currency}
+                      {(() => {
+                        const currencyCode =
+                          isEdit && transaction
+                            ? transaction.currency
+                            : selectedAccount?.currency;
+                        if (!currencyCode) return "";
+                        const symbol = getCurrencySymbol(currencyCode);
+                        return `${symbol} · ${currencyCode}`;
+                      })()}
                     </div>
                   </>
                 )}
