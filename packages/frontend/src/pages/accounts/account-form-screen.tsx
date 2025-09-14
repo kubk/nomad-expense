@@ -155,9 +155,7 @@ export function AccountFormScreen({
   };
 
   const isLoading =
-    createAccountMutation.isPending ||
-    updateAccountMutation.isPending ||
-    deleteAccountMutation.isPending;
+    createAccountMutation.isPending || updateAccountMutation.isPending;
 
   return (
     <Page title={isEdit ? "Edit account" : "Add account"}>
@@ -281,31 +279,27 @@ export function AccountFormScreen({
         />
 
         <Footer>
-          <div className="flex gap-2">
-            <Button
-              size="lg"
-              variant="outline"
-              type="button"
-              className="flex-1"
-              onClick={pop}
-              disabled={isLoading}
-            >
-              <ArrowLeftIcon className="w-4 h-4" />
-              Back
-            </Button>
-            <Button
-              className="flex-1"
-              size="lg"
-              type="submit"
-              disabled={!formData.name.trim() || isLoading}
-            >
-              {isLoading ? (
-                <Loader2Icon className="h-4 w-4 animate-spin" />
-              ) : (
-                "Save"
-              )}
-            </Button>
-          </div>
+          <Button
+            size="lg"
+            variant="outline"
+            type="button"
+            onClick={pop}
+            disabled={isLoading}
+          >
+            <ArrowLeftIcon className="w-4 h-4" />
+            Back
+          </Button>
+          <Button
+            size="lg"
+            type="submit"
+            disabled={!formData.name.trim() || isLoading}
+          >
+            {isLoading ? (
+              <Loader2Icon className="h-4 w-4 animate-spin" />
+            ) : (
+              "Save"
+            )}
+          </Button>
         </Footer>
       </form>
     </Page>
