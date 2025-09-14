@@ -1,10 +1,9 @@
-import { eq, and, asc, desc, max } from "drizzle-orm";
+import { eq, and, asc, max } from "drizzle-orm";
 import { protectedProcedure, t } from "./trpc";
 import { accountTable, transactionTable } from "../db/schema";
 import { getDb } from "../services/db";
 import { z } from "zod";
 import { accountColorSchema, currencySchema } from "../db/enums";
-import { isNonEmpty } from "../db/batch";
 
 export const accountRouter = t.router({
   list: protectedProcedure.query(async ({ ctx }) => {
@@ -18,33 +17,25 @@ export const accountRouter = t.router({
         currency: accountTable.currency,
         color: accountTable.color,
         sort: accountTable.sort,
+        lastTransactionDate: max(transactionTable.createdAt),
       })
       .from(accountTable)
+      .leftJoin(
+        transactionTable,
+        eq(accountTable.id, transactionTable.accountId),
+      )
       .where(eq(accountTable.familyId, familyId))
-      .orderBy(asc(accountTable.sort), asc(accountTable.createdAt))
-      .all();
+      .groupBy(
+        accountTable.id,
+        accountTable.name,
+        accountTable.currency,
+        accountTable.color,
+        accountTable.sort,
+        accountTable.createdAt,
+      )
+      .orderBy(asc(accountTable.sort), asc(accountTable.createdAt));
 
-    const transactionQueries = accounts.map((account) =>
-      db
-        .select({
-          createdAt: transactionTable.createdAt,
-        })
-        .from(transactionTable)
-        .where(eq(transactionTable.accountId, account.id))
-        .orderBy(desc(transactionTable.createdAt))
-        .limit(1),
-    );
-
-    const lastTransactions = isNonEmpty(transactionQueries)
-      ? await db.batch(transactionQueries)
-      : [];
-
-    const accountsWithLastTransaction = accounts.map((account, index) => ({
-      ...account,
-      lastTransactionDate: lastTransactions[index]?.[0]?.createdAt || null,
-    }));
-
-    return accountsWithLastTransaction;
+    return accounts;
   }),
 
   create: protectedProcedure
@@ -59,15 +50,17 @@ export const accountRouter = t.router({
       const db = getDb();
       const familyId = ctx.familyId;
 
-      const maxSortResult = await db
+      const maxSortResults = await db
         .select({ maxSort: max(accountTable.sort) })
         .from(accountTable)
         .where(eq(accountTable.familyId, familyId))
-        .get();
+        .limit(1);
+
+      const maxSortResult = maxSortResults[0];
 
       const nextSort = (maxSortResult?.maxSort ?? -1) + 1;
 
-      const result = await db
+      const results = await db
         .insert(accountTable)
         .values({
           familyId,
@@ -76,8 +69,9 @@ export const accountRouter = t.router({
           currency: input.currency,
           sort: nextSort,
         })
-        .returning({ id: accountTable.id })
-        .get();
+        .returning({ id: accountTable.id });
+
+      const result = results[0];
 
       return result;
     }),
@@ -94,7 +88,7 @@ export const accountRouter = t.router({
       const db = getDb();
       const familyId = ctx.familyId;
 
-      const result = await db
+      const results = await db
         .update(accountTable)
         .set({
           name: input.name,
@@ -106,8 +100,9 @@ export const accountRouter = t.router({
             eq(accountTable.id, input.id),
           ),
         )
-        .returning({ id: accountTable.id })
-        .get();
+        .returning({ id: accountTable.id });
+
+      const result = results[0];
 
       return result;
     }),
@@ -122,7 +117,7 @@ export const accountRouter = t.router({
       const db = getDb();
       const familyId = ctx.familyId;
 
-      const result = await db
+      const results = await db
         .delete(accountTable)
         .where(
           and(
@@ -130,8 +125,9 @@ export const accountRouter = t.router({
             eq(accountTable.id, input.id),
           ),
         )
-        .returning({ id: accountTable.id })
-        .get();
+        .returning({ id: accountTable.id });
+
+      const result = results[0];
 
       return result;
     }),
@@ -159,8 +155,26 @@ export const accountRouter = t.router({
           .returning({ id: accountTable.id }),
       );
 
-      if (isNonEmpty(updateStatements)) {
-        const results = await db.batch(updateStatements);
+      if (updateStatements.length > 0) {
+        const results = await db.transaction(async (tx) => {
+          const txResults = [];
+          for (const [accountId, index] of input.accountIds.map(
+            (id, idx) => [id, idx] as const,
+          )) {
+            const result = await tx
+              .update(accountTable)
+              .set({ sort: index })
+              .where(
+                and(
+                  eq(accountTable.familyId, familyId),
+                  eq(accountTable.id, accountId),
+                ),
+              )
+              .returning({ id: accountTable.id });
+            txResults.push(result);
+          }
+          return txResults;
+        });
         return results;
       }
 

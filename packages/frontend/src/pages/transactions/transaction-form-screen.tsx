@@ -52,7 +52,7 @@ export function TransactionFormScreen({
 }: {
   route: RouteByType<"transactionForm">;
 }) {
-  const { pop } = useRouter();
+  const { pop, navigate } = useRouter();
   const transactionId = route.transactionId;
   const isEdit = Boolean(transactionId);
 
@@ -173,6 +173,7 @@ export function TransactionFormScreen({
         type: formData.type,
         isCountable: formData.isCountable,
       });
+      pop();
     } else {
       let isoString: string | undefined = undefined;
       if (formData.date && formData.time) {
@@ -192,8 +193,9 @@ export function TransactionFormScreen({
         type: formData.type,
         createdAt: isoString || new Date().toISOString(),
       });
+
+      navigate({ type: "main" });
     }
-    pop();
   };
 
   const handleDelete = async () => {

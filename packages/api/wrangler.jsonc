@@ -15,14 +15,6 @@
 	"dev": {
 		"port": 8794
 	},
-	"d1_databases": [
-		{
-		  "binding": "DB",
-		  "database_name": "expense-tracker",
-		  "database_id": "n/a",
-		  "migrations_dir": "drizzle"
-		}
-	],
 	"kv_namespaces": [
 		{
 			"binding": "KV",
@@ -36,14 +28,6 @@
 				{
 					"binding": "KV",
 					"id": "4f8c4ec03b6e4854983ae91786c62fc4"
-				}
-			],
-			"d1_databases": [
-				{
-				  "binding": "DB",
-				  "database_name": "expense-tracker",
-				  "database_id": "81c81638-2dab-420d-9af7-3ce5407ec7ac",
-				  "migrations_dir": "drizzle"
 				}
 			]
 		}
