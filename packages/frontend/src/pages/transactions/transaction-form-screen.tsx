@@ -161,7 +161,6 @@ export function TransactionFormScreen({
           hour: parseInt(formData.time.split(":")[0]),
           minute: parseInt(formData.time.split(":")[1]),
           second: 0,
-          millisecond: 0,
         });
         isoString = dateTime.toISO() || undefined;
       }
@@ -182,7 +181,6 @@ export function TransactionFormScreen({
           hour: parseInt(formData.time.split(":")[0]),
           minute: parseInt(formData.time.split(":")[1]),
           second: 0,
-          millisecond: 0,
         });
         isoString = dateTime.toISO() || undefined;
       }
