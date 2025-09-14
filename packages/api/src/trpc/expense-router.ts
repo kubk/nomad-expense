@@ -65,13 +65,13 @@ const getFilteredTransactions = async (
     // Recent N months filter
     let dateFilter;
     if (input.date.value === 1) {
-      dateFilter = sql`${transactionTable.createdAt} >= datetime('now', '-1 month')`;
+      dateFilter = sql`${transactionTable.createdAt} >= NOW() - INTERVAL '1 month'`;
     } else if (input.date.value === 3) {
-      dateFilter = sql`${transactionTable.createdAt} >= datetime('now', '-3 months')`;
+      dateFilter = sql`${transactionTable.createdAt} >= NOW() - INTERVAL '3 months'`;
     } else if (input.date.value === 6) {
-      dateFilter = sql`${transactionTable.createdAt} >= datetime('now', '-6 months')`;
+      dateFilter = sql`${transactionTable.createdAt} >= NOW() - INTERVAL '6 months'`;
     } else if (input.date.value === 12) {
-      dateFilter = sql`${transactionTable.createdAt} >= datetime('now', '-12 months')`;
+      dateFilter = sql`${transactionTable.createdAt} >= NOW() - INTERVAL '12 months'`;
     }
     if (dateFilter) conditions.push(dateFilter);
   } else if (input.date.type === "custom") {
@@ -81,10 +81,12 @@ const getFilteredTransactions = async (
         const monthStr = month.toString().padStart(2, "0");
         const lastDay = new Date(year, month, 0).getDate();
         return and(
-          gte(transactionTable.createdAt, `${year}-${monthStr}-01`),
+          gte(transactionTable.createdAt, new Date(`${year}-${monthStr}-01`)),
           lte(
             transactionTable.createdAt,
-            `${year}-${monthStr}-${lastDay.toString().padStart(2, "0")}`,
+            new Date(
+              `${year}-${monthStr}-${lastDay.toString().padStart(2, "0")}`,
+            ),
           ),
         )!; // Non-null assertion since we know and() will return a value
       });
@@ -115,8 +117,7 @@ const getFilteredTransactions = async (
     })
     .from(transactionTable)
     .innerJoin(accountTable, eq(transactionTable.accountId, accountTable.id))
-    .where(and(...conditions))
-    .all();
+    .where(and(...conditions));
 };
 
 export const expenseRouter = t.router({
@@ -138,10 +139,9 @@ export const expenseRouter = t.router({
           eq(transactionTable.type, "expense"),
           eq(transactionTable.isCountable, true),
         ),
-      )
-      .all();
+      );
 
-    // Get last 30 days expenses total using SQLite date functions
+    // Get last 30 days expenses total using PostgreSQL date functions
     const last30DaysResult = await db
       .select({
         total: sql<number>`COALESCE(SUM(${transactionTable.usdAmount}), 0)`,
@@ -153,12 +153,11 @@ export const expenseRouter = t.router({
           eq(accountTable.familyId, familyId),
           eq(transactionTable.type, "expense"),
           eq(transactionTable.isCountable, true),
-          sql`${transactionTable.createdAt} >= datetime('now', '-30 days')`,
+          sql`${transactionTable.createdAt} >= NOW() - INTERVAL '30 days'`,
         ),
-      )
-      .get();
+      );
 
-    const last30DaysTotal = last30DaysResult?.total || 0;
+    const last30DaysTotal = last30DaysResult[0]?.total || 0;
 
     // Get recent transactions
     const recentTransactions = await db
@@ -176,8 +175,7 @@ export const expenseRouter = t.router({
       .innerJoin(accountTable, eq(transactionTable.accountId, accountTable.id))
       .where(eq(accountTable.familyId, familyId))
       .orderBy(desc(transactionTable.createdAt))
-      .limit(3)
-      .all();
+      .limit(3);
 
     // Group transactions by month/year for overview
     const monthlyTotals: {
@@ -190,7 +188,7 @@ export const expenseRouter = t.router({
     } = {};
 
     allTransactions.forEach((transaction) => {
-      const dt = DateTime.fromISO(transaction.createdAt);
+      const dt = DateTime.fromJSDate(transaction.createdAt);
       const monthKey = dt.toFormat("MMM yyyy");
       const shortMonth = dt.toFormat("MMM");
       const year = dt.year;
@@ -273,7 +271,7 @@ export const expenseRouter = t.router({
       transactions.forEach((transaction) => {
         if (!transaction.isCountable) return;
 
-        const dt = DateTime.fromISO(transaction.createdAt);
+        const dt = DateTime.fromJSDate(transaction.createdAt);
         const monthKey = dt.toFormat("MMM yyyy");
         const shortMonth = dt.toFormat("MMM");
         const year = dt.year;
@@ -429,23 +427,23 @@ export const expenseRouter = t.router({
             eq(transactionTable.id, input.id),
             eq(accountTable.familyId, familyId),
           ),
-        )
-        .get();
+        );
 
-      if (!transaction) {
+      const transactionResult = transaction[0];
+      if (!transactionResult) {
         throw new Error("Transaction not found");
       }
 
       return {
-        id: transaction.id,
-        desc: transaction.description,
-        amount: transaction.amount,
-        currency: transaction.currency,
-        usd: transaction.usdAmount,
-        createdAt: transaction.createdAt,
-        accountId: transaction.accountId,
-        type: transaction.type,
-        isCountable: transaction.isCountable,
+        id: transactionResult.id,
+        desc: transactionResult.description,
+        amount: transactionResult.amount,
+        currency: transactionResult.currency,
+        usd: transactionResult.usdAmount,
+        createdAt: transactionResult.createdAt,
+        accountId: transactionResult.accountId,
+        type: transactionResult.type,
+        isCountable: transactionResult.isCountable,
       };
     }),
 
@@ -480,10 +478,10 @@ export const expenseRouter = t.router({
             eq(transactionTable.id, input.id),
             eq(accountTable.familyId, familyId),
           ),
-        )
-        .get();
+        );
 
-      if (!existingTransaction) {
+      const existingTransactionResult = existingTransaction[0];
+      if (!existingTransactionResult) {
         throw new Error("Transaction not found");
       }
 
@@ -491,7 +489,7 @@ export const expenseRouter = t.router({
       const amountInCents = Math.round(input.amount * 100);
       const usdAmountInCents = convert(
         amountInCents,
-        existingTransaction.currency,
+        existingTransactionResult.currency,
         "USD",
       );
 
@@ -499,7 +497,7 @@ export const expenseRouter = t.router({
         description: input.description,
         amount: amountInCents,
         usdAmount: usdAmountInCents,
-        createdAt: input.createdAt,
+        createdAt: new Date(input.createdAt),
         type: input.type,
         isCountable: input.isCountable,
       };
@@ -531,10 +529,10 @@ export const expenseRouter = t.router({
             eq(transactionTable.id, input.id),
             eq(accountTable.familyId, familyId),
           ),
-        )
-        .get();
+        );
 
-      if (!existingTransaction) {
+      const existingTransactionResult = existingTransaction[0];
+      if (!existingTransactionResult) {
         throw new Error("Transaction not found");
       }
 
@@ -568,25 +566,29 @@ export const expenseRouter = t.router({
             eq(accountTable.id, input.accountId),
             eq(accountTable.familyId, familyId),
           ),
-        )
-        .get();
+        );
 
-      if (!account) {
+      const accountResult = account[0];
+      if (!accountResult) {
         throw new Error("Account not found");
       }
 
       // Convert amount to cents and calculate USD amount
       const amountInCents = Math.round(input.amount * 100);
-      const usdAmountInCents = convert(amountInCents, account.currency, "USD");
+      const usdAmountInCents = convert(
+        amountInCents,
+        accountResult.currency,
+        "USD",
+      );
 
       await db.insert(transactionTable).values({
         accountId: input.accountId,
         description: input.description,
         amount: amountInCents,
-        currency: account.currency,
+        currency: accountResult.currency,
         usdAmount: usdAmountInCents,
         type: input.type,
-        createdAt: input.createdAt,
+        createdAt: input.createdAt ? new Date(input.createdAt) : undefined,
       });
 
       return { success: true };

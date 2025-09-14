@@ -1,76 +1,91 @@
-import { sqliteTable, text, integer, index } from "drizzle-orm/sqlite-core";
+import {
+  pgTable,
+  text,
+  integer,
+  index,
+  uuid,
+  timestamp,
+  varchar,
+  boolean,
+  pgEnum,
+} from "drizzle-orm/pg-core";
 import {
   accountColor,
   bank,
   currency,
   transactionImportRuleType,
   transactionSource,
-  transactionSourceSchema,
   transactionType,
 } from "./enums";
 
+export const transactionSourceEnum = pgEnum(
+  "transaction_source",
+  transactionSource,
+);
+export const transactionImportRuleTypeEnum = pgEnum(
+  "transaction_import_rule_type",
+  transactionImportRuleType,
+);
+export const transactionTypeEnum = pgEnum("transaction_type", transactionType);
+export const accountColorEnum = pgEnum("account_color", accountColor);
+export const bankEnum = pgEnum("bank", bank);
+export const currencyEnum = pgEnum("currency", currency);
+
 const sharedColumns = {
-  id: text("id")
-    .primaryKey()
+  id: uuid("id").primaryKey().notNull().defaultRandom(),
+  createdAt: timestamp("created_at", { withTimezone: true })
     .notNull()
-    .$defaultFn(() => crypto.randomUUID()),
-  createdAt: text("created_at")
+    .defaultNow(),
+  updatedAt: timestamp("updated_at", { withTimezone: true })
     .notNull()
-    .$defaultFn(() => new Date().toISOString()),
-  updatedAt: text("updated_at")
-    .notNull()
-    .$defaultFn(() => new Date().toISOString())
-    .$onUpdateFn(() => new Date().toISOString()),
+    .defaultNow()
+    .$onUpdate(() => new Date()),
 };
 
-export const userTable = sqliteTable(
+export const userTable = pgTable(
   "user",
   {
     ...sharedColumns,
-    familyId: text("family_id").notNull(),
-    initialFamilyId: text("initial_family_id").notNull(),
-    name: text("name"),
-    username: text("username"),
+    familyId: uuid("family_id").notNull(),
+    initialFamilyId: uuid("initial_family_id").notNull(),
+    name: varchar("name"),
+    username: varchar("username"),
     avatarUrl: text("avatar_url"),
-    telegramId: text("telegram_id").unique(),
-    isAdmin: integer("is_admin", { mode: "boolean" }).notNull().default(false),
+    telegramId: varchar("telegram_id").unique(),
+    isAdmin: boolean("is_admin").notNull().default(false),
   },
   (table) => [index("idx_user_telegram_id").on(table.telegramId)],
 );
 
-export const accountTable = sqliteTable(
+export const accountTable = pgTable(
   "account",
   {
     ...sharedColumns,
-    familyId: text("family_id").notNull(),
-    name: text("name").notNull(),
-    currency: text("currency", { enum: currency }).notNull(),
-    color: text("color", { enum: accountColor }).notNull(),
-    bankType: text("bank_type", { enum: bank }),
+    familyId: uuid("family_id").notNull(),
+    name: varchar("name").notNull(),
+    currency: currencyEnum("currency").notNull(),
+    color: accountColorEnum("color").notNull(),
+    bankType: bankEnum("bank_type"),
     sort: integer("sort").notNull().default(0),
   },
   (table) => [index("idx_account_family_id").on(table.familyId)],
 );
 
-export const transactionTable = sqliteTable(
+export const transactionTable = pgTable(
   "transaction",
   {
     ...sharedColumns,
-    accountId: text("account_id")
+    accountId: uuid("account_id")
       .notNull()
       .references(() => accountTable.id, { onDelete: "cascade" }),
     description: text("description").notNull(),
     amount: integer("amount").notNull(),
-    currency: text("currency", { enum: currency }).notNull(),
-    info: text("info"), // Optional payload
-    source: text("source", { enum: transactionSource })
-      .notNull()
-      .default(transactionSourceSchema.enum.manual),
-    isCountable: integer("is_countable", { mode: "boolean" })
-      .notNull()
-      .default(true),
+    currency: currencyEnum("currency").notNull(),
+    info: text("info"),
+    source: transactionSourceEnum("source").notNull().default("manual"),
+    isCountable: boolean("is_countable").notNull().default(true),
     usdAmount: integer("usd_amount").notNull(),
-    type: text("type", { enum: transactionType }).notNull().default("expense"),
+    type: transactionTypeEnum("type").notNull().default("expense"),
   },
   (table) => [
     index("idx_transaction_account_id").on(table.accountId),
@@ -82,18 +97,18 @@ export const transactionTable = sqliteTable(
   ],
 );
 
-export const inviteTable = sqliteTable(
+export const inviteTable = pgTable(
   "invite",
   {
     ...sharedColumns,
-    familyId: text("family_id").notNull(),
-    invitedByUserId: text("invited_by_user_id")
+    familyId: uuid("family_id").notNull(),
+    invitedByUserId: uuid("invited_by_user_id")
       .notNull()
       .references(() => userTable.id, { onDelete: "cascade" }),
-    code: text("code").notNull().unique(),
-    expiresAt: text("expires_at").notNull(),
-    usedAt: text("used_at"),
-    usedByUserId: text("used_by_user_id").references(() => userTable.id),
+    code: varchar("code").notNull().unique(),
+    expiresAt: timestamp("expires_at", { withTimezone: true }).notNull(),
+    usedAt: timestamp("used_at", { withTimezone: true }),
+    usedByUserId: uuid("used_by_user_id").references(() => userTable.id),
   },
   (table) => [
     index("idx_invite_code").on(table.code),
@@ -101,14 +116,14 @@ export const inviteTable = sqliteTable(
   ],
 );
 
-export const transactionImportRuleTable = sqliteTable(
+export const transactionImportRuleTable = pgTable(
   "transaction_import_rule",
   {
-    name: text("name").notNull(),
-    accountId: text("account_id")
+    name: varchar("name").notNull(),
+    accountId: uuid("account_id")
       .notNull()
       .references(() => accountTable.id, { onDelete: "cascade" }),
-    type: text("type", { enum: transactionImportRuleType }).notNull(),
+    type: transactionImportRuleTypeEnum("type").notNull(),
   },
   (table) => [
     index("idx_transaction_import_rule_account_id").on(table.accountId),

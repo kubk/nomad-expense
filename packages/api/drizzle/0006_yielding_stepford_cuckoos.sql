@@ -1,1 +1,0 @@
-ALTER TABLE `user` ADD `telegram_id` text;

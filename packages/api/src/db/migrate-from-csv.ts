@@ -5,7 +5,6 @@ import {
   transactionTable,
   transactionImportRuleTable,
 } from "./schema";
-import { batch, isNonEmpty } from "./batch";
 import { EXCHANGE_RATES_TO_USD } from "../services/currency-converter";
 import {
   currencySchema,
@@ -165,34 +164,64 @@ export const migrateFromCsv = async (db: DB) => {
     `✨ Transformed data: ${transformedUsers.length} users, ${transformedAccounts.length} accounts, ${transformedTransactions.length} transactions, ${transformedImportRules.length} import rules`,
   );
 
-  // Batch insert data
-  const userChunks = batch(userTable, transformedUsers).map((chunk) =>
-    db.insert(userTable).values(chunk),
-  );
-  const accountChunks = batch(accountTable, transformedAccounts).map((chunk) =>
-    db.insert(accountTable).values(chunk),
-  );
-  const transactionChunks = batch(
-    transactionTable,
-    transformedTransactions,
-  ).map((chunk) => db.insert(transactionTable).values(chunk));
-  const importRuleChunks = batch(
-    transactionImportRuleTable,
-    transformedImportRules,
-  ).map((chunk) => db.insert(transactionImportRuleTable).values(chunk));
+  // Insert data in batches to avoid parameter limit
+  const BATCH_SIZE = 1000; // Safe batch size well under PostgreSQL's 65k parameter limit
 
-  const allChunks = [
-    ...userChunks,
-    ...accountChunks,
-    ...transactionChunks,
-    ...importRuleChunks,
-  ];
+  if (transformedUsers.length > 0) {
+    await insertInBatches(db, userTable, transformedUsers, BATCH_SIZE, "users");
+  }
 
-  if (isNonEmpty(allChunks)) {
-    await db.batch(allChunks);
+  if (transformedAccounts.length > 0) {
+    await insertInBatches(
+      db,
+      accountTable,
+      transformedAccounts,
+      BATCH_SIZE,
+      "accounts",
+    );
+  }
+
+  if (transformedTransactions.length > 0) {
+    await insertInBatches(
+      db,
+      transactionTable,
+      transformedTransactions,
+      BATCH_SIZE,
+      "transactions",
+    );
+  }
+
+  if (transformedImportRules.length > 0) {
+    await insertInBatches(
+      db,
+      transactionImportRuleTable,
+      transformedImportRules,
+      BATCH_SIZE,
+      "import rules",
+    );
   }
 
   console.log(`🎉 Migration completed successfully!`);
+};
+
+const insertInBatches = async (
+  db: DB,
+  table: any,
+  data: any[],
+  batchSize: number,
+  tableName: string,
+) => {
+  console.log(
+    `📦 Inserting ${data.length} ${tableName} in batches of ${batchSize}...`,
+  );
+
+  for (let i = 0; i < data.length; i += batchSize) {
+    const batch = data.slice(i, i + batchSize);
+    await db.insert(table).values(batch);
+    console.log(
+      `   ✓ Inserted batch ${Math.floor(i / batchSize) + 1}/${Math.ceil(data.length / batchSize)} (${batch.length} ${tableName})`,
+    );
+  }
 };
 
 const transformUsers = (
@@ -236,8 +265,8 @@ const transformUsers = (
         avatarUrl: null,
         telegramId: telegramProfile?.telegramId.toString() || null,
         isAdmin: csvUser.isAdmin,
-        createdAt: new Date(csvUser.createdAt).toISOString(),
-        updatedAt: new Date(csvUser.createdAt).toISOString(),
+        createdAt: new Date(csvUser.createdAt),
+        updatedAt: new Date(csvUser.createdAt),
       };
     })
     .filter((user) => user.id); // Filter out any invalid entries
@@ -266,7 +295,6 @@ const transformAccounts = (bankAccountsData: string[][]) => {
       validatedBankType = bankSchema.parse(csvAccount.bankType);
     }
 
-    const now = new Date().toISOString();
     return {
       id: csvAccount.id,
       familyId: csvAccount.familyId,
@@ -274,8 +302,8 @@ const transformAccounts = (bankAccountsData: string[][]) => {
       currency: validatedCurrency,
       color: "blue" as const, // All accounts get blue color as requested
       bankType: validatedBankType,
-      createdAt: now,
-      updatedAt: now,
+      createdAt: new Date(),
+      updatedAt: new Date(),
     };
   });
 };
@@ -341,8 +369,6 @@ const transformTransactions = (
       }
     }
 
-    const transactionDate = new Date(csvTransaction.createdAt).toISOString();
-
     return {
       id: csvTransaction.id,
       accountId: csvTransaction.bankAccountId,
@@ -354,8 +380,8 @@ const transformTransactions = (
       isCountable: csvTransaction.isCountable,
       usdAmount: usdAmount,
       type: transactionTypeValue,
-      createdAt: transactionDate,
-      updatedAt: transactionDate,
+      createdAt: new Date(csvTransaction.createdAt),
+      updatedAt: new Date(csvTransaction.createdAt),
     };
   });
 };

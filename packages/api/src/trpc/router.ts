@@ -6,7 +6,6 @@ import { expenseRouter } from "./expense-router";
 import { accountRouter } from "./account-router";
 import { familyRouter } from "./family-router";
 import { getDb } from "../services/db";
-import { seedDatabase } from "../db/seed";
 import { migrateFromCsv } from "../db/migrate-from-csv";
 
 export const router = t.router({
@@ -15,13 +14,6 @@ export const router = t.router({
       status: "ok",
       stage: getEnv().STAGE,
     };
-  }),
-  seed: publicProcedure.query(async () => {
-    if (getEnv().STAGE === "local") {
-      const db = getDb();
-      await seedDatabase(db);
-    }
-    return { success: true };
   }),
   migrateFromCsv: publicProcedure.query(async () => {
     // if (getEnv().STAGE === "local") {

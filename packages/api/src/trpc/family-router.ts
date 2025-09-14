@@ -24,8 +24,7 @@ export const familyRouter = t.router({
       })
       .from(userTable)
       .where(eq(userTable.familyId, familyId))
-      .orderBy(asc(userTable.createdAt))
-      .all();
+      .orderBy(asc(userTable.createdAt));
 
     return members;
   }),
@@ -39,20 +38,20 @@ export const familyRouter = t.router({
     await db
       .update(inviteTable)
       .set({
-        usedAt: new Date().toISOString(),
+        usedAt: new Date(),
         usedByUserId: userId,
       })
       .where(
         and(
           eq(inviteTable.familyId, familyId),
           sql`${inviteTable.usedAt} IS NULL`,
-          sql`${inviteTable.expiresAt} > datetime('now')`,
+          sql`${inviteTable.expiresAt} > NOW()`,
         ),
       );
 
     // Generate new invite
     const code = generateInviteCode();
-    const expiresAt = DateTime.now().plus({ days: 1 }).toISO();
+    const expiresAt = DateTime.now().plus({ days: 1 }).toJSDate();
 
     const result = await db
       .insert(inviteTable)
@@ -60,12 +59,13 @@ export const familyRouter = t.router({
         familyId,
         invitedByUserId: userId,
         code,
-        expiresAt: expiresAt!,
+        expiresAt: expiresAt,
       })
-      .returning({ id: inviteTable.id, code: inviteTable.code })
-      .get();
+      .returning({ id: inviteTable.id, code: inviteTable.code });
 
-    return result;
+    const resultData = result[0];
+
+    return resultData;
   }),
 
   getActiveInvite: protectedProcedure.query(async ({ ctx }) => {
@@ -84,12 +84,12 @@ export const familyRouter = t.router({
         and(
           eq(inviteTable.familyId, familyId),
           sql`${inviteTable.usedAt} IS NULL`,
-          sql`${inviteTable.expiresAt} > datetime('now')`,
+          sql`${inviteTable.expiresAt} > NOW()`,
         ),
-      )
-      .get();
+      );
 
-    return activeInvite ?? null;
+    const activeInviteResult = activeInvite[0];
+    return activeInviteResult ?? null;
   }),
 
   joinFamily: protectedProcedure
@@ -112,24 +112,24 @@ export const familyRouter = t.router({
           usedAt: inviteTable.usedAt,
         })
         .from(inviteTable)
-        .where(eq(inviteTable.code, input.code))
-        .get();
+        .where(eq(inviteTable.code, input.code));
 
-      if (!invite) {
+      const inviteResult = invite[0];
+      if (!inviteResult) {
         throw new TRPCError({
           code: "BAD_REQUEST",
           message: "Invalid invite code",
         });
       }
 
-      if (invite.usedAt) {
+      if (inviteResult.usedAt) {
         throw new TRPCError({
           code: "BAD_REQUEST",
           message: "This invite has already been used",
         });
       }
 
-      if (new Date(invite.expiresAt) < new Date()) {
+      if (new Date(inviteResult.expiresAt) < new Date()) {
         throw new TRPCError({
           code: "BAD_REQUEST",
           message: "This invite has expired",
@@ -137,38 +137,41 @@ export const familyRouter = t.router({
       }
 
       // Get inviter info
-      const inviter = await db
+      const inviterResult = await db
         .select({
           name: userTable.name,
           username: userTable.username,
         })
         .from(userTable)
-        .where(eq(userTable.id, invite.invitedByUserId))
-        .get();
+        .where(eq(userTable.id, inviteResult.invitedByUserId))
+        .limit(1);
+
+      const inviter = inviterResult[0];
 
       // Update user's family and mark invite as used atomically
-      await db.batch([
-        db
+      await db.transaction(async (tx) => {
+        await tx
           .update(userTable)
           .set({
-            familyId: invite.familyId,
+            familyId: inviteResult.familyId,
           })
-          .where(eq(userTable.id, userId)),
-        db
+          .where(eq(userTable.id, userId));
+
+        await tx
           .update(inviteTable)
           .set({
-            usedAt: new Date().toISOString(),
+            usedAt: new Date(),
             usedByUserId: userId,
           })
-          .where(eq(inviteTable.id, invite.id)),
-      ]);
+          .where(eq(inviteTable.id, inviteResult.id));
+      });
 
       const user = await getUserById(userId);
       // Update cache with new familyId
       if (user?.telegramId) {
         await userCacheSet(user.telegramId, {
           userId,
-          familyId: invite.familyId,
+          familyId: inviteResult.familyId,
         });
       }
 
