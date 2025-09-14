@@ -181,40 +181,38 @@ export function FiltersDrawer({
                   </div>
                   <div className="flex overflow-x-auto pb-3 gap-2">
                     {timePeriods.map((period) => (
-                      <Button
+                      <Badge
                         key={period.value}
                         variant={
                           filterForm.date.type === "months" &&
                           filterForm.date.value === period.value
                             ? "default"
-                            : "outline"
+                            : "secondary"
                         }
-                        size="sm"
                         onClick={() => handleMonthsChange(period.value)}
-                        className="h-8 px-3 text-xs flex items-center gap-2 transition-none"
+                        className="cursor-pointer px-3 py-1.5 text-sm whitespace-nowrap flex-shrink-0 flex items-center gap-2"
                       >
                         {filterForm.date.type === "months" &&
                           filterForm.date.value === period.value && (
                             <CheckIcon className="size-3" />
                           )}
                         {period.label}
-                      </Button>
+                      </Badge>
                     ))}
-                    <Button
+                    <Badge
                       variant={
                         filterForm.date.type === "custom"
                           ? "default"
-                          : "outline"
+                          : "secondary"
                       }
-                      size="sm"
                       onClick={handleShowCustomDatePicker}
-                      className="h-8 px-3 text-xs flex items-center gap-2"
+                      className="cursor-pointer px-3 py-1.5 text-sm whitespace-nowrap flex-shrink-0 flex items-center gap-2"
                     >
                       {filterForm.date.type === "custom" && (
                         <CheckIcon className="size-3" />
                       )}
                       Custom
-                    </Button>
+                    </Badge>
                   </div>
                 </div>
 
@@ -227,22 +225,21 @@ export function FiltersDrawer({
                   </div>
                   <div className="flex overflow-auto pb-3 gap-2">
                     {accounts.map((account) => (
-                      <Button
+                      <Badge
                         key={account.id}
                         variant={
                           filterForm.accounts.includes(account.id)
                             ? "default"
-                            : "outline"
+                            : "secondary"
                         }
-                        size="sm"
                         onClick={() => handleAccountToggle(account.id)}
-                        className="h-8 px-3 text-xs flex items-center gap-2 transition-none"
+                        className="cursor-pointer px-3 py-1.5 text-sm whitespace-nowrap flex-shrink-0 flex items-center gap-2"
                       >
                         {filterForm.accounts.includes(account.id) && (
                           <CheckIcon className="size-3" />
                         )}
                         {account.name}
-                      </Button>
+                      </Badge>
                     ))}
                   </div>
                 </div>
