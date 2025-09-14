@@ -24,6 +24,12 @@
 	"env": {
 		"production": {
 			"name": "expense-tracker-api",
+			"hyperdrive": [
+				{
+					"binding": "HYPERDRIVE",
+					"id": "3d1c71e8cbf5404692e1f636a3ad650f"
+				}
+			],
 			"kv_namespaces": [
 				{
 					"binding": "KV",
