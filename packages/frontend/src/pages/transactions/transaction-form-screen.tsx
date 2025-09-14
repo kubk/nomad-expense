@@ -205,9 +205,7 @@ export function TransactionFormScreen({
   };
 
   const isSaving =
-    updateTransactionMutation.isPending ||
-    deleteTransactionMutation.isPending ||
-    createTransactionMutation.isPending;
+    updateTransactionMutation.isPending || createTransactionMutation.isPending;
 
   const deleteButton = isEdit && (
     <button
@@ -419,37 +417,33 @@ export function TransactionFormScreen({
           />
         </div>
         <Footer>
-          <div className="flex gap-2">
-            <Button
-              size={"lg"}
-              variant="outline"
-              type="button"
-              className="flex-1"
-              onClick={pop}
-              disabled={isSaving || isTransactionLoading}
-            >
-              <ArrowLeftIcon className="w-4 h-4" />
-              Back
-            </Button>
-            <Button
-              className="flex-1"
-              size="lg"
-              type="submit"
-              disabled={
-                !formData.description.trim() ||
-                !formData.amount.trim() ||
-                (!isEdit && !formData.accountId) ||
-                isSaving ||
-                isTransactionLoading
-              }
-            >
-              {isSaving ? (
-                <Loader2Icon className="h-4 w-4 animate-spin" />
-              ) : (
-                "Save"
-              )}
-            </Button>
-          </div>
+          <Button
+            size={"lg"}
+            variant="outline"
+            type="button"
+            onClick={pop}
+            disabled={isSaving || isTransactionLoading}
+          >
+            <ArrowLeftIcon className="w-4 h-4" />
+            Back
+          </Button>
+          <Button
+            size="lg"
+            type="submit"
+            disabled={
+              !formData.description.trim() ||
+              !formData.amount.trim() ||
+              (!isEdit && !formData.accountId) ||
+              isSaving ||
+              isTransactionLoading
+            }
+          >
+            {isSaving ? (
+              <Loader2Icon className="h-4 w-4 animate-spin" />
+            ) : (
+              "Save"
+            )}
+          </Button>
         </Footer>
       </form>
 

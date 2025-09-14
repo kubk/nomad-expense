@@ -1,14 +1,15 @@
 import { initTRPC, TRPCError } from "@trpc/server";
 import { FetchCreateContextFnOptions } from "@trpc/server/adapters/fetch";
 import { authenticate } from "../services/authenticate";
+import { getEnv } from "../services/env";
 
 export async function createContext({
   req,
   resHeaders,
 }: FetchCreateContextFnOptions) {
-  // if (getEnv().STAGE === "local") {
-  //   await new Promise((resolve) => setTimeout(resolve, 500));
-  // }
+  if (getEnv().STAGE === "local") {
+    await new Promise((resolve) => setTimeout(resolve, 1000));
+  }
 
   const authResult = await authenticate(req);
 
