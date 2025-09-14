@@ -1,17 +1,17 @@
-import { drizzle } from "drizzle-orm/d1";
+import { drizzle } from "drizzle-orm/postgres-js";
+import postgres from "postgres";
+import * as schema from "../db/schema";
+import { getEnv } from "./env";
 
-export type DB = ReturnType<typeof drizzle>;
-
-let db: DB | undefined;
-
-// Should be D1Database
-export function setDb(d1: any) {
-  db = drizzle(d1);
+export function getDb() {
+  const client = postgres(getEnv().DB_URL, {
+    prepare: false,
+    fetch_types: false,
+    max: 7,
+    idle_timeout: 0,
+    max_lifetime: 0,
+  });
+  return drizzle(client, { schema });
 }
 
-export function getDb(): DB {
-  if (!db) {
-    throw new Error("DB is not initialized, call setDb first");
-  }
-  return db;
-}
+export type DB = ReturnType<typeof getDb>;

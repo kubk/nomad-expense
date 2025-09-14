@@ -1,75 +1,12 @@
 {
   "version": "7",
-  "dialect": "sqlite",
+  "dialect": "postgresql",
   "entries": [
     {
       "idx": 0,
-      "version": "6",
-      "when": 1756274849853,
-      "tag": "0000_same_turbo",
-      "breakpoints": true
-    },
-    {
-      "idx": 1,
-      "version": "6",
-      "when": 1757572003764,
-      "tag": "0001_light_hulk",
-      "breakpoints": true
-    },
-    {
-      "idx": 2,
-      "version": "6",
-      "when": 1757574088300,
-      "tag": "0002_useful_shooting_star",
-      "breakpoints": true
-    },
-    {
-      "idx": 3,
-      "version": "6",
-      "when": 1757578155839,
-      "tag": "0003_flashy_lily_hollister",
-      "breakpoints": true
-    },
-    {
-      "idx": 4,
-      "version": "6",
-      "when": 1757579491126,
-      "tag": "0004_fine_dragon_man",
-      "breakpoints": true
-    },
-    {
-      "idx": 5,
-      "version": "6",
-      "when": 1757582236613,
-      "tag": "0005_friendly_purifiers",
-      "breakpoints": true
-    },
-    {
-      "idx": 6,
-      "version": "6",
-      "when": 1757582824357,
-      "tag": "0006_yielding_stepford_cuckoos",
-      "breakpoints": true
-    },
-    {
-      "idx": 7,
-      "version": "6",
-      "when": 1757686076355,
-      "tag": "0007_flawless_silvermane",
-      "breakpoints": true
-    },
-    {
-      "idx": 8,
-      "version": "6",
-      "when": 1757743660256,
-      "tag": "0008_open_franklin_storm",
-      "breakpoints": true
-    },
-    {
-      "idx": 9,
-      "version": "6",
-      "when": 1757751306026,
-      "tag": "0009_smart_machine_man",
+      "version": "7",
+      "when": 1757827079201,
+      "tag": "0000_brief_darwin",
       "breakpoints": true
     }
   ]

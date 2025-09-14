@@ -11,14 +11,14 @@
     "typecheck": "npx tsc -b --noEmit",
     "prettier:fix": "prettier --write src/**/*.ts",
     "cf-typegen": "wrangler types",
-    "db:generate": "dotenvx run -f .dev.vars -- npx drizzle-kit generate",
-    "db:migrate": "wrangler d1 migrations apply expense-tracker --local",
+    "db:generate": "dotenvx run -f .dev.vars -- drizzle-kit generate",
+    "db:migrate": "dotenvx run -f .dev.vars -- tsx migrate.ts",
     "db:studio": "dotenvx run -f .dev.vars -- npx drizzle-kit studio",
     "--- production ---": "",
     "production:env:encrypt": "dotenvx encrypt -f .env.production",
     "production:env:decrypt": "dotenvx decrypt --stdout -f .env.production",
     "production:env:check": "dotenvx run -f .env.production -- tsx bin/check-envs.ts",
-    "production:db:migrate": "dotenvx run -f .env.production -- wrangler d1 migrations apply expense-tracker --env production --remote",
+    "production:db:migrate": "dotenvx run -f .env.production -- tsx migrate.ts",
     "production:db:studio": "dotenvx run -f .env.production -- npx drizzle-kit studio"
   },
   "devDependencies": {
