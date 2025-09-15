@@ -33,3 +33,5 @@ export type AccountColor = z.infer<typeof accountColorSchema>;
 export type Currency = z.infer<typeof currencySchema>;
 export type TransactionType = z.infer<typeof transactionTypeSchema>;
 export type TransactionSource = z.infer<typeof transactionSourceSchema>;
+
+export { telegramAuthMethod } from "./services/auth/telegram-auth-method";

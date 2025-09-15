@@ -1,6 +1,6 @@
 import { getDb } from "../../services/db";
 import { userTable } from "../../db/schema";
-import type { UserTelegramType } from "../../services/validate-telegram-login-widget";
+import { type UserTelegramType } from "../../services/auth/schema";
 
 function mergeName(firstName: string, lastName?: string) {
   return firstName + (lastName ? ` ${lastName}` : "");
