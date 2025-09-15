@@ -15,7 +15,7 @@ export function AccountPickerScreen() {
 
   return (
     <Page title="Select account" bg="secondary">
-      <div className="flex flex-col gap-2">
+      <div className="flex flex-col gap-3">
         {accounts.length === 0 && !isLoading ? (
           <div className="mt-[35%]">
             <NoAccountsEmptyState />
@@ -27,7 +27,7 @@ export function AccountPickerScreen() {
           return (
             <button
               key={account.id}
-              className="bg-card rounded-2xl border p-4 text-left active:scale-95 transition-transform"
+              className="bg-card rounded-2xl shadow-sm p-4 text-left active:scale-95 transition-transform"
               onClick={() => {
                 navigate({ type: "transactionForm", accountId: account.id });
               }}
