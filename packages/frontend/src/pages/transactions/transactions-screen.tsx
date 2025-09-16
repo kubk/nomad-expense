@@ -36,7 +36,7 @@ export function TransactionsScreen({
   const totalIncome = transactionsData?.totalIncome || 0;
 
   return (
-    <Page title="Transactions" bg="secondary">
+    <Page title="Transactions">
       <SummaryCard
         isLoading={isLoading}
         onFiltersClick={() => setIsDrawerOpen(true)}

@@ -38,7 +38,7 @@ export function MonthlyBreakdownFull({
   const totalIncome = transactionsData?.totalIncome || 0;
 
   return (
-    <Page title="Monthly breakdown" bg="secondary">
+    <Page title="Monthly breakdown">
       <SummaryCard
         isLoading={isLoading}
         onFiltersClick={() => setIsDrawerOpen(true)}
