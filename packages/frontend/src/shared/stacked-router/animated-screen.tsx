@@ -1,7 +1,6 @@
 import React from "react";
 import { motion, type Transition } from "framer-motion";
 import type { Route } from "./routes";
-import { useBackButton } from "../telegram";
 
 export type AnimationType = "horizontal-slide" | "stacked-slide" | "scale";
 
@@ -85,7 +84,6 @@ export const AnimatedScreen = ({
   getAnimationConfig: (routeType: Route["type"]) => AnimationType;
   transition: Transition;
 }) => {
-  useBackButton();
   const isTopScreen = index === stack.length - 1;
   const isBackground = !isTopScreen;
   const level = index;

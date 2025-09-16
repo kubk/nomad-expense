@@ -10,6 +10,7 @@ import { useRouter } from "@/shared/stacked-router/router";
 import { clearAuthToken } from "@/shared/auth-token";
 import { ConfirmModal } from "../shared/confirm-modal";
 import { useState } from "react";
+import { useBackButton } from "@/shared/telegram";
 
 export function SettingsScreen() {
   const { navigate } = useRouter();
@@ -17,6 +18,7 @@ export function SettingsScreen() {
     trpc.family.listMembers.queryOptions(),
   );
   const [showLogoutModal, setShowLogoutModal] = useState(false);
+  useBackButton();
 
   const handleLogout = () => {
     clearAuthToken();
