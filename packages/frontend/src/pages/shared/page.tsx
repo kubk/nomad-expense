@@ -1,39 +1,7 @@
 import { cn } from "@/lib/utils";
 import { PageHeader } from "./page-header";
-import { ReactNode, useEffect } from "react";
-import { useTheme } from "./theme-provider";
-import { getWebApp } from "@/shared/telegram";
-import { useRouter } from "@/shared/stacked-router/router";
-
-function useTelegramHeaderColorSync(bg: "primary" | "secondary") {
-  const { theme } = useTheme();
-  const { currentRoute } = useRouter();
-  useEffect(() => {
-    const webApp = getWebApp();
-    if (!webApp) return;
-    if (theme === "dark") {
-      if (currentRoute.type === "main") {
-        webApp.setHeaderColor("#262626");
-        return;
-      }
-      if (bg === "primary") {
-        webApp.setHeaderColor("#0a0a0a");
-      } else {
-        webApp.setHeaderColor("#262626");
-      }
-    } else {
-      if (currentRoute.type === "main") {
-        webApp.setHeaderColor("#171717");
-        return;
-      }
-      if (bg === "primary") {
-        webApp.setHeaderColor("#ffffff");
-      } else {
-        webApp.setHeaderColor("#f5f5f5");
-      }
-    }
-  }, [bg, theme]);
-}
+import { ReactNode } from "react";
+import { useTgHeaderColorSync } from "@/shared/use-tg-header-color-sync";
 
 export function Page({
   children,
@@ -46,7 +14,7 @@ export function Page({
   title?: string | ReactNode;
   bg?: "primary" | "secondary";
 }) {
-  useTelegramHeaderColorSync(bg);
+  useTgHeaderColorSync(bg);
 
   return (
     <div
