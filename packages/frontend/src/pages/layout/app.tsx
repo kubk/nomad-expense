@@ -22,7 +22,7 @@ import { getSafeAreaInset } from "@/shared/telegram";
 export function App() {
   useQuery(trpc.accounts.list.queryOptions());
   const { navigationStack, navigate, pop } = useRouter();
-  const safeAreaInset = getSafeAreaInset();
+  // const safeAreaInset = getSafeAreaInset();
 
   const renderScreen = useCallback(
     (route: Route, index: number, stack: Route[]) => {
@@ -101,12 +101,18 @@ export function App() {
   return (
     <div
       className="max-w-md mx-auto relative app-container overflow-hidden"
-      style={{
-        paddingTop: `${safeAreaInset.top}px`,
-        paddingBottom: `${safeAreaInset.bottom}px`,
-        paddingLeft: `${safeAreaInset.left}px`,
-        paddingRight: `${safeAreaInset.right}px`,
-      }}
+      style={
+        {
+          // paddingTop: `${safeAreaInset.top}px`,
+          // paddingBottom: `${safeAreaInset.bottom}px`,
+          // paddingLeft: `${safeAreaInset.left}px`,
+          // paddingRight: `${safeAreaInset.right}px`,
+          // paddingTop: 100,
+          // paddingBottom: 100,
+          // paddingLeft: 100,
+          // paddingRight: 100,
+        }
+      }
     >
       <AnimatePresence initial={false} mode="sync">
         {navigationStack.map((route, index) =>
