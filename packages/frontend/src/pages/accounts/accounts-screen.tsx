@@ -153,7 +153,7 @@ export function AccountsScreen() {
               return (
                 <AccountCard
                   key={account.id}
-                  layout={isReorderMode}
+                  layout={isReorderMode || undefined}
                   className="w-full bg-card rounded-2xl shadow-sm transition-colors"
                 >
                   <div className="flex items-center">
