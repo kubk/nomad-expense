@@ -7,25 +7,25 @@ import { useRouter } from "@/shared/stacked-router/router";
 export function OverviewHeader() {
   const { navigate } = useRouter();
 
-  const { data: overviewData, isLoading } = useQuery(
+  const { data: overviewData, isLoading: isOverviewLoading } = useQuery(
     trpc.expenses.overview.queryOptions(),
   );
 
-  const { data: familyMembers } = useQuery(
+  const { data: familyMembers, isLoading: isFamilyLoading } = useQuery(
     trpc.family.listMembers.queryOptions(),
   );
 
   return (
     <div className="text-primary-foreground bg-muted px-4 py-6 pb-18">
-      <div className="bg-background backdrop-blur rounded-2xl p-4">
+      <div className="bg-background backdrop-blur border shadow-xs rounded-2xl p-4">
         <div className="flex items-start justify-between">
           <div>
             <p className="text-foreground/70 text-sm mb-1">
               Expenses · Last 30 days
             </p>
             <div className="text-3xl text-foreground font-bold font-mono">
-              {isLoading ? (
-                <div className="animate-pulse text-foreground h-9 w-32 rounded"></div>
+              {isOverviewLoading ? (
+                <div className="animate-pulse bg-accent h-9 w-32 rounded" />
               ) : (
                 formatAmount(overviewData?.last30DaysTotal || 0, "USD", {
                   showFractions: false,
@@ -39,18 +39,22 @@ export function OverviewHeader() {
               navigate({ type: "family" });
             }}
           >
-            {familyMembers?.map((member, index) => (
-              <div
-                key={member.id}
-                className="ring-muted dark:ring-foreground ring-2 rounded-full bg-background"
-                style={{ zIndex: familyMembers.length - index }}
-              >
-                <UserAvatar
-                  user={member}
-                  className="[&>div]:bg-background/20 [&>div]:text-primary-foreground [&>div]:text-xs"
-                />
-              </div>
-            ))}
+            {isFamilyLoading ? (
+              <div className="animate-pulse bg-accent h-12 w-12 rounded-full" />
+            ) : (
+              familyMembers?.map((member, index) => (
+                <div
+                  key={member.id}
+                  className="ring-muted dark:ring-foreground ring-2 rounded-full bg-background"
+                  style={{ zIndex: familyMembers.length - index }}
+                >
+                  <UserAvatar
+                    user={member}
+                    className="[&>div]:bg-background/20 [&>div]:text-primary-foreground [&>div]:text-xs"
+                  />
+                </div>
+              ))
+            )}
           </div>
         </div>
       </div>
