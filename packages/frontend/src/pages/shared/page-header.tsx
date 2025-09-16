@@ -1,6 +1,5 @@
 import { ReactNode } from "react";
 import { useRouter } from "@/shared/stacked-router/router";
-import { Button } from "@/components/ui/button";
 import { ArrowLeftIcon } from "lucide-react";
 
 export function PageHeader({
@@ -15,28 +14,22 @@ export function PageHeader({
     <div className="sticky top-0">
       <div className="relative flex items-center justify-center p-4">
         <div className="absolute left-4">
-          <Button
-            variant="outline"
-            size="sm"
+          <button
             onClick={pop}
-            className="bg-background shadow-xs border rounded-full active:scale-95 transition-transform"
+            className="bg-background flex items-center gap-1.5 font-medium text-sm shadow-xs border rounded-full py-1.5 px-3 active:scale-95 transition-transform"
           >
             <ArrowLeftIcon className="h-4 w-4" />
             Back
-          </Button>
+          </button>
         </div>
 
-        <Button
-          variant="outline"
-          size="sm"
-          className="bg-background shadow-xs border rounded-full px-4"
-        >
+        <div className="bg-background font-medium text-sm shadow-xs border rounded-full py-1.5 px-4">
           {title}
-        </Button>
+        </div>
 
         {rightSlot && (
           <div className="absolute right-4">
-            <div className="bg-background shadow-xs border rounded-full px-2">
+            <div className="bg-background shadow-xs border rounded-full px-2 active:scale-95 transition-transform">
               {rightSlot}
             </div>
           </div>
