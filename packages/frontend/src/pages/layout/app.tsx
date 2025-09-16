@@ -9,8 +9,6 @@ import { SettingsScreen } from "../settings/settings-screen";
 import { FamilyScreen } from "../settings/family-screen";
 import { InviteScreen } from "../invite/invite-screen";
 import { AuthScreen } from "../auth/auth-screen";
-import { trpc } from "@/shared/api";
-import { useQuery } from "@tanstack/react-query";
 import { AnimatePresence } from "framer-motion";
 import { useRouter } from "@/shared/stacked-router/router";
 import { useCallback, useEffect } from "react";
