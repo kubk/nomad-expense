@@ -47,7 +47,7 @@ export function SummaryCard({
     >
       <div className="p-4 rounded-md">
         {/* Pills and Filter Button Row */}
-        <div className="flex items-start justify-between mb-4">
+        <div className="flex items-start justify-between mb-3">
           <div className="flex flex-wrap gap-2">
             <div className="bg-muted whitespace-nowrap text-muted-foreground px-3 py-1.5 rounded-full text-xs font-medium flex items-center gap-1.5">
               <CalendarIcon className="w-3 h-3" />
