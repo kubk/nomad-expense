@@ -1,6 +1,3 @@
-import { useEffect } from "react";
-import { useRouter } from "./stacked-router/router";
-
 export function getWebApp() {
   const webApp = window.Telegram?.WebApp;
   if (webApp && webApp.platform !== "unknown") return webApp;
@@ -30,20 +27,20 @@ export function initializeTma() {
   webApp.disableVerticalSwipes();
 }
 
-export function useBackButton() {
-  const { navigationStack, pop } = useRouter();
+// export function useBackButton() {
+//   const { navigationStack, pop } = useRouter();
 
-  useEffect(() => {
-    if (navigationStack.length <= 1) return;
-    const webApp = getWebApp();
-    if (!webApp) return;
+//   useEffect(() => {
+//     if (navigationStack.length <= 1) return;
+//     const webApp = getWebApp();
+//     if (!webApp) return;
 
-    webApp.BackButton.show();
-    webApp.BackButton.onClick(pop);
+//     webApp.BackButton.show();
+//     webApp.BackButton.onClick(pop);
 
-    return () => {
-      webApp.BackButton.hide();
-      webApp.BackButton.offClick(pop);
-    };
-  }, [navigationStack, pop]);
-}
+//     return () => {
+//       webApp.BackButton.hide();
+//       webApp.BackButton.offClick(pop);
+//     };
+//   }, [navigationStack, pop]);
+// }
