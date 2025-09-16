@@ -303,7 +303,7 @@ export function FiltersDrawer({
           </div>
 
           {!showCustomDatePicker && (
-            <DrawerFooter className="flex-row [&_button]:flex-1">
+            <DrawerFooter className="flex-row border-t [&_button]:flex-1">
               <DrawerClose asChild>
                 <Button size="lg" variant="outline">
                   Cancel
