@@ -34,7 +34,6 @@ export async function authenticate(
 
   const cachedUser = await userCacheGet(telegramId);
   if (cachedUser) {
-    console.log("User found in cache");
     return cachedUser;
   }
 
