@@ -22,7 +22,9 @@ export function Page({
         className,
       )}
     >
-      {title && typeof title === "string" ? <PageHeader title={title} /> : null}
+      {title && typeof title === "string" ? (
+        <PageHeader border={bg === "primary"} title={title} />
+      ) : null}
       {title && typeof title !== "string" ? title : null}
       <div className="flex-1 flex flex-col px-4 overflow-auto pb-24 pt-0">
         {children}
