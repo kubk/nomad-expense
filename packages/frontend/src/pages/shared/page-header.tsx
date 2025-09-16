@@ -1,6 +1,8 @@
 import { ReactNode } from "react";
 import { useRouter } from "@/shared/stacked-router/router";
 import { ArrowLeftIcon } from "lucide-react";
+import { getWebApp } from "@/shared/telegram";
+import { cn } from "@/lib/utils";
 
 export function PageHeader({
   title,
@@ -12,7 +14,11 @@ export function PageHeader({
   const { pop } = useRouter();
   return (
     <div className="sticky top-0">
-      <div className="relative flex items-center justify-center p-4">
+      <div
+        className={cn("relative flex items-center justify-center p-4", {
+          "pt-0": getWebApp(),
+        })}
+      >
         <div className="absolute left-4">
           <button
             onClick={pop}
