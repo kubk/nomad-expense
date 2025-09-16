@@ -10,6 +10,7 @@ import { useRouter } from "@/shared/stacked-router/router";
 import { clearAuthToken } from "@/shared/auth-token";
 import { ConfirmModal } from "../shared/confirm-modal";
 import { useState } from "react";
+import { getWebApp } from "@/shared/telegram";
 
 export function SettingsScreen() {
   const { navigate } = useRouter();
@@ -23,6 +24,12 @@ export function SettingsScreen() {
     navigate({ type: "auth" });
     setShowLogoutModal(false);
   };
+
+  function setHeaderColor(color: string) {
+    const webApp = getWebApp();
+    if (!webApp) return;
+    webApp.setHeaderColor(color);
+  }
 
   return (
     <Page title="Settings">
@@ -58,6 +65,30 @@ export function SettingsScreen() {
           <div className="space-y-2">
             <Label htmlFor="theme-select">Theme</Label>
             <ModeToggle />
+          </div>
+        </div>
+
+        {/* Header Color Section */}
+        <div className="space-y-4">
+          <div className="space-y-2">
+            <Label>Header color</Label>
+            <div className="grid grid-cols-6 gap-3">
+              {[
+                "f5f5f5", // Muted
+                "ffffff", // Background
+                "FF6B6B", // Red
+                "45B7D1", // Blue
+                "96CEB4", // Green
+                "FECA57", // Yellow
+              ].map((color) => (
+                <button
+                  key={color}
+                  onClick={() => setHeaderColor(`#${color}`)}
+                  className="w-10 h-10 rounded-lg border-2 border-muted-foreground/20 hover:border-muted-foreground/40 transition-colors"
+                  style={{ backgroundColor: `#${color}` }}
+                />
+              ))}
+            </div>
           </div>
         </div>
 
