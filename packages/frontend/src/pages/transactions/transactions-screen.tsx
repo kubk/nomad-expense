@@ -9,6 +9,7 @@ import { TransactionFilters } from "api";
 import { useAccountIds } from "@/shared/hooks/use-account-ids";
 import { Page } from "../shared/page";
 import { RouteByType, useRouter } from "@/shared/stacked-router/router";
+import { VList } from "virtua";
 
 export function TransactionsScreen({
   route,
@@ -58,15 +59,15 @@ export function TransactionsScreen({
                 </div>
               </div>
             ) : (
-              transactions.map((transaction, idx) => {
-                return (
+              <VList style={{ height: 600 }}>
+                {transactions.map((transaction, idx) => (
                   <TransactionItem
                     key={transaction.id}
                     transaction={transaction}
                     showBorder={idx !== transactions.length - 1}
                   />
-                );
-              })
+                ))}
+              </VList>
             )}
           </CardContent>
         </Card>
