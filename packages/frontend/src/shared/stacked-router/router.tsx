@@ -88,7 +88,7 @@ export const RouterProvider = ({ children }: { children: React.ReactNode }) => {
 export const useRouter = () => {
   const context = React.useContext(Context);
   if (!context) {
-    throw new Error("useAppState must be used within a Provider");
+    throw new Error("useRouter must be used within a Provider");
   }
   return context;
 };
