@@ -8,9 +8,11 @@ import { AnimatePresence, motion } from "framer-motion";
 import { cn } from "@/lib/utils";
 import { useRouter } from "@/shared/stacked-router/router";
 import { Route } from "@/shared/stacked-router/routes";
+import { getSafeAreaInset } from "@/shared/telegram";
 
 export function Navigation() {
   const { currentRoute, navigate } = useRouter();
+  const safeAreaInset = getSafeAreaInset();
 
   const shouldHide =
     currentRoute.type === "monthlyBreakdownFull" ||
@@ -63,6 +65,9 @@ export function Navigation() {
             ease: "easeInOut",
             // Keep it here so I can debug animations
             // duration: 2,
+          }}
+          style={{
+            paddingBottom: safeAreaInset.bottom,
           }}
           className="fixed bottom-0 left-0 right-0 bg-background border-t border-border"
         >
