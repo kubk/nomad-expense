@@ -14,8 +14,8 @@ const getAnimationProps = (
     // Top screen entering/exiting
     return {
       animate: { scale: 1, opacity: 1 },
-      initial: level > 0 ? { scale: 0.95, opacity: 0 } : false,
-      exit: { scale: 0.95, opacity: 0 },
+      initial: level > 0 ? { scale: 0.97, opacity: 0 } : false,
+      exit: { scale: 0.97, opacity: 0 },
     };
   };
 
