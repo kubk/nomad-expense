@@ -7,9 +7,11 @@ import { cn } from "@/lib/utils";
 export function PageHeader({
   title,
   rightSlot,
+  border,
 }: {
   title: string | ReactNode;
   rightSlot?: ReactNode;
+  border?: boolean;
 }) {
   const { pop } = useRouter();
   return (
@@ -22,20 +24,39 @@ export function PageHeader({
         <div className="absolute left-4">
           <button
             onClick={pop}
-            className="bg-background flex items-center gap-1.5 font-medium text-sm shadow-sm dark:border rounded-full py-1.5 px-3 active:scale-95 transition-transform"
+            className={cn(
+              "bg-background flex items-center gap-1.5 font-medium text-sm shadow-sm rounded-full py-1.5 px-3 active:scale-95 transition-transform",
+              {
+                "border shadow-xs": border,
+              },
+            )}
           >
             <ArrowLeftIcon className="h-4 w-4" />
             Back
           </button>
         </div>
 
-        <div className="bg-background font-medium text-sm shadow-sm dark:border rounded-full py-1.5 px-4">
+        <div
+          className={cn(
+            "bg-background font-medium text-sm shadow-sm rounded-full py-1.5 px-4",
+            {
+              "border shadow-xs": border,
+            },
+          )}
+        >
           {title}
         </div>
 
         {rightSlot && (
           <div className="absolute right-4">
-            <div className="bg-background shadow-sm dark:border rounded-full px-2 active:scale-95 transition-transform">
+            <div
+              className={cn(
+                "bg-background shadow-sm rounded-full px-2 active:scale-95 transition-transform",
+                {
+                  "border shadow-xs": border,
+                },
+              )}
+            >
               {rightSlot}
             </div>
           </div>
