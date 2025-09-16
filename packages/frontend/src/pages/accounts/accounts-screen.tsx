@@ -25,6 +25,7 @@ import { useRouter } from "@/shared/stacked-router/router";
 import { NoAccountsEmptyState } from "../shared/no-accounts-empty-state";
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { useBackButton } from "@/shared/telegram";
 
 export function AccountsScreen() {
   const { navigate } = useRouter();
@@ -32,6 +33,7 @@ export function AccountsScreen() {
   const [reorderedAccounts, setReorderedAccounts] = useState<
     typeof accounts | null
   >(null);
+  useBackButton();
 
   const { data: accounts = [], isLoading } = useQuery(
     trpc.accounts.list.queryOptions(),
