@@ -17,10 +17,12 @@ import { useCallback } from "react";
 import { Route } from "@/shared/stacked-router/routes";
 import { AnimatedScreen } from "@/shared/stacked-router/animated-screen";
 import { AccountPickerScreen } from "../transactions/account-picker-screen";
+import { getSafeAreaInset } from "@/shared/telegram";
 
 export function App() {
   useQuery(trpc.accounts.list.queryOptions());
   const { navigationStack, navigate, pop } = useRouter();
+  const safeAreaInset = getSafeAreaInset();
 
   const renderScreen = useCallback(
     (route: Route, index: number, stack: Route[]) => {
@@ -97,7 +99,15 @@ export function App() {
   );
 
   return (
-    <div className="max-w-md mx-auto relative app-container overflow-hidden">
+    <div
+      className="max-w-md mx-auto relative app-container overflow-hidden"
+      style={{
+        paddingTop: `${safeAreaInset.top}px`,
+        paddingBottom: `${safeAreaInset.bottom}px`,
+        paddingLeft: `${safeAreaInset.left}px`,
+        paddingRight: `${safeAreaInset.right}px`,
+      }}
+    >
       <AnimatePresence initial={false} mode="sync">
         {navigationStack.map((route, index) =>
           renderScreen(route, index, navigationStack),
