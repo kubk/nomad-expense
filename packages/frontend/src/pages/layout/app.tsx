@@ -17,7 +17,7 @@ import { useCallback } from "react";
 import { Route } from "@/shared/stacked-router/routes";
 import { AnimatedScreen } from "@/shared/stacked-router/animated-screen";
 import { AccountPickerScreen } from "../transactions/account-picker-screen";
-import { getSafeAreaInset } from "@/shared/telegram";
+// import { getSafeAreaInset } from "@/shared/telegram";
 
 export function App() {
   useQuery(trpc.accounts.list.queryOptions());
