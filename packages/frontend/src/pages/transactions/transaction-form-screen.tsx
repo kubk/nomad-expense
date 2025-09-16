@@ -210,9 +210,9 @@ export function TransactionFormScreen({
     <button
       onClick={() => setShowDeleteConfirm(true)}
       disabled={isSaving}
-      className="p-2 text-red-600 hover:bg-red-50 rounded-lg disabled:opacity-50"
+      className="px-1.5 py-1.75 text-red-600 hover:bg-red-50 rounded-lg disabled:opacity-50"
     >
-      <Trash2Icon className="w-5 h-5" />
+      <Trash2Icon className="w-4.5 h-4.5" />
     </button>
   );
 
