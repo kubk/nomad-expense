@@ -3,6 +3,8 @@ import { UserAvatar } from "@/components/user-avatar";
 import { trpc } from "../../shared/api";
 import { useQuery } from "@tanstack/react-query";
 import { useRouter } from "@/shared/stacked-router/router";
+import { getWebApp } from "@/shared/telegram";
+import { cn } from "@/lib/utils";
 
 export function OverviewHeader() {
   const { navigate } = useRouter();
@@ -16,7 +18,11 @@ export function OverviewHeader() {
   );
 
   return (
-    <div className="text-primary-foreground bg-muted px-4 pb-6 pt-4 pb-18">
+    <div
+      className={cn("text-primary-foreground bg-muted px-4 pb-6 pt-4 pb-18", {
+        "pt-2": getWebApp(),
+      })}
+    >
       <div className="bg-background backdrop-blur border shadow-xs rounded-2xl p-4">
         <div className="flex items-start justify-between">
           <div>
