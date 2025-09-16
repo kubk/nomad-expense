@@ -6,7 +6,7 @@ import { cn } from "@/lib/utils";
 import { useTgHeaderColorSync } from "@/shared/use-tg-header-color-sync";
 
 export function OverviewScreen() {
-  useTgHeaderColorSync("primary");
+  useTgHeaderColorSync("secondary");
 
   return (
     <div className={cn("flex flex-col h-full bg-muted pb-30 overflow-auto")}>
