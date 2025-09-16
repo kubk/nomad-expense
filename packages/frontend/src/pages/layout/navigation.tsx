@@ -63,8 +63,6 @@ export function Navigation() {
           exit={{ opacity: 0, y: "100%" }}
           transition={{
             ease: "easeInOut",
-            // Keep it here so I can debug animations
-            // duration: 2,
           }}
           style={{
             paddingBottom: safeAreaInset.bottom / 2,

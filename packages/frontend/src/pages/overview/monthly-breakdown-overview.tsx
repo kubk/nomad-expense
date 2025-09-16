@@ -10,7 +10,7 @@ export function MonthlyBreakdownOverview() {
 
   return (
     <div className="px-4 -mt-14">
-      <Card className="shadow border-0 gap-0 py-4">
+      <Card className="shadow-sm border-0 gap-0 py-4">
         <CardHeader className="pb-3">
           <div className="flex justify-between items-center">
             <CardTitle className="text-base">Monthly breakdown</CardTitle>

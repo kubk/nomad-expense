@@ -42,7 +42,7 @@ export function SummaryCard({
 
   return (
     <button
-      className="w-full bg-card border shadow-xs rounded-xl active:scale-95 transition-transform"
+      className="w-full bg-card shadow-sm rounded-xl active:scale-95 transition-transform"
       onClick={onFiltersClick}
     >
       <div className="p-4 rounded-md">

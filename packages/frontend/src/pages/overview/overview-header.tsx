@@ -23,7 +23,7 @@ export function OverviewHeader() {
         "pt-2": getWebApp(),
       })}
     >
-      <div className="bg-background backdrop-blur border shadow-xs rounded-2xl p-4">
+      <div className="bg-background backdrop-blur dark:border shadow-sm rounded-2xl p-4">
         <div className="flex items-start justify-between">
           <div>
             <p className="text-foreground/70 text-sm mb-1">

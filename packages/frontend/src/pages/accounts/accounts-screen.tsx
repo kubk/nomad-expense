@@ -23,8 +23,11 @@ import { cn } from "@/lib/utils";
 import { DateTime } from "luxon";
 import { useRouter } from "@/shared/stacked-router/router";
 import { NoAccountsEmptyState } from "../shared/no-accounts-empty-state";
+import { Footer } from "../shared/footer";
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+
+const MotionFooter = motion.create(Footer);
 
 export function AccountsScreen() {
   const { navigate } = useRouter();
@@ -139,7 +142,7 @@ export function AccountsScreen() {
             <Loader2 className="w-8 h-8 animate-spin text-muted-foreground" />
           </div>
         ) : (
-          <div className="flex flex-col gap-4">
+          <div className="flex flex-col gap-3">
             {displayAccounts.length === 0 && !isReorderMode && (
               <div className="mt-[35%]">
                 <NoAccountsEmptyState />
@@ -154,7 +157,7 @@ export function AccountsScreen() {
                 <AccountCard
                   key={account.id}
                   layout={isReorderMode || undefined}
-                  className="w-full bg-card rounded-2xl shadow-sm transition-colors"
+                  className="w-full bg-card rounded-2xl shadow-sm border-none transition-colors"
                 >
                   <div className="flex items-center">
                     <button
@@ -240,39 +243,37 @@ export function AccountsScreen() {
       {/* Bottom action buttons for reorder mode */}
       <AnimatePresence>
         {isReorderMode && (
-          <motion.div
+          <MotionFooter
             initial={{ y: "100%" }}
             animate={{ y: 0 }}
             exit={{ y: "100%" }}
             transition={{
               ease: "easeInOut",
             }}
-            className="fixed z-50 bottom-0 left-0 right-0 bg-background border-t border-border px-4 py-5"
+            className="z-50 w-full"
           >
-            <div className="flex gap-3 max-w-sm mx-auto">
-              <Button
-                variant="outline"
-                className="flex-1"
-                size="lg"
-                onClick={handleCancelReorder}
-              >
-                Cancel
-              </Button>
-              <Button
-                variant="default"
-                className="flex-1"
-                size="lg"
-                onClick={handleSaveReorder}
-                disabled={reorderMutation.isPending}
-              >
-                {reorderMutation.isPending ? (
-                  <Loader2 className="w-4 h-4 animate-spin" />
-                ) : (
-                  "Save"
-                )}
-              </Button>
-            </div>
-          </motion.div>
+            <Button
+              variant="outline"
+              className="flex-1"
+              size="lg"
+              onClick={handleCancelReorder}
+            >
+              Cancel
+            </Button>
+            <Button
+              variant="default"
+              className="flex-1"
+              size="lg"
+              onClick={handleSaveReorder}
+              disabled={reorderMutation.isPending}
+            >
+              {reorderMutation.isPending ? (
+                <Loader2 className="w-4 h-4 animate-spin" />
+              ) : (
+                "Save"
+              )}
+            </Button>
+          </MotionFooter>
         )}
       </AnimatePresence>
     </>
