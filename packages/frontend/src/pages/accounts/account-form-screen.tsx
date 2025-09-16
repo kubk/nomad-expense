@@ -29,6 +29,7 @@ import {
 import { accountColorsPalette } from "./account-colors";
 import { RouteByType, useRouter } from "@/shared/stacked-router/router";
 import { Label } from "@/components/ui/label";
+import { FormActionButton } from "@/components/ui/form-action-button";
 
 type Form = {
   name: string;
@@ -246,23 +247,18 @@ export function AccountFormScreen({
           {isEdit && accountId && (
             <div className="flex flex-col gap-1.5 mt-4">
               <div className="flex gap-3">
-                <button
+                <FormActionButton
                   onClick={() => setShowDeleteConfirm(true)}
-                  type="button"
-                  disabled={isLoading}
-                  className="flex flex-1 items-center justify-center gap-2 px-4 py-3 bg-muted active:scale-95 rounded-xl transition-transform text-sm font-medium text-foreground disabled:opacity-50"
+                  icon={Trash2Icon}
                 >
-                  <Trash2Icon className="w-4 h-4" />
                   Delete
-                </button>
-                <button
+                </FormActionButton>
+                <FormActionButton
                   onClick={handleTransactionsClick}
-                  type="button"
-                  className="flex-1 flex items-center justify-center gap-2 px-4 py-3 bg-muted active:scale-95 rounded-xl transition-transform text-sm font-medium text-foreground"
+                  icon={ListPlusIcon}
                 >
-                  <ListPlusIcon className="w-4 h-4" />
                   Transactions
-                </button>
+                </FormActionButton>
               </div>
             </div>
           )}

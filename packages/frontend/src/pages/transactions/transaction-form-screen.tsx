@@ -37,6 +37,8 @@ import {
   DrawerHeader,
   DrawerTitle,
 } from "@/components/ui/drawer";
+import { FormActionButton } from "@/components/ui/form-action-button";
+import { UploadStatementButton } from "./upload-statement-button";
 
 type Form = {
   description: string;
@@ -206,25 +208,12 @@ export function TransactionFormScreen({
   const isSaving =
     updateTransactionMutation.isPending || createTransactionMutation.isPending;
 
-  const deleteButton = isEdit && (
-    <button
-      onClick={() => setShowDeleteConfirm(true)}
-      disabled={isSaving}
-      className="px-1.5 py-1.75 text-red-600 hover:bg-red-50 rounded-lg disabled:opacity-50"
-    >
-      <Trash2Icon className="w-4.5 h-4.5" />
-    </button>
-  );
-
   const isTransactionLoading = isEdit && !transaction;
 
   return (
     <Page
       title={
-        <PageHeader
-          title={isEdit ? "Edit transaction" : "Add transaction"}
-          rightSlot={deleteButton}
-        />
+        <PageHeader title={isEdit ? "Edit transaction" : "Add transaction"} />
       }
     >
       <form onSubmit={handleSave}>
@@ -376,6 +365,25 @@ export function TransactionFormScreen({
               )}
             </div>
 
+            <div className="flex flex-col gap-1 mt-4">
+              {isTransactionLoading && <Skeleton className="h-11" />}
+              {!isTransactionLoading && (
+                <div className="flex gap-3">
+                  {isEdit && (
+                    <FormActionButton
+                      onClick={() => setShowDeleteConfirm(true)}
+                      icon={Trash2Icon}
+                    >
+                      Delete
+                    </FormActionButton>
+                  )}
+                  {formData.accountId && (
+                    <UploadStatementButton accountId={formData.accountId} />
+                  )}
+                </div>
+              )}
+            </div>
+
             {/* Countable switch - only show in edit mode */}
             {isEdit && (
               <div className="flex flex-col gap-2 pl-0.5">
@@ -415,7 +423,7 @@ export function TransactionFormScreen({
             isOpen={showDeleteConfirm}
             onClose={() => setShowDeleteConfirm(false)}
             onConfirm={handleDelete}
-            title="Delete Transaction"
+            title="Delete transaction"
             description="This will permanently delete this transaction. This action cannot be undone."
             confirmText="Delete"
             isLoading={deleteTransactionMutation.isPending}
