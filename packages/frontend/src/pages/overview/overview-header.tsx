@@ -16,16 +16,16 @@ export function OverviewHeader() {
   );
 
   return (
-    <div className="bg-primary text-primary-foreground dark:bg-muted px-4 py-6 pb-18">
-      <div className="bg-background/10 dark:bg-background/50 backdrop-blur rounded-2xl p-4">
+    <div className="text-primary-foreground bg-muted px-4 py-6 pb-18">
+      <div className="bg-background backdrop-blur rounded-2xl p-4">
         <div className="flex items-start justify-between">
           <div>
-            <p className="text-primary-foreground/70 dark:text-foreground/70 text-sm mb-1">
+            <p className="text-foreground/70 text-sm mb-1">
               Expenses · Last 30 days
             </p>
-            <div className="text-3xl dark:text-foreground font-bold font-mono">
+            <div className="text-3xl text-foreground font-bold font-mono">
               {isLoading ? (
-                <div className="animate-pulse bg-muted h-9 w-32 rounded"></div>
+                <div className="animate-pulse text-foreground h-9 w-32 rounded"></div>
               ) : (
                 formatAmount(overviewData?.last30DaysTotal || 0, "USD", {
                   showFractions: false,
@@ -42,7 +42,7 @@ export function OverviewHeader() {
             {familyMembers?.map((member, index) => (
               <div
                 key={member.id}
-                className="ring-background dark:ring-foreground ring-2 rounded-full bg-background"
+                className="ring-muted dark:ring-foreground ring-2 rounded-full bg-background"
                 style={{ zIndex: familyMembers.length - index }}
               >
                 <UserAvatar
