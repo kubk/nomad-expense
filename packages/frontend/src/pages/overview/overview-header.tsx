@@ -16,7 +16,7 @@ export function OverviewHeader() {
   );
 
   return (
-    <div className="text-primary-foreground bg-muted px-4 py-6 pb-18">
+    <div className="text-primary-foreground bg-muted px-4 pb-6 pt-4 pb-18">
       <div className="bg-background backdrop-blur border shadow-xs rounded-2xl p-4">
         <div className="flex items-start justify-between">
           <div>
