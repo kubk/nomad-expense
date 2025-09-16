@@ -4,7 +4,6 @@ import { ArrowLeftIcon } from "lucide-react";
 import { getWebApp } from "@/shared/telegram";
 import { cn } from "@/lib/utils";
 import { isFormRoute } from "@/shared/stacked-router/routes";
-import { motion } from "framer-motion";
 
 export function PageHeader({
   title,
