@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { eq, and, or, desc, gte, lte, inArray, sql, like } from "drizzle-orm";
+import { eq, and, or, desc, gte, lte, inArray, sql, ilike } from "drizzle-orm";
 import { DateTime } from "luxon";
 import { protectedProcedure, t } from "./trpc";
 import { transactionTable, accountTable } from "../db/schema";
@@ -55,7 +55,7 @@ const getFilteredTransactions = async (
       );
     } else if (input.description.type === "includes") {
       conditions.push(
-        like(transactionTable.description, `%${input.description.input}%`),
+        ilike(transactionTable.description, `%${input.description.input}%`),
       );
     }
   }
