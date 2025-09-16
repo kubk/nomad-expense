@@ -2,19 +2,6 @@ import { useTheme } from "@/pages/shared/theme-provider";
 import { useEffect } from "react";
 import { getWebApp } from "./telegram";
 
-export function useTgHeaderColorMainSync() {
-  const { theme } = useTheme();
-  useEffect(() => {
-    const webApp = getWebApp();
-    if (!webApp) return;
-    if (theme === "dark") {
-      webApp.setHeaderColor("#262626");
-    } else {
-      webApp.setHeaderColor("#171717");
-    }
-  }, [theme]);
-}
-
 export function useTgHeaderColorSync(bg: "primary" | "secondary") {
   const { theme } = useTheme();
   useEffect(() => {

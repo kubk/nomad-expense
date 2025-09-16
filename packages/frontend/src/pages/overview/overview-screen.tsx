@@ -3,15 +3,13 @@ import { OverviewHeader } from "./overview-header";
 import { MonthlyBreakdownOverview } from "./monthly-breakdown-overview";
 import { AddTransactionFab } from "./add-transaction-fab";
 import { cn } from "@/lib/utils";
-import { useTgHeaderColorMainSync } from "@/shared/use-tg-header-color-sync";
+import { useTgHeaderColorSync } from "@/shared/use-tg-header-color-sync";
 
 export function OverviewScreen() {
-  useTgHeaderColorMainSync();
+  useTgHeaderColorSync("primary");
 
   return (
-    <div
-      className={cn("flex flex-col h-full bg-muted/100 pb-30 overflow-auto")}
-    >
+    <div className={cn("flex flex-col h-full bg-muted pb-30 overflow-auto")}>
       <OverviewHeader />
       <MonthlyBreakdownOverview />
       <RecentTransactionsOverview />
