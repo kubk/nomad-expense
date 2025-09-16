@@ -187,14 +187,21 @@ export function AccountsScreen() {
                           <h3 className="font-semibold text-foreground text-lg">
                             {account.name}
                           </h3>
-                          <div className="flex items-center gap-2 mt-1.5 text-xs text-muted-foreground">
+                          <div className="flex items-center gap-1 mt-1.5 text-xs text-muted-foreground">
+                            <span>
+                              {account.transactionCount} transaction
+                              {account.transactionCount === 1 ? "" : "s"}
+                            </span>
                             {account.lastTransactionDate && (
-                              <span>
-                                Last transaction:{" "}
-                                {DateTime.fromISO(
-                                  account.lastTransactionDate,
-                                ).toLocaleString(DateTime.DATE_SHORT)}
-                              </span>
+                              <>
+                                <span>·</span>
+                                <span>
+                                  Last:{" "}
+                                  {DateTime.fromISO(
+                                    account.lastTransactionDate,
+                                  ).toLocaleString(DateTime.DATE_SHORT)}
+                                </span>
+                              </>
                             )}
                           </div>
                         </div>

@@ -1,4 +1,4 @@
-import { eq, and, asc, max } from "drizzle-orm";
+import { eq, and, asc, max, count } from "drizzle-orm";
 import { protectedProcedure, t } from "./trpc";
 import { accountTable, transactionTable } from "../db/schema";
 import { getDb } from "../services/db";
@@ -17,7 +17,9 @@ export const accountRouter = t.router({
         currency: accountTable.currency,
         color: accountTable.color,
         sort: accountTable.sort,
+        bankType: accountTable.bankType,
         lastTransactionDate: max(transactionTable.createdAt),
+        transactionCount: count(transactionTable.id),
       })
       .from(accountTable)
       .leftJoin(
@@ -31,6 +33,7 @@ export const accountRouter = t.router({
         accountTable.currency,
         accountTable.color,
         accountTable.sort,
+        accountTable.bankType,
         accountTable.createdAt,
       )
       .orderBy(asc(accountTable.sort), asc(accountTable.createdAt));
