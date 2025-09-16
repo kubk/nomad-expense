@@ -3,17 +3,18 @@ import { useRouter } from "@/shared/stacked-router/router";
 import { ArrowLeftIcon } from "lucide-react";
 import { getWebApp } from "@/shared/telegram";
 import { cn } from "@/lib/utils";
+import { isFormRoute } from "@/shared/stacked-router/routes";
+import { motion } from "framer-motion";
 
 export function PageHeader({
   title,
   rightSlot,
-  border,
 }: {
   title: string | ReactNode;
   rightSlot?: ReactNode;
-  border?: boolean;
 }) {
-  const { pop } = useRouter();
+  const { pop, currentRoute } = useRouter();
+  const isForm = isFormRoute(currentRoute);
   return (
     <div className="sticky top-0">
       <div
@@ -27,7 +28,7 @@ export function PageHeader({
             className={cn(
               "bg-background flex items-center gap-1.5 font-medium text-sm shadow-sm rounded-full py-1.5 px-3 active:scale-95 transition-transform",
               {
-                "border shadow-xs": border,
+                "border shadow-xs": isForm,
               },
             )}
           >
@@ -40,7 +41,7 @@ export function PageHeader({
           className={cn(
             "bg-background font-medium text-sm shadow-sm rounded-full py-1.5 px-4",
             {
-              "border shadow-xs": border,
+              "border shadow-xs": isForm,
             },
           )}
         >
@@ -53,7 +54,7 @@ export function PageHeader({
               className={cn(
                 "bg-background shadow-sm rounded-full px-2 active:scale-95 transition-transform",
                 {
-                  "border shadow-xs": border,
+                  "border shadow-xs": isForm,
                 },
               )}
             >

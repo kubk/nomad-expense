@@ -14,7 +14,7 @@ export function AccountPickerScreen() {
   const { navigate } = useRouter();
 
   return (
-    <Page title="Select account" bg="secondary">
+    <Page title="Select account">
       <div className="flex flex-col gap-3">
         {accounts.length === 0 && !isLoading ? (
           <div className="mt-[35%]">

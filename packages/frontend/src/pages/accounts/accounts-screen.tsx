@@ -26,6 +26,7 @@ import { NoAccountsEmptyState } from "../shared/no-accounts-empty-state";
 import { Footer } from "../shared/footer";
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { DrawerDescription } from "@/components/ui/drawer";
 
 const MotionFooter = motion.create(Footer);
 
@@ -95,7 +96,6 @@ export function AccountsScreen() {
   return (
     <>
       <Page
-        bg="secondary"
         title={
           <PageHeader
             title="Accounts"
@@ -108,6 +108,7 @@ export function AccountsScreen() {
                     </Button>
                   </DropDrawerTrigger>
                   <DropDrawerContent align="end">
+                    <DrawerDescription />
                     <DropDrawerItem
                       className="cursor-pointer"
                       icon={<PlusIcon className="h-4 w-4" />}
