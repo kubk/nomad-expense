@@ -26,5 +26,5 @@ export function useTgHeaderColorSync() {
         webApp.setHeaderColor("#f5f5f5");
       }
     }
-  }, [theme, isFormRoute]);
+  }, [theme, isForm]);
 }
