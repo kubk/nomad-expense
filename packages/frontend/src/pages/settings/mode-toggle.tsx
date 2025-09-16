@@ -1,4 +1,4 @@
-import { MoonIcon, SunIcon, MonitorIcon } from "lucide-react";
+import { MoonIcon, SunIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useTheme } from "../shared/theme-provider";
 import { cn } from "@/lib/utils";
@@ -17,11 +17,6 @@ export function ModeToggle() {
       value: "dark" as const,
       icon: MoonIcon,
     },
-    {
-      name: "System",
-      value: "system" as const,
-      icon: MonitorIcon,
-    },
   ];
 
   return (
@@ -35,8 +30,8 @@ export function ModeToggle() {
           className={cn(
             "flex-1 flex flex-col items-center gap-1 h-auto py-2 px-3",
             theme === value
-              ? "bg-background text-foreground shadow-sm"
-              : "hover:bg-background/50",
+              ? "bg-background text-foreground shadow-sm !hover:none"
+              : "",
           )}
         >
           <Icon className="h-4 w-4" />
