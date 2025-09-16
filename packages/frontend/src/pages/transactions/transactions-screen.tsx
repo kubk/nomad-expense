@@ -59,7 +59,7 @@ export function TransactionsScreen({
                   ))}
                 </div>
               </div>
-            ) : transactions.length > 0 ? (
+            ) : transactions.length >= 6 ? (
               <VList style={{ height: 600 }}>
                 {transactions.map((transaction, idx) => (
                   <TransactionItem
@@ -69,6 +69,16 @@ export function TransactionsScreen({
                   />
                 ))}
               </VList>
+            ) : transactions.length > 0 ? (
+              <div>
+                {transactions.map((transaction, idx) => (
+                  <TransactionItem
+                    key={transaction.id}
+                    transaction={transaction}
+                    showBorder={idx !== transactions.length - 1}
+                  />
+                ))}
+              </div>
             ) : (
               <div className="flex flex-col items-center justify-center py-16 px-4">
                 <div className="w-16 h-16 rounded-full bg-muted/50 flex items-center justify-center mb-4">
