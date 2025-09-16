@@ -10,6 +10,7 @@ import { useAccountIds } from "@/shared/hooks/use-account-ids";
 import { Page } from "../shared/page";
 import { RouteByType, useRouter } from "@/shared/stacked-router/router";
 import { VList } from "virtua";
+import { FilterIcon } from "lucide-react";
 
 export function TransactionsScreen({
   route,
@@ -58,7 +59,7 @@ export function TransactionsScreen({
                   ))}
                 </div>
               </div>
-            ) : (
+            ) : transactions.length > 0 ? (
               <VList style={{ height: 600 }}>
                 {transactions.map((transaction, idx) => (
                   <TransactionItem
@@ -68,6 +69,18 @@ export function TransactionsScreen({
                   />
                 ))}
               </VList>
+            ) : (
+              <div className="flex flex-col items-center justify-center py-16 px-4">
+                <div className="w-16 h-16 rounded-full bg-muted/50 flex items-center justify-center mb-4">
+                  <FilterIcon className="w-8 h-8 text-muted-foreground" />
+                </div>
+                <h3 className="text-lg font-medium text-foreground mb-2">
+                  No transactions found
+                </h3>
+                <p className="text-sm text-muted-foreground text-center max-w-sm">
+                  Try updating your filters to see more transactions
+                </p>
+              </div>
             )}
           </CardContent>
         </Card>
