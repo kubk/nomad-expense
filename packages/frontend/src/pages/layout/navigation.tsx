@@ -67,7 +67,7 @@ export function Navigation() {
             // duration: 2,
           }}
           style={{
-            paddingBottom: safeAreaInset.bottom,
+            paddingBottom: safeAreaInset.bottom / 2,
           }}
           className="fixed bottom-0 left-0 right-0 bg-background border-t border-border"
         >
