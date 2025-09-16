@@ -16,10 +16,12 @@ import { Route } from "@/shared/stacked-router/routes";
 import { AnimatedScreen } from "@/shared/stacked-router/animated-screen";
 import { AccountPickerScreen } from "../transactions/account-picker-screen";
 import { initializeTma } from "@/shared/telegram";
+import { useTgHeaderColorSync } from "@/shared/use-tg-header-color-sync";
 // import { getSafeAreaInset } from "@/shared/telegram";
 
 export function App() {
   useEffect(initializeTma, []);
+  useTgHeaderColorSync();
   const { navigationStack, navigate, pop } = useRouter();
   // const safeAreaInset = getSafeAreaInset();
 
