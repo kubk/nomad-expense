@@ -1,7 +1,6 @@
 import { cn } from "@/lib/utils";
 import { PageHeader } from "./page-header";
 import { ReactNode } from "react";
-import { useTgHeaderColorSync } from "@/shared/use-tg-header-color-sync";
 
 export function Page({
   children,
@@ -14,8 +13,6 @@ export function Page({
   title?: string | ReactNode;
   bg?: "primary" | "secondary";
 }) {
-  useTgHeaderColorSync(bg);
-
   return (
     <div
       className={cn(
