@@ -1,17 +1,28 @@
 import { cn } from "@/lib/utils";
 import { PageHeader } from "./page-header";
-import { ReactNode } from "react";
+import { ReactNode, useEffect } from "react";
+import { useTheme } from "./theme-provider";
+import { getWebApp } from "@/shared/telegram";
 
-export function PlainPage({
-  children,
-  className,
-}: {
-  children: ReactNode;
-  className?: string;
-}) {
-  return (
-    <div className={cn("flex flex-col h-full", className)}>{children}</div>
-  );
+function useTelegramHeaderColorSync(bg: "primary" | "secondary") {
+  const { theme } = useTheme();
+  useEffect(() => {
+    const webApp = getWebApp();
+    if (!webApp) return;
+    if (theme === "dark") {
+      if (bg === "primary") {
+        webApp.setHeaderColor("#0a0a0a");
+      } else {
+        webApp.setHeaderColor("#262626");
+      }
+    } else {
+      if (bg === "primary") {
+        webApp.setHeaderColor("#ffffff");
+      } else {
+        webApp.setHeaderColor("#f5f5f5");
+      }
+    }
+  }, [bg, theme]);
 }
 
 export function Page({
@@ -25,6 +36,8 @@ export function Page({
   title?: string | ReactNode;
   bg?: "primary" | "secondary";
 }) {
+  useTelegramHeaderColorSync(bg);
+
   return (
     <div
       className={cn(
