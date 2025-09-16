@@ -20,7 +20,7 @@ export function OverviewHeader() {
   return (
     <div
       className={cn("text-primary-foreground bg-muted px-4 pb-6 pt-4 pb-18", {
-        "pt-2": getWebApp(),
+        "pt-1": getWebApp(),
       })}
     >
       <div className="bg-background backdrop-blur dark:border shadow-sm rounded-2xl p-4">
