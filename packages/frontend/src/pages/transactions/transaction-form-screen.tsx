@@ -143,7 +143,7 @@ export function TransactionFormScreen({
       const timeString = transactionDateTime.toFormat("HH:mm");
 
       setFormData({
-        description: transaction.desc,
+        description: transaction.description,
         accountId: transaction.accountId,
         amount: (transaction.amount / 100).toString(),
         date: transactionDate,
