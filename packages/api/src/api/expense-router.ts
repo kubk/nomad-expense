@@ -81,11 +81,11 @@ const getFilteredTransactions = async (
     if (input.date.value.length > 0) {
       const monthConditions = input.date.value.map(({ year, month }) => {
         const startDate = DateTime.fromObject({ year, month, day: 1 });
-        const endDate = startDate.endOf('month');
+        const endDate = startDate.endOf("month");
 
         return and(
           gte(transactionTable.createdAt, startDate.toJSDate()),
-          lte(transactionTable.createdAt, endDate.toJSDate())
+          lte(transactionTable.createdAt, endDate.toJSDate()),
         )!; // Non-null assertion since we know and() will return a value
       });
 
