@@ -14,8 +14,6 @@ export function TransactionItem({
 }) {
   const { navigate } = useRouter();
   const isIncome = transaction.type === "income";
-  const displayAmount = transaction.amount;
-  const displayAmountInUSD = transaction.usd;
 
   const handleClick = () => {
     navigate({ type: "transactionForm", transactionId: transaction.id });
@@ -50,7 +48,7 @@ export function TransactionItem({
           )}
         >
           <span>{isIncome ? "+" : ""}</span>
-          <span>{formatAmount(displayAmount, transaction.currency)}</span>
+          <span>{formatAmount(transaction.amount, transaction.currency)}</span>
         </div>
         {transaction.currency !== "USD" && (
           <div
@@ -62,7 +60,7 @@ export function TransactionItem({
             )}
           >
             <span>{isIncome ? "+" : ""}</span>
-            <span>{formatAmount(displayAmountInUSD, "USD")}</span>
+            <span>{formatAmount(transaction.usdAmount, "USD")}</span>
           </div>
         )}
       </div>
