@@ -7,7 +7,7 @@ import { getDb, type DB } from "../services/db";
 import { transactionTypeSchema } from "../db/enums";
 import { getAccountByFamilyId } from "../db/account/can-acess-account";
 import { TRPCError } from "@trpc/server";
-import { createMoneyFullFromHuman } from "../services/base-money";
+import { createMoneyFull } from "../services/money/money";
 
 const transactionFilterSchema = z.object({
   accounts: z.array(z.string()),
@@ -450,8 +450,8 @@ export const expenseRouter = t.router({
         throw new TRPCError({ code: "NOT_FOUND" });
       }
 
-      const money = createMoneyFullFromHuman({
-        amountHuman: input.amount,
+      const money = createMoneyFull({
+        amount: { amountHuman: input.amount },
         currency: existingTransactionResult.currency,
       });
 
@@ -528,8 +528,8 @@ export const expenseRouter = t.router({
 
       const account = accountResult.account;
 
-      const money = createMoneyFullFromHuman({
-        amountHuman: input.amount,
+      const money = createMoneyFull({
+        amount: { amountHuman: input.amount },
         currency: account.currency,
       });
 

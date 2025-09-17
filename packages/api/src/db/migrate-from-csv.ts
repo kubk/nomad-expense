@@ -5,7 +5,7 @@ import {
   transactionTable,
   transactionImportRuleTable,
 } from "./schema";
-import { EXCHANGE_RATES_TO_USD } from "../services/currency-converter";
+import { EXCHANGE_RATES_TO_USD } from "../services/money/currency-converter";
 import {
   currencySchema,
   transactionSourceSchema,

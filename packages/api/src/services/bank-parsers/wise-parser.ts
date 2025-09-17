@@ -1,7 +1,10 @@
 import { z } from "zod";
-import { parseCSVFromFile } from "../csv-parser";
+import { parseCSVFromFile } from "./csv-parser";
 import { currencySchema } from "../../db/enums";
-import { SupportedCurrency } from "../currency-converter";
+import {
+  ParsedTransaction,
+  parsedTransactionSchema,
+} from "./parsed-transaction";
 
 const wiseCSVRowSchema = z.object({
   Amount: z.string(),
@@ -11,34 +14,29 @@ const wiseCSVRowSchema = z.object({
   Date: z.string(),
 });
 
-export type WiseTransaction = {
-  amount: number;
-  currency: SupportedCurrency;
-  title: string;
-  info: string;
-  createdAt: Date;
-};
-
 export async function parseWiseStatement(
   file: File,
-): Promise<WiseTransaction[]> {
+): Promise<ParsedTransaction[]> {
   const csvData = await parseCSVFromFile(file);
 
-  const transactions: WiseTransaction[] = [];
+  const transactions: ParsedTransaction[] = [];
 
   for (const row of csvData) {
     // Fail fast - don't catch validation errors
     const validatedRow = wiseCSVRowSchema.parse(row);
 
-    const transaction: WiseTransaction = {
-      amount: parseAmount(validatedRow.Amount),
+    const amount = parseAmount(validatedRow.Amount);
+    const transaction = {
+      amount: Math.abs(amount),
       currency: validatedRow.Currency,
-      title: validatedRow.Merchant || validatedRow.Description,
+      description: validatedRow.Merchant || validatedRow.Description,
       info: validatedRow.Description,
+      type: amount < 0 ? "expense" : "income",
       createdAt: parseDate(validatedRow.Date),
     };
 
-    transactions.push(transaction);
+    const validatedTransaction = parsedTransactionSchema.parse(transaction);
+    transactions.push(validatedTransaction);
   }
 
   return transactions;

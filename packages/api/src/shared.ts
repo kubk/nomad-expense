@@ -6,7 +6,7 @@ export {
   type CurrencyInfo,
   EXCHANGE_RATES_TO_USD,
   convert,
-} from "./services/currency-converter";
+} from "./services/money/currency-converter";
 import type { inferRouterInputs, inferRouterOutputs } from "@trpc/server";
 import {
   accountColorSchema,
@@ -35,3 +35,5 @@ export type TransactionType = z.infer<typeof transactionTypeSchema>;
 export type TransactionSource = z.infer<typeof transactionSourceSchema>;
 
 export { telegramAuthMethod } from "./services/auth/telegram-auth-method";
+
+export { type UploadHandlerResponse } from "./api/upload-handler";
