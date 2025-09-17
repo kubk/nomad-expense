@@ -50,7 +50,7 @@ export function MonthlyChart() {
           return (
             <div className="flex items-end pb-4 min-w-max">
               {sortedMonthlyData.map((month) => {
-                const heightPercentage = (month.amount / maxAmount) * 100;
+                const heightPercentage = (month.usdAmount / maxAmount) * 100;
                 const barHeight = (heightPercentage / 100) * 100; // 100px max height
 
                 return (
@@ -74,7 +74,7 @@ export function MonthlyChart() {
                     }}
                   >
                     <div className="mb-4 text-xs font-semibold text-foreground text-center font-mono">
-                      {formatAmount(month.amount, "USD", {
+                      {formatAmount(month.usdAmount, "USD", {
                         showFractions: false,
                       })}
                     </div>

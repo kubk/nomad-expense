@@ -1,3 +1,3 @@
-export function calculateMaxAmount(data: { amount: number }[]): number {
-  return Math.max(...data.map((item) => item.amount), 0);
+export function calculateMaxAmount(data: { usdAmount: number }[]): number {
+  return Math.max(...data.map((item) => item.usdAmount), 0);
 }

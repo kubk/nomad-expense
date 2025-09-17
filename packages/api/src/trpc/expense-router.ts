@@ -193,7 +193,7 @@ export const expenseRouter = t.router({
     // Group transactions by month/year for overview
     const monthlyTotals: {
       [key: string]: {
-        amount: number;
+        usdAmount: number;
         year: number;
         month: number;
         shortMonth: string;
@@ -209,14 +209,14 @@ export const expenseRouter = t.router({
 
       if (!monthlyTotals[monthKey]) {
         monthlyTotals[monthKey] = {
-          amount: 0,
+          usdAmount: 0,
           year,
           month,
           shortMonth,
         };
       }
 
-      monthlyTotals[monthKey].amount += transaction.usdAmount;
+      monthlyTotals[monthKey].usdAmount += transaction.usdAmount;
     });
 
     // Convert to array and sort chronologically
@@ -230,7 +230,7 @@ export const expenseRouter = t.router({
         month: `${monthData.shortMonth} ${monthData.year}`,
         shortMonth: monthData.shortMonth,
         monthNumber: monthData.month,
-        amount: monthData.amount,
+        usdAmount: monthData.usdAmount,
         year: monthData.year,
       }));
 
@@ -244,7 +244,7 @@ export const expenseRouter = t.router({
         desc: t.description,
         amount: t.amount,
         currency: t.currency,
-        usd: t.usdAmount,
+        usdAmount: t.usdAmount,
         createdAt: t.createdAt,
         accountId: t.accountId,
         type: t.type,
@@ -263,7 +263,7 @@ export const expenseRouter = t.router({
       // Group transactions by month (expenses and income separately)
       const monthlyExpenseTotals: {
         [key: string]: {
-          amount: number;
+          usdAmount: number;
           year: number;
           month: number;
           shortMonth: string;
@@ -271,7 +271,7 @@ export const expenseRouter = t.router({
       } = {};
       const monthlyIncomeTotals: {
         [key: string]: {
-          amount: number;
+          usdAmount: number;
           year: number;
           month: number;
           shortMonth: string;
@@ -290,23 +290,23 @@ export const expenseRouter = t.router({
         if (transaction.type === "expense") {
           if (!monthlyExpenseTotals[monthKey]) {
             monthlyExpenseTotals[monthKey] = {
-              amount: 0,
+              usdAmount: 0,
               year,
               month,
               shortMonth,
             };
           }
-          monthlyExpenseTotals[monthKey].amount += transaction.usdAmount;
+          monthlyExpenseTotals[monthKey].usdAmount += transaction.usdAmount;
         } else if (transaction.type === "income") {
           if (!monthlyIncomeTotals[monthKey]) {
             monthlyIncomeTotals[monthKey] = {
-              amount: 0,
+              usdAmount: 0,
               year,
               month,
               shortMonth,
             };
           }
-          monthlyIncomeTotals[monthKey].amount += transaction.usdAmount;
+          monthlyIncomeTotals[monthKey].usdAmount += transaction.usdAmount;
         }
       });
 
@@ -316,7 +316,7 @@ export const expenseRouter = t.router({
           month: `${monthData.shortMonth} ${monthData.year}`,
           shortMonth: monthData.shortMonth,
           monthNumber: monthData.month,
-          amount: Math.round(monthData.amount),
+          usdAmount: Math.round(monthData.usdAmount),
           year: monthData.year,
         }))
         .sort((a, b) => {
@@ -330,7 +330,7 @@ export const expenseRouter = t.router({
               comparison = a.monthNumber - b.monthNumber;
             }
           } else if (input.order.field === "amount") {
-            comparison = a.amount - b.amount;
+            comparison = a.usdAmount - b.usdAmount;
           }
 
           return input.order.direction === "desc" ? -comparison : comparison;
@@ -338,12 +338,12 @@ export const expenseRouter = t.router({
 
       // Calculate totals for the filtered period
       const totalExpenses = Object.values(monthlyExpenseTotals).reduce(
-        (sum, monthData) => sum + monthData.amount,
+        (sum, monthData) => sum + monthData.usdAmount,
         0,
       );
 
       const totalIncome = Object.values(monthlyIncomeTotals).reduce(
-        (sum, monthData) => sum + monthData.amount,
+        (sum, monthData) => sum + monthData.usdAmount,
         0,
       );
 
@@ -393,7 +393,7 @@ export const expenseRouter = t.router({
           desc: t.description,
           amount: t.amount,
           currency: t.currency,
-          usd: t.usdAmount,
+          usdAmount: t.usdAmount,
           createdAt: t.createdAt,
           accountId: t.accountId,
           type: t.type,
