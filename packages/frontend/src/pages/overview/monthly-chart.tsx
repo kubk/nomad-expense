@@ -7,6 +7,7 @@ import { MonthlyChartEmptyState } from "./monthly-chart-empty-state";
 import { MonthlyChartLoader } from "./monthly-chart-loader";
 import { useAccountIds } from "@/shared/hooks/use-account-ids";
 import { useRouter } from "@/shared/stacked-router/router";
+import { calculateMaxAmount } from "../../shared/chart-calculations";
 
 export function MonthlyChart() {
   const scrollContainerRef = useRef<HTMLDivElement>(null);
@@ -18,7 +19,7 @@ export function MonthlyChart() {
   );
 
   const sortedMonthlyData = overviewData?.overview.data || [];
-  const maxAmount = overviewData?.overview.maxAmountUsd || 0;
+  const maxAmount = calculateMaxAmount(sortedMonthlyData);
 
   useEffect(() => {
     // Scroll to the right on mount

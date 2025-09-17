@@ -10,6 +10,7 @@ import { useAccountIds } from "@/shared/hooks/use-account-ids";
 import { Page } from "../shared/page";
 import { RouteByType } from "@/shared/stacked-router/router";
 import { useRouter } from "@/shared/stacked-router/router";
+import { calculateMaxAmount } from "../../shared/chart-calculations";
 
 export function MonthlyBreakdownFull({
   route,
@@ -33,7 +34,7 @@ export function MonthlyBreakdownFull({
   );
 
   const filteredMonthlyData = transactionsData?.data || [];
-  const maxAmount = transactionsData?.maxAmount || 0;
+  const maxAmount = calculateMaxAmount(filteredMonthlyData);
   const totalExpenses = transactionsData?.totalExpenses || 0;
   const totalIncome = transactionsData?.totalIncome || 0;
 
