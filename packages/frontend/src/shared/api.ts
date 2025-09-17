@@ -1,7 +1,7 @@
 import { env } from "./env";
 import type { ApiRouter } from "api";
 import { QueryClient } from "@tanstack/react-query";
-import { createTRPCClient, httpBatchLink } from "@trpc/client";
+import { createTRPCClient, httpLink } from "@trpc/client";
 import { createTRPCOptionsProxy } from "@trpc/tanstack-react-query";
 import { getAuthToken } from "./auth-token";
 
@@ -16,7 +16,7 @@ export const queryClient = new QueryClient({
 
 const trpcClient = createTRPCClient<ApiRouter>({
   links: [
-    httpBatchLink({
+    httpLink({
       url: env.VITE_API_URL,
       headers: () => ({
         Authorization: getAuthToken(),

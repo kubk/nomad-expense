@@ -192,10 +192,6 @@ export function FiltersDrawer({
                         onClick={() => handleMonthsChange(period.value)}
                         className="cursor-pointer px-3 py-1.5 text-sm whitespace-nowrap flex-shrink-0 flex items-center gap-2"
                       >
-                        {filterForm.date.type === "months" &&
-                          filterForm.date.value === period.value && (
-                            <CheckIcon className="size-3" />
-                          )}
                         {period.label}
                       </Badge>
                     ))}
