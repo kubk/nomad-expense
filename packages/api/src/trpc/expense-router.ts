@@ -80,16 +80,12 @@ const getFilteredTransactions = async (
     // Custom year-month filter
     if (input.date.value.length > 0) {
       const monthConditions = input.date.value.map(({ year, month }) => {
-        const monthStr = month.toString().padStart(2, "0");
-        const lastDay = new Date(year, month, 0).getDate();
+        const startDate = DateTime.fromObject({ year, month, day: 1 });
+        const endDate = startDate.endOf('month');
+
         return and(
-          gte(transactionTable.createdAt, new Date(`${year}-${monthStr}-01`)),
-          lte(
-            transactionTable.createdAt,
-            new Date(
-              `${year}-${monthStr}-${lastDay.toString().padStart(2, "0")}`,
-            ),
-          ),
+          gte(transactionTable.createdAt, startDate.toJSDate()),
+          lte(transactionTable.createdAt, endDate.toJSDate())
         )!; // Non-null assertion since we know and() will return a value
       });
 
