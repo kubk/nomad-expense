@@ -1,5 +1,5 @@
 import z from "zod";
-import { router } from "./trpc/router";
+import { router } from "./api/router";
 export {
   type SupportedCurrency,
   SUPPORTED_CURRENCIES,

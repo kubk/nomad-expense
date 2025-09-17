@@ -1,9 +1,10 @@
 import { fetchRequestHandler } from "@trpc/server/adapters/fetch";
-import { createContext } from "./trpc/trpc";
+import { createContext } from "./api/trpc";
 import { addCorsHeaders } from "./lib/cloudflare/cors";
 import { setEnv } from "./services/env";
-import { router } from "./trpc/router";
+import { router } from "./api/router";
 import { setKv } from "./services/kv";
+import { uploadHandler } from "./api/upload-handler";
 
 export default {
   async fetch(request, env) {
@@ -12,6 +13,12 @@ export default {
 
     if (request.method === "OPTIONS") {
       return addCorsHeaders();
+    }
+
+    const url = new URL(request.url);
+    const key = url.pathname.slice(1);
+    if (request.method === "POST" && key === "upload-statement") {
+      return uploadHandler(request);
     }
 
     const response = await fetchRequestHandler({
