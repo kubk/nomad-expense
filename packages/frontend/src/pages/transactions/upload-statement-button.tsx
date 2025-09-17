@@ -22,25 +22,17 @@ export function UploadStatementButton({ accountId }: { accountId: string }) {
     const file = event.target.files?.[0];
     if (!file) return;
 
-    if (!account || account.bankType !== "Wise") {
-      toast.error("Only Wise bank statements are currently supported");
-      return;
-    }
-
     setIsUploading(true);
     try {
       const result = await uploadStatementFile(file, accountId);
 
-      if (result.success) {
+      if (result.type === "success") {
         toast.success(
           `Bank statement processed successfully! Removed ${result.removed || 0} transactions, added ${result.added || 0} new transactions.`,
         );
       } else {
-        toast.error(result.error || "Upload failed");
+        toast.error(result.message || "Upload failed");
       }
-    } catch (error) {
-      console.error("Upload error:", error);
-      toast.error("An unexpected error occurred");
     } finally {
       setIsUploading(false);
       if (fileInputRef.current) {
