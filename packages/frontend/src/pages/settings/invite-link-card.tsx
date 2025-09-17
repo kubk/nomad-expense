@@ -3,7 +3,7 @@ import { CopyIcon, CheckIcon, ClockIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { DateTime } from "luxon";
-import { generateInviteUrl } from "../../shared/generate-invite-url";
+import { generateInviteUrl } from "./generate-invite-url";
 import { copyToClipboard } from "../../shared/copy-to-clipboard";
 
 export function InviteLinkCard({

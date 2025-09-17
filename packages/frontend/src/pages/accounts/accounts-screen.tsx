@@ -14,16 +14,16 @@ import {
   DropDrawerTrigger,
 } from "@/components/ui/dropdrawer";
 import { getCurrencySymbol } from "../../shared/currency-formatter";
-import { PageHeader } from "../shared/page-header";
+import { PageHeader } from "../widgets/page-header";
 import { trpc } from "@/shared/api";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { Page } from "../shared/page";
+import { Page } from "../widgets/page";
 import { getColorById } from "./account-colors";
 import { cn } from "@/lib/utils";
 import { DateTime } from "luxon";
 import { useRouter } from "@/shared/stacked-router/router";
-import { NoAccountsEmptyState } from "../shared/no-accounts-empty-state";
-import { Footer } from "../shared/footer";
+import { NoAccountsEmptyState } from "../widgets/no-accounts-empty-state";
+import { Footer } from "../widgets/footer";
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { DrawerDescription } from "@/components/ui/drawer";

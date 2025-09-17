@@ -3,12 +3,12 @@ import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ModeToggle } from "./mode-toggle";
-import { Page } from "../shared/page";
+import { Page } from "../widgets/page";
 import { trpc } from "@/shared/api";
 import { useQuery } from "@tanstack/react-query";
 import { useRouter } from "@/shared/stacked-router/router";
 import { clearAuthToken } from "@/shared/auth-token";
-import { ConfirmModal } from "../shared/confirm-modal";
+import { ConfirmModal } from "../widgets/confirm-modal";
 import { useState } from "react";
 
 export function SettingsScreen() {

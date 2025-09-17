@@ -1,13 +1,13 @@
 import { useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { MonthlyBreakdownItem } from "./monthly-breakdown-item";
-import { SummaryCard } from "../shared/summary-card";
-import { FiltersDrawer } from "../shared/filters-drawer";
+import { SummaryCard } from "../widgets/summary-card";
+import { FiltersDrawer } from "../widgets/filters-drawer";
 import { trpc } from "../../shared/api";
 import { useQuery } from "@tanstack/react-query";
 import { TransactionFilters } from "api";
 import { useAccountIds } from "@/shared/hooks/use-account-ids";
-import { Page } from "../shared/page";
+import { Page } from "../widgets/page";
 import { RouteByType } from "@/shared/stacked-router/router";
 import { useRouter } from "@/shared/stacked-router/router";
 import { calculateMaxAmount } from "../../shared/chart-calculations";

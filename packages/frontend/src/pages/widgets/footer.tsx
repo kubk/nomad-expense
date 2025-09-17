@@ -1,4 +1,4 @@
-import { getSafeAreaInset } from "@/shared/telegram";
+import { getSafeAreaInset } from "@/shared/telegram/telegram";
 import { ReactNode } from "react";
 import { cn } from "@/lib/utils";
 

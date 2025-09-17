@@ -1,5 +1,5 @@
 import { env } from "./env";
-import { getWebApp } from "./telegram";
+import { getWebApp } from "./telegram/telegram";
 import { telegramAuthMethod } from "api";
 
 export const authQueryKey = "authQuery";

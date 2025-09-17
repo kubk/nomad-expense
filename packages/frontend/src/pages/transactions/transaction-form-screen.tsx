@@ -19,10 +19,10 @@ import {
 } from "@/components/ui/popover";
 import { Skeleton } from "@/components/ui/skeleton";
 import { RouteByType, useRouter } from "@/shared/stacked-router/router";
-import { PageHeader } from "../shared/page-header";
-import { Page } from "../shared/page";
-import { ConfirmModal } from "../shared/confirm-modal";
-import { Footer } from "../shared/footer";
+import { PageHeader } from "../widgets/page-header";
+import { Page } from "../widgets/page";
+import { ConfirmModal } from "../widgets/confirm-modal";
+import { Footer } from "../widgets/footer";
 import { trpc } from "@/shared/api";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { TransactionType } from "api";
