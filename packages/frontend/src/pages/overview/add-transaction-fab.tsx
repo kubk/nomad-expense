@@ -1,7 +1,7 @@
 import { PlusIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useRouter } from "@/shared/stacked-router/router";
-import { getSafeAreaInset } from "@/shared/telegram";
+import { getSafeAreaInset } from "@/shared/telegram/telegram";
 
 export function AddTransactionFab() {
   const { navigate } = useRouter();

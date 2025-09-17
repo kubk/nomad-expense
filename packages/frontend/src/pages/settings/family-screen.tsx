@@ -1,6 +1,6 @@
 import { PlusIcon, CircleQuestionMarkIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Page } from "../shared/page";
+import { Page } from "../widgets/page";
 import { FamilyMemberItem } from "./family-member-item";
 import { InviteLinkCard } from "./invite-link-card";
 import { trpc } from "@/shared/api";

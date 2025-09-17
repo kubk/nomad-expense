@@ -26,16 +26,6 @@ npm run typecheck  # TypeScript type checking
 - Types are centralized for consistency
 - Data is mocked but structured for easy API integration
 
-## Transaction System
-
-### Amount Structure
-- Transaction amounts are stored as integers representing cents (multiplied by 100)
-
-### Calculation Rules
-- Summary totals should only include expenses
-- Income transactions are excluded from total calculations
-- Individual transaction display converts from cents to dollars (divided by 100)
-
 ### **IMPORTANT: Money Handling Architecture**
 - **Storage**: All amounts stored as integers in cents (e.g., $1.23 = 123 cents)
 - **Calculations**: All math operations work with cents only (no decimal divisions)
@@ -78,6 +68,7 @@ export function Component({
   - `transactions/` - Transactions page and related components
   - `overview/` - Overview page and related components
   - `settings/` - Settings page and related components
+  - `widgets/` - Components reused across multiple pages
 
 ### Shared Resources
 - `shared/` - Reusable functions and logic (NOT UI components)
