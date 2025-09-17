@@ -12,39 +12,44 @@ describe("parseWiseStatement", () => {
     expect(transactions).toMatchInlineSnapshot(`
           [
             {
-              "amount": -5000,
+              "amount": 5000,
               "createdAt": 2024-03-14T17:00:00.000Z,
               "currency": "USD",
+              "description": "Coffee Shop",
               "info": "Morning coffee purchase",
-              "title": "Coffee Shop",
+              "type": "expense",
             },
             {
-              "amount": -12075,
+              "amount": 12075,
               "createdAt": 2024-03-15T17:00:00.000Z,
               "currency": "EUR",
+              "description": "Amazon",
               "info": "Online shopping - books",
-              "title": "Amazon",
+              "type": "expense",
             },
             {
-              "amount": -2550,
+              "amount": 2550,
               "createdAt": 2024-03-16T17:00:00.000Z,
               "currency": "USD",
+              "description": "Uber",
               "info": "Ride to airport",
-              "title": "Uber",
+              "type": "expense",
             },
             {
               "amount": 50000,
               "createdAt": 2024-03-17T17:00:00.000Z,
               "currency": "USD",
+              "description": "Freelance Payment",
               "info": "Client payment for project",
-              "title": "Freelance Payment",
+              "type": "income",
             },
             {
-              "amount": -1525,
+              "amount": 1525,
               "createdAt": 2024-03-18T17:00:00.000Z,
               "currency": "USD",
+              "description": "Starbucks",
               "info": "Coffee and pastry",
-              "title": "Starbucks",
+              "type": "expense",
             },
           ]
         `);
@@ -56,13 +61,15 @@ describe("parseWiseStatement", () => {
     await expect(parseWiseStatement(invalidFile)).rejects.toThrow();
   });
 
-  it("should use merchant name as title when available, fallback to description", async () => {
+  it("should use merchant name as description when available, fallback to description", async () => {
     const csvWithEmptyMerchant = `Amount,Currency,Merchant,Description,Date
 -25.00,USD,,ATM Withdrawal,20-03-2024`;
 
     const transactions = await parseWiseStatement(
       new File([csvWithEmptyMerchant], "test.csv"),
     );
-    expect(transactions[0].title).toBe("ATM Withdrawal");
+    expect(transactions[0].description).toBe("ATM Withdrawal");
+    expect(transactions[0].type).toBe("expense");
+    expect(transactions[0].amount).toBe(2500);
   });
 });

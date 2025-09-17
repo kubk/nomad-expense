@@ -1,19 +1,34 @@
-import { addCorsHeaders } from "../lib/cloudflare/cors";
 import { authenticate } from "../services/auth/authenticate";
 import { getDb } from "../services/db";
 import { parseWiseStatement } from "../services/bank-parsers/wise-parser";
 import { importTransactions } from "../services/transaction-import";
+import {
+  AccountFromFamily,
+  getAccountByFamilyId,
+} from "../db/account/can-acess-account";
+import { ParseTransactionFn } from "../services/bank-parsers/parsed-transaction";
+import { jsonResponse } from "./json-response";
+
+export type UploadHandlerResponse =
+  | { type: "error"; message: string }
+  | { type: "success"; removed: number; added: number };
+
+function getTransactionParserByAccount(
+  account: AccountFromFamily,
+): ParseTransactionFn {
+  switch (account.bankType) {
+    case "Wise":
+      return parseWiseStatement;
+    default:
+      throw new Error("Unsupported bank type: " + account.bankType);
+  }
+}
 
 export async function uploadHandler(request: Request): Promise<Response> {
   try {
     const authResult = await authenticate(request);
     if (!authResult) {
-      return addCorsHeaders(
-        new Response(JSON.stringify({ error: "Unauthorized" }), {
-          status: 401,
-          headers: { "Content-Type": "application/json" },
-        }),
-      );
+      return jsonResponse(401, { type: "error", message: "Unauthorized" });
     }
 
     const formData = await request.formData();
@@ -21,67 +36,48 @@ export async function uploadHandler(request: Request): Promise<Response> {
     const accountId = formData.get("accountId") as string;
 
     if (!file) {
-      return addCorsHeaders(
-        new Response(JSON.stringify({ error: "No file provided" }), {
-          status: 400,
-          headers: { "Content-Type": "application/json" },
-        }),
-      );
+      return jsonResponse(400, { type: "error", message: "No file provided" });
     }
 
     if (!accountId) {
-      return addCorsHeaders(
-        new Response(JSON.stringify({ error: "No account ID provided" }), {
-          status: 400,
-          headers: { "Content-Type": "application/json" },
-        }),
-      );
+      return jsonResponse(400, {
+        type: "error",
+        message: "No account ID provided",
+      });
     }
 
-    console.log("Processing bank statement:", {
-      fileName: file.name,
-      fileSize: file.size,
-      accountId,
-      userId: authResult.userId,
-      familyId: authResult.familyId,
-    });
-
-    // Parse the Wise CSV file
-    const transactions = await parseWiseStatement(file);
-
-    // Import the transactions
     const db = getDb();
-    const result = await importTransactions(
+    const accountResult = await getAccountByFamilyId(
       db,
       accountId,
       authResult.familyId,
-      transactions,
     );
 
-    return addCorsHeaders(
-      new Response(
-        JSON.stringify({
-          success: true,
-          removed: result.removed,
-          added: result.added,
-        }),
-        {
-          status: 200,
-          headers: { "Content-Type": "application/json" },
-        },
-      ),
+    if (accountResult.type === "notFound") {
+      return jsonResponse(403, { type: "error", message: "Access denied" });
+    }
+
+    const transactionParser = getTransactionParserByAccount(
+      accountResult.account,
     );
+
+    const result = await importTransactions(
+      db,
+      accountResult.account,
+      await transactionParser(file),
+    );
+
+    return jsonResponse(200, {
+      type: "success",
+      removed: result.removed,
+      added: result.added,
+    });
   } catch (error) {
     console.error("Upload error:", error);
 
-    const errorMessage =
-      error instanceof Error ? error.message : "Unknown error occurred";
-
-    return addCorsHeaders(
-      new Response(JSON.stringify({ error: errorMessage }), {
-        status: 500,
-        headers: { "Content-Type": "application/json" },
-      }),
-    );
+    return jsonResponse(500, {
+      type: "error",
+      message: "Internal server error",
+    });
   }
 }
