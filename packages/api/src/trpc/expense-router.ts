@@ -125,57 +125,70 @@ export const expenseRouter = t.router({
     const db = getDb();
     const familyId = ctx.familyId;
 
-    // Get all transactions for the user (for overview chart data)
-    const allTransactions = await db
-      .select({
-        usdAmount: transactionTable.usdAmount,
-        createdAt: transactionTable.createdAt,
-      })
-      .from(transactionTable)
-      .innerJoin(accountTable, eq(transactionTable.accountId, accountTable.id))
-      .where(
-        and(
-          eq(accountTable.familyId, familyId),
-          eq(transactionTable.type, "expense"),
-          eq(transactionTable.isCountable, true),
-        ),
-      );
+    // Run all queries in parallel for better performance
+    const [allTransactions, last30DaysResult, recentTransactions] =
+      await Promise.all([
+        // Get all transactions for the user (for overview chart data)
+        db
+          .select({
+            usdAmount: transactionTable.usdAmount,
+            createdAt: transactionTable.createdAt,
+          })
+          .from(transactionTable)
+          .innerJoin(
+            accountTable,
+            eq(transactionTable.accountId, accountTable.id),
+          )
+          .where(
+            and(
+              eq(accountTable.familyId, familyId),
+              eq(transactionTable.type, "expense"),
+              eq(transactionTable.isCountable, true),
+            ),
+          ),
 
-    // Get last 30 days expenses total using PostgreSQL date functions
-    const last30DaysResult = await db
-      .select({
-        total: sql<number>`COALESCE(SUM(${transactionTable.usdAmount}), 0)`,
-      })
-      .from(transactionTable)
-      .innerJoin(accountTable, eq(transactionTable.accountId, accountTable.id))
-      .where(
-        and(
-          eq(accountTable.familyId, familyId),
-          eq(transactionTable.type, "expense"),
-          eq(transactionTable.isCountable, true),
-          sql`${transactionTable.createdAt} >= NOW() - INTERVAL '30 days'`,
-        ),
-      );
+        // Get last 30 days expenses total using PostgreSQL date functions
+        db
+          .select({
+            total: sql<number>`COALESCE(SUM(${transactionTable.usdAmount}), 0)`,
+          })
+          .from(transactionTable)
+          .innerJoin(
+            accountTable,
+            eq(transactionTable.accountId, accountTable.id),
+          )
+          .where(
+            and(
+              eq(accountTable.familyId, familyId),
+              eq(transactionTable.type, "expense"),
+              eq(transactionTable.isCountable, true),
+              sql`${transactionTable.createdAt} >= NOW() - INTERVAL '30 days'`,
+            ),
+          ),
+
+        // Get recent transactions
+        db
+          .select({
+            id: transactionTable.id,
+            description: transactionTable.description,
+            amount: transactionTable.amount,
+            currency: transactionTable.currency,
+            usdAmount: transactionTable.usdAmount,
+            createdAt: transactionTable.createdAt,
+            accountId: accountTable.id,
+            type: transactionTable.type,
+          })
+          .from(transactionTable)
+          .innerJoin(
+            accountTable,
+            eq(transactionTable.accountId, accountTable.id),
+          )
+          .where(eq(accountTable.familyId, familyId))
+          .orderBy(desc(transactionTable.createdAt))
+          .limit(3),
+      ]);
 
     const last30DaysTotal = last30DaysResult[0]?.total || 0;
-
-    // Get recent transactions
-    const recentTransactions = await db
-      .select({
-        id: transactionTable.id,
-        description: transactionTable.description,
-        amount: transactionTable.amount,
-        currency: transactionTable.currency,
-        usdAmount: transactionTable.usdAmount,
-        createdAt: transactionTable.createdAt,
-        accountId: accountTable.id,
-        type: transactionTable.type,
-      })
-      .from(transactionTable)
-      .innerJoin(accountTable, eq(transactionTable.accountId, accountTable.id))
-      .where(eq(accountTable.familyId, familyId))
-      .orderBy(desc(transactionTable.createdAt))
-      .limit(3);
 
     // Group transactions by month/year for overview
     const monthlyTotals: {
@@ -221,12 +234,9 @@ export const expenseRouter = t.router({
         year: monthData.year,
       }));
 
-    const maxAmountUsd = Math.max(...monthlyData.map((m) => m.amount));
-
     return {
       overview: {
         data: monthlyData,
-        maxAmountUsd,
       },
       last30DaysTotal,
       recentTransactions: recentTransactions.map((t) => ({
@@ -326,11 +336,6 @@ export const expenseRouter = t.router({
           return input.order.direction === "desc" ? -comparison : comparison;
         });
 
-      const maxAmount = Math.max(
-        ...filteredMonthlyData.map((m) => m.amount),
-        0,
-      );
-
       // Calculate totals for the filtered period
       const totalExpenses = Object.values(monthlyExpenseTotals).reduce(
         (sum, monthData) => sum + monthData.amount,
@@ -344,7 +349,6 @@ export const expenseRouter = t.router({
 
       return {
         data: filteredMonthlyData,
-        maxAmount,
         totalExpenses,
         totalIncome,
       };
