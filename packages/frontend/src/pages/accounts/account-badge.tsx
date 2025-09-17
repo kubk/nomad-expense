@@ -4,8 +4,10 @@ import { cn } from "@/lib/utils";
 import { getColorById } from "./account-colors";
 
 export function AccountBadge({ accountId }: { accountId: string }) {
-  const { data: accounts = [] } = useQuery(trpc.accounts.list.queryOptions());
-  const account = accounts.find((a) => a.id === accountId);
+  const { data: account } = useQuery({
+    ...trpc.accounts.list.queryOptions(),
+    select: (accounts) => accounts.find((a) => a.id === accountId),
+  });
 
   if (!account) {
     return null;

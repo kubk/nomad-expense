@@ -4,8 +4,10 @@ import { DateTime } from "luxon";
 import { protectedProcedure, t } from "./trpc";
 import { transactionTable, accountTable } from "../db/schema";
 import { getDb, type DB } from "../services/db";
-import { convert } from "../services/currency-converter";
 import { transactionTypeSchema } from "../db/enums";
+import { getAccountByFamilyId } from "../db/account/can-acess-account";
+import { TRPCError } from "@trpc/server";
+import { createMoneyFullFromHuman } from "../services/base-money";
 
 const transactionFilterSchema = z.object({
   accounts: z.array(z.string()),
@@ -125,67 +127,59 @@ export const expenseRouter = t.router({
     const db = getDb();
     const familyId = ctx.familyId;
 
-    // Run all queries in parallel for better performance
+    const allTransactionsDb = db
+      .select({
+        usdAmount: transactionTable.usdAmount,
+        createdAt: transactionTable.createdAt,
+      })
+      .from(transactionTable)
+      .innerJoin(accountTable, eq(transactionTable.accountId, accountTable.id))
+      .where(
+        and(
+          eq(accountTable.familyId, familyId),
+          eq(transactionTable.type, "expense"),
+          eq(transactionTable.isCountable, true),
+        ),
+      );
+
+    const last30ExpensesDb = db
+      .select({
+        total: sql<number>`COALESCE(SUM(${transactionTable.usdAmount}), 0)`,
+      })
+      .from(transactionTable)
+      .innerJoin(accountTable, eq(transactionTable.accountId, accountTable.id))
+      .where(
+        and(
+          eq(accountTable.familyId, familyId),
+          eq(transactionTable.type, "expense"),
+          eq(transactionTable.isCountable, true),
+          sql`${transactionTable.createdAt} >= NOW() - INTERVAL '30 days'`,
+        ),
+      );
+
+    const recentTransactionsDb = db
+      .select({
+        id: transactionTable.id,
+        description: transactionTable.description,
+        amount: transactionTable.amount,
+        currency: transactionTable.currency,
+        usdAmount: transactionTable.usdAmount,
+        createdAt: transactionTable.createdAt,
+        accountId: accountTable.id,
+        type: transactionTable.type,
+        isCountable: transactionTable.isCountable,
+      })
+      .from(transactionTable)
+      .innerJoin(accountTable, eq(transactionTable.accountId, accountTable.id))
+      .where(eq(accountTable.familyId, familyId))
+      .orderBy(desc(transactionTable.createdAt))
+      .limit(3);
+
     const [allTransactions, last30DaysResult, recentTransactions] =
       await Promise.all([
-        // Get all transactions for the user (for overview chart data)
-        db
-          .select({
-            usdAmount: transactionTable.usdAmount,
-            createdAt: transactionTable.createdAt,
-          })
-          .from(transactionTable)
-          .innerJoin(
-            accountTable,
-            eq(transactionTable.accountId, accountTable.id),
-          )
-          .where(
-            and(
-              eq(accountTable.familyId, familyId),
-              eq(transactionTable.type, "expense"),
-              eq(transactionTable.isCountable, true),
-            ),
-          ),
-
-        // Get last 30 days expenses total using PostgreSQL date functions
-        db
-          .select({
-            total: sql<number>`COALESCE(SUM(${transactionTable.usdAmount}), 0)`,
-          })
-          .from(transactionTable)
-          .innerJoin(
-            accountTable,
-            eq(transactionTable.accountId, accountTable.id),
-          )
-          .where(
-            and(
-              eq(accountTable.familyId, familyId),
-              eq(transactionTable.type, "expense"),
-              eq(transactionTable.isCountable, true),
-              sql`${transactionTable.createdAt} >= NOW() - INTERVAL '30 days'`,
-            ),
-          ),
-
-        // Get recent transactions
-        db
-          .select({
-            id: transactionTable.id,
-            description: transactionTable.description,
-            amount: transactionTable.amount,
-            currency: transactionTable.currency,
-            usdAmount: transactionTable.usdAmount,
-            createdAt: transactionTable.createdAt,
-            accountId: accountTable.id,
-            type: transactionTable.type,
-          })
-          .from(transactionTable)
-          .innerJoin(
-            accountTable,
-            eq(transactionTable.accountId, accountTable.id),
-          )
-          .where(eq(accountTable.familyId, familyId))
-          .orderBy(desc(transactionTable.createdAt))
-          .limit(3),
+        allTransactionsDb,
+        last30ExpensesDb,
+        recentTransactionsDb,
       ]);
 
     const last30DaysTotal = last30DaysResult[0]?.total || 0;
@@ -239,16 +233,7 @@ export const expenseRouter = t.router({
         data: monthlyData,
       },
       last30DaysTotal,
-      recentTransactions: recentTransactions.map((t) => ({
-        id: t.id,
-        desc: t.description,
-        amount: t.amount,
-        currency: t.currency,
-        usdAmount: t.usdAmount,
-        createdAt: t.createdAt,
-        accountId: t.accountId,
-        type: t.type,
-      })),
+      recentTransactions,
     };
   }),
 
@@ -376,7 +361,6 @@ export const expenseRouter = t.router({
         return input.order.direction === "desc" ? -comparison : comparison;
       });
 
-      // Calculate totals for filtered transactions (expenses and income separately)
       const totalExpenses = transactions.reduce((sum, t) => {
         if (t.type !== "expense" || !t.isCountable) return sum;
         return sum + t.usdAmount;
@@ -388,16 +372,7 @@ export const expenseRouter = t.router({
       }, 0);
 
       return {
-        transactions: transactions.map((t) => ({
-          id: t.id,
-          desc: t.description,
-          amount: t.amount,
-          currency: t.currency,
-          usdAmount: t.usdAmount,
-          createdAt: t.createdAt,
-          accountId: t.accountId,
-          type: t.type,
-        })),
+        transactions,
         totalExpenses,
         totalIncome,
       };
@@ -435,20 +410,10 @@ export const expenseRouter = t.router({
 
       const transactionResult = transaction[0];
       if (!transactionResult) {
-        throw new Error("Transaction not found");
+        throw new TRPCError({ code: "NOT_FOUND" });
       }
 
-      return {
-        id: transactionResult.id,
-        desc: transactionResult.description,
-        amount: transactionResult.amount,
-        currency: transactionResult.currency,
-        usd: transactionResult.usdAmount,
-        createdAt: transactionResult.createdAt,
-        accountId: transactionResult.accountId,
-        type: transactionResult.type,
-        isCountable: transactionResult.isCountable,
-      };
+      return transactionResult;
     }),
 
   updateTransaction: protectedProcedure
@@ -458,7 +423,7 @@ export const expenseRouter = t.router({
         description: z.string().min(1),
         amount: z.number(),
         createdAt: z.string(),
-        type: z.enum(["expense", "income"]),
+        type: transactionTypeSchema,
         isCountable: z.boolean(),
       }),
     )
@@ -486,29 +451,24 @@ export const expenseRouter = t.router({
 
       const existingTransactionResult = existingTransaction[0];
       if (!existingTransactionResult) {
-        throw new Error("Transaction not found");
+        throw new TRPCError({ code: "NOT_FOUND" });
       }
 
-      // Convert amount to cents and calculate USD amount
-      const amountInCents = Math.round(input.amount * 100);
-      const usdAmountInCents = convert(
-        amountInCents,
-        existingTransactionResult.currency,
-        "USD",
-      );
-
-      const updateData = {
-        description: input.description,
-        amount: amountInCents,
-        usdAmount: usdAmountInCents,
-        createdAt: new Date(input.createdAt),
-        type: input.type,
-        isCountable: input.isCountable,
-      };
+      const money = createMoneyFullFromHuman({
+        amountHuman: input.amount,
+        currency: existingTransactionResult.currency,
+      });
 
       await db
         .update(transactionTable)
-        .set(updateData)
+        .set({
+          description: input.description,
+          amount: money.amountCents,
+          usdAmount: money.baseAmountCents,
+          createdAt: new Date(input.createdAt),
+          type: input.type,
+          isCountable: input.isCountable,
+        })
         .where(eq(transactionTable.id, input.id));
 
       return { success: true };
@@ -537,7 +497,7 @@ export const expenseRouter = t.router({
 
       const existingTransactionResult = existingTransaction[0];
       if (!existingTransactionResult) {
-        throw new Error("Transaction not found");
+        throw new TRPCError({ code: "NOT_FOUND" });
       }
 
       await db
@@ -561,36 +521,28 @@ export const expenseRouter = t.router({
       const db = getDb();
       const familyId = ctx.familyId;
 
-      // Verify account belongs to user
-      const account = await db
-        .select({ currency: accountTable.currency })
-        .from(accountTable)
-        .where(
-          and(
-            eq(accountTable.id, input.accountId),
-            eq(accountTable.familyId, familyId),
-          ),
-        );
-
-      const accountResult = account[0];
-      if (!accountResult) {
-        throw new Error("Account not found");
+      const accountResult = await getAccountByFamilyId(
+        db,
+        input.accountId,
+        familyId,
+      );
+      if (accountResult.type === "notFound") {
+        throw new TRPCError({ code: "UNAUTHORIZED" });
       }
 
-      // Convert amount to cents and calculate USD amount
-      const amountInCents = Math.round(input.amount * 100);
-      const usdAmountInCents = convert(
-        amountInCents,
-        accountResult.currency,
-        "USD",
-      );
+      const account = accountResult.account;
+
+      const money = createMoneyFullFromHuman({
+        amountHuman: input.amount,
+        currency: account.currency,
+      });
 
       await db.insert(transactionTable).values({
         accountId: input.accountId,
         description: input.description,
-        amount: amountInCents,
-        currency: accountResult.currency,
-        usdAmount: usdAmountInCents,
+        amount: money.amountCents,
+        currency: account.currency,
+        usdAmount: money.baseAmountCents,
         type: input.type,
         createdAt: input.createdAt ? new Date(input.createdAt) : undefined,
       });
