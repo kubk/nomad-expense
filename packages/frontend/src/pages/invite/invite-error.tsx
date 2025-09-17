@@ -16,7 +16,7 @@ export function InviteError({ errorMessage }: { errorMessage: string }) {
             </div>
             <div className="space-y-4">
               <h1 className="text-2xl font-semibold text-foreground">
-                Invalid Invite
+                Invalid invite
               </h1>
               <p className="text-muted-foreground">{errorMessage}</p>
             </div>
