@@ -15,9 +15,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Page } from "../shared/page";
-import { ConfirmModal } from "../shared/confirm-modal";
-import { Footer } from "../shared/footer";
+import { Page } from "../widgets/page";
+import { ConfirmModal } from "../widgets/confirm-modal";
+import { Footer } from "../widgets/footer";
 import { trpc } from "@/shared/api";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { cn } from "@/lib/utils";

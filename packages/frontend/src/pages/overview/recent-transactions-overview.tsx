@@ -1,6 +1,6 @@
 import { ChevronRightIcon } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
-import { TransactionItem } from "../shared/transaction-item";
+import { TransactionItem } from "../widgets/transaction-item";
 import { trpc } from "../../shared/api";
 import { useQuery } from "@tanstack/react-query";
 import { useRouter } from "@/shared/stacked-router/router";

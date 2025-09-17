@@ -2,7 +2,7 @@ import * as React from "react";
 import { Drawer as DrawerPrimitive } from "vaul";
 
 import { cn } from "@/lib/utils";
-import { getSafeAreaInset } from "@/shared/telegram";
+import { getSafeAreaInset } from "@/shared/telegram/telegram";
 
 function Drawer({
   ...props

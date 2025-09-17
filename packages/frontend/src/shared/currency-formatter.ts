@@ -1,14 +1,8 @@
-import { SupportedCurrency, CurrencyInfo, SUPPORTED_CURRENCIES } from "api";
+import { SupportedCurrency, SUPPORTED_CURRENCIES } from "api";
 
 export function getCurrencySymbol(currencyCode: SupportedCurrency): string {
   const currency = SUPPORTED_CURRENCIES.find((c) => c.code === currencyCode);
   return currency?.symbol || currencyCode;
-}
-
-export function getCurrencyInfo(
-  currencyCode: SupportedCurrency,
-): CurrencyInfo | undefined {
-  return SUPPORTED_CURRENCIES.find((c) => c.code === currencyCode);
 }
 
 // Format amount with currency symbol (amount in cents)

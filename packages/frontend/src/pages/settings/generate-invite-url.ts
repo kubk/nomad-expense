@@ -1,4 +1,4 @@
-import { routeToUrl } from "./stacked-router/url-convert";
+import { routeToUrl } from "../../shared/stacked-router/url-convert";
 
 export const generateInviteUrl = (code: string): string => {
   return `${window.location.origin}${routeToUrl({

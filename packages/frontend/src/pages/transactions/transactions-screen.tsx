@@ -1,13 +1,13 @@
 import { Card, CardContent } from "@/components/ui/card";
-import { TransactionItem } from "../shared/transaction-item";
-import { SummaryCard } from "../shared/summary-card";
-import { FiltersDrawer } from "../shared/filters-drawer";
+import { TransactionItem } from "../widgets/transaction-item";
+import { SummaryCard } from "../widgets/summary-card";
+import { FiltersDrawer } from "../widgets/filters-drawer";
 import { useState } from "react";
 import { trpc } from "@/shared/api";
 import { useQuery } from "@tanstack/react-query";
 import { TransactionFilters } from "api";
 import { useAccountIds } from "@/shared/hooks/use-account-ids";
-import { Page } from "../shared/page";
+import { Page } from "../widgets/page";
 import { RouteByType, useRouter } from "@/shared/stacked-router/router";
 import { VList } from "virtua";
 import { FilterIcon } from "lucide-react";

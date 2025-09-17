@@ -3,9 +3,9 @@ import { getColorById } from "../accounts/account-colors";
 import { getCurrencySymbol } from "../../shared/currency-formatter";
 import { trpc } from "@/shared/api";
 import { useQuery } from "@tanstack/react-query";
-import { Page } from "../shared/page";
+import { Page } from "../widgets/page";
 import { useRouter } from "@/shared/stacked-router/router";
-import { NoAccountsEmptyState } from "../shared/no-accounts-empty-state";
+import { NoAccountsEmptyState } from "../widgets/no-accounts-empty-state";
 
 export function AccountPickerScreen() {
   const { data: accounts = [], isLoading } = useQuery(

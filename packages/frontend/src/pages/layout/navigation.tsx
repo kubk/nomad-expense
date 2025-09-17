@@ -8,7 +8,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import { cn } from "@/lib/utils";
 import { useRouter } from "@/shared/stacked-router/router";
 import { Route } from "@/shared/stacked-router/routes";
-import { getSafeAreaInset } from "@/shared/telegram";
+import { getSafeAreaInset } from "@/shared/telegram/telegram";
 
 export function Navigation() {
   const { currentRoute, navigate } = useRouter();

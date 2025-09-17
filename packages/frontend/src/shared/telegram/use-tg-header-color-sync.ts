@@ -1,8 +1,8 @@
-import { useTheme } from "@/pages/shared/theme-provider";
+import { useTheme } from "@/pages/widgets/theme-provider";
 import { useEffect } from "react";
 import { getWebApp } from "./telegram";
 import { useRouter } from "@/shared/stacked-router/router";
-import { isFormRoute } from "./stacked-router/routes";
+import { isFormRoute } from "@/shared/stacked-router/routes";
 
 export function useTgHeaderColorSync() {
   const { theme } = useTheme();

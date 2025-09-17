@@ -1,7 +1,7 @@
 import { ReactNode } from "react";
 import { useRouter } from "@/shared/stacked-router/router";
 import { ArrowLeftIcon } from "lucide-react";
-import { getWebApp } from "@/shared/telegram";
+import { getWebApp } from "@/shared/telegram/telegram";
 import { cn } from "@/lib/utils";
 import { isFormRoute } from "@/shared/stacked-router/routes";
 
