@@ -17,7 +17,7 @@ export function MonthlyBreakdownItem({
   const { navigate } = useRouter();
   const accountIds = useAccountIds();
 
-  const widthPercentage = (month.amount / maxAmount) * 100;
+  const widthPercentage = (month.usdAmount / maxAmount) * 100;
   const barWidth = Math.max(widthPercentage, 2); // Minimum 2% width
 
   return (
@@ -44,7 +44,7 @@ export function MonthlyBreakdownItem({
               {month.shortMonth} {month.year}
             </div>
             <div className="font-semibold text-foreground font-mono">
-              {formatAmount(month.amount, "USD")}
+              {formatAmount(month.usdAmount, "USD")}
             </div>
           </div>
 
