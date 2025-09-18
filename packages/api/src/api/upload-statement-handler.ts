@@ -24,7 +24,9 @@ function getTransactionParserByAccount(
   }
 }
 
-export async function uploadHandler(request: Request): Promise<Response> {
+export async function uploadStatementHandler(
+  request: Request,
+): Promise<Response> {
   try {
     const authResult = await authenticate(request);
     if (!authResult) {
@@ -45,6 +47,10 @@ export async function uploadHandler(request: Request): Promise<Response> {
         message: "No account ID provided",
       });
     }
+
+    console.log(accountId, file);
+
+    return null;
 
     const db = getDb();
     const accountResult = await getAccountByFamilyId(
