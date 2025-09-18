@@ -5,7 +5,7 @@ import { protectedProcedure, t } from "./trpc";
 import { transactionTable, accountTable } from "../db/schema";
 import { getDb, type DB } from "../services/db";
 import { transactionTypeSchema } from "../db/enums";
-import { getAccountByFamilyId } from "../db/account/can-acess-account";
+import { getAccountByFamilyId } from "../db/account/get-account-by-family-id";
 import { TRPCError } from "@trpc/server";
 import { createMoneyFull } from "../services/money/money";
 
@@ -451,7 +451,7 @@ export const expenseRouter = t.router({
       }
 
       const money = createMoneyFull({
-        amount: { amountHuman: input.amount },
+        amountHuman: input.amount,
         currency: existingTransactionResult.currency,
       });
 
@@ -529,7 +529,7 @@ export const expenseRouter = t.router({
       const account = accountResult.account;
 
       const money = createMoneyFull({
-        amount: { amountHuman: input.amount },
+        amountHuman: input.amount,
         currency: account.currency,
       });
 

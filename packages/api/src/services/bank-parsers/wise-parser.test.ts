@@ -10,49 +10,49 @@ describe("parseWiseStatement", () => {
     );
 
     expect(transactions).toMatchInlineSnapshot(`
-          [
-            {
-              "amount": 5000,
-              "createdAt": 2024-03-14T17:00:00.000Z,
-              "currency": "USD",
-              "description": "Coffee Shop",
-              "info": "Morning coffee purchase",
-              "type": "expense",
-            },
-            {
-              "amount": 12075,
-              "createdAt": 2024-03-15T17:00:00.000Z,
-              "currency": "EUR",
-              "description": "Amazon",
-              "info": "Online shopping - books",
-              "type": "expense",
-            },
-            {
-              "amount": 2550,
-              "createdAt": 2024-03-16T17:00:00.000Z,
-              "currency": "USD",
-              "description": "Uber",
-              "info": "Ride to airport",
-              "type": "expense",
-            },
-            {
-              "amount": 50000,
-              "createdAt": 2024-03-17T17:00:00.000Z,
-              "currency": "USD",
-              "description": "Freelance Payment",
-              "info": "Client payment for project",
-              "type": "income",
-            },
-            {
-              "amount": 1525,
-              "createdAt": 2024-03-18T17:00:00.000Z,
-              "currency": "USD",
-              "description": "Starbucks",
-              "info": "Coffee and pastry",
-              "type": "expense",
-            },
-          ]
-        `);
+      [
+        {
+          "amount": 5000,
+          "createdAt": 2024-03-15T00:00:00.000Z,
+          "currency": "USD",
+          "description": "Coffee Shop",
+          "info": "Morning coffee purchase",
+          "type": "expense",
+        },
+        {
+          "amount": 12075,
+          "createdAt": 2024-03-16T00:00:00.000Z,
+          "currency": "EUR",
+          "description": "Amazon",
+          "info": "Online shopping - books",
+          "type": "expense",
+        },
+        {
+          "amount": 2550,
+          "createdAt": 2024-03-17T00:00:00.000Z,
+          "currency": "USD",
+          "description": "Uber",
+          "info": "Ride to airport",
+          "type": "expense",
+        },
+        {
+          "amount": 50000,
+          "createdAt": 2024-03-18T00:00:00.000Z,
+          "currency": "USD",
+          "description": "Freelance Payment",
+          "info": "Client payment for project",
+          "type": "income",
+        },
+        {
+          "amount": 1525,
+          "createdAt": 2024-03-19T00:00:00.000Z,
+          "currency": "USD",
+          "description": "Starbucks",
+          "info": "Coffee and pastry",
+          "type": "expense",
+        },
+      ]
+    `);
   });
 
   it("should fail fast on invalid schema", async () => {
