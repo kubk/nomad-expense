@@ -1,4 +1,4 @@
-import { addCorsHeaders } from "../lib/cloudflare/cors";
+import { addCorsHeaders } from "./cors";
 
 export function jsonResponse(
   status: number,

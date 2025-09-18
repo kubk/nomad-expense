@@ -2,7 +2,7 @@ import { and, eq, gte, lte } from "drizzle-orm";
 import type { DB } from "./db";
 import { transactionTable } from "../db/schema";
 import type { ParsedTransaction } from "./bank-parsers/parsed-transaction";
-import { AccountFromFamily } from "../db/account/can-acess-account";
+import { AccountFromFamily } from "../db/account/get-account-by-family-id";
 import { createMoneyFull } from "./money/money";
 
 export type ImportResult = {
@@ -37,7 +37,7 @@ export async function importTransactions(
 
   const newTransactions = transactions.map((transaction) => {
     const money = createMoneyFull({
-      amount: { amountHuman: transaction.amount },
+      amountHuman: transaction.amount,
       currency: transaction.currency,
     });
 
