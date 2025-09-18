@@ -4,7 +4,7 @@ import { addCorsHeaders } from "./lib/cloudflare/cors";
 import { setEnv } from "./services/env";
 import { router } from "./api/router";
 import { setKv } from "./services/kv";
-import { uploadHandler } from "./api/upload-handler";
+import { uploadStatementHandler } from "./api/upload-statement-handler";
 
 export default {
   async fetch(request, env) {
@@ -18,7 +18,7 @@ export default {
     const url = new URL(request.url);
     const key = url.pathname.slice(1);
     if (request.method === "POST" && key === "upload-statement") {
-      return uploadHandler(request);
+      return uploadStatementHandler(request);
     }
 
     const response = await fetchRequestHandler({

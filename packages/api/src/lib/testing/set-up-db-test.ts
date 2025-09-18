@@ -17,6 +17,14 @@ export const fixtures = {
       id: "6507c6ab-5c1f-4f51-a3ee-cf4bab848267"
     },
   },
+  accounts: {
+    accountTry: {
+      id: "449cce5f-04b3-489b-96a0-2aa8fb14bc8f",
+    },
+    accountUsd: {
+      id: "61637396-a7c2-4ccc-91b8-9098a62aee18",
+    },
+  }
 };
 
 async function seed() {
@@ -53,38 +61,37 @@ async function seed() {
       },
     ]);
 
-  const [accountTry, accountUsd] = await db
+  await db
     .insert(schema.accountTable)
     .values([
       {
-        id: "449cce5f-04b3-489b-96a0-2aa8fb14bc8f",
+        id: fixtures.accounts.accountTry.id,
         familyId: familyId,
-        name: "Yapi Kredi TRY",
+        name: "Yapi Kredi",
         currency: "TRY",
         color: "blue",
         bankType: "YapiKredi",
       },
       {
-        id: "61637396-a7c2-4ccc-91b8-9098a62aee18",
+        id: fixtures.accounts.accountUsd.id,
         familyId: familyId,
-        name: "Yapi Kredi USD",
+        name: "Wise",
         currency: "USD",
         color: "green",
-        bankType: "YapiKredi",
+        bankType: "Wise",
       },
     ])
-    .returning();
 
   // Add transaction import rules
   await db.insert(schema.transactionImportRuleTable).values([
     {
       name: "Digital Ocean",
-      accountId: accountTry.id,
+      accountId: fixtures.accounts.accountTry.id,
       type: "MakeUncountable",
     },
     {
       name: " Buy",
-      accountId: accountTry.id,
+      accountId: fixtures.accounts.accountTry.id,
       type: "FilterTransactionName",
     },
   ]);
@@ -93,6 +100,7 @@ async function seed() {
   const migrosMoney = createMoneyFull({ amountHuman: 5.5, currency: "TRY" });
   const digitalOceanMoney = createMoneyFull({ amountHuman: 55.5, currency: "TRY" });
   const ukCertMoney = createMoneyFull({ amountHuman: 55.5, currency: "TRY" });
+
   const amazonMoney = createMoneyFull({ amountHuman: 10, currency: "USD" });
   const usdtMoney = createMoneyFull({ amountHuman: 2000, currency: "USD" });
   const digitalOceanUsdMoney = createMoneyFull({ amountHuman: 100, currency: "USD" });
@@ -101,7 +109,7 @@ async function seed() {
   await db.insert(schema.transactionTable).values([
     // TRY account transactions
     {
-      accountId: accountTry.id,
+      accountId: fixtures.accounts.accountTry.id,
       description: "Migros Buy",
       amount: migrosMoney.amountCents,
       currency: "TRY",
@@ -111,7 +119,7 @@ async function seed() {
       source: "imported",
     },
     {
-      accountId: accountTry.id,
+      accountId: fixtures.accounts.accountTry.id,
       description: "Digital Ocean",
       amount: digitalOceanMoney.amountCents,
       currency: "TRY",
@@ -121,7 +129,7 @@ async function seed() {
       source: "imported",
     },
     {
-      accountId: accountTry.id,
+      accountId: fixtures.accounts.accountTry.id,
       description: "Payment for UK certificate",
       amount: ukCertMoney.amountCents,
       currency: "TRY",
@@ -133,7 +141,7 @@ async function seed() {
     },
     // USD account transactions
     {
-      accountId: accountUsd.id,
+      accountId: fixtures.accounts.accountUsd.id,
       description: "Amazon",
       amount: amazonMoney.amountCents,
       currency: "USD",
@@ -143,7 +151,7 @@ async function seed() {
       source: "imported",
     },
     {
-      accountId: accountUsd.id,
+      accountId: fixtures.accounts.accountUsd.id,
       description: "USDT withdraw",
       amount: usdtMoney.amountCents,
       currency: "USD",
@@ -153,7 +161,7 @@ async function seed() {
       source: "imported",
     },
     {
-      accountId: accountUsd.id,
+      accountId: fixtures.accounts.accountUsd.id,
       description: "Payment for Digital Ocean",
       amount: digitalOceanUsdMoney.amountCents,
       currency: "USD",
@@ -164,7 +172,7 @@ async function seed() {
       isCountable: false,
     },
     {
-      accountId: accountUsd.id,
+      accountId: fixtures.accounts.accountUsd.id,
       description: "I Talki",
       amount: italkiMoney.amountCents,
       currency: "USD",

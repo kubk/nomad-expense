@@ -36,4 +36,4 @@ export type TransactionSource = z.infer<typeof transactionSourceSchema>;
 
 export { telegramAuthMethod } from "./services/auth/telegram-auth-method";
 
-export { type UploadHandlerResponse } from "./api/upload-handler";
+export { type UploadHandlerResponse } from "./api/upload-statement-handler";
