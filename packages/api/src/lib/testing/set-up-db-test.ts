@@ -99,6 +99,17 @@ async function seed() {
       accountId: fixtures.accounts.accountTry.id,
       type: "FilterTransactionName",
     },
+    // Rules for USD account for testing
+    {
+      name: "Digital Ocean",
+      accountId: fixtures.accounts.accountUsd.id,
+      type: "MakeUncountable",
+    },
+    {
+      name: " Buy",
+      accountId: fixtures.accounts.accountUsd.id,
+      type: "FilterTransactionName",
+    },
   ]);
 
   // Add test transactions
