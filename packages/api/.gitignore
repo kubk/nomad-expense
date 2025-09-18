@@ -175,6 +175,7 @@ dist
 .flaskenv*
 !.env.development
 !.env.production
+!.env.test
 
 tsconfig.tsbuildinfo
 
