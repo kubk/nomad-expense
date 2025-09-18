@@ -13,6 +13,9 @@ export const fixtures = {
     bob: {
       id: "9a9f9a8d-093a-4901-a439-8abb31392d77",
     },
+    charlie: {
+      id: "6507c6ab-5c1f-4f51-a3ee-cf4bab848267"
+    },
   },
 };
 
@@ -39,6 +42,14 @@ async function seed() {
         name: "Bob",
         username: "bob",
         telegramId: "2",
+      },
+      {
+        id: fixtures.users.charlie.id,
+        familyId: 'f3941d1c-88e0-476b-8b5f-81d243e24e90',
+        initialFamilyId: 'f3941d1c-88e0-476b-8b5f-81d243e24e90',
+        name: "Charlie",
+        username: "charlie",
+        telegramId: "3",
       },
     ]);
 
