@@ -3,10 +3,10 @@ import { Transaction } from "../../db/db-types";
 
 export type TransactionLimited = Pick<Transaction, "description" | "isCountable">;
 
-const makeTransactionUncountableRule = (
-  transaction: TransactionLimited,
+function makeTransactionUncountableRule<T extends TransactionLimited>(
+  transaction: T,
   filters: TransactionImportRule[]
-): TransactionLimited => {
+): T {
   const shouldMakeUncountable = filters
     .filter((filter) => filter.type === "MakeUncountable")
     .some((filter) => {
@@ -16,10 +16,10 @@ const makeTransactionUncountableRule = (
   return shouldMakeUncountable ? { ...transaction, isCountable: false } : transaction;
 };
 
-const filterTransactionDescriptionRule = (
-  transaction: TransactionLimited,
+function filterTransactionDescriptionRule<T extends TransactionLimited>(
+  transaction: T,
   filters: TransactionImportRule[]
-): TransactionLimited => {
+): T {
   const newDescription = filters
     .filter((filter) => filter.type === "FilterTransactionName")
     .reduce((accumulator, current) => accumulator.replace(new RegExp(current.name), ""), transaction.description);
@@ -30,10 +30,10 @@ const filterTransactionDescriptionRule = (
   };
 };
 
-export const applyImportRules = (
-  transaction: TransactionLimited,
+export function applyImportRules<T extends TransactionLimited>(
+  transaction: T,
   importRules: TransactionImportRule[]
-): TransactionLimited => {
+): T {
   const appliers = [
     makeTransactionUncountableRule,
     filterTransactionDescriptionRule,
