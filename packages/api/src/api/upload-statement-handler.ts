@@ -48,10 +48,6 @@ export async function uploadStatementHandler(
       });
     }
 
-    console.log(accountId, file);
-
-    return null;
-
     const db = getDb();
     const accountResult = await getAccountByFamilyId(
       db,

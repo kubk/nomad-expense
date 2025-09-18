@@ -4,6 +4,11 @@ import { PgTable } from "drizzle-orm/pg-core";
 import { setEnv } from "../../services/env";
 import { getDb } from "../../services/db";
 import { createMoneyFull } from "../../services/money/money";
+import { DateTime, Settings } from "luxon";
+
+Settings.throwOnInvalid = true;
+
+export const testNow = DateTime.fromISO('2025-01-17');
 
 export const fixtures = {
   users: {
@@ -117,6 +122,7 @@ async function seed() {
       usdAmount: migrosMoney.baseAmountCents,
       type: "expense",
       source: "imported",
+      createdAt: testNow.toJSDate(),
     },
     {
       accountId: fixtures.accounts.accountTry.id,
@@ -127,6 +133,7 @@ async function seed() {
       usdAmount: digitalOceanMoney.baseAmountCents,
       type: "expense",
       source: "imported",
+      createdAt: testNow.toJSDate(),
     },
     {
       accountId: fixtures.accounts.accountTry.id,
@@ -138,6 +145,7 @@ async function seed() {
       type: "expense",
       source: "manual",
       isCountable: false,
+      createdAt: testNow.toJSDate(),
     },
     // USD account transactions
     {
@@ -149,6 +157,7 @@ async function seed() {
       usdAmount: amazonMoney.baseAmountCents,
       type: "expense",
       source: "imported",
+      createdAt: testNow.toJSDate(),
     },
     {
       accountId: fixtures.accounts.accountUsd.id,
@@ -159,6 +168,7 @@ async function seed() {
       usdAmount: usdtMoney.baseAmountCents,
       type: "income",
       source: "imported",
+      createdAt: testNow.toJSDate(),
     },
     {
       accountId: fixtures.accounts.accountUsd.id,
@@ -170,6 +180,7 @@ async function seed() {
       type: "expense",
       source: "imported",
       isCountable: false,
+      createdAt: testNow.minus({ weeks: 1 }).toJSDate(),
     },
     {
       accountId: fixtures.accounts.accountUsd.id,
@@ -180,6 +191,7 @@ async function seed() {
       usdAmount: italkiMoney.baseAmountCents,
       type: "income",
       source: "imported",
+      createdAt: testNow.minus({ month: 1 }).toJSDate(),
     },
   ]);
 }
