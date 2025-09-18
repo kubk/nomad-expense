@@ -4,6 +4,8 @@ import { transactionTable } from "../db/schema";
 import type { ParsedTransaction } from "./bank-parsers/parsed-transaction";
 import { AccountFromFamily } from "../db/account/get-account-by-family-id";
 import { createMoneyFull } from "./money/money";
+import { getRulesByAccountId } from "../db/transaction-import-rule/get-rules-by-account-id";
+import { applyImportRules } from "./import-rules/import-rules";
 
 export type ImportResult = {
   removed: number;
@@ -35,13 +37,15 @@ export async function importTransactions(
     lte(transactionTable.createdAt, maxTransactionDate),
   );
 
+  const importRules = await getRulesByAccountId(db, account.id);
+
   const newTransactions = transactions.map((transaction) => {
     const money = createMoneyFull({
       amountHuman: transaction.amount,
       currency: transaction.currency,
     });
 
-    return {
+    const baseTransaction = {
       accountId: account.id,
       description: transaction.description,
       amount: money.amountCents,
@@ -53,6 +57,8 @@ export async function importTransactions(
       type: transaction.type,
       createdAt: transaction.createdAt,
     };
+
+    return applyImportRules(baseTransaction, importRules);
   });
 
   // First, count how many transactions will be deleted

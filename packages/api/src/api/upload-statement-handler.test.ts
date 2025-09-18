@@ -1,4 +1,5 @@
 import { expect, it, describe, vi } from "vitest";
+import { eq } from "drizzle-orm";
 import { setUpDbTest, fixtures, testNow } from "../lib/testing/set-up-db-test";
 import {
   uploadStatementHandler,
@@ -8,6 +9,7 @@ import { getUserById } from "../db/user/get-user-by-id";
 import { assert } from "../lib/typescript/assert";
 import { getRowCount } from "../lib/testing/get-row-count";
 import { transactionTable } from "../db/schema";
+import { getDb } from "../services/db";
 
 vi.mock("../services/auth/authenticate", () => ({
   authenticate: vi.fn(),
@@ -142,5 +144,88 @@ describe("upload-statement-handler", () => {
       expect(responseData.removed).toBe(0);
       expect(transactionCountAfter).toBe(transactionCountBefore + 3);
     }
+  });
+
+  it("should apply import rules during transaction import", async () => {
+    await setupAuth();
+
+    // Create transactions that will trigger the import rules
+    // Based on fixtures: "Digital Ocean" rule makes transactions uncountable
+    // and " Buy" rule filters description text
+    const csvContent = createCsvContent([
+      {
+        amount: "-50.00",
+        merchant: "Migros",
+        description: "Migros Buy", // Should become "Migros" (FilterTransactionName rule)
+        daysOffset: 1,
+      },
+      {
+        amount: "-100.00",
+        merchant: "Digital Ocean",
+        description: "Digital Ocean", // Should become uncountable (MakeUncountable rule)
+        daysOffset: 2,
+      },
+      {
+        amount: "-25.00",
+        merchant: "Regular Store",
+        description: "Regular Store", // Should remain unchanged (no matching rules)
+        daysOffset: 3,
+      },
+    ]);
+
+    const transactionCountBefore = await getRowCount(transactionTable);
+    const result = await uploadStatementHandler(
+      createMockRequest(csvContent, fixtures.accounts.accountUsd.id),
+    );
+    const transactionCountAfter = await getRowCount(transactionTable);
+
+    const responseData = (await result.json()) as UploadHandlerResponse;
+
+    expect(responseData.type).toBe("success");
+    if (responseData.type === "success") {
+      expect(responseData.added).toBe(3);
+      expect(responseData.removed).toBe(0); // No overlapping dates with existing USD account transactions
+      expect(transactionCountAfter).toBe(
+        transactionCountBefore + responseData.added - responseData.removed,
+      );
+    }
+
+    const db = getDb();
+    const importedTransactions = await db
+      .select()
+      .from(transactionTable)
+      .where(eq(transactionTable.accountId, fixtures.accounts.accountUsd.id));
+
+    // Filter only imported transactions (not existing ones)
+    const newlyImportedTransactions = importedTransactions.filter(
+      (t) => t.source === "imported",
+    );
+
+    // Check that "Migros Buy" became "Migros" (FilterTransactionName rule applied)
+    const migrosTransaction = newlyImportedTransactions.find(
+      (t) => t.description === "Migros",
+    );
+    expect(migrosTransaction).toBeDefined();
+    expect(migrosTransaction?.isCountable).toBe(true);
+
+    // Check that transaction with " Buy" was not found (because it was filtered)
+    const migrosBuyTransaction = newlyImportedTransactions.find(
+      (t) => t.description === "Migros Buy",
+    );
+    expect(migrosBuyTransaction).toBeUndefined();
+
+    // Check that "Digital Ocean" transaction became uncountable (MakeUncountable rule applied)
+    const digitalOceanTransaction = newlyImportedTransactions.find(
+      (t) => t.description === "Digital Ocean",
+    );
+    expect(digitalOceanTransaction).toBeDefined();
+    expect(digitalOceanTransaction?.isCountable).toBe(false);
+
+    // Check that non-matching transaction remained unchanged
+    const regularStoreTransaction = newlyImportedTransactions.find(
+      (t) => t.description === "Regular Store",
+    );
+    expect(regularStoreTransaction).toBeDefined();
+    expect(regularStoreTransaction?.isCountable).toBe(true);
   });
 });
