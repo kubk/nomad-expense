@@ -8,6 +8,7 @@ import {
 } from "../db/account/get-account-by-family-id";
 import { ParseTransactionFn } from "../services/bank-parsers/parsed-transaction";
 import { jsonResponse } from "../lib/cloudflare/json-response";
+import { kasikornParser } from "../services/bank-parsers/kasikorn-parser";
 
 export type UploadHandlerResponse =
   | { type: "error"; message: string }
@@ -19,6 +20,8 @@ function getTransactionParserByAccount(
   switch (account.bankType) {
     case "Wise":
       return parseWiseStatement;
+    case "Kasikorn":
+      return kasikornParser;
     default:
       throw new Error("Unsupported bank type: " + account.bankType);
   }
