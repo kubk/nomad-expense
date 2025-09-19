@@ -17,4 +17,9 @@ app.get("/*", (c) => {
   return container.fetch(c.req.raw);
 });
 
+app.post("/*", (c) => {
+  const container = getContainer(c.env.MY_CONTAINER);
+  return container.fetch(c.req.raw);
+});
+
 export default app;
