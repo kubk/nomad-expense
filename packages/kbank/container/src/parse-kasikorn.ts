@@ -1,6 +1,4 @@
-import { assembleTransactions } from "./assemble-transactions";
-// @ts-ignore
-const PDFJS = require(`pdf-parse/lib/pdf.js/v1.10.100/build/pdf.js`);
+import { assembleTransactions } from "./assemble-transactions.ts";
 
 export const ITEM_SEPARATOR = "___";
 export const ROW_SEPARATOR = "\n\t\n\n";
@@ -29,6 +27,8 @@ const renderPage = (pageData: any) => {
 
 export const createKasikornParser = (password: string) => {
   return async (bankStatement: Buffer) => {
+    // @ts-ignore
+    const PDFJS = await import(`pdf-parse/lib/pdf.js/v1.10.100/build/pdf.js`);
     const doc = await PDFJS.getDocument({
       data: bankStatement,
       password: password,
