@@ -17,4 +17,4 @@ COPY . .
 EXPOSE 3094
 
 # Define the command to run the application
-CMD ["node", "index.ts"]
+CMD ["node", "src/index.ts"]
