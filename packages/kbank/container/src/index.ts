@@ -1,11 +1,8 @@
 import { Hono } from "hono";
 import { serve } from "@hono/node-server";
-import multer from "multer";
 import { createKasikornParser } from "./parse-kasikorn.ts";
 
 const app = new Hono();
-
-const upload = multer({ storage: multer.memoryStorage() });
 
 const PORT = process.env.PORT ? parseInt(process.env.PORT) : undefined;
 
@@ -23,28 +20,26 @@ app.get("/health", (c) => {
 
 app.post("/parse", async (c) => {
   try {
-    const uploadMiddleware = upload.single("pdf");
+    const body = await c.req.parseBody();
 
-    await new Promise<void>((resolve, reject) => {
-      uploadMiddleware(c.req.raw as any, {} as any, (err: any) => {
-        if (err) reject(err);
-        else resolve();
-      });
-    });
-
-    const file = (c.req.raw as any).file;
-
-    if (!file) {
+    if (!body["pdf"]) {
       return c.json({ error: "No PDF file provided" }, 400);
     }
 
-    if (file.mimetype !== "application/pdf") {
+    const file = body["pdf"] as File;
+
+    if (!(file instanceof File)) {
+      return c.json({ error: "Invalid file upload" }, 400);
+    }
+
+    if (file.type !== "application/pdf") {
       return c.json({ error: "File must be a PDF" }, 400);
     }
 
+    const buffer = Buffer.from(await file.arrayBuffer());
     const password = c.req.query("password") || "";
     const parser = createKasikornParser(password);
-    const transactions = await parser(file.buffer);
+    const transactions = await parser(buffer);
 
     return c.json(transactions, 200);
   } catch (error) {
