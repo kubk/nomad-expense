@@ -1,0 +1,39 @@
+/**
+ * For more details on how to configure Wrangler, refer to:
+ * https://developers.cloudflare.com/workers/wrangler/configuration/
+ */
+{
+	"$schema": "node_modules/wrangler/config-schema.json",
+	"name": "kbank",
+	"main": "src/index.ts",
+	"compatibility_date": "2025-05-23",
+	"compatibility_flags": [
+		"nodejs_compat"
+	],
+	"observability": {
+		"enabled": true
+	},
+	"containers": [
+		{
+			"class_name": "MyContainer",
+			"image": "./container/Dockerfile",
+			"max_instances": 2
+		}
+	],
+	"durable_objects": {
+		"bindings": [
+			{
+				"class_name": "MyContainer",
+				"name": "MY_CONTAINER"
+			}
+		]
+	},
+	"migrations": [
+		{
+			"new_sqlite_classes": [
+				"MyContainer"
+			],
+			"tag": "v1"
+		}
+	]
+}
