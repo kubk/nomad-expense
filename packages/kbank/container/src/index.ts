@@ -1,7 +1,7 @@
 import { Hono } from "hono";
 import { serve } from "@hono/node-server";
 import multer from "multer";
-import { createKasikornParser } from "./kasikorn/parse-kasikorn";
+import { createKasikornParser } from "./parse-kasikorn.ts";
 
 const app = new Hono();
 
