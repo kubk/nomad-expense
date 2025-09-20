@@ -17,7 +17,7 @@ export function PageHeader({
   return (
     <div className="sticky top-0">
       <div
-        className={cn("relative flex items-center justify-center p-4", {
+        className={cn("relative flex items-center justify-center p-4 pb-6", {
           "pt-1": getWebApp(),
         })}
       >

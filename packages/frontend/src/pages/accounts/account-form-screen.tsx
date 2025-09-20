@@ -249,13 +249,13 @@ export function AccountFormScreen({
               <div className="flex gap-3">
                 <FormActionButton
                   onClick={() => setShowDeleteConfirm(true)}
-                  icon={Trash2Icon}
+                  icon={<Trash2Icon className="h-4 w-4" />}
                 >
                   Delete
                 </FormActionButton>
                 <FormActionButton
                   onClick={handleTransactionsClick}
-                  icon={ListPlusIcon}
+                  icon={<ListPlusIcon className="h-4 w-4" />}
                 >
                   Transactions
                 </FormActionButton>
