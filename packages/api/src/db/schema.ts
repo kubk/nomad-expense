@@ -8,6 +8,7 @@ import {
   varchar,
   boolean,
   pgEnum,
+  jsonb,
 } from "drizzle-orm/pg-core";
 import {
   accountColor,
@@ -66,6 +67,7 @@ export const accountTable = pgTable(
     currency: currencyEnum("currency").notNull(),
     color: accountColorEnum("color").notNull(),
     bankType: bankEnum("bank_type"),
+    meta: jsonb("meta"),
     sort: integer("sort").notNull().default(0),
   },
   (table) => [index("idx_account_family_id").on(table.familyId)],

@@ -1,12 +1,33 @@
 import { z } from "zod";
-import { parseCSVFromFile } from "./csv-parser";
 import { currencySchema } from "../../db/enums";
 import {
   ParsedTransaction,
   parsedTransactionSchema,
 } from "./parsed-transaction";
+import Papa from "papaparse";
 
-const wiseCSVRowSchema = z.object({
+export async function parseCsvFromFile(
+  file: File,
+): Promise<Record<string, string>[]> {
+  const content = await file.text();
+
+  const result = Papa.parse<Record<string, string>>(content, {
+    header: true,
+    skipEmptyLines: true,
+    transformHeader: (header) => header.trim(),
+    transform: (value) => value.trim(),
+  });
+
+  if (result.errors.length > 0) {
+    throw new Error(
+      `CSV parsing errors: ${result.errors.map((e) => e.message).join(", ")}`,
+    );
+  }
+
+  return result.data;
+}
+
+const rowSchema = z.object({
   Amount: z.string(),
   Currency: currencySchema,
   Merchant: z.string(),
@@ -17,13 +38,12 @@ const wiseCSVRowSchema = z.object({
 export async function parseWiseStatement(
   file: File,
 ): Promise<ParsedTransaction[]> {
-  const csvData = await parseCSVFromFile(file);
+  const csvData = await parseCsvFromFile(file);
 
   const transactions: ParsedTransaction[] = [];
 
   for (const row of csvData) {
-    // Fail fast - don't catch validation errors
-    const validatedRow = wiseCSVRowSchema.parse(row);
+    const validatedRow = rowSchema.parse(row);
 
     const amount = parseAmount(validatedRow.Amount);
     const transaction = {
