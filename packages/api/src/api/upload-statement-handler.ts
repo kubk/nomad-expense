@@ -1,31 +1,13 @@
 import { authenticate } from "../services/auth/authenticate";
 import { getDb } from "../services/db";
-import { parseWiseStatement } from "../services/bank-parsers/wise-parser";
 import { importTransactions } from "../services/transaction-import";
-import {
-  AccountFromFamily,
-  getAccountByFamilyId,
-} from "../db/account/get-account-by-family-id";
-import { ParseTransactionFn } from "../services/bank-parsers/parsed-transaction";
+import { getAccountByFamilyId } from "../db/account/get-account-by-family-id";
 import { jsonResponse } from "../lib/cloudflare/json-response";
-import { kasikornParser } from "../services/bank-parsers/kasikorn-parser";
+import { getTransactionParserByAccount } from "../services/bank-parsers/get-transaction-parser-by-account";
 
 export type UploadHandlerResponse =
   | { type: "error"; message: string }
   | { type: "success"; removed: number; added: number };
-
-function getTransactionParserByAccount(
-  account: AccountFromFamily,
-): ParseTransactionFn {
-  switch (account.bankType) {
-    case "Wise":
-      return parseWiseStatement;
-    case "Kasikorn":
-      return kasikornParser;
-    default:
-      throw new Error("Unsupported bank type: " + account.bankType);
-  }
-}
 
 export async function uploadStatementHandler(
   request: Request,

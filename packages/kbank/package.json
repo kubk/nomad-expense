@@ -1,10 +1,8 @@
 {
-	"name": "containers",
-	"description": "Build a Container-enabled Worker",
+	"name": "kbank",
 	"private": true,
 	"scripts": {
 		"deploy": "wrangler deploy",
-		"dev": "wrangler dev",
 		"start": "wrangler dev",
 		"test": "echo 1",
 		"typecheck": "npx tsc -b --noEmit",

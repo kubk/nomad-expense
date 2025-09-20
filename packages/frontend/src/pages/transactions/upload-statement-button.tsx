@@ -1,4 +1,4 @@
-import { FilePlus2Icon, LoaderIcon } from "lucide-react";
+import { FilePlus2Icon, Loader2Icon } from "lucide-react";
 import { FormActionButton } from "@/components/ui/form-action-button";
 import { trpc } from "@/shared/api";
 import { useQuery } from "@tanstack/react-query";
@@ -28,7 +28,7 @@ export function UploadStatementButton({ accountId }: { accountId: string }) {
 
       if (result.type === "success") {
         toast.success(
-          `Bank statement processed successfully! Removed ${result.removed || 0} transactions, added ${result.added || 0} new transactions.`,
+          `Bank statement uploaded! Removed ${result.removed || 0}, added ${result.added || 0} transactions`,
         );
       } else {
         toast.error(result.message || "Upload failed");
@@ -55,7 +55,13 @@ export function UploadStatementButton({ accountId }: { accountId: string }) {
         className="hidden"
       />
       <FormActionButton
-        icon={isUploading ? LoaderIcon : FilePlus2Icon}
+        icon={
+          isUploading ? (
+            <Loader2Icon className="h-4 w-4 animate-spin" />
+          ) : (
+            <FilePlus2Icon className="h-4 w-4" />
+          )
+        }
         onClick={handleClick}
         disabled={isUploading}
       >

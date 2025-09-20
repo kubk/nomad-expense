@@ -13,6 +13,9 @@
 	"observability": {
 		"enabled": true
 	},
+	"dev": {
+		"port": 8894
+	},
 	"containers": [
 		{
 			"class_name": "MyContainer",
