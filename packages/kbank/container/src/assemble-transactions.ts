@@ -1,4 +1,10 @@
-import type { Transaction } from "./types";
+type Transaction = {
+  createdAt: Date;
+  amount: number;
+  info: string;
+  title: string;
+  currency: "THB";
+};
 
 export const ITEM_SEPARATOR = "___";
 
