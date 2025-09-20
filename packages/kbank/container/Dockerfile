@@ -16,5 +16,5 @@ COPY . .
 # Expose the port the app runs on
 EXPOSE 3094
 
-# Define the command to run the application
+# New node.js can run TypeScript directly
 CMD ["node", "src/index.ts"]
