@@ -7,11 +7,13 @@ import { useRef, useState } from "react";
 import { toast } from "sonner";
 import { useRouter } from "@/shared/stacked-router/router";
 import { storeUploadResult } from "@/shared/upload-result-storage";
+import { useInvalidateTransactions } from "@/shared/hooks/use-invalidate-transactions";
 
 export function UploadStatementButton({ accountId }: { accountId: string }) {
   const { data: accounts = [] } = useQuery(trpc.accounts.list.queryOptions());
   const account = accounts.find((a) => a.id === accountId);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const invalidateTransactions = useInvalidateTransactions();
   const [isUploading, setIsUploading] = useState(false);
   const { navigate } = useRouter();
 
@@ -31,6 +33,7 @@ export function UploadStatementButton({ accountId }: { accountId: string }) {
 
       if (result.type === "success") {
         const key = storeUploadResult(result.added, result.removed);
+        invalidateTransactions();
         toast.success(
           `Bank statement uploaded! Removed ${result.removed?.length || 0}, added ${result.added?.length || 0} transactions`,
         );

@@ -58,12 +58,16 @@ export function AccountFormScreen({
 
   const queryClient = useQueryClient();
 
+  function invalidateAccounts() {
+    queryClient.invalidateQueries({
+      queryKey: trpc.accounts.list.queryKey(),
+    });
+  }
+
   const createAccountMutation = useMutation(
     trpc.accounts.create.mutationOptions({
       onSuccess: () => {
-        queryClient.invalidateQueries({
-          queryKey: trpc.accounts.list.queryKey(),
-        });
+        invalidateAccounts();
       },
     }),
   );
@@ -71,9 +75,7 @@ export function AccountFormScreen({
   const updateAccountMutation = useMutation(
     trpc.accounts.update.mutationOptions({
       onSuccess: () => {
-        queryClient.invalidateQueries({
-          queryKey: trpc.accounts.list.queryKey(),
-        });
+        invalidateAccounts();
       },
     }),
   );
@@ -81,9 +83,7 @@ export function AccountFormScreen({
   const deleteAccountMutation = useMutation(
     trpc.accounts.delete.mutationOptions({
       onSuccess: () => {
-        queryClient.invalidateQueries({
-          queryKey: trpc.accounts.list.queryKey(),
-        });
+        invalidateAccounts();
         navigate({ type: "accounts" });
         setShowDeleteConfirm(false);
       },

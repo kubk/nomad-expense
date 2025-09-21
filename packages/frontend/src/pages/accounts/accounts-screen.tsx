@@ -44,8 +44,9 @@ export function AccountsScreen() {
   const reorderMutation = useMutation(
     trpc.accounts.reorder.mutationOptions({
       onSuccess: () => {
-        const queryKey = trpc.accounts.list.queryKey();
-        queryClient.invalidateQueries({ queryKey });
+        queryClient.invalidateQueries({
+          queryKey: trpc.accounts.list.queryKey(),
+        });
         setReorderedAccounts(null);
       },
     }),
