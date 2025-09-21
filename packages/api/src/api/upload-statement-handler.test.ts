@@ -142,8 +142,8 @@ describe("upload-statement-handler", () => {
 
     expect(responseData.type).toBe("success");
     if (responseData.type === "success") {
-      expect(responseData.added).toBe(3);
-      expect(responseData.removed).toBe(0);
+      expect(responseData.added.length).toBe(3);
+      expect(responseData.removed.length).toBe(0);
       expect(transactionCountAfter).toBe(transactionCountBefore + 3);
     }
   });
