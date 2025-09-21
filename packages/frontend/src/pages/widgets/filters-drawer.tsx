@@ -62,6 +62,18 @@ export function FiltersDrawer({
     }));
   };
 
+  const handleSelectAllAccounts = () => {
+    const allAccountIds = accounts.map((account) => account.id);
+    const areAllSelected = allAccountIds.every((id) =>
+      filterForm.accounts.includes(id),
+    );
+
+    setFilterForm((prev) => ({
+      ...prev,
+      accounts: areAllSelected ? [] : allAccountIds,
+    }));
+  };
+
   const handleMonthsChange = (months: number) => {
     setFilterForm((prev) => ({
       ...prev,
@@ -218,6 +230,20 @@ export function FiltersDrawer({
                       <CreditCardIcon className="size-4 text-muted-foreground" />
                       <h3 className="font-medium">Bank accounts</h3>
                     </div>
+                    {accounts.length > 1 && (
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={handleSelectAllAccounts}
+                        className="text-md h-6 px-2"
+                      >
+                        {accounts.every((account) =>
+                          filterForm.accounts.includes(account.id),
+                        )
+                          ? "Deselect all"
+                          : "Select all"}
+                      </Button>
+                    )}
                   </div>
                   <div className="flex overflow-auto pb-3 gap-2">
                     {accounts.map((account) => (
