@@ -18,13 +18,11 @@ import { AccountPickerScreen } from "../transactions/account-picker-screen";
 import { StatementUploadResultScreen } from "../transactions/statement-upload-result-screen";
 import { initializeTma } from "@/shared/telegram/telegram";
 import { useTgHeaderColorSync } from "@/shared/telegram/use-tg-header-color-sync";
-// import { getSafeAreaInset } from "@/shared/telegram";
 
 export function App() {
   useEffect(initializeTma, []);
   useTgHeaderColorSync();
   const { navigationStack, navigate, pop } = useRouter();
-  // const safeAreaInset = getSafeAreaInset();
 
   const renderScreen = useCallback(
     (route: Route, index: number, stack: Route[]) => {
@@ -81,8 +79,6 @@ export function App() {
           route={route}
           transition={{
             ease: "easeInOut",
-            // Keep it here so I can debug animations
-            // duration: 2,
           }}
           getAnimationConfig={(routeType) => {
             if (
@@ -104,21 +100,7 @@ export function App() {
   );
 
   return (
-    <div
-      className="max-w-md mx-auto relative app-container overflow-hidden"
-      style={
-        {
-          // paddingTop: `${safeAreaInset.top}px`,
-          // paddingBottom: `${safeAreaInset.bottom}px`,
-          // paddingLeft: `${safeAreaInset.left}px`,
-          // paddingRight: `${safeAreaInset.right}px`,
-          // paddingTop: 100,
-          // paddingBottom: 100,
-          // paddingLeft: 100,
-          // paddingRight: 100,
-        }
-      }
-    >
+    <div className="max-w-md mx-auto relative app-container overflow-hidden">
       <AnimatePresence initial={false} mode="sync">
         {navigationStack.map((route, index) =>
           renderScreen(route, index, navigationStack),
