@@ -7,10 +7,10 @@ import { useRouter } from "@/shared/stacked-router/router";
 
 export function TransactionItem({
   transaction,
-  showBorder = false,
+  borderBottom = false,
 }: {
   transaction: Transaction;
-  showBorder?: boolean;
+  borderBottom?: boolean;
 }) {
   const { navigate } = useRouter();
   const isIncome = transaction.type === "income";
@@ -23,7 +23,7 @@ export function TransactionItem({
     <div
       className={cn(
         "flex items-center justify-between p-4 cursor-pointer hover:bg-muted/50 transition-colors",
-        showBorder && "border-b",
+        borderBottom && "border-b",
       )}
       onClick={handleClick}
     >

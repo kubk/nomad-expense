@@ -45,7 +45,7 @@ export function RecentTransactionsOverview() {
               <TransactionItem
                 key={t.id}
                 transaction={t}
-                showBorder={idx !== 2}
+                borderBottom={idx !== 2}
               />
             ))
           )}
