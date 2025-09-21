@@ -39,6 +39,7 @@ import {
 } from "@/components/ui/drawer";
 import { FormActionButton } from "@/components/ui/form-action-button";
 import { UploadStatementButton } from "./upload-statement-button";
+import { useInvalidateTransactions } from "@/shared/hooks/use-invalidate-transactions";
 
 type Form = {
   description: string;
@@ -82,19 +83,12 @@ export function TransactionFormScreen({
   const selectedAccount = accounts.find((acc) => acc.id === formData.accountId);
 
   const queryClient = useQueryClient();
+  const invalidateTransactions = useInvalidateTransactions();
 
   const updateTransactionMutation = useMutation(
     trpc.expenses.updateTransaction.mutationOptions({
       onSuccess: () => {
-        queryClient.invalidateQueries({
-          queryKey: trpc.expenses.transactionsList.queryKey(),
-        });
-        queryClient.invalidateQueries({
-          queryKey: trpc.expenses.overview.queryKey(),
-        });
-        queryClient.invalidateQueries({
-          queryKey: trpc.expenses.transactionsByMonth.queryKey(),
-        });
+        invalidateTransactions();
       },
     }),
   );
@@ -102,15 +96,7 @@ export function TransactionFormScreen({
   const createTransactionMutation = useMutation(
     trpc.expenses.createTransaction.mutationOptions({
       onSuccess: () => {
-        queryClient.invalidateQueries({
-          queryKey: trpc.expenses.transactionsList.queryKey(),
-        });
-        queryClient.invalidateQueries({
-          queryKey: trpc.expenses.overview.queryKey(),
-        });
-        queryClient.invalidateQueries({
-          queryKey: trpc.expenses.transactionsByMonth.queryKey(),
-        });
+        invalidateTransactions();
         queryClient.invalidateQueries({
           queryKey: trpc.accounts.list.queryKey(),
         });
@@ -121,15 +107,7 @@ export function TransactionFormScreen({
   const deleteTransactionMutation = useMutation(
     trpc.expenses.deleteTransaction.mutationOptions({
       onSuccess: () => {
-        queryClient.invalidateQueries({
-          queryKey: trpc.expenses.transactionsList.queryKey(),
-        });
-        queryClient.invalidateQueries({
-          queryKey: trpc.expenses.overview.queryKey(),
-        });
-        queryClient.invalidateQueries({
-          queryKey: trpc.expenses.transactionsByMonth.queryKey(),
-        });
+        invalidateTransactions();
         pop();
       },
     }),
