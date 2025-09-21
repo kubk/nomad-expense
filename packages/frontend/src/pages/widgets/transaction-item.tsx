@@ -4,7 +4,6 @@ import { formatDisplayDate } from "@/shared/format-display-date";
 import { AccountBadge } from "../accounts/account-badge";
 import { cn } from "@/lib/utils";
 import { useRouter } from "@/shared/stacked-router/router";
-import { GhostIcon } from "lucide-react";
 
 export function TransactionItem({
   transaction,
