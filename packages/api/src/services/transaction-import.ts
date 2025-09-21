@@ -22,8 +22,6 @@ export async function importTransactions(
     throw new Error("Minimum transaction amount is 2");
   }
 
-  console.log("Importing transactions: ", transactions.length);
-
   // Find min and max dates from the imported transactions
   const dates = transactions.map((t) => t.createdAt);
   const minTransactionDate = new Date(

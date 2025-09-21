@@ -1,4 +1,9 @@
 {
+	"typescript.preferences.autoImportSpecifierExcludeRegexes": ["@radix-ui"],
+	"search.exclude": {
+	  "**/packages/frontend/dist": true,
+	  "**/packages/api/.wrangler": true,
+	},
 	"files.associations": {
 		"wrangler.json": "jsonc"
 	}
