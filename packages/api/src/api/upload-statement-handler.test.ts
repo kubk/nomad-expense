@@ -99,10 +99,12 @@ describe("upload-statement-handler", () => {
 
     expect(responseData.type).toBe("success");
     if (responseData.type === "success") {
-      expect(responseData.added).toBe(5);
-      expect(responseData.removed).toBe(2);
+      expect(responseData.added.length).toBe(5);
+      expect(responseData.removed.length).toBe(2);
       expect(transactionCountAfter).toBe(
-        transactionCountBefore + responseData.added - responseData.removed,
+        transactionCountBefore +
+          responseData.added.length -
+          responseData.removed.length,
       );
     }
   });
@@ -183,10 +185,12 @@ describe("upload-statement-handler", () => {
 
     expect(responseData.type).toBe("success");
     if (responseData.type === "success") {
-      expect(responseData.added).toBe(3);
-      expect(responseData.removed).toBe(0); // No overlapping dates with existing USD account transactions
+      expect(responseData.added.length).toBe(3);
+      expect(responseData.removed.length).toBe(0); // No overlapping dates with existing USD account transactions
       expect(transactionCountAfter).toBe(
-        transactionCountBefore + responseData.added - responseData.removed,
+        transactionCountBefore +
+          responseData.added.length -
+          responseData.removed.length,
       );
     }
 

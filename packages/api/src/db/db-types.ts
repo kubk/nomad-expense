@@ -9,4 +9,4 @@ export type AccountSelect = InferSelectModel<typeof accountTable>;
 export type TransactionImportRule = InferSelectModel<
   typeof transactionImportRuleTable
 >;
-export type Transaction = InferSelectModel<typeof transactionTable>;
+export type TransactionFull = InferSelectModel<typeof transactionTable>;

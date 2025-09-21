@@ -6,10 +6,11 @@ import { AccountFromFamily } from "../db/account/get-account-by-family-id";
 import { createMoneyFull } from "./money/money";
 import { getRulesByAccountId } from "../db/transaction-import-rule/get-rules-by-account-id";
 import { applyImportRules } from "./import-rules/import-rules";
+import { TransactionFull } from "../db/db-types";
 
 export type ImportResult = {
-  removed: number;
-  added: number;
+  removed: TransactionFull[];
+  added: TransactionFull[];
 };
 
 export async function importTransactions(
@@ -63,21 +64,24 @@ export async function importTransactions(
     return applyImportRules(baseTransaction, importRules);
   });
 
-  // First, count how many transactions will be deleted
-  const existingTransactions = await db
-    .select({ id: transactionTable.id })
+  // First, get all transactions that will be deleted
+  const removedTransactions = await db
+    .select()
     .from(transactionTable)
     .where(dateRangeFilter);
 
-  const removedCount = existingTransactions.length;
+  let addedTransactions: TransactionFull[] = [];
 
   await db.transaction(async (tx) => {
     await tx.delete(transactionTable).where(dateRangeFilter);
-    await tx.insert(transactionTable).values(newTransactions);
+    addedTransactions = await tx
+      .insert(transactionTable)
+      .values(newTransactions)
+      .returning();
   });
 
   return {
-    removed: removedCount,
-    added: newTransactions.length,
+    removed: removedTransactions,
+    added: addedTransactions,
   };
 }
