@@ -12,7 +12,7 @@ describe("parseWiseStatement", () => {
     expect(transactions).toMatchInlineSnapshot(`
       [
         {
-          "amount": 5000,
+          "amountCents": 5000,
           "createdAt": 2024-03-15T00:00:00.000Z,
           "currency": "USD",
           "description": "Coffee Shop",
@@ -20,7 +20,7 @@ describe("parseWiseStatement", () => {
           "type": "expense",
         },
         {
-          "amount": 12075,
+          "amountCents": 12075,
           "createdAt": 2024-03-16T00:00:00.000Z,
           "currency": "EUR",
           "description": "Amazon",
@@ -28,7 +28,7 @@ describe("parseWiseStatement", () => {
           "type": "expense",
         },
         {
-          "amount": 2550,
+          "amountCents": 2550,
           "createdAt": 2024-03-17T00:00:00.000Z,
           "currency": "USD",
           "description": "Uber",
@@ -36,7 +36,7 @@ describe("parseWiseStatement", () => {
           "type": "expense",
         },
         {
-          "amount": 50000,
+          "amountCents": 50000,
           "createdAt": 2024-03-18T00:00:00.000Z,
           "currency": "USD",
           "description": "Freelance Payment",
@@ -44,7 +44,7 @@ describe("parseWiseStatement", () => {
           "type": "income",
         },
         {
-          "amount": 1525,
+          "amountCents": 1525,
           "createdAt": 2024-03-19T00:00:00.000Z,
           "currency": "USD",
           "description": "Starbucks",
@@ -70,6 +70,6 @@ describe("parseWiseStatement", () => {
     );
     expect(transactions[0].description).toBe("ATM Withdrawal");
     expect(transactions[0].type).toBe("expense");
-    expect(transactions[0].amount).toBe(2500);
+    expect(transactions[0].amountCents).toBe(2500);
   });
 });

@@ -42,7 +42,7 @@ export async function importTransactions(
 
   const newTransactions = transactions.map((transaction) => {
     const money = createMoneyFull({
-      amountHuman: transaction.amount,
+      amountCents: transaction.amountCents,
       currency: transaction.currency,
     });
 

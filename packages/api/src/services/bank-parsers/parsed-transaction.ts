@@ -2,7 +2,7 @@ import { z } from "zod";
 import { currencySchema, transactionTypeSchema } from "../../db/enums";
 
 export const parsedTransactionSchema = z.object({
-  amount: z.number().int(),
+  amountCents: z.number().int(),
   currency: currencySchema,
   description: z.string(),
   info: z.string().optional(),
