@@ -1,11 +1,14 @@
 import { TransactionImportRule } from "../../db/db-types";
-import { Transaction } from "../../db/db-types";
+import { TransactionFull } from "../../db/db-types";
 
-export type TransactionLimited = Pick<Transaction, "description" | "isCountable">;
+export type TransactionLimited = Pick<
+  TransactionFull,
+  "description" | "isCountable"
+>;
 
 function makeTransactionUncountableRule<T extends TransactionLimited>(
   transaction: T,
-  filters: TransactionImportRule[]
+  filters: TransactionImportRule[],
 ): T {
   const shouldMakeUncountable = filters
     .filter((filter) => filter.type === "MakeUncountable")
@@ -13,26 +16,32 @@ function makeTransactionUncountableRule<T extends TransactionLimited>(
       return new RegExp(filter.name).test(transaction.description);
     });
 
-  return shouldMakeUncountable ? { ...transaction, isCountable: false } : transaction;
-};
+  return shouldMakeUncountable
+    ? { ...transaction, isCountable: false }
+    : transaction;
+}
 
 function filterTransactionDescriptionRule<T extends TransactionLimited>(
   transaction: T,
-  filters: TransactionImportRule[]
+  filters: TransactionImportRule[],
 ): T {
   const newDescription = filters
     .filter((filter) => filter.type === "FilterTransactionName")
-    .reduce((accumulator, current) => accumulator.replace(new RegExp(current.name), ""), transaction.description);
+    .reduce(
+      (accumulator, current) =>
+        accumulator.replace(new RegExp(current.name), ""),
+      transaction.description,
+    );
 
   return {
     ...transaction,
     description: newDescription,
   };
-};
+}
 
 export function applyImportRules<T extends TransactionLimited>(
   transaction: T,
-  importRules: TransactionImportRule[]
+  importRules: TransactionImportRule[],
 ): T {
   const appliers = [
     makeTransactionUncountableRule,
@@ -41,6 +50,6 @@ export function applyImportRules<T extends TransactionLimited>(
 
   return appliers.reduce(
     (transaction, apply) => apply(transaction, importRules),
-    transaction
+    transaction,
   );
-};
+}

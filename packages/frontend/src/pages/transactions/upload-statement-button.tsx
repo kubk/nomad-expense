@@ -5,12 +5,15 @@ import { useQuery } from "@tanstack/react-query";
 import { uploadStatementFile } from "@/shared/upload-file";
 import { useRef, useState } from "react";
 import { toast } from "sonner";
+import { useRouter } from "@/shared/stacked-router/router";
+import { storeUploadResult } from "@/shared/upload-result-storage";
 
 export function UploadStatementButton({ accountId }: { accountId: string }) {
   const { data: accounts = [] } = useQuery(trpc.accounts.list.queryOptions());
   const account = accounts.find((a) => a.id === accountId);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [isUploading, setIsUploading] = useState(false);
+  const { navigate } = useRouter();
 
   if (!account || !account.bankType) {
     return null;
@@ -27,9 +30,11 @@ export function UploadStatementButton({ accountId }: { accountId: string }) {
       const result = await uploadStatementFile(file, accountId);
 
       if (result.type === "success") {
+        const key = storeUploadResult(result.added, result.removed);
         toast.success(
-          `Bank statement uploaded! Removed ${result.removed || 0}, added ${result.added || 0} transactions`,
+          `Bank statement uploaded! Removed ${result.removed?.length || 0}, added ${result.added?.length || 0} transactions`,
         );
+        navigate({ type: "statementUploadResult", key }, { replace: true });
       } else {
         toast.error(result.message || "Upload failed");
       }
