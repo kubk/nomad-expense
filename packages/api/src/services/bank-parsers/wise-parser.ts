@@ -47,7 +47,7 @@ export async function parseWiseStatement(
 
     const amount = parseAmount(validatedRow.Amount);
     const transaction = {
-      amount: Math.abs(amount),
+      amountCents: Math.abs(amount),
       currency: validatedRow.Currency,
       description: validatedRow.Merchant || validatedRow.Description,
       info: validatedRow.Description,
