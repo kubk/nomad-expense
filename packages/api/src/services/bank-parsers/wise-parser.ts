@@ -5,6 +5,7 @@ import {
   parsedTransactionSchema,
 } from "./parsed-transaction";
 import Papa from "papaparse";
+import { DateTime } from "luxon";
 
 export async function parseCsvFromFile(
   file: File,
@@ -33,6 +34,7 @@ const rowSchema = z.object({
   Merchant: z.string(),
   Description: z.string(),
   Date: z.string(),
+  "Date Time": z.string().optional(),
 });
 
 export async function parseWiseStatement(
@@ -52,7 +54,7 @@ export async function parseWiseStatement(
       description: validatedRow.Merchant || validatedRow.Description,
       info: validatedRow.Description,
       type: amount < 0 ? "expense" : "income",
-      createdAt: parseDate(validatedRow.Date),
+      createdAt: parseDate(validatedRow["Date Time"] || validatedRow.Date),
     };
 
     const validatedTransaction = parsedTransactionSchema.parse(transaction);
@@ -72,6 +74,21 @@ function parseAmount(amountStr: string): number {
 }
 
 function parseDate(date: string): Date {
-  const [day, monthNumber, year] = date.split("-");
-  return new Date(parseInt(year), parseInt(monthNumber) - 1, parseInt(day));
+  // Try Date Time format first: "20-09-2025 20:57:59.282"
+  if (date.includes(" ")) {
+    // Remove milliseconds if present
+    const dateWithoutMs = date.split(".")[0];
+    const parsed = DateTime.fromFormat(dateWithoutMs, "dd-MM-yyyy HH:mm:ss");
+    if (parsed.isValid) {
+      return parsed.toJSDate();
+    }
+  }
+
+  // Fallback to Date format: "20-03-2024"
+  const parsed = DateTime.fromFormat(date, "dd-MM-yyyy");
+  if (parsed.isValid) {
+    return parsed.toJSDate();
+  }
+
+  throw new Error(`Unable to parse date: ${date}`);
 }

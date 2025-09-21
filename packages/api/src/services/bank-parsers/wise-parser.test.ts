@@ -72,4 +72,28 @@ describe("parseWiseStatement", () => {
     expect(transactions[0].type).toBe("expense");
     expect(transactions[0].amountCents).toBe(2500);
   });
+
+  it("should parse Date Time field with time information", async () => {
+    const csvWithDateTime = `Amount,Currency,Merchant,Description,Date,"Date Time"
+-1.70,USD,"Google Telegram London","Card transaction of 69.99 TRY issued by Google Telegram London",20-09-2025,"20-09-2025 20:57:59.282"`;
+
+    const transactions = await parseWiseStatement(
+      new File([csvWithDateTime], "test.csv"),
+    );
+    expect(transactions[0].createdAt).toEqual(
+      new Date(2025, 8, 20, 20, 57, 59),
+    );
+    expect(transactions[0].description).toBe("Google Telegram London");
+    expect(transactions[0].amountCents).toBe(170);
+  });
+
+  it("should fallback to Date field when Date Time is not available", async () => {
+    const csvWithoutDateTime = `Amount,Currency,Merchant,Description,Date
+-25.00,USD,Coffee Shop,Morning coffee,15-03-2024`;
+
+    const transactions = await parseWiseStatement(
+      new File([csvWithoutDateTime], "test.csv"),
+    );
+    expect(transactions[0].createdAt).toEqual(new Date(2024, 2, 15));
+  });
 });
