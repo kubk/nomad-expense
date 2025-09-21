@@ -4,6 +4,7 @@ import { formatDisplayDate } from "@/shared/format-display-date";
 import { AccountBadge } from "../accounts/account-badge";
 import { cn } from "@/lib/utils";
 import { useRouter } from "@/shared/stacked-router/router";
+import { GhostIcon } from "lucide-react";
 
 export function TransactionItem({
   transaction,
@@ -29,7 +30,12 @@ export function TransactionItem({
     >
       <div className="flex-1">
         <div className="flex items-center gap-2">
-          <p className="font-medium text-sm text-foreground">
+          <p
+            className={cn(
+              "font-medium text-sm text-foreground",
+              !transaction.isCountable && "text-muted-foreground",
+            )}
+          >
             {transaction.description}
           </p>
         </div>
@@ -44,7 +50,10 @@ export function TransactionItem({
         <div
           className={cn(
             "flex items-center gap-1 font-semibold text-sm font-mono",
-            isIncome && "text-green-700 dark:text-green-400",
+            isIncome &&
+              transaction.isCountable &&
+              "text-green-700 dark:text-green-400",
+            !transaction.isCountable && "text-muted-foreground",
           )}
         >
           <span>{isIncome ? "+" : ""}</span>
@@ -54,7 +63,7 @@ export function TransactionItem({
           <div
             className={cn(
               "flex items-center gap-1 text-xs font-mono",
-              isIncome
+              isIncome && transaction.isCountable
                 ? "text-green-600 dark:text-green-400"
                 : "text-muted-foreground",
             )}
