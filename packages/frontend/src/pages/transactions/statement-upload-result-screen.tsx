@@ -43,7 +43,7 @@ export function StatementUploadResultScreen({
                   <TransactionItem
                     key={transaction.id}
                     transaction={transaction}
-                    showBorder={index < sortedAdded.length - 1}
+                    borderBottom={index < sortedAdded.length - 1}
                   />
                 ))}
               </CardContent>
@@ -62,7 +62,7 @@ export function StatementUploadResultScreen({
                   <TransactionItem
                     key={transaction.id}
                     transaction={transaction}
-                    showBorder={index < sortedRemoved.length - 1}
+                    borderBottom={index < sortedRemoved.length - 1}
                   />
                 ))}
               </CardContent>

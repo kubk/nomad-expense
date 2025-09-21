@@ -65,7 +65,7 @@ export function TransactionsScreen({
                   <TransactionItem
                     key={transaction.id}
                     transaction={transaction}
-                    showBorder={idx !== transactions.length - 1}
+                    borderBottom={idx !== transactions.length - 1}
                   />
                 ))}
               </VList>
@@ -75,7 +75,7 @@ export function TransactionsScreen({
                   <TransactionItem
                     key={transaction.id}
                     transaction={transaction}
-                    showBorder={idx !== transactions.length - 1}
+                    borderBottom={idx !== transactions.length - 1}
                   />
                 ))}
               </div>
