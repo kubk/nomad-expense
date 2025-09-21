@@ -15,6 +15,7 @@ import { useCallback, useEffect } from "react";
 import { Route } from "@/shared/stacked-router/routes";
 import { AnimatedScreen } from "@/shared/stacked-router/animated-screen";
 import { AccountPickerScreen } from "../transactions/account-picker-screen";
+import { StatementUploadResultScreen } from "../transactions/statement-upload-result-screen";
 import { initializeTma } from "@/shared/telegram/telegram";
 import { useTgHeaderColorSync } from "@/shared/telegram/use-tg-header-color-sync";
 // import { getSafeAreaInset } from "@/shared/telegram";
@@ -64,6 +65,9 @@ export function App() {
           break;
         case "auth":
           ScreenComponent = <AuthScreen {...props} />;
+          break;
+        case "statementUploadResult":
+          ScreenComponent = <StatementUploadResultScreen {...props} />;
           break;
         default:
           return type satisfies never;

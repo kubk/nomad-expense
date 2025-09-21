@@ -4,10 +4,11 @@ import { importTransactions } from "../services/transaction-import";
 import { getAccountByFamilyId } from "../db/account/get-account-by-family-id";
 import { jsonResponse } from "../lib/cloudflare/json-response";
 import { getTransactionParserByAccount } from "../services/bank-parsers/get-transaction-parser-by-account";
+import { Transaction } from "../shared";
 
 export type UploadHandlerResponse =
   | { type: "error"; message: string }
-  | { type: "success"; removed: number; added: number };
+  | { type: "success"; removed: Transaction[]; added: Transaction[] };
 
 export async function uploadStatementHandler(
   request: Request,

@@ -71,6 +71,10 @@ export const routeSchema = v.variant("type", [
   v.object({
     type: v.literal("auth"),
   }),
+  v.object({
+    type: v.literal("statementUploadResult"),
+    key: v.string(),
+  }),
 ]);
 
 export type Route = v.InferOutput<typeof routeSchema>;
