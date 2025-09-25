@@ -16,7 +16,7 @@ function getSafeAreaValue(property: string): number {
 export function browserGetSafeAreaInset() {
   if (isStandaloneMode()) {
     const safeAreaTop = getSafeAreaValue("env(safe-area-inset-top)");
-    const safeAreaBottom = getSafeAreaValue("env(safe-area-inset-bottom)");
+    const safeAreaBottom = 6;
 
     return {
       top: safeAreaTop,
