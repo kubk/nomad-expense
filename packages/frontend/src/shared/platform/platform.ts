@@ -11,5 +11,11 @@ export function getSafeAreaInset() {
       bottom: tgInset.bottom / 2,
     };
   }
-  return browserGetSafeAreaInset();
+
+  const browserInset = browserGetSafeAreaInset();
+
+  return {
+    top: browserInset.top,
+    bottom: browserInset.bottom * 2,
+  };
 }
