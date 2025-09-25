@@ -16,6 +16,6 @@ export function getSafeAreaInset() {
 
   return {
     top: browserInset.top,
-    bottom: browserInset.bottom * 2,
+    bottom: browserInset.bottom * 3,
   };
 }
