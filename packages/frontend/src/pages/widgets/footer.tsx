@@ -1,4 +1,4 @@
-import { getSafeAreaInset } from "@/shared/telegram/telegram";
+import { getSafeAreaInset } from "@/shared/platform/platform";
 import { ReactNode } from "react";
 import { cn } from "@/lib/utils";
 
@@ -19,7 +19,7 @@ export function Footer({
         className,
       )}
       style={{
-        paddingBottom: 16 + getSafeAreaInset().bottom / 2,
+        paddingBottom: 16 + getSafeAreaInset().bottom,
       }}
     >
       {children}

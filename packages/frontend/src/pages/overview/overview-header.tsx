@@ -3,7 +3,7 @@ import { UserAvatar } from "@/components/user-avatar";
 import { trpc } from "../../shared/api";
 import { useQuery } from "@tanstack/react-query";
 import { useRouter } from "@/shared/stacked-router/router";
-import { getWebApp } from "@/shared/telegram/telegram";
+import { getWebApp } from "@/shared/platform/telegram";
 import { cn } from "@/lib/utils";
 
 export function OverviewHeader() {

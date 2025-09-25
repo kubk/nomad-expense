@@ -16,8 +16,8 @@ import { Route } from "@/shared/stacked-router/routes";
 import { AnimatedScreen } from "@/shared/stacked-router/animated-screen";
 import { AccountPickerScreen } from "../transactions/account-picker-screen";
 import { StatementUploadResultScreen } from "../transactions/statement-upload-result-screen";
-import { initializeTma } from "@/shared/telegram/telegram";
-import { useTgHeaderColorSync } from "@/shared/telegram/use-tg-header-color-sync";
+import { initializeTma } from "@/shared/platform/telegram";
+import { useTgHeaderColorSync } from "@/shared/platform/use-tg-header-color-sync";
 
 export function App() {
   useEffect(initializeTma, []);
