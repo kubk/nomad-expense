@@ -4,8 +4,6 @@ import {
   Loader2Icon,
   ChevronDownIcon,
   ArrowLeftIcon,
-  CircleQuestionMarkIcon,
-  ArrowRightLeftIcon,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -29,19 +27,12 @@ import { TransactionType } from "api";
 import { DateTime } from "luxon";
 import { getCurrencySymbol } from "@/shared/currency-formatter";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Switch } from "@/components/ui/switch";
-import {
-  Drawer,
-  DrawerContent,
-  DrawerDescription,
-  DrawerHeader,
-  DrawerTitle,
-} from "@/components/ui/drawer";
 import { FormActionButton } from "@/components/ui/form-action-button";
 import { UploadStatementButton } from "./upload-statement-button";
 import { useInvalidateTransactions } from "@/shared/hooks/use-invalidate-transactions";
+import { CountableSwitch } from "./countable-switch";
 
-type Form = {
+export type TransactionForm = {
   description: string;
   accountId: string;
   amount: string;
@@ -60,7 +51,7 @@ export function TransactionFormScreen({
   const transactionId = route.transactionId;
   const isEdit = Boolean(transactionId);
 
-  const [formData, setFormData] = useState<Form>({
+  const [formData, setFormData] = useState<TransactionForm>({
     description: "",
     accountId: route.accountId || "",
     amount: "",
@@ -70,7 +61,6 @@ export function TransactionFormScreen({
     isCountable: true,
   });
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
-  const [isHelpOpen, setIsHelpOpen] = useState(false);
 
   const { data: transaction } = useQuery(
     trpc.expenses.getTransaction.queryOptions(
@@ -362,38 +352,12 @@ export function TransactionFormScreen({
               )}
             </div>
 
-            {/* Countable switch - only show in edit mode */}
             {isEdit && (
-              <div className="flex flex-col gap-2 pl-0.5">
-                <div className="flex items-center gap-2">
-                  <label className="flex items-center gap-2 cursor-pointer">
-                    {isTransactionLoading ? (
-                      <Skeleton className="h-5 w-8" />
-                    ) : (
-                      <Switch
-                        checked={!formData.isCountable}
-                        onCheckedChange={(checked) =>
-                          setFormData((prev) => ({
-                            ...prev,
-                            isCountable: !checked,
-                          }))
-                        }
-                      />
-                    )}
-                    <span className="text-sm text-muted-foreground">
-                      Exclude from totals
-                    </span>
-                  </label>
-                  <CircleQuestionMarkIcon
-                    onClick={(e) => {
-                      e.preventDefault();
-                      e.stopPropagation();
-                      setIsHelpOpen(true);
-                    }}
-                    className="size-4 text-muted-foreground active:scale-95 transition-transform cursor-pointer flex-shrink-0"
-                  />
-                </div>
-              </div>
+              <CountableSwitch
+                formData={formData}
+                setFormData={setFormData}
+                isTransactionLoading={isTransactionLoading}
+              />
             )}
           </div>
 
@@ -437,43 +401,6 @@ export function TransactionFormScreen({
           </Button>
         </Footer>
       </form>
-
-      <Drawer open={isHelpOpen} onOpenChange={setIsHelpOpen}>
-        <DrawerContent>
-          <DrawerHeader>
-            <DrawerTitle />
-            <DrawerDescription />
-          </DrawerHeader>
-
-          <div className="px-4 pb-6 space-y-6">
-            <div className="flex items-start gap-3">
-              <div className="flex-shrink-0 w-8 h-8 bg-primary/10 rounded-full flex items-center justify-center mt-0.5">
-                <ArrowRightLeftIcon className="size-4 text-primary" />
-              </div>
-              <div>
-                <p className="text-md font-medium text-foreground mb-0.5">
-                  Why exclude transactions?
-                </p>
-                <p className="text-sm text-muted-foreground">
-                  When you transfer money between your accounts, it's not really
-                  spending - it's just moving money. Mark these transactions as
-                  "excluded" so they don't affect your spending totals.
-                </p>
-              </div>
-            </div>
-
-            <div className="pt-2">
-              <Button
-                onClick={() => setIsHelpOpen(false)}
-                className="w-full"
-                size="lg"
-              >
-                Got it
-              </Button>
-            </div>
-          </div>
-        </DrawerContent>
-      </Drawer>
     </Page>
   );
 }
