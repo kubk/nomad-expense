@@ -2,7 +2,7 @@ import * as React from "react";
 import { Drawer as DrawerPrimitive } from "vaul";
 
 import { cn } from "@/lib/utils";
-import { getSafeAreaInset } from "@/shared/telegram/telegram";
+import { getSafeAreaInset } from "@/shared/platform/platform";
 
 function Drawer({
   ...props
@@ -63,7 +63,7 @@ function DrawerContent({
           className,
         )}
         style={{
-          paddingBottom: getSafeAreaInset().bottom / 2,
+          paddingBottom: getSafeAreaInset().bottom,
         }}
         {...props}
       >
