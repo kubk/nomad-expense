@@ -355,9 +355,9 @@ export function TransactionFormScreen({
                       Delete
                     </FormActionButton>
                   )}
-                  {formData.accountId && (
+                  {formData.accountId && !isEdit ? (
                     <UploadStatementButton accountId={formData.accountId} />
-                  )}
+                  ) : null}
                 </div>
               )}
             </div>
