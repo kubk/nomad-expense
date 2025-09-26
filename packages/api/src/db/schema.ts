@@ -67,6 +67,7 @@ export const accountTable = pgTable(
     currency: currencyEnum("currency").notNull(),
     color: accountColorEnum("color").notNull(),
     bankType: bankEnum("bank_type"),
+    timezone: varchar("timezone").default("UTC"),
     meta: jsonb("meta"),
     sort: integer("sort").notNull().default(0),
   },

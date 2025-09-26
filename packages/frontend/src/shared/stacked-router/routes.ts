@@ -51,6 +51,10 @@ export const routeSchema = v.variant("type", [
     accountId: v.optional(v.string()),
   }),
   v.object({
+    type: v.literal("importSettings"),
+    accountId: v.string(),
+  }),
+  v.object({
     type: v.literal("accountPicker"),
   }),
   v.object({
@@ -82,6 +86,7 @@ export type Route = v.InferOutput<typeof routeSchema>;
 export function isFormRoute(route: Route) {
   return (
     route.type === "accountForm" ||
+    route.type === "importSettings" ||
     route.type === "transactionForm" ||
     route.type === "settings" ||
     route.type === "family"

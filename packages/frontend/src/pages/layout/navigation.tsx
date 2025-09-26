@@ -17,6 +17,7 @@ export function Navigation() {
     currentRoute.type === "monthlyBreakdownFull" ||
     currentRoute.type === "transactionForm" ||
     currentRoute.type === "accountPicker" ||
+    currentRoute.type === "importSettings" ||
     currentRoute.type === "accountForm" ||
     currentRoute.type === "auth" ||
     currentRoute.type === "invite";
