@@ -8,7 +8,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import { cn } from "@/lib/utils";
 import { useRouter } from "@/shared/stacked-router/router";
 import { Route } from "@/shared/stacked-router/routes";
-import { getSafeAreaInset } from "@/shared/platform/platform";
+import { platform } from "@/shared/platform/platforms";
 
 export function Navigation() {
   const { currentRoute, navigate } = useRouter();
@@ -64,7 +64,7 @@ export function Navigation() {
             ease: "easeInOut",
           }}
           style={{
-            paddingBottom: getSafeAreaInset().bottom,
+            paddingBottom: platform.safeAreaInset().bottom,
           }}
           className="fixed bottom-0 left-0 right-0 bg-background border-t border-border"
         >
