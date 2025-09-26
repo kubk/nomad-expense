@@ -1,5 +1,16 @@
 import { z } from "zod";
-import { eq, and, or, desc, gte, lte, inArray, sql, ilike } from "drizzle-orm";
+import {
+  eq,
+  and,
+  or,
+  desc,
+  gte,
+  lte,
+  inArray,
+  sql,
+  ilike,
+  count,
+} from "drizzle-orm";
 import { DateTime } from "luxon";
 import { protectedProcedure, t } from "./trpc";
 import { transactionTable, accountTable } from "../db/schema";
@@ -544,5 +555,71 @@ export const expenseRouter = t.router({
       });
 
       return { success: true };
+    }),
+
+  getMostUsedDescriptions: protectedProcedure
+    .input(
+      z.object({
+        accountId: z.string(),
+        transactionType: transactionTypeSchema,
+      }),
+    )
+    .query(async ({ ctx, input }) => {
+      const db = getDb();
+      const familyId = ctx.familyId;
+
+      const accountResult = await getAccountByFamilyId(
+        db,
+        input.accountId,
+        familyId,
+      );
+      if (accountResult.type === "notFound") {
+        throw new TRPCError({ code: "UNAUTHORIZED" });
+      }
+
+      const descriptions = await db
+        .select({
+          description: transactionTable.description,
+          count: count(),
+        })
+        .from(transactionTable)
+        .where(
+          and(
+            eq(transactionTable.accountId, input.accountId),
+            eq(transactionTable.source, "manual"),
+            eq(transactionTable.type, input.transactionType),
+          ),
+        )
+        .groupBy(transactionTable.description)
+        .orderBy(desc(count()))
+        .limit(25);
+
+      if (descriptions.length === 0) {
+        if (input.transactionType === "expense") {
+          return [
+            "Groceries",
+            "Restaurant",
+            "Transport",
+            "Shopping",
+            "Utilities",
+            "Entertainment",
+            "Health",
+            "Education",
+            "Travel",
+          ];
+        } else {
+          return [
+            "Salary",
+            "Gift",
+            "Investment",
+            "Loan",
+            "Interest",
+            "Bonus",
+            "Refund",
+          ];
+        }
+      }
+
+      return descriptions.map((item) => item.description);
     }),
 });
