@@ -10,6 +10,8 @@ export {
 import type { inferRouterInputs, inferRouterOutputs } from "@trpc/server";
 import {
   accountColorSchema,
+  bank,
+  bankSchema,
   currencySchema,
   transactionSourceSchema,
   transactionTypeSchema,
@@ -30,6 +32,8 @@ export type Account = RouterOutputs["accounts"]["list"][0];
 export type MonthlyData = MonthlyBreakdownFull["data"][0];
 
 export type AccountColor = z.infer<typeof accountColorSchema>;
+export { bank };
+export type Bank = z.infer<typeof bankSchema>;
 export type Currency = z.infer<typeof currencySchema>;
 export type TransactionType = z.infer<typeof transactionTypeSchema>;
 export type TransactionSource = z.infer<typeof transactionSourceSchema>;

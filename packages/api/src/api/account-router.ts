@@ -3,7 +3,7 @@ import { protectedProcedure, t } from "./trpc";
 import { accountTable, transactionTable } from "../db/schema";
 import { getDb } from "../services/db";
 import { z } from "zod";
-import { accountColorSchema, currencySchema } from "../db/enums";
+import { accountColorSchema, bankSchema, currencySchema } from "../db/enums";
 
 export const accountRouter = t.router({
   list: protectedProcedure.query(async ({ ctx }) => {
@@ -18,6 +18,7 @@ export const accountRouter = t.router({
         color: accountTable.color,
         sort: accountTable.sort,
         bankType: accountTable.bankType,
+        timezone: accountTable.timezone,
         lastTransactionDate: max(transactionTable.createdAt),
         transactionCount: count(transactionTable.id),
       })
@@ -182,5 +183,36 @@ export const accountRouter = t.router({
       }
 
       return [];
+    }),
+
+  updateImportSettings: protectedProcedure
+    .input(
+      z.object({
+        id: z.string(),
+        bankType: bankSchema.nullable(),
+        timezone: z.string(),
+      }),
+    )
+    .mutation(async ({ ctx, input }) => {
+      const db = getDb();
+      const familyId = ctx.familyId;
+
+      const results = await db
+        .update(accountTable)
+        .set({
+          bankType: input.bankType,
+          timezone: input.timezone,
+        })
+        .where(
+          and(
+            eq(accountTable.familyId, familyId),
+            eq(accountTable.id, input.id),
+          ),
+        )
+        .returning({ id: accountTable.id });
+
+      const result = results[0];
+
+      return result;
     }),
 });

@@ -2,6 +2,7 @@ import { TransactionsScreen } from "../transactions/transactions-screen";
 import { MonthlyBreakdownFull } from "../monthly-breakdown-full/monthly-breakdown-full";
 import { AccountsScreen } from "../accounts/accounts-screen";
 import { AccountFormScreen } from "../accounts/account-form-screen";
+import { ImportSettingsScreen } from "../accounts/import-settings-screen";
 import { TransactionFormScreen } from "../transactions/transaction-form-screen";
 import { Navigation } from "./navigation";
 import { OverviewScreen } from "../overview/overview-screen";
@@ -45,6 +46,9 @@ export function App() {
           break;
         case "accountForm":
           ScreenComponent = <AccountFormScreen {...props} />;
+          break;
+        case "importSettings":
+          ScreenComponent = <ImportSettingsScreen {...props} />;
           break;
         case "transactionForm":
           ScreenComponent = <TransactionFormScreen {...props} />;
