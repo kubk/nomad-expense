@@ -7,7 +7,6 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Calendar } from "@/components/ui/calendar";
 import {
@@ -31,6 +30,7 @@ import { FormActionButton } from "@/components/ui/form-action-button";
 import { UploadStatementButton } from "./upload-statement-button";
 import { useInvalidateTransactions } from "@/shared/hooks/use-invalidate-transactions";
 import { CountableSwitch } from "./countable-switch";
+import { QuickTitles } from "./quick-titles";
 
 export type TransactionForm = {
   description: string;
@@ -277,11 +277,10 @@ export function TransactionFormScreen({
             {/* Amount input for both edit and create modes */}
             <div className="flex flex-col gap-2">
               <label className="text-sm font-medium">Amount</label>
-              <div className="flex gap-2">
+              <div className="flex gap-3">
                 {isTransactionLoading ? (
                   <>
-                    <Skeleton className="h-9.5 flex-1" />
-                    <Skeleton className="h-9.5 w-18" />
+                    <Skeleton className="h-9.5 w-16" />
                   </>
                 ) : (
                   <>
@@ -298,7 +297,7 @@ export function TransactionFormScreen({
                       }
                       className="flex-1"
                     />
-                    <div className="px-3 py-2 border border-input bg-muted rounded-md text-sm text-muted-foreground min-w-16 flex items-center justify-center">
+                    <div className="text-lg text-muted-foreground min-w-16 flex items-center justify-center">
                       {(() => {
                         const currencyCode =
                           isEdit && transaction
@@ -315,20 +314,27 @@ export function TransactionFormScreen({
             </div>
 
             <div className="flex flex-col gap-2">
-              <label className="text-sm font-medium">Description</label>
+              {!isEdit && !isTransactionLoading && formData.accountId && (
+                <QuickTitles
+                  accountId={formData.accountId}
+                  transactionType={formData.type}
+                  onTitleClick={(title) =>
+                    setFormData((prev) => ({ ...prev, description: title }))
+                  }
+                />
+              )}
               {isTransactionLoading ? (
-                <Skeleton className="h-16 w-full" />
+                <Skeleton className="h-9 w-full" />
               ) : (
-                <Textarea
+                <Input
                   placeholder="Groceries"
                   value={formData.description}
-                  onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) =>
+                  onChange={(e) =>
                     setFormData((prev) => ({
                       ...prev,
                       description: e.target.value,
                     }))
                   }
-                  rows={2}
                 />
               )}
             </div>
