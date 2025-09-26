@@ -16,12 +16,12 @@ import { Route } from "@/shared/stacked-router/routes";
 import { AnimatedScreen } from "@/shared/stacked-router/animated-screen";
 import { AccountPickerScreen } from "../transactions/account-picker-screen";
 import { StatementUploadResultScreen } from "../transactions/statement-upload-result-screen";
-import { initializeTma } from "@/shared/platform/telegram";
-import { useTgHeaderColorSync } from "@/shared/platform/use-tg-header-color-sync";
+import { platform } from "@/shared/platform/platforms";
+import { useHeaderColorSync } from "@/shared/platform/use-header-color-sync";
 
 export function App() {
-  useEffect(initializeTma, []);
-  useTgHeaderColorSync();
+  useEffect(platform.initialize, []);
+  useHeaderColorSync();
   const { navigationStack, navigate, pop } = useRouter();
 
   const renderScreen = useCallback(

@@ -1,7 +1,7 @@
 import { PlusIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useRouter } from "@/shared/stacked-router/router";
-import { getSafeAreaInset } from "@/shared/platform/platform";
+import { platform } from "@/shared/platform/platforms";
 
 export function AddTransactionFab() {
   const { navigate } = useRouter();
@@ -10,7 +10,7 @@ export function AddTransactionFab() {
     <Button
       className="fixed right-4 h-14 w-14 rounded-full shadow-md"
       style={{
-        bottom: 92 + getSafeAreaInset().bottom,
+        bottom: 92 + platform.safeAreaInset().bottom,
       }}
       onClick={() => navigate({ type: "accountPicker" })}
     >
