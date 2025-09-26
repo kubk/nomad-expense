@@ -1,21 +1,32 @@
+import { Platform } from "./platforms";
+
 export function getWebApp() {
   const webApp = window.Telegram?.WebApp;
   if (webApp && webApp.platform !== "unknown") return webApp;
   return null;
 }
 
-export function telegramGetSafeAreaInset() {
-  const webAppInset = getWebApp()?.safeAreaInset;
-  if (webAppInset) return webAppInset;
-  return { top: 0, bottom: 0 };
-}
-
-export function initializeTma() {
+export function createTelegramPlatform(): Platform {
   const webApp = getWebApp();
-  if (!webApp) return;
+  if (!webApp) {
+    throw new Error("Telegram platform not initialized");
+  }
 
-  webApp.ready();
-  webApp.disableVerticalSwipes();
+  return {
+    initialize() {
+      webApp.ready();
+      webApp.disableVerticalSwipes();
+    },
+    safeAreaInset() {
+      return {
+        top: webApp.safeAreaInset.top,
+        bottom: webApp.safeAreaInset.bottom / 2,
+      };
+    },
+    syncHeader(color: string) {
+      webApp.setHeaderColor(color);
+    },
+  };
 }
 
 // export function useBackButton() {

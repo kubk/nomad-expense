@@ -42,15 +42,6 @@ export function ThemeProvider({
     }
 
     root.classList.add(theme);
-
-    // Update theme-color meta tag
-    let metaThemeColor = document.querySelector("meta[name='theme-color']") as HTMLMetaElement;
-    if (!metaThemeColor) {
-      metaThemeColor = document.createElement("meta");
-      metaThemeColor.name = "theme-color";
-      document.head.appendChild(metaThemeColor);
-    }
-    metaThemeColor.content = theme === "dark" ? "#0a0a0a" : "#ffffff";
   }, [theme]);
 
   const value = {
