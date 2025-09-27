@@ -1,12 +1,13 @@
 import { and, eq, gte, lte } from "drizzle-orm";
-import type { DB } from "./db";
-import { transactionTable } from "../db/schema";
-import type { ParsedTransaction } from "./bank-parsers/parsed-transaction";
-import { AccountFromFamily } from "../db/account/get-account-by-family-id";
-import { createMoneyFull } from "./money/money";
-import { getRulesByAccountId } from "../db/transaction-import-rule/get-rules-by-account-id";
-import { applyImportRules } from "./import-rules/import-rules";
-import { TransactionFull } from "../db/db-types";
+import type { DB } from "../db";
+import { interpretDateInTimezone } from "./timezone-converter";
+import { transactionTable } from "../../db/schema";
+import type { ParsedTransaction } from "../bank-parsers/parsed-transaction";
+import { AccountFromFamily } from "../../db/account/get-account-by-family-id";
+import { createMoneyFull } from "../money/money";
+import { getRulesByAccountId } from "../../db/transaction-import-rule/get-rules-by-account-id";
+import { applyImportRules } from "./import-rules";
+import { TransactionFull } from "../../db/db-types";
 
 export type ImportResult = {
   removed: TransactionFull[];
@@ -46,6 +47,11 @@ export async function importTransactions(
       currency: transaction.currency,
     });
 
+    const utcDate = interpretDateInTimezone(
+      transaction.createdAt,
+      account.timezone,
+    );
+
     const baseTransaction = {
       accountId: account.id,
       description: transaction.description,
@@ -56,7 +62,7 @@ export async function importTransactions(
       isCountable: true,
       usdAmount: money.baseAmountCents,
       type: transaction.type,
-      createdAt: transaction.createdAt,
+      createdAt: utcDate,
     };
 
     return applyImportRules(baseTransaction, importRules);
