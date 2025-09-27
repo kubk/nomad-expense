@@ -1,5 +1,6 @@
 import { expect, it, describe, vi } from "vitest";
 import { eq } from "drizzle-orm";
+import { DateTime } from "luxon";
 import { setUpDbTest, fixtures, testNow } from "../lib/testing/set-up-db-test";
 import {
   uploadStatementHandler,
@@ -239,7 +240,6 @@ describe("upload-statement-handler", () => {
 
     const caller = await getCaller({ loginAs: "alice" });
 
-    // Create the same transaction data for both imports
     const createTransactionCsv = () =>
       createCsvContent([
         {
@@ -250,72 +250,46 @@ describe("upload-statement-handler", () => {
         },
         {
           amount: "-25.00",
-          merchant: "Another Test Store",
-          description: "Another timezone test",
-          daysOffset: 1,
+          merchant: "Another Store",
+          description: "Another transaction",
+          daysOffset: 2,
         },
       ]);
 
-    // First import with UTC timezone (default)
-    await caller.accounts.updateImportSettings({
-      id: fixtures.accounts.accountUsd.id,
-      bankType: "Wise",
-      timezone: "UTC",
-    });
+    // Helper function to import transaction with specified timezone
+    const importWithTimezone = async (timezone: string) => {
+      await caller.accounts.updateImportSettings({
+        id: fixtures.accounts.accountUsd.id,
+        bankType: "Wise",
+        timezone,
+      });
 
-    const utcResult = await uploadStatementHandler(
-      createMockRequest(createTransactionCsv()),
+      const result = await uploadStatementHandler(
+        createMockRequest(createTransactionCsv()),
+      );
+      const responseData = (await result.json()) as UploadHandlerResponse;
+
+      expect(responseData.type).toBe("success");
+      assert(responseData.type === "success", "Upload should succeed");
+
+      const transaction = responseData.added.find(
+        (t) => t.description === "Timezone Test Store",
+      );
+      expect(transaction).toBeDefined();
+      assert(transaction, "Transaction should be found in response");
+
+      return transaction;
+    };
+
+    const utcTransaction = await importWithTimezone("UTC");
+
+    const bangkokTransaction = await importWithTimezone("Asia/Bangkok");
+
+    const utcDate = DateTime.fromJSDate(new Date(utcTransaction.createdAt));
+    const bangkokDate = DateTime.fromJSDate(
+      new Date(bangkokTransaction.createdAt),
     );
-    const utcResponseData = (await utcResult.json()) as UploadHandlerResponse;
 
-    expect(utcResponseData.type).toBe("success");
-    if (utcResponseData.type !== "success") return;
-
-    const utcTransaction = utcResponseData.added.find(
-      (t) => t.description === "Timezone Test Store",
-    );
-    expect(utcTransaction).toBeDefined();
-    if (!utcTransaction) return;
-
-    // Clear transactions for second import
-    const db = getDb();
-    await db
-      .delete(transactionTable)
-      .where(eq(transactionTable.accountId, fixtures.accounts.accountUsd.id));
-
-    // Second import with Asia/Bangkok timezone
-    await caller.accounts.updateImportSettings({
-      id: fixtures.accounts.accountUsd.id,
-      bankType: "Wise",
-      timezone: "Asia/Bangkok",
-    });
-
-    const bangkokResult = await uploadStatementHandler(
-      createMockRequest(createTransactionCsv()),
-    );
-    const bangkokResponseData =
-      (await bangkokResult.json()) as UploadHandlerResponse;
-
-    expect(bangkokResponseData.type).toBe("success");
-    if (bangkokResponseData.type !== "success") return;
-
-    const bangkokTransaction = bangkokResponseData.added.find(
-      (t) => t.description === "Timezone Test Store",
-    );
-    expect(bangkokTransaction).toBeDefined();
-    if (!bangkokTransaction) return;
-
-    // Compare the dates - Asia/Bangkok is UTC+7
-    // When we parse "16-01-2025" as Bangkok time, it means 2025-01-16T00:00:00+07:00
-    // Which converts to UTC as 2025-01-15T17:00:00Z (7 hours earlier)
-    // When we parse "16-01-2025" as UTC time, it means 2025-01-16T00:00:00Z
-    const utcDate = new Date(utcTransaction.createdAt);
-    const bangkokDate = new Date(bangkokTransaction.createdAt);
-
-    const timeDiffMs = utcDate.getTime() - bangkokDate.getTime();
-    const timeDiffHours = timeDiffMs / (1000 * 60 * 60);
-
-    // Should be 7 hours difference (Bangkok time converted to UTC is 7 hours earlier)
-    expect(timeDiffHours).toBe(7);
+    expect(utcDate.diff(bangkokDate, "hours").hours).toBe(7);
   });
 });
