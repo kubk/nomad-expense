@@ -5,7 +5,7 @@ import { and, eq } from "drizzle-orm";
 
 export type AccountFromFamily = Pick<
   AccountSelect,
-  "id" | "currency" | "bankType" | "meta"
+  "id" | "currency" | "bankType" | "meta" | "timezone"
 >;
 
 type Result =
@@ -23,6 +23,7 @@ export async function getAccountByFamilyId(
       currency: accountTable.currency,
       bankType: accountTable.bankType,
       meta: accountTable.meta,
+      timezone: accountTable.timezone,
     })
     .from(accountTable)
     .where(

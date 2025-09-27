@@ -1,6 +1,6 @@
 import { authenticate } from "../services/auth/authenticate";
 import { getDb } from "../services/db";
-import { importTransactions } from "../services/transaction-import";
+import { importTransactions } from "../services/transaction-import/transaction-import";
 import { getAccountByFamilyId } from "../db/account/get-account-by-family-id";
 import { jsonResponse } from "../lib/cloudflare/json-response";
 import { getTransactionParserByAccount } from "../services/bank-parsers/get-transaction-parser-by-account";
