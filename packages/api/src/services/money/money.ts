@@ -10,7 +10,7 @@ export type MoneyFull = {
 export function createMoneyFull(
   params:
     | { amountHuman: number; currency: SupportedCurrency }
-    | { amountCents: number; currency: SupportedCurrency }
+    | { amountCents: number; currency: SupportedCurrency },
 ): MoneyFull {
   // For now we keep USD hardcoded until we implement proper currency conversion
   const baseCurrency = "USD";

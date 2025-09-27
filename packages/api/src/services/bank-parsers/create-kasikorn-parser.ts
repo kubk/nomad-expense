@@ -35,7 +35,7 @@ export function createKasikornParser(password: string): ParseTransactionFn {
     const apiData = apiResponseSchema.parse(rawData);
 
     return apiData.map((item) => ({
-      amountCents: item.amount,
+      amountCents: Math.abs(item.amount),
       currency: item.currency,
       description: item.title,
       info: item.info,
