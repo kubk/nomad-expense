@@ -358,13 +358,13 @@ export function TransactionFormScreen({
               )}
             </div>
 
-            {isEdit && (
+            {isEdit && selectedAccount?.bankType ? (
               <CountableSwitch
                 formData={formData}
                 setFormData={setFormData}
                 isTransactionLoading={isTransactionLoading}
               />
-            )}
+            ) : null}
           </div>
 
           <ConfirmModal

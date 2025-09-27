@@ -8,7 +8,7 @@ import { DateTime, Settings } from "luxon";
 
 Settings.throwOnInvalid = true;
 
-export const testNow = DateTime.fromISO('2025-01-17');
+export const testNow = DateTime.fromISO("2025-01-17");
 
 export const fixtures = {
   users: {
@@ -19,7 +19,7 @@ export const fixtures = {
       id: "9a9f9a8d-093a-4901-a439-8abb31392d77",
     },
     charlie: {
-      id: "6507c6ab-5c1f-4f51-a3ee-cf4bab848267"
+      id: "6507c6ab-5c1f-4f51-a3ee-cf4bab848267",
     },
   },
   accounts: {
@@ -29,7 +29,7 @@ export const fixtures = {
     accountUsd: {
       id: "61637396-a7c2-4ccc-91b8-9098a62aee18",
     },
-  }
+  },
 };
 
 async function seed() {
@@ -37,55 +37,51 @@ async function seed() {
 
   const familyId = fixtures.users.alice.id;
 
-  await db
-    .insert(schema.userTable)
-    .values([
-      {
-        id: fixtures.users.alice.id,
-        familyId: familyId,
-        initialFamilyId: familyId,
-        name: "Alice",
-        username: "alice",
-        telegramId: "1",
-      },
-      {
-        id: fixtures.users.bob.id,
-        familyId: familyId,
-        initialFamilyId: familyId,
-        name: "Bob",
-        username: "bob",
-        telegramId: "2",
-      },
-      {
-        id: fixtures.users.charlie.id,
-        familyId: 'f3941d1c-88e0-476b-8b5f-81d243e24e90',
-        initialFamilyId: 'f3941d1c-88e0-476b-8b5f-81d243e24e90',
-        name: "Charlie",
-        username: "charlie",
-        telegramId: "3",
-      },
-    ]);
+  await db.insert(schema.userTable).values([
+    {
+      id: fixtures.users.alice.id,
+      familyId: familyId,
+      initialFamilyId: familyId,
+      name: "Alice",
+      username: "alice",
+      telegramId: "1",
+    },
+    {
+      id: fixtures.users.bob.id,
+      familyId: familyId,
+      initialFamilyId: familyId,
+      name: "Bob",
+      username: "bob",
+      telegramId: "2",
+    },
+    {
+      id: fixtures.users.charlie.id,
+      familyId: "f3941d1c-88e0-476b-8b5f-81d243e24e90",
+      initialFamilyId: "f3941d1c-88e0-476b-8b5f-81d243e24e90",
+      name: "Charlie",
+      username: "charlie",
+      telegramId: "3",
+    },
+  ]);
 
-  await db
-    .insert(schema.accountTable)
-    .values([
-      {
-        id: fixtures.accounts.accountTry.id,
-        familyId: familyId,
-        name: "Yapi Kredi",
-        currency: "TRY",
-        color: "blue",
-        bankType: "YapiKredi",
-      },
-      {
-        id: fixtures.accounts.accountUsd.id,
-        familyId: familyId,
-        name: "Wise",
-        currency: "USD",
-        color: "green",
-        bankType: "Wise",
-      },
-    ])
+  await db.insert(schema.accountTable).values([
+    {
+      id: fixtures.accounts.accountTry.id,
+      familyId: familyId,
+      name: "Yapi Kredi",
+      currency: "TRY",
+      color: "blue",
+      bankType: "YapiKredi",
+    },
+    {
+      id: fixtures.accounts.accountUsd.id,
+      familyId: familyId,
+      name: "Wise",
+      currency: "USD",
+      color: "green",
+      bankType: "Wise",
+    },
+  ]);
 
   // Add transaction import rules
   await db.insert(schema.transactionImportRuleTable).values([
@@ -114,12 +110,18 @@ async function seed() {
 
   // Add test transactions
   const migrosMoney = createMoneyFull({ amountHuman: 5.5, currency: "TRY" });
-  const digitalOceanMoney = createMoneyFull({ amountHuman: 55.5, currency: "TRY" });
+  const digitalOceanMoney = createMoneyFull({
+    amountHuman: 55.5,
+    currency: "TRY",
+  });
   const ukCertMoney = createMoneyFull({ amountHuman: 55.5, currency: "TRY" });
 
   const amazonMoney = createMoneyFull({ amountHuman: 10, currency: "USD" });
   const usdtMoney = createMoneyFull({ amountHuman: 2000, currency: "USD" });
-  const digitalOceanUsdMoney = createMoneyFull({ amountHuman: 100, currency: "USD" });
+  const digitalOceanUsdMoney = createMoneyFull({
+    amountHuman: 100,
+    currency: "USD",
+  });
   const italkiMoney = createMoneyFull({ amountHuman: 500, currency: "USD" });
 
   await db.insert(schema.transactionTable).values([

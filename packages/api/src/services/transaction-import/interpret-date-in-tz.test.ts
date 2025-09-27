@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { interpretDateInTimezone } from "./timezone-converter";
+import { interpretDateInTimezone } from "./interpret-date-in-tz";
 
 describe("interpretDateInTimezone", () => {
   it("should return the same date for UTC timezone", () => {
