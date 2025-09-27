@@ -10,6 +10,7 @@ import { assert } from "../lib/typescript/assert";
 import { getRowCount } from "../lib/testing/get-row-count";
 import { transactionTable } from "../db/schema";
 import { getDb } from "../services/db";
+import { getCaller } from "../lib/testing/get-trpc-caller";
 
 vi.mock("../services/auth/authenticate", () => ({
   authenticate: vi.fn(),
@@ -231,5 +232,90 @@ describe("upload-statement-handler", () => {
     );
     expect(regularStoreTransaction).toBeDefined();
     expect(regularStoreTransaction?.isCountable).toBe(true);
+  });
+
+  it("should apply account timezone when importing transactions", async () => {
+    await setupAuth();
+
+    const caller = await getCaller({ loginAs: "alice" });
+
+    // Create the same transaction data for both imports
+    const createTransactionCsv = () =>
+      createCsvContent([
+        {
+          amount: "-50.00",
+          merchant: "Timezone Test Store",
+          description: "Timezone test transaction",
+          daysOffset: 1,
+        },
+        {
+          amount: "-25.00",
+          merchant: "Another Test Store",
+          description: "Another timezone test",
+          daysOffset: 1,
+        },
+      ]);
+
+    // First import with UTC timezone (default)
+    await caller.accounts.updateImportSettings({
+      id: fixtures.accounts.accountUsd.id,
+      bankType: "Wise",
+      timezone: "UTC",
+    });
+
+    const utcResult = await uploadStatementHandler(
+      createMockRequest(createTransactionCsv()),
+    );
+    const utcResponseData = (await utcResult.json()) as UploadHandlerResponse;
+
+    expect(utcResponseData.type).toBe("success");
+    if (utcResponseData.type !== "success") return;
+
+    const utcTransaction = utcResponseData.added.find(
+      (t) => t.description === "Timezone Test Store",
+    );
+    expect(utcTransaction).toBeDefined();
+    if (!utcTransaction) return;
+
+    // Clear transactions for second import
+    const db = getDb();
+    await db
+      .delete(transactionTable)
+      .where(eq(transactionTable.accountId, fixtures.accounts.accountUsd.id));
+
+    // Second import with Asia/Bangkok timezone
+    await caller.accounts.updateImportSettings({
+      id: fixtures.accounts.accountUsd.id,
+      bankType: "Wise",
+      timezone: "Asia/Bangkok",
+    });
+
+    const bangkokResult = await uploadStatementHandler(
+      createMockRequest(createTransactionCsv()),
+    );
+    const bangkokResponseData =
+      (await bangkokResult.json()) as UploadHandlerResponse;
+
+    expect(bangkokResponseData.type).toBe("success");
+    if (bangkokResponseData.type !== "success") return;
+
+    const bangkokTransaction = bangkokResponseData.added.find(
+      (t) => t.description === "Timezone Test Store",
+    );
+    expect(bangkokTransaction).toBeDefined();
+    if (!bangkokTransaction) return;
+
+    // Compare the dates - Asia/Bangkok is UTC+7
+    // When we parse "16-01-2025" as Bangkok time, it means 2025-01-16T00:00:00+07:00
+    // Which converts to UTC as 2025-01-15T17:00:00Z (7 hours earlier)
+    // When we parse "16-01-2025" as UTC time, it means 2025-01-16T00:00:00Z
+    const utcDate = new Date(utcTransaction.createdAt);
+    const bangkokDate = new Date(bangkokTransaction.createdAt);
+
+    const timeDiffMs = utcDate.getTime() - bangkokDate.getTime();
+    const timeDiffHours = timeDiffMs / (1000 * 60 * 60);
+
+    // Should be 7 hours difference (Bangkok time converted to UTC is 7 hours earlier)
+    expect(timeDiffHours).toBe(7);
   });
 });

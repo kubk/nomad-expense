@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { ArrowLeftIcon, Loader2Icon, CheckIcon } from "lucide-react";
+import { ArrowLeftIcon, Loader2Icon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Select,
@@ -77,8 +77,6 @@ export function ImportSettingsScreen({
       },
     }),
   );
-
-  // Get list of popular timezones with offsets
 
   useEffect(() => {
     if (existingAccount) {
