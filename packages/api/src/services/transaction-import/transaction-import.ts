@@ -1,6 +1,6 @@
 import { and, eq, gte, lte } from "drizzle-orm";
 import type { DB } from "../db";
-import { interpretDateInTimezone } from "./timezone-converter";
+import { interpretDateInTimezone } from "./interpret-date-in-tz";
 import { transactionTable } from "../../db/schema";
 import type { ParsedTransaction } from "../bank-parsers/parsed-transaction";
 import { AccountFromFamily } from "../../db/account/get-account-by-family-id";
