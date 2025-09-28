@@ -18,8 +18,8 @@ export function createKasikornParser(password: string): ParseTransactionFn {
     formData.append("pdf", file);
 
     const url = new URL(getEnv().KASIKORN_API_URL);
-    console.log('Trying to send request to ' + url.toString());
     url.searchParams.set("password", password);
+    console.log('2. Trying to send request to ' + url.toString());
 
     const response = await fetch(url.toString(), {
       method: "POST",
