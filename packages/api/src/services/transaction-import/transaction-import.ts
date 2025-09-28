@@ -1,6 +1,5 @@
 import { and, eq, gte, lte } from "drizzle-orm";
 import type { DB } from "../db";
-import { interpretDateInTimezone } from "./interpret-date-in-tz";
 import { transactionTable } from "../../db/schema";
 import type { ParsedTransaction } from "../bank-parsers/parsed-transaction";
 import { AccountFromFamily } from "../../db/account/get-account-by-family-id";
@@ -47,11 +46,6 @@ export async function importTransactions(
       currency: transaction.currency,
     });
 
-    const utcDate = interpretDateInTimezone(
-      transaction.createdAt,
-      account.timezone,
-    );
-
     const baseTransaction = {
       accountId: account.id,
       description: transaction.description,
@@ -62,7 +56,7 @@ export async function importTransactions(
       isCountable: true,
       usdAmount: money.baseAmountCents,
       type: transaction.type,
-      createdAt: utcDate,
+      createdAt: transaction.createdAt,
     };
 
     return applyImportRules(baseTransaction, importRules);

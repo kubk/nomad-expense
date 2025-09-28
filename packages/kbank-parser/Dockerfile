@@ -8,7 +8,7 @@ ENV TZ=UTC
 
 COPY package*.json ./
 
-RUN if [ "$INSTALL_DEV" = "true" ]; then npm ci; else npm ci --omit=dev; fi
+RUN if [ "$INSTALL_DEV" = "true" ]; then npm install; else npm install --omit=dev; fi
 
 COPY . .
 

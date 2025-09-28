@@ -13,7 +13,7 @@ const apiTransactionSchema = z.object({
 const apiResponseSchema = z.array(apiTransactionSchema);
 
 export function createKasikornParser(password: string): ParseTransactionFn {
-  return async (file: File) => {
+  return async (file: File, _timezone: string) => {
     const formData = new FormData();
     formData.append("pdf", file);
 

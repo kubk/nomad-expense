@@ -1,3 +1,5 @@
+import { DateTime } from "luxon";
+
 type Transaction = {
   createdAt: Date;
   amount: number;
@@ -39,20 +41,25 @@ export const parseMoney = (moneyString?: string) => {
 const getDate = (dateString: string, timeString: string) => {
   const [day, month, year] = dateString.split("-").map(Number);
   const [hour, minute] = timeString.split(":").map(Number);
-  // JavaScript's Date constructor expects months to be 0-indexed
-  const date = new Date(
-    (year ?? 0) + 2000,
-    (month ?? 1) - 1,
-    day ?? 1,
-    hour ?? 0,
-    minute ?? 0,
+
+  // The PDF times are in Bangkok local time, so we create a DateTime in Bangkok timezone
+  // This will properly convert 13:14 Bangkok time to the equivalent UTC time (06:14 UTC)
+  const bangkokDateTime = DateTime.fromObject(
+    {
+      year: (year ?? 0) + 2000,
+      month: month ?? 1,
+      day: day ?? 1,
+      hour: hour ?? 0,
+      minute: minute ?? 0,
+    },
+    { zone: "Asia/Bangkok" },
   );
-  // @ts-ignore
-  if (isNaN(date)) {
+
+  if (!bangkokDateTime.isValid) {
     throw new Error(`Invalid date or time: ${dateString}:${timeString}`);
   }
 
-  return date;
+  return bangkokDateTime.toJSDate();
 };
 
 const tryParseMoney = (row: string, columns: string[]) => {

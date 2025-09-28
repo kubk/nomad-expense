@@ -12,4 +12,7 @@ export const parsedTransactionSchema = z.object({
 
 export type ParsedTransaction = z.infer<typeof parsedTransactionSchema>;
 
-export type ParseTransactionFn = (file: File) => Promise<ParsedTransaction[]>;
+export type ParseTransactionFn = (
+  file: File,
+  timezone: string,
+) => Promise<ParsedTransaction[]>;

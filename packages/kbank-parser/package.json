@@ -12,13 +12,15 @@
   "description": "",
   "dependencies": {
     "@hono/node-server": "^1.19.3",
-    "@types/multer": "^2.0.0",
     "hono": "^4.9.8",
+    "luxon": "^3.7.2",
     "pdf-parse": "^1.1.1"
   },
   "devDependencies": {
     "@types/node": "^24.5.2",
     "typescript": "^5.9.2",
-    "vitest": "^3.2.4"
+    "vitest": "^3.2.4",
+    "@types/luxon": "^3.7.1",
+    "@types/multer": "^2.0.0"
   }
 }

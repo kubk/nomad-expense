@@ -52,7 +52,7 @@ export async function uploadStatementHandler(
     const result = await importTransactions(
       db,
       accountResult.account,
-      await transactionParser(file),
+      await transactionParser(file, accountResult.account.timezone),
     );
 
     return jsonResponse(200, {
