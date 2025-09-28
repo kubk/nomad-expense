@@ -6,6 +6,7 @@ import {
 } from "./parsed-transaction";
 import Papa from "papaparse";
 import { DateTime } from "luxon";
+import { interpretDateInTimezone } from "../transaction-import/interpret-date-in-tz";
 
 export async function parseCsvFromFile(
   file: File,
@@ -39,6 +40,7 @@ const rowSchema = z.object({
 
 export async function parseWiseStatement(
   file: File,
+  timezone: string,
 ): Promise<ParsedTransaction[]> {
   const csvData = await parseCsvFromFile(file);
 
@@ -48,13 +50,18 @@ export async function parseWiseStatement(
     const validatedRow = rowSchema.parse(row);
 
     const amount = parseAmount(validatedRow.Amount);
+    const parsedDate = parseDate(
+      validatedRow["Date Time"] || validatedRow.Date,
+    );
+    const utcDate = interpretDateInTimezone(parsedDate, timezone);
+
     const transaction = {
       amountCents: Math.abs(amount),
       currency: validatedRow.Currency,
       description: validatedRow.Merchant || validatedRow.Description,
       info: validatedRow.Description,
       type: amount < 0 ? "expense" : "income",
-      createdAt: parseDate(validatedRow["Date Time"] || validatedRow.Date),
+      createdAt: utcDate,
     };
 
     const validatedTransaction = parsedTransactionSchema.parse(transaction);
