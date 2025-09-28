@@ -7,6 +7,7 @@ describe("parseWiseStatement", () => {
     const csv = readFileSync("./fixtures/wise-statement.csv", "utf-8");
     const transactions = await parseWiseStatement(
       new File([csv], "wise-statement.csv"),
+      "UTC",
     );
 
     expect(transactions).toMatchInlineSnapshot(`
@@ -58,7 +59,7 @@ describe("parseWiseStatement", () => {
   it("should fail fast on invalid schema", async () => {
     const invalidCsv = "InvalidColumn,AnotherColumn\nvalue1,value2";
     const invalidFile = new File([invalidCsv], "invalid.csv");
-    await expect(parseWiseStatement(invalidFile)).rejects.toThrow();
+    await expect(parseWiseStatement(invalidFile, "UTC")).rejects.toThrow();
   });
 
   it("should use merchant name as description when available, fallback to description", async () => {
@@ -67,6 +68,7 @@ describe("parseWiseStatement", () => {
 
     const transactions = await parseWiseStatement(
       new File([csvWithEmptyMerchant], "test.csv"),
+      "UTC",
     );
     expect(transactions[0].description).toBe("ATM Withdrawal");
     expect(transactions[0].type).toBe("expense");
@@ -79,6 +81,7 @@ describe("parseWiseStatement", () => {
 
     const transactions = await parseWiseStatement(
       new File([csvWithDateTime], "test.csv"),
+      "UTC",
     );
     expect(transactions[0].createdAt).toEqual(
       new Date(2025, 8, 20, 20, 57, 59),
@@ -93,6 +96,7 @@ describe("parseWiseStatement", () => {
 
     const transactions = await parseWiseStatement(
       new File([csvWithoutDateTime], "test.csv"),
+      "UTC",
     );
     expect(transactions[0].createdAt).toEqual(new Date(2024, 2, 15));
   });
