@@ -21,6 +21,12 @@
 			"id": "4f8c4ec03b6e4854983ae91786c62fc4"
 		}
 	],
+	"services": [
+		{
+			"binding": "KBANK_SERVICE",
+			"service": "kbank"
+		}
+	],
 	"env": {
 		"production": {
 			"name": "expense-tracker-api",
@@ -34,6 +40,12 @@
 				{
 					"binding": "KV",
 					"id": "4f8c4ec03b6e4854983ae91786c62fc4"
+				}
+			],
+			"services": [
+				{
+					"binding": "KBANK_SERVICE",
+					"service": "kbank"
 				}
 			]
 		}

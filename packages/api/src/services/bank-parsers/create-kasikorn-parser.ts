@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { ParseTransactionFn } from "./parsed-transaction";
-import { getEnv } from "../env";
+import { env } from "cloudflare:workers";
 
 const apiTransactionSchema = z.object({
   createdAt: z.string().transform((str) => new Date(str)),
@@ -17,14 +17,15 @@ export function createKasikornParser(password: string): ParseTransactionFn {
     const formData = new FormData();
     formData.append("pdf", file);
 
-    const url = new URL(getEnv().KASIKORN_API_URL);
-    url.searchParams.set("password", password);
-    console.log('2. Trying to send request to ' + url.toString());
-
-    const response = await fetch(url.toString(), {
-      method: "POST",
-      body: formData,
-    });
+    const response = await env.KBANK_SERVICE.fetch(
+      new Request(
+        `https://kbank.example.com/parse?password=${encodeURIComponent(password)}`,
+        {
+          method: "POST",
+          body: formData,
+        },
+      ),
+    );
 
     if (!response.ok) {
       throw new Error(
