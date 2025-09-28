@@ -17,6 +17,10 @@ vi.mock("../services/auth/authenticate", () => ({
   authenticate: vi.fn(),
 }));
 
+vi.mock("cloudflare:workers", () => ({
+  env: {},
+}));
+
 function createCsvContent(
   transactions: Array<{
     amount: string;
