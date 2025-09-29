@@ -1,10 +1,9 @@
 import { authenticate } from "../services/auth/authenticate";
 import { getDb } from "../services/db";
-import { importTransactions } from "../services/transaction-import/transaction-import";
 import { getAccountByFamilyId } from "../db/account/get-account-by-family-id";
 import { jsonResponse } from "../lib/cloudflare/json-response";
-import { getTransactionParserByAccount } from "../services/bank-parsers/get-transaction-parser-by-account";
 import { Transaction } from "../shared";
+import { importFile } from "../services/transaction-import/import-filte";
 
 export type UploadHandlerResponse =
   | { type: "error"; message: string }
@@ -45,20 +44,12 @@ export async function uploadStatementHandler(
       return jsonResponse(403, { type: "error", message: "Access denied" });
     }
 
-    const transactionParser = getTransactionParserByAccount(
-      accountResult.account,
-    );
-
-    const result = await importTransactions(
-      db,
-      accountResult.account,
-      await transactionParser(file, accountResult.account.timezone),
-    );
+    const importResult = await importFile(db, accountResult.account, file);
 
     return jsonResponse(200, {
       type: "success",
-      removed: result.removed,
-      added: result.added,
+      removed: importResult.removed,
+      added: importResult.added,
     });
   } catch (error) {
     console.error("Upload error:", error);
