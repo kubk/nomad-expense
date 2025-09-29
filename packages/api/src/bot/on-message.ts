@@ -73,7 +73,6 @@ export async function onMessage(ctx: Context) {
         "❌ Failed to import transactions. Please check your file format and try again.",
       );
 
-      // Clear the user's bot state on error too
       await setUserBotState(db, ctx.from.id.toString(), null);
     }
     return;
