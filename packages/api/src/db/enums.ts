@@ -13,6 +13,7 @@ export const transactionImportRuleTypeSchema = z.enum(
 
 export const transactionType = ["expense", "income"] as const;
 export const transactionTypeSchema = z.enum(transactionType);
+export type TransactionType = (typeof transactionType)[number];
 
 export const accountColor = [
   "blue",
