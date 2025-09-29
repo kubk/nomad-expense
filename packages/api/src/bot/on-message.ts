@@ -4,11 +4,10 @@ import { getDb } from "../services/db";
 import { authenticate } from "../services/auth/authenticate";
 import { getUserBotState, setUserBotState } from "../db/user/user-bot-state";
 import { getFamilyImportableAccounts } from "../db/account/get-family-importable-accounts";
-import { getTransactionParserByAccount } from "../services/bank-parsers/get-transaction-parser-by-account";
-import { importTransactions } from "../services/transaction-import/transaction-import";
 import { withCancelText } from "./with-cancel-text";
 import { sendIsTyping } from "./send-is-typing";
 import { replyStart } from "./reply-start";
+import { importFile } from "../services/transaction-import/import-filte";
 
 export async function onMessage(ctx: Context) {
   if (!ctx.from || !ctx.message) {
@@ -56,18 +55,7 @@ export async function onMessage(ctx: Context) {
     const uploadedFile = new File([fileBuffer], file.file_path || "statement");
 
     try {
-      const transactionParser = getTransactionParserByAccount(selectedAccount);
-
-      const parsedTransactions = await transactionParser(
-        uploadedFile,
-        selectedAccount.timezone,
-      );
-
-      const importResult = await importTransactions(
-        db,
-        selectedAccount,
-        parsedTransactions,
-      );
+      const importResult = await importFile(db, selectedAccount, uploadedFile);
 
       const addedCount = importResult.added.length;
       const removedCount = importResult.removed.length;
