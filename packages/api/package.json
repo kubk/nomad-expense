@@ -7,6 +7,7 @@
   "scripts": {
     "--- local ---": "",
     "start": "wrangler dev",
+    "tunnel": "../../../ngrok http --domain=causal-magpie-closing.ngrok-free.app 8794",
     "test": "./bin/test-api.sh",
     "typecheck": "npx tsc -b --noEmit",
     "prettier:fix": "prettier --write src/**/*.ts",
@@ -47,6 +48,7 @@
     "better-sqlite3": "^12.2.0",
     "drizzle-orm": "^0.41.0",
     "drizzle-zod": "^0.8.3",
+    "grammy": "^1.38.2",
     "luxon": "^3.7.1",
     "papaparse": "^5.5.3",
     "zod": "^3.24.2"
