@@ -19,6 +19,7 @@ import { transactionTypeSchema } from "../db/enums";
 import { getAccountByFamilyId } from "../db/account/get-account-by-family-id";
 import { TRPCError } from "@trpc/server";
 import { createMoneyFull } from "../services/money/money";
+import { getMostUsedDescriptions } from "../services/transaction-descriptions";
 
 const transactionFilterSchema = z.object({
   accounts: z.array(z.string()),
@@ -577,49 +578,10 @@ export const expenseRouter = t.router({
         throw new TRPCError({ code: "UNAUTHORIZED" });
       }
 
-      const descriptions = await db
-        .select({
-          description: transactionTable.description,
-          count: count(),
-        })
-        .from(transactionTable)
-        .where(
-          and(
-            eq(transactionTable.accountId, input.accountId),
-            eq(transactionTable.source, "manual"),
-            eq(transactionTable.type, input.transactionType),
-          ),
-        )
-        .groupBy(transactionTable.description)
-        .orderBy(desc(count()))
-        .limit(25);
-
-      if (descriptions.length === 0) {
-        if (input.transactionType === "expense") {
-          return [
-            "Groceries",
-            "Restaurant",
-            "Transport",
-            "Shopping",
-            "Utilities",
-            "Entertainment",
-            "Health",
-            "Education",
-            "Travel",
-          ];
-        } else {
-          return [
-            "Salary",
-            "Gift",
-            "Investment",
-            "Loan",
-            "Interest",
-            "Bonus",
-            "Refund",
-          ];
-        }
-      }
-
-      return descriptions.map((item) => item.description);
+      return getMostUsedDescriptions(
+        db,
+        input.accountId,
+        input.transactionType,
+      );
     }),
 });

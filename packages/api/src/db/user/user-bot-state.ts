@@ -2,12 +2,25 @@ import { z } from "zod";
 import { userTable } from "../schema";
 import { eq } from "drizzle-orm";
 import { DB } from "../../services/db";
+import { transactionTypeSchema } from "../enums";
 
 export const userBotStateSchema = z
   .discriminatedUnion("type", [
     z.object({
       type: z.literal("uploadStatement"),
       fileId: z.string(),
+    }),
+    z.object({
+      type: z.literal("selectingTransactionType"),
+      accountId: z.string(),
+      amountHuman: z.number(),
+      description: z.string().optional(),
+    }),
+    z.object({
+      type: z.literal("addingTransactionDescription"),
+      accountId: z.string(),
+      amountHuman: z.number(),
+      transactionType: transactionTypeSchema,
     }),
   ])
   .nullable();
