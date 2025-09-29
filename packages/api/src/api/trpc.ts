@@ -11,7 +11,7 @@ export async function createContext({
     await new Promise((resolve) => setTimeout(resolve, 1000));
   }
 
-  const authResult = await authenticate(req);
+  const authResult = await authenticate({ type: "api", req });
 
   return {
     req,

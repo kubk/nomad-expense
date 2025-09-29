@@ -14,7 +14,7 @@ export async function uploadStatementHandler(
   request: Request,
 ): Promise<Response> {
   try {
-    const authResult = await authenticate(request);
+    const authResult = await authenticate({ type: "api", req: request });
     if (!authResult) {
       return jsonResponse(401, { type: "error", message: "Unauthorized" });
     }

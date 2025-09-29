@@ -54,6 +54,7 @@ export const userTable = pgTable(
     avatarUrl: text("avatar_url"),
     telegramId: varchar("telegram_id").unique(),
     isAdmin: boolean("is_admin").notNull().default(false),
+    botState: jsonb("bot_state"),
   },
   (table) => [index("idx_user_telegram_id").on(table.telegramId)],
 );
