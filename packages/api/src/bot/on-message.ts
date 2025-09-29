@@ -64,7 +64,9 @@ export async function onMessage(ctx: Context) {
       resultMessage += `📥 Added: ${addedCount} transaction${addedCount !== 1 ? "s" : ""}\n\n`;
       resultMessage += `🗑️ Removed: ${removedCount} transaction${removedCount !== 1 ? "s" : ""}`;
 
-      await ctx.reply(resultMessage);
+      await ctx.reply(resultMessage, {
+        reply_markup: { remove_keyboard: true },
+      });
 
       await setUserBotState(db, ctx.from.id.toString(), null);
     } catch (error) {
