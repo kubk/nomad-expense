@@ -1,15 +1,5 @@
 import { z } from "zod";
-import {
-  eq,
-  and,
-  or,
-  desc,
-  gte,
-  lte,
-  inArray,
-  sql,
-  ilike,
-} from "drizzle-orm";
+import { eq, and, or, desc, gte, lte, inArray, sql, ilike } from "drizzle-orm";
 import { DateTime } from "luxon";
 import { protectedProcedure, t } from "./trpc";
 import { transactionTable, accountTable } from "../db/schema";
@@ -19,6 +9,7 @@ import { getAccountByFamilyId } from "../db/account/get-account-by-family-id";
 import { TRPCError } from "@trpc/server";
 import { createMoneyFull } from "../services/money/money";
 import { getMostUsedDescriptions } from "../services/transaction-descriptions";
+import { createTransactionWithRules } from "../db/transaction/create-transaction-with-rules";
 
 const transactionFilterSchema = z.object({
   accounts: z.array(z.string()),
@@ -544,15 +535,15 @@ export const expenseRouter = t.router({
         currency: account.currency,
       });
 
-      await db.insert(transactionTable).values({
-        accountId: input.accountId,
-        description: input.description,
-        amount: money.amountCents,
-        currency: account.currency,
-        usdAmount: money.baseAmountCents,
-        type: input.type,
-        createdAt: input.createdAt ? new Date(input.createdAt) : undefined,
-      });
+      await createTransactionWithRules(
+        input.accountId,
+        familyId,
+        input.description,
+        money.amountCents,
+        input.type,
+        ctx.userId,
+        input.createdAt ? new Date(input.createdAt) : undefined,
+      );
 
       return { success: true };
     }),

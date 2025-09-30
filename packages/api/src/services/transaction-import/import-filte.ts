@@ -7,6 +7,7 @@ export async function importFile(
   db: DB,
   account: AccountFromFamily,
   file: File,
+  authorUserId: string,
 ) {
   const transactionParser = getTransactionParserByAccount(account);
   const parsedTransactions = await transactionParser(file, account.timezone);
@@ -15,6 +16,7 @@ export async function importFile(
     db,
     account,
     parsedTransactions,
+    authorUserId,
   );
 
   return importResult;
