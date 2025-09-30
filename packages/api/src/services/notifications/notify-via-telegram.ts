@@ -1,4 +1,4 @@
-import { eq, and } from "drizzle-orm";
+import { eq, and, ne, isNotNull } from "drizzle-orm";
 import { getDb } from "../db";
 import { userTable } from "../../db/schema";
 import { getBot } from "../telegram/get-bot";
@@ -49,7 +49,7 @@ export async function notifyViaTelegram(payload: NotificationPayload) {
       await bot.api.sendMessage(targetUser.telegramId, message);
     } else {
       // Notify all family members except the author
-      const familyMembers = await db
+      const recipients = await db
         .select({
           telegramId: userTable.telegramId,
           name: userTable.name,
@@ -59,12 +59,10 @@ export async function notifyViaTelegram(payload: NotificationPayload) {
           and(
             eq(userTable.familyId, payload.familyId),
             eq(userTable.isFamilyNotified, true),
+            ne(userTable.id, payload.excludeUserId),
+            isNotNull(userTable.telegramId),
           ),
         );
-
-      const recipients = familyMembers.filter(
-        (member) => member.telegramId !== null,
-      );
 
       for (const recipient of recipients) {
         if (!recipient.telegramId) continue;
@@ -72,14 +70,16 @@ export async function notifyViaTelegram(payload: NotificationPayload) {
         let message: string;
         if (payload.type === "newTransaction") {
           const amount = (payload.money.amountCents / 100).toFixed(2);
-          message = `💸 ${payload.transactionAuthor} added a transaction: ${amount} ${payload.money.currency}`;
+          message = `💸 *${payload.transactionAuthor}* spent ${amount} ${payload.money.currency}`;
         } else {
-          message = `📊 ${payload.transactionAuthor} uploaded a bank statement for ${payload.bankAccountName}\n`;
+          message = `📊 *${payload.transactionAuthor}* uploaded a bank statement for *${payload.bankAccountName}*\n`;
           message += `📥 Added: ${payload.newTransactions} transaction${payload.newTransactions !== 1 ? "s" : ""}\n`;
           message += `🗑️ Removed: ${payload.removedTransactions} transaction${payload.removedTransactions !== 1 ? "s" : ""}`;
         }
 
-        await bot.api.sendMessage(recipient.telegramId, message);
+        await bot.api.sendMessage(recipient.telegramId, message, {
+          parse_mode: "Markdown",
+        });
       }
     }
   } catch (error) {
