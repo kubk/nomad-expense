@@ -15,6 +15,7 @@ export type NotificationPayload =
       familyId: string;
       excludeUserId: string;
       transactionAuthor: string;
+      description: string;
       money: MoneyFull;
     }
   | {
@@ -70,7 +71,7 @@ export async function notifyViaTelegram(payload: NotificationPayload) {
         let message: string;
         if (payload.type === "newTransaction") {
           const amount = (payload.money.amountCents / 100).toFixed(2);
-          message = `💸 *${payload.transactionAuthor}* spent ${amount} ${payload.money.currency}`;
+          message = `💸 ${amount} ${payload.money.currency} spent on *${payload.description}* by ${payload.transactionAuthor}`;
         } else {
           message = `📊 *${payload.transactionAuthor}* uploaded a bank statement for *${payload.bankAccountName}*\n`;
           message += `📥 Added: ${payload.newTransactions} transaction${payload.newTransactions !== 1 ? "s" : ""}\n`;

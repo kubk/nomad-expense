@@ -11,12 +11,6 @@ export const userBotStateSchema = z
       fileId: z.string(),
     }),
     z.object({
-      type: z.literal("selectingTransactionType"),
-      accountId: z.string(),
-      amountCents: z.number(),
-      description: z.string().optional(),
-    }),
-    z.object({
       type: z.literal("addingTransactionDescription"),
       accountId: z.string(),
       amountCents: z.number(),
