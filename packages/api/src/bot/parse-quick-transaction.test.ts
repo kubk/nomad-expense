@@ -50,6 +50,7 @@ describe("parseQuickTransaction", () => {
         name: "USD Account",
       },
       description: "rent",
+      transactionType: "expense",
     });
   });
 
@@ -67,6 +68,7 @@ describe("parseQuickTransaction", () => {
         name: "USD Account",
       },
       description: "public transport",
+      transactionType: "expense",
     });
   });
 
@@ -80,6 +82,7 @@ describe("parseQuickTransaction", () => {
         familyId: "family1",
         name: "USD Account",
       },
+      transactionType: "expense",
     });
   });
 
@@ -93,6 +96,7 @@ describe("parseQuickTransaction", () => {
         familyId: "family1",
         name: "USD Account",
       },
+      transactionType: "expense",
     });
   });
 
@@ -106,6 +110,7 @@ describe("parseQuickTransaction", () => {
         familyId: "family1",
         name: "EUR Account",
       },
+      transactionType: "expense",
     });
   });
 
@@ -119,6 +124,7 @@ describe("parseQuickTransaction", () => {
         familyId: "family1",
         name: "EUR Account",
       },
+      transactionType: "expense",
     });
   });
 
@@ -133,6 +139,7 @@ describe("parseQuickTransaction", () => {
         name: "THB Account",
       },
       description: "coffee",
+      transactionType: "expense",
     });
   });
 
@@ -147,6 +154,36 @@ describe("parseQuickTransaction", () => {
         name: "USD Account",
       },
       description: "coffee",
+      transactionType: "expense",
+    });
+  });
+
+  it("should parse income transaction with + prefix", () => {
+    const result = parseQuickTransaction("+3000 USD salary", mockAccounts);
+    expect(result).toEqual({
+      amountCents: 300000,
+      account: {
+        id: "1",
+        currency: "USD",
+        familyId: "family1",
+        name: "USD Account",
+      },
+      description: "salary",
+      transactionType: "income",
+    });
+  });
+
+  it("should parse income without description", () => {
+    const result = parseQuickTransaction("+3000 USD", mockAccounts);
+    expect(result).toEqual({
+      amountCents: 300000,
+      account: {
+        id: "1",
+        currency: "USD",
+        familyId: "family1",
+        name: "USD Account",
+      },
+      transactionType: "income",
     });
   });
 });

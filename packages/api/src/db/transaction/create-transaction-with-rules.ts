@@ -66,6 +66,7 @@ export async function createTransactionWithRules(
       familyId,
       excludeUserId: authorUserId,
       transactionAuthor: getUserDisplayName(author),
+      description,
       money,
     });
   }

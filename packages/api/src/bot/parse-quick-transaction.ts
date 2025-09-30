@@ -1,4 +1,4 @@
-import { currencySchema } from "../db/enums";
+import { currencySchema, type TransactionType } from "../db/enums";
 import { AccountSelect } from "../db/db-types";
 
 type ParseError = {
@@ -9,6 +9,7 @@ export type SuccessResult = {
   amountCents: number;
   account: AccountSelect;
   description?: string;
+  transactionType?: TransactionType;
 };
 
 export type ParseQuickTransactionResult = SuccessResult | ParseError;
@@ -17,7 +18,19 @@ export const parseQuickTransaction = (
   text: string,
   accounts: AccountSelect[],
 ): ParseQuickTransactionResult => {
-  const matches = text.match(/^(\S+)\s+(\S+)\s*(.*)$/);
+  // Check for + prefix to determine transaction type
+  let transactionType: TransactionType | undefined;
+  let processedText = text;
+
+  if (text.startsWith("+")) {
+    transactionType = "income";
+    processedText = text.slice(1).trim();
+  } else {
+    // Default to expense if no prefix
+    transactionType = "expense";
+  }
+
+  const matches = processedText.match(/^(\S+)\s+(\S+)\s*(.*)$/);
 
   if (!matches) {
     return { error: "invalid_input" };
@@ -59,11 +72,13 @@ export const parseQuickTransaction = (
       amountCents,
       account: account,
       description: description.trim(),
+      transactionType,
     };
   }
 
   return {
     amountCents,
     account,
+    transactionType,
   };
 };

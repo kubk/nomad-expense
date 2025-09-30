@@ -9,13 +9,8 @@ import { sendIsTyping } from "./send-is-typing";
 import { replyStart } from "./reply-start";
 import { importFile } from "../services/transaction-import/import-filte";
 import { parseQuickTransaction } from "./parse-quick-transaction";
-import {
-  buildReplyKeyboard,
-  EXPENSE_BUTTON_TEXT,
-  INCOME_BUTTON_TEXT,
-} from "./build-reply-keyboard";
+import { buildReplyKeyboard } from "./build-reply-keyboard";
 import { getMostUsedDescriptions } from "../services/transaction-descriptions";
-import type { TransactionType } from "../db/enums";
 import { createTransactionWithRules } from "../db/transaction/create-transaction-with-rules";
 import { downloadTelegramFileAsBuffer } from "./download-telegram-file-as-buffer";
 
@@ -94,68 +89,6 @@ export async function onMessage(ctx: Context) {
     return;
   }
 
-  if (userState?.type === "selectingTransactionType" && ctx.message.text) {
-    const text = ctx.message.text.trim();
-    let transactionType: TransactionType;
-
-    if (text === EXPENSE_BUTTON_TEXT) {
-      transactionType = "expense";
-    } else if (text === INCOME_BUTTON_TEXT) {
-      transactionType = "income";
-    } else {
-      await ctx.reply(withCancelText("Please select a valid transaction type"));
-      return;
-    }
-
-    if (userState.description) {
-      // We already have description, create transaction directly
-      try {
-        await createTransactionWithRules(
-          userState.accountId,
-          authResult.familyId,
-          userState.description,
-          userState.amountCents,
-          transactionType,
-          authResult.userId,
-        );
-
-        await ctx.reply("✅ Transaction added successfully!", {
-          reply_markup: { remove_keyboard: true },
-        });
-        await setUserBotState(db, ctx.from.id.toString(), null);
-      } catch (error) {
-        console.error("Transaction creation error:", error);
-        await ctx.reply("❌ Failed to create transaction. Please try again.");
-        await setUserBotState(db, ctx.from.id.toString(), null);
-      }
-    } else {
-      await setUserBotState(db, ctx.from.id.toString(), {
-        type: "addingTransactionDescription",
-        accountId: userState.accountId,
-        amountCents: userState.amountCents,
-        transactionType,
-      });
-
-      const mostUsedDescriptions = await getMostUsedDescriptions(
-        db,
-        userState.accountId,
-        transactionType,
-      );
-
-      if (mostUsedDescriptions.length > 0) {
-        await ctx.reply(
-          withCancelText("Type or select transaction description"),
-          {
-            reply_markup: buildReplyKeyboard(mostUsedDescriptions),
-          },
-        );
-      } else {
-        await ctx.reply(withCancelText("Type transaction description"));
-      }
-    }
-    return;
-  }
-
   if (userState?.type === "addingTransactionDescription" && ctx.message.text) {
     const description = ctx.message.text.trim();
 
@@ -194,20 +127,56 @@ export async function onMessage(ctx: Context) {
     if ("error" in parseResult) {
       await ctx.reply(withCancelText("Enter a valid transaction"));
     } else {
-      await setUserBotState(db, ctx.from.id.toString(), {
-        type: "selectingTransactionType",
-        accountId: parseResult.account.id,
-        amountCents: parseResult.amountCents,
-        description: parseResult.description,
-      });
+      // If we have transaction type and description, create transaction immediately
+      if (parseResult.transactionType && parseResult.description) {
+        try {
+          await createTransactionWithRules(
+            parseResult.account.id,
+            authResult.familyId,
+            parseResult.description,
+            parseResult.amountCents,
+            parseResult.transactionType,
+            authResult.userId,
+          );
 
-      await ctx.reply(withCancelText("Please select transaction type"), {
-        reply_markup: buildReplyKeyboard([
-          EXPENSE_BUTTON_TEXT,
-          INCOME_BUTTON_TEXT,
-        ]),
-      });
-      return;
+          await ctx.reply("✅ Transaction added successfully!", {
+            reply_markup: { remove_keyboard: true },
+          });
+          return;
+        } catch (error) {
+          console.error("Transaction creation error:", error);
+          await ctx.reply("❌ Failed to create transaction. Please try again.");
+          return;
+        }
+      }
+
+      // If we have transaction type but no description, ask for description
+      if (parseResult.transactionType && !parseResult.description) {
+        await setUserBotState(db, ctx.from.id.toString(), {
+          type: "addingTransactionDescription",
+          accountId: parseResult.account.id,
+          amountCents: parseResult.amountCents,
+          transactionType: parseResult.transactionType,
+        });
+
+        const mostUsedDescriptions = await getMostUsedDescriptions(
+          db,
+          parseResult.account.id,
+          parseResult.transactionType,
+        );
+
+        if (mostUsedDescriptions.length > 0) {
+          await ctx.reply(
+            withCancelText("Type or select transaction description"),
+            {
+              reply_markup: buildReplyKeyboard(mostUsedDescriptions),
+            },
+          );
+        } else {
+          await ctx.reply(withCancelText("Type transaction description"));
+        }
+        return;
+      }
     }
   }
 
