@@ -15,6 +15,7 @@ export function createTelegramPlatform(): Platform {
   return {
     initialize() {
       webApp.ready();
+      webApp.expand();
       webApp.disableVerticalSwipes();
     },
     safeAreaInset() {
