@@ -21,8 +21,9 @@ export const botRouter = t.router({
     const bot = getBot();
     bot.use(ignoreOldMessageMiddleware);
     bot.command("start", onStart);
-    bot.on("message", onMessage);
     bot.command("cancel", onCancel);
+
+    bot.on("message", onMessage);
     bot.on("callback_query:data", onCallbackQuery);
 
     const handleWebhook = webhookCallback(bot, "cloudflare-mod");

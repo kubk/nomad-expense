@@ -15,8 +15,7 @@ import { createTransactionWithRules } from "../db/transaction/create-transaction
 import { downloadTelegramFileAsBuffer } from "./download-telegram-file-as-buffer";
 
 export async function onMessage(ctx: Context) {
-  const isCommand = ctx.message?.text?.startsWith("/");
-  if (!ctx.from || !ctx.message || isCommand) {
+  if (!ctx.from || !ctx.message) {
     return;
   }
   const db = getDb();
