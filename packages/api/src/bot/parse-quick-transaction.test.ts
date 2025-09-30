@@ -42,7 +42,7 @@ describe("parseQuickTransaction", () => {
   it("should return account and description if both are valid", () => {
     const result = parseQuickTransaction("100 USD rent", mockAccounts);
     expect(result).toEqual({
-      amount: 10000, // 100 * 100 cents
+      amountCents: 10000, // 100 * 100 cents
       account: {
         id: "1",
         currency: "USD",
@@ -59,7 +59,7 @@ describe("parseQuickTransaction", () => {
       mockAccounts,
     );
     expect(result).toEqual({
-      amount: 10000,
+      amountCents: 10000,
       account: {
         id: "1",
         currency: "USD",
@@ -73,7 +73,7 @@ describe("parseQuickTransaction", () => {
   it("should return only account if description is missing", () => {
     const result = parseQuickTransaction("100 USD", mockAccounts);
     expect(result).toEqual({
-      amount: 10000,
+      amountCents: 10000,
       account: {
         id: "1",
         currency: "USD",
@@ -86,7 +86,7 @@ describe("parseQuickTransaction", () => {
   it("should be case insensitive for currency", () => {
     const result = parseQuickTransaction("100 usd", mockAccounts);
     expect(result).toEqual({
-      amount: 10000,
+      amountCents: 10000,
       account: {
         id: "1",
         currency: "USD",
@@ -99,7 +99,7 @@ describe("parseQuickTransaction", () => {
   it("should parse float amounts", () => {
     const result = parseQuickTransaction("2.5 eur", mockAccounts);
     expect(result).toEqual({
-      amount: 250, // 2.5 * 100 cents
+      amountCents: 250, // 2.5 * 100 cents
       account: {
         id: "2",
         currency: "EUR",
@@ -112,7 +112,7 @@ describe("parseQuickTransaction", () => {
   it("should parse float with high precision", () => {
     const result = parseQuickTransaction("2.33333 eur", mockAccounts);
     expect(result).toEqual({
-      amount: 233, // 2.33333 * 100 = 233.333, rounded to 233
+      amountCents: 233, // 2.33333 * 100 = 233.333, rounded to 233
       account: {
         id: "2",
         currency: "EUR",
@@ -125,7 +125,7 @@ describe("parseQuickTransaction", () => {
   it("should handle THB currency", () => {
     const result = parseQuickTransaction("10 THB coffee", mockAccounts);
     expect(result).toEqual({
-      amount: 1000,
+      amountCents: 1000,
       account: {
         id: "3",
         currency: "THB",
@@ -139,7 +139,7 @@ describe("parseQuickTransaction", () => {
   it("should trim description whitespace", () => {
     const result = parseQuickTransaction("10 USD   coffee   ", mockAccounts);
     expect(result).toEqual({
-      amount: 1000,
+      amountCents: 1000,
       account: {
         id: "1",
         currency: "USD",

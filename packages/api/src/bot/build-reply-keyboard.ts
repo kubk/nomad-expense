@@ -3,11 +3,11 @@ import { Keyboard } from "grammy";
 export const EXPENSE_BUTTON_TEXT = "Expense";
 export const INCOME_BUTTON_TEXT = "Income";
 
-export function createDescriptionKeyboard(descriptions: string[]): Keyboard {
+export function buildReplyKeyboard(values: string[]): Keyboard {
   let keyboard = new Keyboard();
 
-  for (const description of descriptions) {
-    keyboard = keyboard.row().text(description);
+  for (const value of values) {
+    keyboard = keyboard.row().text(value);
   }
 
   return keyboard.oneTime(true);

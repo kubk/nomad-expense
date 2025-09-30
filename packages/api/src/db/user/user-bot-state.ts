@@ -13,13 +13,13 @@ export const userBotStateSchema = z
     z.object({
       type: z.literal("selectingTransactionType"),
       accountId: z.string(),
-      amountHuman: z.number(),
+      amountCents: z.number(),
       description: z.string().optional(),
     }),
     z.object({
       type: z.literal("addingTransactionDescription"),
       accountId: z.string(),
-      amountHuman: z.number(),
+      amountCents: z.number(),
       transactionType: transactionTypeSchema,
     }),
   ])
