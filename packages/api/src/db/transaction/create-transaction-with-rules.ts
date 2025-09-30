@@ -10,7 +10,7 @@ export async function createTransactionWithRules(
   accountId: string,
   familyId: string,
   description: string,
-  amountHuman: number,
+  amountCents: number,
   transactionType: TransactionType,
 ) {
   const db = getDb();
@@ -23,7 +23,7 @@ export async function createTransactionWithRules(
   const account = accountResult.account;
 
   const money = createMoneyFull({
-    amountHuman: amountHuman,
+    amountCents: amountCents,
     currency: account.currency,
   });
 
