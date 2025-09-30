@@ -1,4 +1,4 @@
-import { Bot, webhookCallback } from "grammy";
+import { webhookCallback } from "grammy";
 import { publicProcedure, t } from "./trpc";
 import { getEnv } from "../services/env";
 import { TRPCError } from "@trpc/server";
@@ -7,6 +7,7 @@ import { onCallbackQuery } from "../bot/on-callback-query";
 import { onCancel } from "../bot/on-cancel";
 import { onStart } from "../bot/on-start";
 import { onMessage } from "../bot/on-message";
+import { getBot } from "../services/telegram/get-bot";
 
 export const botRouter = t.router({
   webhook: publicProcedure.mutation(async ({ ctx }) => {
@@ -17,7 +18,7 @@ export const botRouter = t.router({
       throw new TRPCError({ code: "UNAUTHORIZED" });
     }
 
-    const bot = new Bot(getEnv().TELEGRAM_BOT_TOKEN);
+    const bot = getBot();
     bot.use(ignoreOldMessageMiddleware);
     bot.command("start", onStart);
     bot.on("message", onMessage);

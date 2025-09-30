@@ -44,7 +44,12 @@ export async function uploadStatementHandler(
       return jsonResponse(403, { type: "error", message: "Access denied" });
     }
 
-    const importResult = await importFile(db, accountResult.account, file);
+    const importResult = await importFile(
+      db,
+      accountResult.account,
+      file,
+      authResult.userId,
+    );
 
     return jsonResponse(200, {
       type: "success",

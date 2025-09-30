@@ -8,6 +8,9 @@ import { userCacheSet } from "../services/user-cache";
 import { z } from "zod";
 import { DateTime } from "luxon";
 import { generateInviteCode } from "../services/generate-invoice-code";
+import { getFamilyOwner } from "../db/user/get-family-owner";
+import { notifyViaTelegram } from "../services/notifications/notify-via-telegram";
+import { getUserDisplayName } from "../services/user-display";
 
 export const familyRouter = t.router({
   listMembers: protectedProcedure.query(async ({ ctx }) => {
@@ -172,6 +175,16 @@ export const familyRouter = t.router({
         await userCacheSet(user.telegramId, {
           userId,
           familyId: inviteResult.familyId,
+        });
+      }
+
+      // Notify family owner about new member
+      const familyOwner = await getFamilyOwner(inviteResult.familyId);
+      if (familyOwner && familyOwner.id !== userId && user) {
+        await notifyViaTelegram({
+          type: "userJoinedYourFamily",
+          targetUserId: familyOwner.id,
+          newMemberName: getUserDisplayName(user),
         });
       }
 

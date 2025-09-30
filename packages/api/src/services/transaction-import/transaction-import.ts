@@ -7,6 +7,9 @@ import { createMoneyFull } from "../money/money";
 import { getRulesByAccountId } from "../../db/transaction-import-rule/get-rules-by-account-id";
 import { applyImportRules } from "./import-rules";
 import { TransactionFull } from "../../db/db-types";
+import { getUserById } from "../../db/user/get-user-by-id";
+import { notifyViaTelegram } from "../notifications/notify-via-telegram";
+import { getUserDisplayName } from "../user-display";
 
 export type ImportResult = {
   removed: TransactionFull[];
@@ -17,6 +20,7 @@ export async function importTransactions(
   db: DB,
   account: AccountFromFamily,
   transactions: ParsedTransaction[],
+  authorUserId: string,
 ): Promise<ImportResult> {
   if (transactions.length < 2) {
     throw new Error("Minimum transaction amount is 2");
@@ -77,6 +81,20 @@ export async function importTransactions(
       .values(newTransactions)
       .returning();
   });
+
+  // Send notification to family members
+  const author = await getUserById(authorUserId);
+  if (author) {
+    await notifyViaTelegram({
+      type: "uploadedBankStatement",
+      familyId: account.familyId,
+      excludeUserId: authorUserId,
+      transactionAuthor: getUserDisplayName(author),
+      bankAccountName: account.name,
+      newTransactions: addedTransactions.length,
+      removedTransactions: removedTransactions.length,
+    });
+  }
 
   return {
     removed: removedTransactions,

@@ -1,15 +1,6 @@
-export type UserLike = {
-  name: string | null;
-  username: string | null;
-  avatarUrl?: string | null;
-};
+import { type UserLike, getUserDisplayName } from "api";
 
-export function getUserDisplayName(user: UserLike): string {
-  if (user.name) {
-    return user.name;
-  }
-  return user.username || "Unknown User";
-}
+export { type UserLike, getUserDisplayName };
 
 export function getUserInitials(user: UserLike): string {
   if (user.name) {

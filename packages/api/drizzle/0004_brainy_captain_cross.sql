@@ -1,0 +1,1 @@
+ALTER TABLE "user" ADD COLUMN "is_family_notified" boolean DEFAULT true NOT NULL;
