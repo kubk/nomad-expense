@@ -1,5 +1,4 @@
-import { Context, Keyboard } from "grammy";
-import { getEnv } from "../services/env";
+import { Context } from "grammy";
 import { getDb } from "../services/db";
 import { authenticate } from "../services/auth/authenticate";
 import { getUserBotState, setUserBotState } from "../db/user/user-bot-state";
@@ -11,13 +10,14 @@ import { replyStart } from "./reply-start";
 import { importFile } from "../services/transaction-import/import-filte";
 import { parseQuickTransaction } from "./parse-quick-transaction";
 import {
-  createDescriptionKeyboard,
+  buildReplyKeyboard,
   EXPENSE_BUTTON_TEXT,
   INCOME_BUTTON_TEXT,
-} from "./transaction-helpers";
+} from "./build-reply-keyboard";
 import { getMostUsedDescriptions } from "../services/transaction-descriptions";
 import type { TransactionType } from "../db/enums";
 import { createTransactionWithRules } from "../db/transaction/create-transaction-with-rules";
+import { downloadTelegramFileAsBuffer } from "./download-telegram-file-as-buffer";
 
 export async function onMessage(ctx: Context) {
   if (!ctx.from || !ctx.message) {
@@ -43,26 +43,25 @@ export async function onMessage(ctx: Context) {
     );
 
     if (!selectedAccount) {
-      await ctx.reply("Invalid account selection. Please try again or /cancel");
+      await ctx.reply(
+        withCancelText("Invalid account selection. Please try again"),
+      );
       return;
     }
 
-    const file = await ctx.api.getFile(userState.fileId);
-
-    if (!file.file_path) {
-      throw new Error("Could not get file path");
+    const fileBuffer = await downloadTelegramFileAsBuffer(
+      ctx,
+      userState.fileId,
+    );
+    if (fileBuffer.type === "error") {
+      console.error("Failed to process file", fileBuffer.message);
+      await ctx.reply(
+        withCancelText("Failed to process file. Please try again"),
+      );
+      return;
     }
 
-    const fileUrl = `https://api.telegram.org/file/bot${getEnv().TELEGRAM_BOT_TOKEN}/${file.file_path}`;
-    const response = await fetch(fileUrl);
-
-    if (!response.ok) {
-      throw new Error(`Failed to download file: ${response.statusText}`);
-    }
-
-    const fileBuffer = await response.arrayBuffer();
-
-    const uploadedFile = new File([fileBuffer], file.file_path || "statement");
+    const uploadedFile = new File([fileBuffer.buffer], fileBuffer.filePath);
 
     try {
       const importResult = await importFile(db, selectedAccount, uploadedFile);
@@ -99,7 +98,7 @@ export async function onMessage(ctx: Context) {
     } else if (text === INCOME_BUTTON_TEXT) {
       transactionType = "income";
     } else {
-      await ctx.reply("Please select a valid transaction type or /cancel");
+      await ctx.reply(withCancelText("Please select a valid transaction type"));
       return;
     }
 
@@ -110,7 +109,7 @@ export async function onMessage(ctx: Context) {
           userState.accountId,
           authResult.familyId,
           userState.description,
-          userState.amountHuman,
+          userState.amountCents,
           transactionType,
         );
 
@@ -124,11 +123,10 @@ export async function onMessage(ctx: Context) {
         await setUserBotState(db, ctx.from.id.toString(), null);
       }
     } else {
-      // Need to ask for description
       await setUserBotState(db, ctx.from.id.toString(), {
         type: "addingTransactionDescription",
         accountId: userState.accountId,
-        amountHuman: userState.amountHuman,
+        amountCents: userState.amountCents,
         transactionType,
       });
 
@@ -142,7 +140,7 @@ export async function onMessage(ctx: Context) {
         await ctx.reply(
           withCancelText("Type or select transaction description"),
           {
-            reply_markup: createDescriptionKeyboard(mostUsedDescriptions),
+            reply_markup: buildReplyKeyboard(mostUsedDescriptions),
           },
         );
       } else {
@@ -165,7 +163,7 @@ export async function onMessage(ctx: Context) {
         userState.accountId,
         authResult.familyId,
         description,
-        userState.amountHuman,
+        userState.amountCents,
         userState.transactionType,
       );
 
@@ -192,15 +190,15 @@ export async function onMessage(ctx: Context) {
       await setUserBotState(db, ctx.from.id.toString(), {
         type: "selectingTransactionType",
         accountId: parseResult.account.id,
-        amountHuman: parseResult.amount,
+        amountCents: parseResult.amountCents,
         description: parseResult.description,
       });
 
       await ctx.reply(withCancelText("Please select transaction type"), {
-        reply_markup: new Keyboard()
-          .text(EXPENSE_BUTTON_TEXT)
-          .text(INCOME_BUTTON_TEXT)
-          .oneTime(true),
+        reply_markup: buildReplyKeyboard([
+          EXPENSE_BUTTON_TEXT,
+          INCOME_BUTTON_TEXT,
+        ]),
       });
       return;
     }
@@ -221,11 +219,9 @@ export async function onMessage(ctx: Context) {
       fileId: ctx.message.document.file_id,
     });
 
-    let accountsKeyboard = new Keyboard();
-    for (const account of accounts) {
-      accountsKeyboard = accountsKeyboard.row().text(account.name);
-    }
-    accountsKeyboard = accountsKeyboard.oneTime(true);
+    const accountsKeyboard = buildReplyKeyboard(
+      accounts.map((account) => account.name),
+    );
 
     await ctx.reply(withCancelText("Select an account"), {
       reply_markup: accountsKeyboard,

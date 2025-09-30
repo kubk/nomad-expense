@@ -6,7 +6,7 @@ type ParseError = {
 };
 
 export type SuccessResult = {
-  amount: number;
+  amountCents: number;
   account: AccountSelect;
   description?: string;
 };
@@ -56,14 +56,14 @@ export const parseQuickTransaction = (
 
   if (description && description.trim()) {
     return {
-      amount: amountCents,
+      amountCents,
       account: account,
       description: description.trim(),
     };
   }
 
   return {
-    amount: amountCents,
-    account: account,
+    amountCents,
+    account,
   };
 };
