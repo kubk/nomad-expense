@@ -2,7 +2,7 @@ import { getEnv } from "../services/env";
 import { publicProcedure } from "./trpc";
 import { t } from "./trpc";
 import { userRouter } from "./user-router";
-import { expenseRouter } from "./expense-router";
+import { expenseRouter } from "./transaction-router";
 import { accountRouter } from "./account-router";
 import { familyRouter } from "./family-router";
 import { getDb } from "../services/db";
