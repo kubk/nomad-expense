@@ -1,8 +1,5 @@
 import { Keyboard } from "grammy";
 
-export const EXPENSE_BUTTON_TEXT = "Expense";
-export const INCOME_BUTTON_TEXT = "Income";
-
 export function buildReplyKeyboard(values: string[]): Keyboard {
   let keyboard = new Keyboard();
 
