@@ -4,6 +4,9 @@ import { createMoneyFull } from "../../services/money/money";
 import { applyImportRules } from "../../services/transaction-import/import-rules";
 import { getRulesByAccountId } from "../transaction-import-rule/get-rules-by-account-id";
 import { getAccountByFamilyId } from "../account/get-account-by-family-id";
+import { getUserById } from "../user/get-user-by-id";
+import { notifyViaTelegram } from "../../services/notifications/notify-via-telegram";
+import { getUserDisplayName } from "../../services/user-display";
 import type { TransactionType } from "../enums";
 
 export async function createTransactionWithRules(
@@ -12,6 +15,8 @@ export async function createTransactionWithRules(
   description: string,
   amountCents: number,
   transactionType: TransactionType,
+  authorUserId: string,
+  createdAt?: Date,
 ) {
   const db = getDb();
 
@@ -37,13 +42,33 @@ export async function createTransactionWithRules(
     importRules,
   );
 
-  await db.insert(transactionTable).values({
-    accountId,
-    description: processedTransaction.description,
-    amount: money.amountCents,
-    currency: account.currency,
-    usdAmount: money.baseAmountCents,
-    type: transactionType,
-    isCountable: processedTransaction.isCountable,
-  });
+  const result = await db
+    .insert(transactionTable)
+    .values({
+      accountId,
+      description: processedTransaction.description,
+      amount: money.amountCents,
+      currency: account.currency,
+      usdAmount: money.baseAmountCents,
+      type: transactionType,
+      isCountable: processedTransaction.isCountable,
+      createdAt,
+    })
+    .returning();
+
+  const transaction = result[0];
+
+  // Send notification to family members
+  const author = await getUserById(authorUserId);
+  if (author) {
+    await notifyViaTelegram({
+      type: "newTransaction",
+      familyId,
+      excludeUserId: authorUserId,
+      transactionAuthor: getUserDisplayName(author),
+      money,
+    });
+  }
+
+  return transaction;
 }

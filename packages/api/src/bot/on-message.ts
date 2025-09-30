@@ -64,7 +64,12 @@ export async function onMessage(ctx: Context) {
     const uploadedFile = new File([fileBuffer.buffer], fileBuffer.filePath);
 
     try {
-      const importResult = await importFile(db, selectedAccount, uploadedFile);
+      const importResult = await importFile(
+        db,
+        selectedAccount,
+        uploadedFile,
+        authResult.userId,
+      );
 
       const addedCount = importResult.added.length;
       const removedCount = importResult.removed.length;
@@ -111,6 +116,7 @@ export async function onMessage(ctx: Context) {
           userState.description,
           userState.amountCents,
           transactionType,
+          authResult.userId,
         );
 
         await ctx.reply("✅ Transaction added successfully!", {
@@ -165,6 +171,7 @@ export async function onMessage(ctx: Context) {
         description,
         userState.amountCents,
         userState.transactionType,
+        authResult.userId,
       );
 
       await ctx.reply("✅ Transaction added successfully!", {

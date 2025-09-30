@@ -12,9 +12,14 @@ import { getRowCount } from "../lib/testing/get-row-count";
 import { transactionTable } from "../db/schema";
 import { getDb } from "../services/db";
 import { getCaller } from "../lib/testing/get-trpc-caller";
+import { notifyViaTelegram } from "../services/notifications/notify-via-telegram";
 
 vi.mock("../services/auth/authenticate", () => ({
   authenticate: vi.fn(),
+}));
+
+vi.mock("../services/notifications/notify-via-telegram", () => ({
+  notifyViaTelegram: vi.fn(),
 }));
 
 vi.mock("cloudflare:workers", () => ({
@@ -113,6 +118,13 @@ describe("upload-statement-handler", () => {
           responseData.removed.length,
       );
     }
+
+    // Verify notification was sent
+    expect(notifyViaTelegram).toHaveBeenCalledWith(
+      expect.objectContaining({
+        type: "uploadedBankStatement",
+      }),
+    );
   });
 
   it("should upload statement with non-overlapping dates (no removals)", async () => {
@@ -152,6 +164,13 @@ describe("upload-statement-handler", () => {
       expect(responseData.removed.length).toBe(0);
       expect(transactionCountAfter).toBe(transactionCountBefore + 3);
     }
+
+    // Verify notification was sent
+    expect(notifyViaTelegram).toHaveBeenCalledWith(
+      expect.objectContaining({
+        type: "uploadedBankStatement",
+      }),
+    );
   });
 
   it("should apply import rules during transaction import", async () => {
@@ -237,6 +256,13 @@ describe("upload-statement-handler", () => {
     );
     expect(regularStoreTransaction).toBeDefined();
     expect(regularStoreTransaction?.isCountable).toBe(true);
+
+    // Verify notification was sent
+    expect(notifyViaTelegram).toHaveBeenCalledWith(
+      expect.objectContaining({
+        type: "uploadedBankStatement",
+      }),
+    );
   });
 
   it("should apply account timezone when importing transactions", async () => {
@@ -295,5 +321,12 @@ describe("upload-statement-handler", () => {
     );
 
     expect(utcDate.diff(bangkokDate, "hours").hours).toBe(7);
+
+    // Verify notification was sent (should be called twice - once for each import)
+    expect(notifyViaTelegram).toHaveBeenCalledWith(
+      expect.objectContaining({
+        type: "uploadedBankStatement",
+      }),
+    );
   });
 });
