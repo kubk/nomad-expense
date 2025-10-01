@@ -11,5 +11,7 @@ export async function onCancel(ctx: Context) {
 
   sendIsTyping(ctx);
   await setUserBotState(getDb(), fromId.toString(), null);
-  await ctx.reply("❌ Operation cancelled");
+  await ctx.reply("❌ Operation cancelled", {
+    reply_markup: { remove_keyboard: true },
+  });
 }
