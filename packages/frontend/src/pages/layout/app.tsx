@@ -19,11 +19,18 @@ import { AccountPickerScreen } from "../transactions/account-picker-screen";
 import { StatementUploadResultScreen } from "../transactions/statement-upload-result-screen";
 import { platform } from "@/shared/platform/platforms";
 import { useHeaderColorSync } from "@/shared/platform/use-header-color-sync";
+import { getAuthToken } from "@/shared/auth-token";
 
 export function App() {
   useEffect(platform.initialize, []);
   useHeaderColorSync();
   const { navigationStack, navigate, pop } = useRouter();
+
+  useEffect(() => {
+    if (!getAuthToken()) {
+      navigate({ type: "auth" });
+    }
+  }, []);
 
   const renderScreen = useCallback(
     (route: Route, index: number, stack: Route[]) => {
