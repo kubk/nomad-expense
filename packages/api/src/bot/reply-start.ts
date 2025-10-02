@@ -15,9 +15,10 @@ export async function replyStart(ctx: Context) {
   }
   inlineKeyboard.url("Telegram group", links.channel);
 
-  await ctx.reply(
-    "Track your expenses across different accounts and families",
+  await ctx.replyWithPhoto(
+    "https://expense-tracker-frontend.7gorbachevm.workers.dev/img/preview.png",
     {
+      caption: "Track your expenses across different accounts and families",
       reply_markup: inlineKeyboard,
     },
   );
