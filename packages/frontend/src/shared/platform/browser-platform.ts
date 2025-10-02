@@ -35,5 +35,8 @@ export function createBrowserPlatform(): Platform {
       }
       metaThemeColor.content = color;
     },
+    openInternalLink(link: string) {
+      window.location.href = link;
+    },
   };
 }

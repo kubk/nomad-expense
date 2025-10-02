@@ -2,9 +2,9 @@ import { Card, CardContent } from "@/components/ui/card";
 import { RouteByType } from "@/shared/stacked-router/router";
 import { ReceiptIcon } from "lucide-react";
 import { LoginButton } from "@telegram-auth/react";
-import { env } from "@/shared/env";
 import { saveAuthToken } from "@/shared/auth-token";
 import { useRouter } from "@/shared/stacked-router/router";
+import { links } from "api";
 
 export function AuthScreen({ route: _ }: { route: RouteByType<"auth"> }) {
   const { navigate } = useRouter();
@@ -31,7 +31,7 @@ export function AuthScreen({ route: _ }: { route: RouteByType<"auth"> }) {
               showAvatar={false}
               cornerRadius={8}
               buttonSize="large"
-              botUsername={env.VITE_TELEGRAM_BOT_USERNAME}
+              botUsername={links.botUsername}
               onAuthCallback={(data) => {
                 saveAuthToken(JSON.stringify(data));
                 navigate({ type: "main" });

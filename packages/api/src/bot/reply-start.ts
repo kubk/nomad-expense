@@ -1,7 +1,7 @@
 import { Context } from "grammy";
 import { InlineKeyboard } from "grammy";
 import { getEnv } from "../services/env";
-import { messages } from "../bot/messages";
+import { links } from "../bot/messages";
 
 export async function replyStart(ctx: Context) {
   let inlineKeyboard = new InlineKeyboard();
@@ -13,7 +13,7 @@ export async function replyStart(ctx: Context) {
       getEnv().FRONTEND_URL,
     );
   }
-  inlineKeyboard.url("Telegram group", messages.channel);
+  inlineKeyboard.url("Telegram group", links.channel);
 
   await ctx.reply(
     "Track your expenses across different accounts and families",

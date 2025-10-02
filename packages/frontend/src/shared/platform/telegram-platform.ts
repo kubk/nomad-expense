@@ -27,23 +27,8 @@ export function createTelegramPlatform(): Platform {
     syncHeader(color: string) {
       webApp.setHeaderColor(color);
     },
+    openInternalLink(link: string) {
+      webApp.openLink(link);
+    },
   };
 }
-
-// export function useBackButton() {
-//   const { navigationStack, pop } = useRouter();
-
-//   useEffect(() => {
-//     if (navigationStack.length <= 1) return;
-//     const webApp = getWebApp();
-//     if (!webApp) return;
-
-//     webApp.BackButton.show();
-//     webApp.BackButton.onClick(pop);
-
-//     return () => {
-//       webApp.BackButton.hide();
-//       webApp.BackButton.offClick(pop);
-//     };
-//   }, [navigationStack, pop]);
-// }
