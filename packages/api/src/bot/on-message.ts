@@ -1,4 +1,4 @@
-import { Context } from "grammy";
+import { Context, InlineKeyboard } from "grammy";
 import { getDb } from "../services/db";
 import { authenticate } from "../services/auth/authenticate";
 import { getUserBotState, setUserBotState } from "../db/user/user-bot-state";
@@ -13,6 +13,7 @@ import { buildReplyKeyboard } from "./build-reply-keyboard";
 import { getMostUsedDescriptions } from "../services/transaction-descriptions";
 import { createTransactionWithRules } from "../db/transaction/create-transaction-with-rules";
 import { downloadTelegramFileAsBuffer } from "./download-telegram-file-as-buffer";
+import { getEnv } from "../services/env";
 
 export async function onMessage(ctx: Context) {
   if (!ctx.from || !ctx.message) {
@@ -120,8 +121,19 @@ export async function onMessage(ctx: Context) {
   }
 
   if (!userState && ctx.message.text) {
-    // Check if message looks like a transaction: "10 THB" or "3 USD Coffee"
     const userAccounts = await getFamilyAccounts(db, authResult.familyId);
+
+    if (userAccounts.length === 0) {
+      await ctx.reply("You have no accounts yet. Please add one in the app", {
+        reply_markup: new InlineKeyboard().webApp(
+          "📱 Create account",
+          getEnv().FRONTEND_URL + "?type=accountPicker",
+        ),
+      });
+      return;
+    }
+
+    // Check if message looks like a transaction: "10 THB" or "3 USD Coffee"
     const parseResult = parseQuickTransaction(ctx.message.text, userAccounts);
 
     if ("error" in parseResult) {
@@ -207,5 +219,4 @@ export async function onMessage(ctx: Context) {
   }
 
   await ctx.reply("Command not recognized");
-  await replyStart(ctx);
 }
