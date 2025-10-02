@@ -1,22 +1,19 @@
 import { MonthlyData } from "api";
 import { formatAmount } from "../../shared/currency-formatter";
-import { useAccountIds } from "@/shared/hooks/use-account-ids";
-import { useRouter } from "@/shared/stacked-router/router";
 
 export function MonthlyBreakdownItem({
   month,
   index,
   totalItems,
   maxAmount,
+  onMonthClick,
 }: {
   month: MonthlyData;
   index: number;
   totalItems: number;
   maxAmount: number;
+  onMonthClick: (month: MonthlyData) => void;
 }) {
-  const { navigate } = useRouter();
-  const accountIds = useAccountIds();
-
   const widthPercentage = (month.usdAmount / maxAmount) * 100;
   const barWidth = Math.max(widthPercentage, 2); // Minimum 2% width
 
@@ -24,19 +21,7 @@ export function MonthlyBreakdownItem({
     <div key={month.month}>
       <div
         className="cursor-pointer transition-colors p-4"
-        onClick={() => {
-          navigate({
-            type: "transactions",
-            filters: {
-              accounts: accountIds,
-              date: {
-                type: "custom",
-                value: [{ year: month.year, month: month.monthNumber }],
-              },
-              order: { field: "createdAt", direction: "desc" },
-            },
-          });
-        }}
+        onClick={() => onMonthClick(month)}
       >
         <div className="space-y-3">
           <div className="flex items-center justify-between">
