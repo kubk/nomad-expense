@@ -29,14 +29,17 @@ describe("parseQuickTransaction", () => {
     expect(result).toEqual({ error: "invalid_input" });
   });
 
-  it("should return invalid_currency error if currency does not match any account", () => {
+  it("should return no_account_for_currency error if currency does not match any account", () => {
     const result = parseQuickTransaction("100 JPY rent", mockAccounts);
-    expect(result).toEqual({ error: "invalid_currency" });
+    expect(result).toEqual({
+      error: "no_account_for_currency",
+      currency: "JPY",
+    });
   });
 
   it("should return invalid_currency error if currency is not valid", () => {
     const result = parseQuickTransaction("100 XYZ rent", mockAccounts);
-    expect(result).toEqual({ error: "invalid_currency" });
+    expect(result).toEqual({ error: "invalid_currency", currency: "XYZ" });
   });
 
   it("should return account and description if both are valid", () => {
