@@ -6,7 +6,6 @@ import { getFamilyImportableAccounts } from "../db/account/get-family-importable
 import { getFamilyAccounts } from "../db/account/get-family-accounts";
 import { withCancelText } from "./with-cancel-text";
 import { sendIsTyping } from "./send-is-typing";
-import { replyStart } from "./reply-start";
 import { importFile } from "../services/transaction-import/import-filte";
 import { parseQuickTransaction } from "./parse-quick-transaction";
 import { buildReplyKeyboard } from "./build-reply-keyboard";
@@ -137,7 +136,23 @@ export async function onMessage(ctx: Context) {
     const parseResult = parseQuickTransaction(ctx.message.text, userAccounts);
 
     if ("error" in parseResult) {
-      await ctx.reply(withCancelText("Enter a valid transaction"));
+      let errorMessage = "";
+      switch (parseResult.error) {
+        case "invalid_input":
+          errorMessage =
+            "Invalid format. Use: [amount] [currency] [description]\\nExample: 10 USD coffee";
+          break;
+        case "invalid_number":
+          errorMessage = "Amount must be a positive number";
+          break;
+        case "invalid_currency":
+          errorMessage = `Currency '${parseResult.currency}' is not supported`;
+          break;
+        case "no_account_for_currency":
+          errorMessage = `You have no ${parseResult.currency} account. Create one in the app first`;
+          break;
+      }
+      await ctx.reply(withCancelText(errorMessage));
     } else {
       // If we have transaction type and description, create transaction immediately
       if (parseResult.transactionType && parseResult.description) {

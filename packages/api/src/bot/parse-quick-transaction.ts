@@ -2,7 +2,12 @@ import { currencySchema, type TransactionType } from "../db/enums";
 import { AccountSelect } from "../db/db-types";
 
 type ParseError = {
-  error: "invalid_number" | "invalid_currency" | "invalid_input";
+  error:
+    | "invalid_number"
+    | "invalid_currency"
+    | "no_account_for_currency"
+    | "invalid_input";
+  currency?: string;
 };
 
 export type SuccessResult = {
@@ -51,7 +56,7 @@ export const parseQuickTransaction = (
   // Validate currency and find matching account
   const currencyValidation = currencySchema.safeParse(currency.toUpperCase());
   if (!currencyValidation.success) {
-    return { error: "invalid_currency" };
+    return { error: "invalid_currency", currency: currency.toUpperCase() };
   }
 
   const validCurrency = currencyValidation.data;
@@ -61,7 +66,7 @@ export const parseQuickTransaction = (
   );
 
   if (!account) {
-    return { error: "invalid_currency" };
+    return { error: "no_account_for_currency", currency: validCurrency };
   }
 
   // Convert amount to cents (multiply by 100 and round to avoid floating point issues)
