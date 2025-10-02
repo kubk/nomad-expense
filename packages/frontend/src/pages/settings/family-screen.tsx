@@ -7,8 +7,10 @@ import { trpc } from "@/shared/api";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { useState } from "react";
 import { FamilyHelp } from "./family-help";
+import { RouteByType } from "@/shared/stacked-router/router";
+import { isFormRoute } from "@/shared/stacked-router/routes";
 
-export function FamilyScreen() {
+export function FamilyScreen({ route }: { route: RouteByType<"family"> }) {
   const [isHelpOpen, setIsHelpOpen] = useState(false);
 
   const { data: members, isLoading: isMembersLoading } = useQuery(
@@ -31,7 +33,7 @@ export function FamilyScreen() {
   };
 
   return (
-    <Page title="Family">
+    <Page title="Family" isForm={isFormRoute(route)}>
       <div className="space-y-6">
         {/* Invite Section */}
         <div className="space-y-4">

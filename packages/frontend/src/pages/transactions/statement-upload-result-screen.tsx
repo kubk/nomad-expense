@@ -2,6 +2,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { TransactionItem } from "../widgets/transaction-item";
 import { Page } from "../widgets/page";
 import { RouteByType } from "@/shared/stacked-router/router";
+import { isFormRoute } from "@/shared/stacked-router/routes";
 import { getUploadResult } from "@/shared/upload-result-storage";
 
 export function StatementUploadResultScreen({
@@ -13,7 +14,7 @@ export function StatementUploadResultScreen({
 
   if (!uploadResult) {
     return (
-      <Page title="Upload Result">
+      <Page title="Upload Result" isForm={isFormRoute(route)}>
         <div className="flex items-center justify-center py-8">
           <p className="text-muted-foreground">No upload results found.</p>
         </div>
@@ -30,7 +31,7 @@ export function StatementUploadResultScreen({
   );
 
   return (
-    <Page title="Upload Result">
+    <Page title="Upload Result" isForm={isFormRoute(route)}>
       <div className="space-y-4">
         {sortedAdded.length > 0 && (
           <div>
