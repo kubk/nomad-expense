@@ -13,6 +13,7 @@ import { Footer } from "../widgets/footer";
 import { trpc } from "@/shared/api";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { RouteByType, useRouter } from "@/shared/stacked-router/router";
+import { isFormRoute } from "@/shared/stacked-router/routes";
 import { Label } from "@/components/ui/label";
 import { Skeleton } from "@/components/ui/skeleton";
 import { bank, type Bank } from "api";
@@ -96,7 +97,7 @@ export function ImportSettingsScreen({
   };
 
   return (
-    <Page title="Import settings">
+    <Page title="Import settings" isForm={isFormRoute(route)}>
       <div className="flex-1 space-y-6">
         <div className="flex flex-col gap-2">
           <Label>Bank type</Label>

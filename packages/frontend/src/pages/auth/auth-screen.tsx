@@ -6,7 +6,7 @@ import { env } from "@/shared/env";
 import { saveAuthToken } from "@/shared/auth-token";
 import { useRouter } from "@/shared/stacked-router/router";
 
-export function AuthScreen({}: { route: RouteByType<"auth"> }) {
+export function AuthScreen({ route: _ }: { route: RouteByType<"auth"> }) {
   const { navigate } = useRouter();
 
   return (
