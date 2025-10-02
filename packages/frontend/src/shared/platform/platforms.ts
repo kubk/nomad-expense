@@ -5,6 +5,7 @@ export type Platform = {
   initialize(): void;
   syncHeader(color: string): void;
   safeAreaInset(): { top: number; bottom: number };
+  openInternalLink(link: string): void;
 };
 
 export const platform = getWebApp()
