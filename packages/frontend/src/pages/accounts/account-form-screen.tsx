@@ -5,6 +5,7 @@ import {
   Loader2Icon,
   ListPlusIcon,
   ArrowLeftIcon,
+  PlusIcon,
   WrenchIcon,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -162,6 +163,12 @@ export function AccountFormScreen({
     navigate({ type: "importSettings", accountId });
   };
 
+  const handleCreateTransactionClick = () => {
+    if (!accountId) return;
+
+    navigate({ type: "transactionForm", accountId });
+  };
+
   const isLoading =
     createAccountMutation.isPending || updateAccountMutation.isPending;
 
@@ -255,10 +262,10 @@ export function AccountFormScreen({
             <div className="flex flex-col gap-1.5 mt-4">
               <div className="grid grid-cols-2 gap-3">
                 <FormActionButton
-                  onClick={() => setShowDeleteConfirm(true)}
-                  icon={<Trash2Icon className="h-4 w-4" />}
+                  onClick={handleCreateTransactionClick}
+                  icon={<PlusIcon className="h-4 w-4" />}
                 >
-                  Delete
+                  Transaction
                 </FormActionButton>
                 <FormActionButton
                   onClick={handleTransactionsClick}
@@ -271,6 +278,12 @@ export function AccountFormScreen({
                   icon={<WrenchIcon className="h-4 w-4" />}
                 >
                   Advanced
+                </FormActionButton>
+                <FormActionButton
+                  onClick={() => setShowDeleteConfirm(true)}
+                  icon={<Trash2Icon className="h-4 w-4" />}
+                >
+                  Delete
                 </FormActionButton>
               </div>
             </div>
