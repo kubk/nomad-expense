@@ -68,6 +68,18 @@ export function MonthlyBreakdownFull({
                 index={index}
                 totalItems={filteredMonthlyData.length}
                 maxAmount={maxAmount}
+                onMonthClick={(month) => {
+                  navigate({
+                    type: "transactions",
+                    filters: {
+                      ...filters,
+                      date: {
+                        type: "custom",
+                        value: [{ year: month.year, month: month.monthNumber }],
+                      },
+                    },
+                  });
+                }}
               />
             ))
           )}
