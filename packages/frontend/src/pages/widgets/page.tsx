@@ -1,24 +1,23 @@
 import { cn } from "@/lib/utils";
 import { PageHeader } from "./page-header";
 import { ReactNode } from "react";
-import { useRouter } from "@/shared/stacked-router/router";
-import { isFormRoute } from "@/shared/stacked-router/routes";
 
 export function Page({
   children,
   className,
   title,
+  isForm,
 }: {
   children: ReactNode;
   className?: string;
   title?: string | ReactNode;
+  isForm: boolean;
 }) {
-  const { currentRoute } = useRouter();
   return (
     <div
       className={cn(
         "flex flex-col h-full",
-        isFormRoute(currentRoute) ? "bg-background" : "bg-muted",
+        isForm ? "bg-background" : "bg-muted",
         className,
       )}
     >

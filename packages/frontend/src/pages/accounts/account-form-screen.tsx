@@ -20,8 +20,8 @@ import {
 import { Page } from "../widgets/page";
 import { ConfirmModal } from "../widgets/confirm-modal";
 import { Footer } from "../widgets/footer";
-import { trpc } from "@/shared/api";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { queryClient, trpc } from "@/shared/api";
+import { useQuery, useMutation } from "@tanstack/react-query";
 import { cn } from "@/lib/utils";
 import {
   SUPPORTED_CURRENCIES,
@@ -30,8 +30,15 @@ import {
 } from "api";
 import { accountColorsPalette } from "./account-colors";
 import { RouteByType, useRouter } from "@/shared/stacked-router/router";
+import { isFormRoute } from "@/shared/stacked-router/routes";
 import { Label } from "@/components/ui/label";
 import { FormActionButton } from "@/components/ui/form-action-button";
+
+function invalidateAccounts() {
+  queryClient.invalidateQueries({
+    queryKey: trpc.accounts.list.queryKey(),
+  });
+}
 
 type Form = {
   name: string;
@@ -57,14 +64,6 @@ export function AccountFormScreen({
 
   const { data: accounts = [] } = useQuery(trpc.accounts.list.queryOptions());
   const existingAccount = accounts.find((account) => account.id === accountId);
-
-  const queryClient = useQueryClient();
-
-  function invalidateAccounts() {
-    queryClient.invalidateQueries({
-      queryKey: trpc.accounts.list.queryKey(),
-    });
-  }
 
   const createAccountMutation = useMutation(
     trpc.accounts.create.mutationOptions({
@@ -173,7 +172,10 @@ export function AccountFormScreen({
     createAccountMutation.isPending || updateAccountMutation.isPending;
 
   return (
-    <Page title={isEdit ? "Edit account" : "Add account"}>
+    <Page
+      title={isEdit ? "Edit account" : "Add account"}
+      isForm={isFormRoute(route)}
+    >
       <form onSubmit={handleSave}>
         <div className="flex-1 space-y-6">
           <div className="flex flex-col gap-2">

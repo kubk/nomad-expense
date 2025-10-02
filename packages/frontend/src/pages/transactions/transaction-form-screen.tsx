@@ -16,6 +16,7 @@ import {
 } from "@/components/ui/popover";
 import { Skeleton } from "@/components/ui/skeleton";
 import { RouteByType, useRouter } from "@/shared/stacked-router/router";
+import { isFormRoute } from "@/shared/stacked-router/routes";
 import { PageHeader } from "../widgets/page-header";
 import { Page } from "../widgets/page";
 import { ConfirmModal } from "../widgets/confirm-modal";
@@ -183,6 +184,7 @@ export function TransactionFormScreen({
       title={
         <PageHeader title={isEdit ? "Edit transaction" : "Add transaction"} />
       }
+      isForm={isFormRoute(route)}
     >
       <form onSubmit={handleSave}>
         <div className="flex-1 flex flex-col">

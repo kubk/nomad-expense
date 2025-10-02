@@ -21,7 +21,8 @@ import { Page } from "../widgets/page";
 import { getColorById } from "./account-colors";
 import { cn } from "@/lib/utils";
 import { DateTime } from "luxon";
-import { useRouter } from "@/shared/stacked-router/router";
+import { RouteByType, useRouter } from "@/shared/stacked-router/router";
+import { isFormRoute } from "@/shared/stacked-router/routes";
 import { NoAccountsEmptyState } from "../widgets/no-accounts-empty-state";
 import { Footer } from "../widgets/footer";
 import { useState } from "react";
@@ -30,7 +31,7 @@ import { DrawerDescription } from "@/components/ui/drawer";
 
 const MotionFooter = motion.create(Footer);
 
-export function AccountsScreen() {
+export function AccountsScreen({ route }: { route: RouteByType<"accounts"> }) {
   const { navigate } = useRouter();
   const queryClient = useQueryClient();
   const [reorderedAccounts, setReorderedAccounts] = useState<
@@ -97,6 +98,7 @@ export function AccountsScreen() {
   return (
     <>
       <Page
+        isForm={isFormRoute(route)}
         title={
           <PageHeader
             title="Accounts"
@@ -159,13 +161,15 @@ export function AccountsScreen() {
                 <AccountCard
                   key={account.id}
                   layout={isReorderMode || undefined}
-                  className="w-full bg-card rounded-2xl shadow-sm border-none transition-colors"
+                  className={cn(
+                    "w-full bg-card rounded-2xl shadow-sm border-none transition-colors",
+                    !isReorderMode && "active:scale-95",
+                  )}
                 >
                   <div className="flex items-center">
                     <button
                       className={cn(
                         "flex-1 text-left p-5 transition-transform",
-                        !isReorderMode && "active:scale-95",
                       )}
                       onClick={() => handleAccountClick(account.id)}
                       disabled={isReorderMode}

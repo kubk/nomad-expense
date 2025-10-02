@@ -1,20 +1,25 @@
 import { cn } from "@/lib/utils";
+import { Page } from "../widgets/page";
 import { getColorById } from "../accounts/account-colors";
 import { getCurrencySymbol } from "../../shared/currency-formatter";
 import { trpc } from "@/shared/api";
 import { useQuery } from "@tanstack/react-query";
-import { Page } from "../widgets/page";
-import { useRouter } from "@/shared/stacked-router/router";
+import { RouteByType, useRouter } from "@/shared/stacked-router/router";
+import { isFormRoute } from "@/shared/stacked-router/routes";
 import { NoAccountsEmptyState } from "../widgets/no-accounts-empty-state";
 
-export function AccountPickerScreen() {
+export function AccountPickerScreen({
+  route,
+}: {
+  route: RouteByType<"accountPicker">;
+}) {
   const { data: accounts = [], isLoading } = useQuery(
     trpc.accounts.list.queryOptions(),
   );
   const { navigate } = useRouter();
 
   return (
-    <Page title="Select account">
+    <Page title="Select account" isForm={isFormRoute(route)}>
       <div className="flex flex-col gap-3">
         {accounts.length === 0 && !isLoading ? (
           <div className="mt-[35%]">

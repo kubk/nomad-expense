@@ -10,6 +10,7 @@ import { useAccountIds } from "@/shared/hooks/use-account-ids";
 import { Page } from "../widgets/page";
 import { RouteByType } from "@/shared/stacked-router/router";
 import { useRouter } from "@/shared/stacked-router/router";
+import { isFormRoute } from "@/shared/stacked-router/routes";
 import { calculateMaxAmount } from "../../shared/chart-calculations";
 
 export function MonthlyBreakdownFull({
@@ -39,7 +40,7 @@ export function MonthlyBreakdownFull({
   const totalIncome = transactionsData?.totalIncome || 0;
 
   return (
-    <Page title="Monthly breakdown">
+    <Page title="Monthly breakdown" isForm={isFormRoute(route)}>
       <SummaryCard
         isLoading={isLoading}
         onFiltersClick={() => setIsDrawerOpen(true)}

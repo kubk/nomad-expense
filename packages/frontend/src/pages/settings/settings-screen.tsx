@@ -6,12 +6,13 @@ import { ModeToggle } from "./mode-toggle";
 import { Page } from "../widgets/page";
 import { trpc } from "@/shared/api";
 import { useQuery } from "@tanstack/react-query";
-import { useRouter } from "@/shared/stacked-router/router";
+import { RouteByType, useRouter } from "@/shared/stacked-router/router";
+import { isFormRoute } from "@/shared/stacked-router/routes";
 import { clearAuthToken } from "@/shared/auth-token";
 import { ConfirmModal } from "../widgets/confirm-modal";
 import { useState } from "react";
 
-export function SettingsScreen() {
+export function SettingsScreen({ route }: { route: RouteByType<"settings"> }) {
   const { navigate } = useRouter();
   const { data: familyMembers } = useQuery(
     trpc.family.listMembers.queryOptions(),
@@ -25,7 +26,7 @@ export function SettingsScreen() {
   };
 
   return (
-    <Page title="Settings">
+    <Page title="Settings" isForm={isFormRoute(route)}>
       <div className="space-y-8 mt-2">
         {/* Family Section */}
         <div className="space-y-4">
