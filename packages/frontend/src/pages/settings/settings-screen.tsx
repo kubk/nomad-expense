@@ -1,4 +1,9 @@
-import { UsersIcon, ChevronRightIcon, LogOutIcon } from "lucide-react";
+import {
+  UsersIcon,
+  ChevronRightIcon,
+  LogOutIcon,
+  MessageCircleIcon,
+} from "lucide-react";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -11,6 +16,9 @@ import { isFormRoute } from "@/shared/stacked-router/routes";
 import { clearAuthToken } from "@/shared/auth-token";
 import { ConfirmModal } from "../widgets/confirm-modal";
 import { useState } from "react";
+import { platform } from "@/shared/platform/platforms";
+import { links } from "api";
+import { getWebApp } from "@/shared/platform/telegram-platform";
 
 export function SettingsScreen({ route }: { route: RouteByType<"settings"> }) {
   const { navigate } = useRouter();
@@ -62,16 +70,37 @@ export function SettingsScreen({ route }: { route: RouteByType<"settings"> }) {
           </div>
         </div>
 
-        {/* Logout Section */}
-        <div className="space-y-4">
-          <Button
-            onClick={() => setShowLogoutModal(true)}
-            variant="outline"
-            className="w-full justify-start"
-          >
-            <LogOutIcon className="size-4 mr-3" />
-            <span>Logout</span>
-          </Button>
+        <div className="space-y-2">
+          {/* Telegram Group Section */}
+          <div className="space-y-4">
+            <Button
+              onClick={() => {
+                platform.openInternalLink(links.channel);
+              }}
+              variant="outline"
+              className="w-full justify-between"
+            >
+              <div className="flex items-center gap-3">
+                <MessageCircleIcon className="size-4" />
+                <span>Telegram group</span>
+              </div>
+              <ChevronRightIcon className="size-4 text-muted-foreground" />
+            </Button>
+          </div>
+
+          {/* Logout Section */}
+          {!getWebApp() && (
+            <div className="space-y-4">
+              <Button
+                onClick={() => setShowLogoutModal(true)}
+                variant="outline"
+                className="w-full justify-start"
+              >
+                <LogOutIcon className="size-4 mr-3" />
+                <span>Logout</span>
+              </Button>
+            </div>
+          )}
         </div>
       </div>
 
