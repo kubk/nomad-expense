@@ -23,7 +23,6 @@ export function getEnv() {
 }
 
 export function setEnv(envInput: any) {
-  // Hyperdrive is only used on prod
   if ("HYPERDRIVE" in envInput) {
     envInput.DB_URL = envInput.HYPERDRIVE.connectionString;
   }
