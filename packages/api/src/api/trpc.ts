@@ -23,7 +23,20 @@ export async function createContext({
 
 export type Context = Awaited<ReturnType<typeof createContext>>;
 
-export const t = initTRPC.context<Context>().create();
+export const t = initTRPC.context<Context>().create({
+  errorFormatter: ({ shape, error }) => {
+    if (
+      error.code === "INTERNAL_SERVER_ERROR" &&
+      getEnv().STAGE === "production"
+    ) {
+      return {
+        ...shape,
+        message: "Internal server error",
+      };
+    }
+    return shape;
+  },
+});
 
 const isAuthed = t.middleware(async ({ ctx, next }) => {
   if (!ctx.userId || !ctx.familyId) {
