@@ -71,7 +71,6 @@ export function SettingsScreen({ route }: { route: RouteByType<"settings"> }) {
         </div>
 
         <div className="space-y-2">
-          {/* Telegram Group Section */}
           <div className="space-y-4">
             <Button
               onClick={() => {
@@ -88,7 +87,6 @@ export function SettingsScreen({ route }: { route: RouteByType<"settings"> }) {
             </Button>
           </div>
 
-          {/* Logout Section */}
           {!getWebApp() && (
             <div className="space-y-4">
               <Button
