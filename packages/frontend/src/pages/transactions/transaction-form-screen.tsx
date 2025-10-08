@@ -4,6 +4,7 @@ import {
   Loader2Icon,
   ChevronDownIcon,
   ArrowLeftIcon,
+  RepeatIcon,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -104,6 +105,18 @@ export function TransactionFormScreen({
     }),
   );
 
+  const repeatTransactionMutation = useMutation(
+    trpc.expenses.createTransaction.mutationOptions({
+      onSuccess: () => {
+        invalidateTransactions();
+        queryClient.invalidateQueries({
+          queryKey: trpc.accounts.list.queryKey(),
+        });
+        pop();
+      },
+    }),
+  );
+
   useEffect(() => {
     if (transaction) {
       // Parse ISO timestamp string using luxon
@@ -125,43 +138,38 @@ export function TransactionFormScreen({
 
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (isEdit && transactionId) {
-      let isoString: string | undefined = undefined;
-      if (formData.date && formData.time) {
-        const dateTime = DateTime.fromJSDate(formData.date).set({
-          hour: parseInt(formData.time.split(":")[0]),
-          minute: parseInt(formData.time.split(":")[1]),
-          second: 0,
-        });
-        isoString = dateTime.toISO() || undefined;
+
+    const getCreatedAt = () => {
+      if (!formData.date || !formData.time) {
+        return new Date().toISOString();
       }
 
+      const [hour, minute] = formData.time.split(":");
+      const dateTime = DateTime.fromJSDate(formData.date).set({
+        hour: parseInt(hour),
+        minute: parseInt(minute),
+        second: 0,
+      });
+      return dateTime.toISO() || new Date().toISOString();
+    };
+
+    if (isEdit && transactionId) {
       await updateTransactionMutation.mutateAsync({
         id: transactionId,
         description: formData.description,
         amount: parseFloat(formData.amount),
-        createdAt: isoString || new Date().toISOString(),
+        createdAt: getCreatedAt(),
         type: formData.type,
         isCountable: formData.isCountable,
       });
       pop();
     } else {
-      let isoString: string | undefined = undefined;
-      if (formData.date && formData.time) {
-        const dateTime = DateTime.fromJSDate(formData.date).set({
-          hour: parseInt(formData.time.split(":")[0]),
-          minute: parseInt(formData.time.split(":")[1]),
-          second: 0,
-        });
-        isoString = dateTime.toISO() || undefined;
-      }
-
       await createTransactionMutation.mutateAsync({
         accountId: formData.accountId,
         description: formData.description,
         amount: parseFloat(formData.amount),
         type: formData.type,
-        createdAt: isoString || new Date().toISOString(),
+        createdAt: getCreatedAt(),
       });
 
       navigate({ type: "main" });
@@ -174,8 +182,22 @@ export function TransactionFormScreen({
     await deleteTransactionMutation.mutateAsync({ id: transactionId });
   };
 
+  const handleRepeat = async () => {
+    if (!transaction) return;
+
+    await repeatTransactionMutation.mutateAsync({
+      accountId: transaction.accountId,
+      description: formData.description,
+      amount: parseFloat(formData.amount),
+      type: formData.type,
+      createdAt: new Date().toISOString(),
+    });
+  };
+
   const isSaving =
-    updateTransactionMutation.isPending || createTransactionMutation.isPending;
+    updateTransactionMutation.isPending ||
+    createTransactionMutation.isPending ||
+    repeatTransactionMutation.isPending;
 
   const isTransactionLoading = isEdit && !transaction;
 
@@ -346,12 +368,31 @@ export function TransactionFormScreen({
               {!isTransactionLoading && (
                 <div className="flex gap-3">
                   {isEdit && (
-                    <FormActionButton
-                      onClick={() => setShowDeleteConfirm(true)}
-                      icon={<Trash2Icon className="h-4 w-4" />}
-                    >
-                      Delete
-                    </FormActionButton>
+                    <>
+                      <FormActionButton
+                        onClick={handleRepeat}
+                        icon={
+                          repeatTransactionMutation.isPending ? (
+                            <Loader2Icon className="h-4 w-4 animate-spin" />
+                          ) : (
+                            <RepeatIcon className="h-4 w-4" />
+                          )
+                        }
+                        disabled={
+                          repeatTransactionMutation.isPending ||
+                          isSaving ||
+                          isTransactionLoading
+                        }
+                      >
+                        Repeat
+                      </FormActionButton>
+                      <FormActionButton
+                        onClick={() => setShowDeleteConfirm(true)}
+                        icon={<Trash2Icon className="h-4 w-4" />}
+                      >
+                        Delete
+                      </FormActionButton>
+                    </>
                   )}
                   {formData.accountId && !isEdit ? (
                     <UploadStatementButton accountId={formData.accountId} />
