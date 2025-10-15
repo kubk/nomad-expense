@@ -74,6 +74,13 @@ export function Component({
 - `shared/` - Reusable functions and logic (NOT UI components)
   - API utilities, providers, routing helpers, etc.
 
+## React Query / Data Fetching
+
+- **NEVER use `useQueryClient()` hook** - The app uses a singleton QueryClient instance
+- **Always import**: `import { queryClient } from "@/shared/api"` to access the QueryClient
+- **Cache invalidation**: Use the imported singleton `queryClient.invalidateQueries()` instead of the hook
+- **Why**: Using the hook can create multiple QueryClient instances, causing cache invalidation bugs where newly created data doesn't appear in lists
+
 ## Date/Time Handling
 
 - **Library**: Use Luxon for all date/time operations

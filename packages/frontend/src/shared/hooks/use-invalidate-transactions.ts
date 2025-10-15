@@ -1,9 +1,6 @@
-import { trpc } from "@/shared/api";
-import { useQueryClient } from "@tanstack/react-query";
+import { trpc, queryClient } from "@/shared/api";
 
 export function useInvalidateTransactions() {
-  const queryClient = useQueryClient();
-
   return () => {
     queryClient.invalidateQueries({
       queryKey: trpc.expenses.transactionsList.queryKey(),
