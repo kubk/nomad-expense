@@ -22,8 +22,8 @@ import { PageHeader } from "../widgets/page-header";
 import { Page } from "../widgets/page";
 import { ConfirmModal } from "../widgets/confirm-modal";
 import { Footer } from "../widgets/footer";
-import { trpc } from "@/shared/api";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { trpc, queryClient } from "@/shared/api";
+import { useQuery, useMutation } from "@tanstack/react-query";
 import { TransactionType } from "api";
 import { DateTime } from "luxon";
 import { getCurrencySymbol } from "@/shared/currency-formatter";
@@ -74,7 +74,6 @@ export function TransactionFormScreen({
   const { data: accounts = [] } = useQuery(trpc.accounts.list.queryOptions());
   const selectedAccount = accounts.find((acc) => acc.id === formData.accountId);
 
-  const queryClient = useQueryClient();
   const invalidateTransactions = useInvalidateTransactions();
 
   const updateTransactionMutation = useMutation(

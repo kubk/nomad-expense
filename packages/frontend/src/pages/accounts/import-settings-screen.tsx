@@ -10,8 +10,8 @@ import {
 } from "@/components/ui/select";
 import { Page } from "../widgets/page";
 import { Footer } from "../widgets/footer";
-import { trpc } from "@/shared/api";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { trpc, queryClient } from "@/shared/api";
+import { useQuery, useMutation } from "@tanstack/react-query";
 import { RouteByType, useRouter } from "@/shared/stacked-router/router";
 import { isFormRoute } from "@/shared/stacked-router/routes";
 import { Label } from "@/components/ui/label";
@@ -52,7 +52,6 @@ export function ImportSettingsScreen({
 }) {
   const { pop } = useRouter();
   const { accountId } = route;
-  const queryClient = useQueryClient();
 
   const [formData, setFormData] = useState<Form>({
     bankType: "None",
