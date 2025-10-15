@@ -15,8 +15,8 @@ import {
 } from "@/components/ui/dropdrawer";
 import { getCurrencySymbol } from "../../shared/currency-formatter";
 import { PageHeader } from "../widgets/page-header";
-import { trpc } from "@/shared/api";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { trpc, queryClient } from "@/shared/api";
+import { useQuery, useMutation } from "@tanstack/react-query";
 import { Page } from "../widgets/page";
 import { getColorById } from "./account-colors";
 import { cn } from "@/lib/utils";
@@ -33,7 +33,6 @@ const MotionFooter = motion.create(Footer);
 
 export function AccountsScreen({ route }: { route: RouteByType<"accounts"> }) {
   const { navigate } = useRouter();
-  const queryClient = useQueryClient();
   const [reorderedAccounts, setReorderedAccounts] = useState<
     typeof accounts | null
   >(null);
