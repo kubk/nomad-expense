@@ -232,71 +232,6 @@ export function TransactionFormScreen({
               )}
             </div>
 
-            {/* Transaction Details Step */}
-            {/* Date/Time picker for both create and edit mode */}
-            <div className="flex gap-4">
-              <div className="flex flex-col gap-3 flex-1">
-                <Label htmlFor="date-picker" className="px-1">
-                  Date
-                </Label>
-                {isTransactionLoading ? (
-                  <Skeleton className="h-9 w-full" />
-                ) : (
-                  <Popover>
-                    <PopoverTrigger asChild>
-                      <Button
-                        variant="outline"
-                        id="date-picker"
-                        type="button"
-                        className="justify-between font-normal"
-                      >
-                        {formData.date
-                          ? formData.date.toLocaleDateString()
-                          : "Select date"}
-                        <ChevronDownIcon className="h-4 w-4" />
-                      </Button>
-                    </PopoverTrigger>
-                    <PopoverContent
-                      className="w-auto overflow-hidden p-0"
-                      align="start"
-                    >
-                      <Calendar
-                        mode="single"
-                        selected={formData.date}
-                        onSelect={(date) => {
-                          setFormData((prev) => ({
-                            ...prev,
-                            date,
-                          }));
-                        }}
-                      />
-                    </PopoverContent>
-                  </Popover>
-                )}
-              </div>
-              <div className="flex flex-col gap-3 flex-1">
-                <Label htmlFor="time-picker" className="px-1">
-                  Time
-                </Label>
-                {isTransactionLoading ? (
-                  <Skeleton className="h-9 w-full" />
-                ) : (
-                  <Input
-                    type="time"
-                    id="time-picker"
-                    value={formData.time}
-                    onChange={(e) =>
-                      setFormData((prev) => ({
-                        ...prev,
-                        time: e.target.value,
-                      }))
-                    }
-                    className="bg-background appearance-none [&::-webkit-calendar-picker-indicator]:hidden [&::-webkit-calendar-picker-indicator]:appearance-none"
-                  />
-                )}
-              </div>
-            </div>
-
             {/* Amount input for both edit and create modes */}
             <div className="flex flex-col gap-2">
               <label className="text-sm font-medium">Amount</label>
@@ -360,6 +295,70 @@ export function TransactionFormScreen({
                   }
                 />
               )}
+            </div>
+
+            {/* Date/Time picker */}
+            <div className="flex gap-4">
+              <div className="flex flex-col gap-3 flex-1">
+                <Label htmlFor="date-picker" className="px-1">
+                  Date
+                </Label>
+                {isTransactionLoading ? (
+                  <Skeleton className="h-9 w-full" />
+                ) : (
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <Button
+                        variant="outline"
+                        id="date-picker"
+                        type="button"
+                        className="justify-between font-normal"
+                      >
+                        {formData.date
+                          ? formData.date.toLocaleDateString()
+                          : "Select date"}
+                        <ChevronDownIcon className="h-4 w-4" />
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent
+                      className="w-auto overflow-hidden p-0"
+                      align="start"
+                    >
+                      <Calendar
+                        mode="single"
+                        selected={formData.date}
+                        onSelect={(date) => {
+                          setFormData((prev) => ({
+                            ...prev,
+                            date,
+                          }));
+                        }}
+                      />
+                    </PopoverContent>
+                  </Popover>
+                )}
+              </div>
+              <div className="flex flex-col gap-3 flex-1">
+                <Label htmlFor="time-picker" className="px-1">
+                  Time
+                </Label>
+                {isTransactionLoading ? (
+                  <Skeleton className="h-9 w-full" />
+                ) : (
+                  <Input
+                    type="time"
+                    id="time-picker"
+                    value={formData.time}
+                    onChange={(e) =>
+                      setFormData((prev) => ({
+                        ...prev,
+                        time: e.target.value,
+                      }))
+                    }
+                    className="bg-background appearance-none [&::-webkit-calendar-picker-indicator]:hidden [&::-webkit-calendar-picker-indicator]:appearance-none"
+                  />
+                )}
+              </div>
             </div>
 
             <div className="flex flex-col gap-1 mt-4">
