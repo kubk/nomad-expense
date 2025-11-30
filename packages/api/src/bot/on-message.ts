@@ -140,7 +140,7 @@ export async function onMessage(ctx: Context) {
       switch (parseResult.error) {
         case "invalid_input":
           errorMessage =
-            "Invalid format. Use: [amount] [currency] [description]\\nExample: 10 USD coffee";
+            "Invalid format. Use: [amount] [currency] [description]\n\nExample: 10 USD coffee";
           break;
         case "invalid_number":
           errorMessage = "Amount must be a positive number";
