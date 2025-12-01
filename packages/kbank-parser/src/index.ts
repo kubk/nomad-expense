@@ -32,9 +32,9 @@ app.post("/parse", async (c) => {
       return c.json({ error: "Invalid file upload" }, 400);
     }
 
-    if (file.type !== "application/pdf") {
-      return c.json({ error: "File must be a PDF" }, 400);
-    }
+    // if (file.type !== "application/pdf") {
+    //   return c.json({ error: "File must be a PDF" }, 400);
+    // }
 
     const buffer = Buffer.from(await file.arrayBuffer());
     const password = c.req.query("password") || "";
