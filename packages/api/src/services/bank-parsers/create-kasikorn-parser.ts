@@ -29,7 +29,7 @@ export function createKasikornParser(password: string): ParseTransactionFn {
 
     if (!response.ok) {
       throw new Error(
-        `KBank API request failed: ${response.status} ${await response.json()}`,
+        `KBank API request failed: ${response.status} ${JSON.stringify(await response.json())}`,
       );
     }
 
