@@ -1,4 +1,4 @@
-import type { SupportedCurrency } from "./currency-converter";
+import type { SupportedCurrency } from "./currency";
 
 // Exchange rates to USD (1 USD = x target currency)
 export const EXCHANGE_RATES_TO_USD = {

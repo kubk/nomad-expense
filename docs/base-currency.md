@@ -12,7 +12,7 @@ The base currency feature allows families to choose which currency is used for a
 
 4. **Mock API for testing**: The `exchange-rate-mock-api.ts` provides fixed exchange rates and a `convert` function for testing without external API calls.
 
-5. **Flexible conversion**: The `createMoneyFullWithLiveRate` function accepts an optional `converter` parameter, allowing injection of different conversion implementations (live rates for production, mock rates for tests).
+5. **Flexible conversion**: The `createMoney` function accepts an optional `converter` parameter, allowing injection of different conversion implementations (live rates for production, mock rates for tests).
 
 6. **Transaction amounts**: Each transaction stores:
    - `amount`: Original amount in the account's currency (in cents)
@@ -36,8 +36,8 @@ When a user changes the base currency in settings:
 
 - `packages/api/src/services/money/exchange-rate-api.ts` - Exchange rate fetching with fallback (jsDelivr CDN primary, Cloudflare Pages fallback)
 - `packages/api/src/services/money/exchange-rate-mock-api.ts` - Mock exchange rates for testing (contains `EXCHANGE_RATES_TO_USD` constant and `convert` function)
-- `packages/api/src/services/money/money.ts` - Money conversion functions (`createMoneyFullWithLiveRate` with optional converter parameter)
-- `packages/api/src/services/money/currency-converter.ts` - Currency metadata (`SupportedCurrency` type, `SUPPORTED_CURRENCIES` array with names/symbols)
+- `packages/api/src/services/money/money.ts` - Money conversion functions (`createMoney` with optional converter parameter)
+- `packages/api/src/services/money/currency.ts` - Currency metadata (`SupportedCurrency` type, `SUPPORTED_CURRENCIES` array with names/symbols)
 - `packages/api/src/db/user/get-family-base-currency.ts` - Helper to get family's base currency
 - `packages/api/src/api/family-router.ts` - API endpoints
 - `packages/frontend/src/pages/settings/base-currency-setting.tsx` - Settings UI
@@ -45,14 +45,14 @@ When a user changes the base currency in settings:
 ## Money Conversion Architecture
 
 ### Core Functions
-- `createMoneyFullWithLiveRate(params, baseCurrency, date, converter?)` - Creates `MoneyFull` object with conversion
+- `createMoney(params, baseCurrency, date, converter?)` - Creates `Money` object with conversion
   - `converter` parameter is optional, defaults to `convertWithLiveRate`
   - Allows injecting mock converters for testing
 - `convertWithLiveRate(amountInCents, fromCurrency, toCurrency, date)` - Fetches live rates and converts
 - `convert` (in `exchange-rate-mock-api.ts`) - Mock conversion using fixed rates
 
 ### Data Types
-- `MoneyFull` - Contains `amountCents`, `currency`, `baseAmountCents`, `baseCurrency`
+- `Money` - Contains `amountCents`, `currency`, `baseAmountCents`, `baseCurrency`
 - `SupportedCurrency` - Type-safe currency codes from database enum
 - `CurrencyInfo` - Currency metadata (name, symbol)
 

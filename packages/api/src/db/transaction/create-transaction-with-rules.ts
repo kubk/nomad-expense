@@ -1,6 +1,6 @@
 import { getDb } from "../../services/db";
 import { transactionTable } from "../schema";
-import { createMoneyFullWithLiveRate } from "../../services/money/money";
+import { createMoney } from "../../services/money/money";
 import { applyImportRules } from "../../services/transaction-import/import-rules";
 import { getRulesByAccountId } from "../transaction-import-rule/get-rules-by-account-id";
 import { getAccountByFamilyId } from "../account/get-account-by-family-id";
@@ -32,7 +32,7 @@ export async function createTransactionWithRules(
   // Use the transaction date for exchange rate, or current date if not provided
   const transactionDate = createdAt ?? new Date();
 
-  const money = await createMoneyFullWithLiveRate(
+  const money = await createMoney(
     {
       amountCents: amountCents,
       currency: account.currency,
