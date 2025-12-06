@@ -32,7 +32,7 @@ export async function createMoneyFullWithLiveRate(
     | { amountHuman: number; currency: SupportedCurrency }
     | { amountCents: number; currency: SupportedCurrency },
   baseCurrency: SupportedCurrency,
-  date: Date | "latest" = "latest",
+  date: Date | "latest",
 ): Promise<MoneyFull> {
   const amountCents =
     "amountHuman" in params

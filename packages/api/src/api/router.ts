@@ -5,8 +5,6 @@ import { userRouter } from "./user-router";
 import { expenseRouter } from "./transaction-router";
 import { accountRouter } from "./account-router";
 import { familyRouter } from "./family-router";
-import { getDb } from "../services/db";
-import { migrateFromCsv } from "../db/migrate-from-csv";
 import { botRouter } from "./bot-router";
 
 export const router = t.router({
@@ -14,17 +12,6 @@ export const router = t.router({
     return {
       status: "ok",
       stage: getEnv().STAGE,
-    };
-  }),
-  migrateFromCsv: publicProcedure.query(async () => {
-    if (getEnv().STAGE === "local") {
-      const db = getDb();
-      await migrateFromCsv(db);
-      return { success: true };
-    }
-    return {
-      success: false,
-      error: "Migration only available in local environment",
     };
   }),
   users: userRouter,

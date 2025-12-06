@@ -3,13 +3,14 @@ import type { DB } from "../db";
 import { transactionTable } from "../../db/schema";
 import type { ParsedTransaction } from "../bank-parsers/parsed-transaction";
 import { AccountFromFamily } from "../../db/account/get-account-by-family-id";
-import { createMoneyFull } from "../money/money";
+import { createMoneyFullWithLiveRate } from "../money/money";
 import { getRulesByAccountId } from "../../db/transaction-import-rule/get-rules-by-account-id";
 import { applyImportRules } from "./import-rules";
 import { TransactionFull } from "../../db/db-types";
 import { getUserById } from "../../db/user/get-user-by-id";
 import { notifyViaTelegram } from "../notifications/notify-via-telegram";
 import { getUserDisplayName } from "../user-display";
+import { getFamilyBaseCurrency } from "../../db/user/get-family-base-currency";
 
 export type ImportResult = {
   removed: TransactionFull[];
@@ -43,28 +44,35 @@ export async function importTransactions(
   );
 
   const importRules = await getRulesByAccountId(db, account.id);
+  const baseCurrency = await getFamilyBaseCurrency(account.familyId);
 
-  const newTransactions = transactions.map((transaction) => {
-    const money = createMoneyFull({
-      amountCents: transaction.amountCents,
-      currency: transaction.currency,
-    });
+  const newTransactions = await Promise.all(
+    transactions.map(async (transaction) => {
+      const money = await createMoneyFullWithLiveRate(
+        {
+          amountCents: transaction.amountCents,
+          currency: transaction.currency,
+        },
+        baseCurrency,
+        transaction.createdAt,
+      );
 
-    const baseTransaction = {
-      accountId: account.id,
-      description: transaction.description,
-      amount: money.amountCents,
-      currency: money.currency,
-      info: transaction.info,
-      source: "imported" as const,
-      isCountable: true,
-      usdAmount: money.baseAmountCents,
-      type: transaction.type,
-      createdAt: transaction.createdAt,
-    };
+      const baseTransaction = {
+        accountId: account.id,
+        description: transaction.description,
+        amount: money.amountCents,
+        currency: money.currency,
+        info: transaction.info,
+        source: "imported" as const,
+        isCountable: true,
+        usdAmount: money.baseAmountCents,
+        type: transaction.type,
+        createdAt: transaction.createdAt,
+      };
 
-    return applyImportRules(baseTransaction, importRules);
-  });
+      return applyImportRules(baseTransaction, importRules);
+    }),
+  );
 
   // First, get all transactions that will be deleted
   const removedTransactions = await db
