@@ -20,7 +20,6 @@ vi.mock("../services/user-cache", () => ({
 
 // Mock the exchange rate API to avoid actual HTTP calls in tests
 vi.mock("../services/money/exchange-rate-api", () => ({
-  fetchExchangeRate: vi.fn().mockResolvedValue(0.92), // USD to EUR rate
   convertWithLiveRate: vi
     .fn()
     .mockImplementation(async (amountInCents, fromCurrency, toCurrency) => {
