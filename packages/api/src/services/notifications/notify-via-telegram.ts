@@ -2,7 +2,7 @@ import { eq, and, ne, isNotNull } from "drizzle-orm";
 import { getDb } from "../db";
 import { userTable } from "../../db/schema";
 import { getBot } from "../telegram/get-bot";
-import type { MoneyFull } from "../money/money";
+import type { Money } from "../money/money";
 
 export type NotificationPayload =
   | {
@@ -16,7 +16,7 @@ export type NotificationPayload =
       excludeUserId: string;
       transactionAuthor: string;
       description: string;
-      money: MoneyFull;
+      money: Money;
     }
   | {
       type: "uploadedBankStatement";

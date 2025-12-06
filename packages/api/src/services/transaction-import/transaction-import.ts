@@ -3,7 +3,7 @@ import type { DB } from "../db";
 import { transactionTable } from "../../db/schema";
 import type { ParsedTransaction } from "../bank-parsers/parsed-transaction";
 import { AccountFromFamily } from "../../db/account/get-account-by-family-id";
-import { createMoneyFullWithLiveRate } from "../money/money";
+import { createMoney } from "../money/money";
 import { getRulesByAccountId } from "../../db/transaction-import-rule/get-rules-by-account-id";
 import { applyImportRules } from "./import-rules";
 import { TransactionFull } from "../../db/db-types";
@@ -48,7 +48,7 @@ export async function importTransactions(
 
   const newTransactions = await Promise.all(
     transactions.map(async (transaction) => {
-      const money = await createMoneyFullWithLiveRate(
+      const money = await createMoney(
         {
           amountCents: transaction.amountCents,
           currency: transaction.currency,
