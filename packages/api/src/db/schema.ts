@@ -51,6 +51,8 @@ export const userTable = pgTable(
     initialFamilyId: uuid("initial_family_id").notNull(),
     // Should user be notified about family transactions
     isFamilyNotified: boolean("is_family_notified").notNull().default(true),
+    // Base currency for the family (synced across all family members)
+    baseCurrency: currencyEnum("base_currency").notNull().default("USD"),
     name: varchar("name"),
     username: varchar("username"),
     avatarUrl: text("avatar_url"),
