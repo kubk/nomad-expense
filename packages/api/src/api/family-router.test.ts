@@ -123,13 +123,14 @@ describe("family router", () => {
         )
         .where(eq(accountTable.familyId, fixtures.users.alice.id));
 
-      // Update to EUR and recalculate
-      await callerAlice.family.updateBaseCurrency({ baseCurrency: "EUR" });
-      const recalcResult = await callerAlice.family.recalculateTransactions();
+      // Update to EUR - this now also recalculates transactions
+      const result = await callerAlice.family.updateBaseCurrency({
+        baseCurrency: "EUR",
+      });
 
-      expect(recalcResult.success).toBe(true);
-      expect(recalcResult.updatedCount).toBe(transactionsBefore.length);
-      expect(recalcResult.totalCount).toBe(transactionsBefore.length);
+      expect(result.success).toBe(true);
+      expect(result.updatedCount).toBe(transactionsBefore.length);
+      expect(result.totalCount).toBe(transactionsBefore.length);
 
       // Verify amounts have been updated (mock converts by multiplying 0.92)
       const transactionsAfter = await db

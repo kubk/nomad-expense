@@ -18,6 +18,7 @@ import { notifyViaTelegram } from "../services/notifications/notify-via-telegram
 import { getUserDisplayName } from "../services/user-display";
 import { currencySchema } from "../db/enums";
 import { convertWithLiveRate } from "../services/money/exchange-rate-api";
+import { getFamilyBaseCurrency } from "../db/user/get-family-base-currency";
 
 export const familyRouter = t.router({
   listMembers: protectedProcedure.query(async ({ ctx }) => {
@@ -202,16 +203,7 @@ export const familyRouter = t.router({
     }),
 
   getBaseCurrency: protectedProcedure.query(async ({ ctx }) => {
-    const db = getDb();
-    const userId = ctx.userId;
-
-    const result = await db
-      .select({ baseCurrency: userTable.baseCurrency })
-      .from(userTable)
-      .where(eq(userTable.id, userId))
-      .limit(1);
-
-    return result[0]?.baseCurrency ?? "USD";
+    return getFamilyBaseCurrency(ctx.familyId);
   }),
 
   updateBaseCurrency: protectedProcedure
@@ -223,71 +215,59 @@ export const familyRouter = t.router({
     .mutation(async ({ ctx, input }) => {
       const db = getDb();
       const familyId = ctx.familyId;
+      const newBaseCurrency = input.baseCurrency;
 
       // Update baseCurrency for all family members
       await db
         .update(userTable)
-        .set({ baseCurrency: input.baseCurrency })
+        .set({ baseCurrency: newBaseCurrency })
         .where(eq(userTable.familyId, familyId));
 
-      return { success: true };
-    }),
+      // Get all transactions for this family
+      const transactions = await db
+        .select({
+          id: transactionTable.id,
+          amount: transactionTable.amount,
+          currency: transactionTable.currency,
+          createdAt: transactionTable.createdAt,
+        })
+        .from(transactionTable)
+        .innerJoin(
+          accountTable,
+          eq(transactionTable.accountId, accountTable.id),
+        )
+        .where(eq(accountTable.familyId, familyId));
 
-  recalculateTransactions: protectedProcedure.mutation(async ({ ctx }) => {
-    const db = getDb();
-    const familyId = ctx.familyId;
+      // Recalculate each transaction's base amount
+      let updatedCount = 0;
+      for (const transaction of transactions) {
+        try {
+          const newBaseAmount = await convertWithLiveRate(
+            transaction.amount,
+            transaction.currency,
+            newBaseCurrency,
+            transaction.createdAt,
+          );
 
-    // Get the family's base currency
-    const userResult = await db
-      .select({ baseCurrency: userTable.baseCurrency })
-      .from(userTable)
-      .where(eq(userTable.familyId, familyId))
-      .limit(1);
+          await db
+            .update(transactionTable)
+            .set({ usdAmount: newBaseAmount })
+            .where(eq(transactionTable.id, transaction.id));
 
-    const baseCurrency = userResult[0]?.baseCurrency ?? "USD";
-
-    // Get all transactions for this family
-    const transactions = await db
-      .select({
-        id: transactionTable.id,
-        amount: transactionTable.amount,
-        currency: transactionTable.currency,
-        createdAt: transactionTable.createdAt,
-      })
-      .from(transactionTable)
-      .innerJoin(accountTable, eq(transactionTable.accountId, accountTable.id))
-      .where(eq(accountTable.familyId, familyId));
-
-    // Recalculate each transaction's base amount
-    let updatedCount = 0;
-    for (const transaction of transactions) {
-      try {
-        const newBaseAmount = await convertWithLiveRate(
-          transaction.amount,
-          transaction.currency,
-          baseCurrency,
-          transaction.createdAt,
-        );
-
-        await db
-          .update(transactionTable)
-          .set({ usdAmount: newBaseAmount })
-          .where(eq(transactionTable.id, transaction.id));
-
-        updatedCount++;
-      } catch (error) {
-        console.error(
-          `Failed to recalculate transaction ${transaction.id}:`,
-          error,
-        );
-        // Continue with other transactions even if one fails
+          updatedCount++;
+        } catch (error) {
+          console.error(
+            `Failed to recalculate transaction ${transaction.id}:`,
+            error,
+          );
+          // Continue with other transactions even if one fails
+        }
       }
-    }
 
-    return {
-      success: true,
-      updatedCount,
-      totalCount: transactions.length,
-    };
-  }),
+      return {
+        success: true,
+        updatedCount,
+        totalCount: transactions.length,
+      };
+    }),
 });

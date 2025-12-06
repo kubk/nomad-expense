@@ -15,7 +15,7 @@ import { trpc, queryClient } from "@/shared/api";
 import { ConfirmModal } from "../widgets/confirm-modal";
 
 export function BaseCurrencySetting() {
-  const [showRecalculateModal, setShowRecalculateModal] = useState(false);
+  const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [pendingCurrency, setPendingCurrency] = useState<Currency | null>(null);
 
   const { data: currentCurrency, isLoading } = useQuery(
@@ -28,15 +28,8 @@ export function BaseCurrencySetting() {
         queryClient.invalidateQueries({
           queryKey: ["family", "getBaseCurrency"],
         });
-      },
-    }),
-  );
-
-  const recalculateMutation = useMutation(
-    trpc.family.recalculateTransactions.mutationOptions({
-      onSuccess: () => {
         queryClient.invalidateQueries({ queryKey: ["expenses"] });
-        setShowRecalculateModal(false);
+        setShowConfirmModal(false);
         setPendingCurrency(null);
       },
     }),
@@ -44,7 +37,7 @@ export function BaseCurrencySetting() {
 
   const handleCurrencyChange = (value: string) => {
     setPendingCurrency(value as Currency);
-    setShowRecalculateModal(true);
+    setShowConfirmModal(true);
   };
 
   const handleConfirmChange = async () => {
@@ -53,17 +46,14 @@ export function BaseCurrencySetting() {
     await updateCurrencyMutation.mutateAsync({
       baseCurrency: pendingCurrency,
     });
-
-    await recalculateMutation.mutateAsync();
   };
 
   const handleCancelChange = () => {
-    setShowRecalculateModal(false);
+    setShowConfirmModal(false);
     setPendingCurrency(null);
   };
 
-  const isUpdating =
-    updateCurrencyMutation.isPending || recalculateMutation.isPending;
+  const isUpdating = updateCurrencyMutation.isPending;
 
   if (isLoading) {
     return (
@@ -100,7 +90,7 @@ export function BaseCurrencySetting() {
       </div>
 
       <ConfirmModal
-        isOpen={showRecalculateModal}
+        isOpen={showConfirmModal}
         onClose={handleCancelChange}
         onConfirm={handleConfirmChange}
         title="Change base currency"
