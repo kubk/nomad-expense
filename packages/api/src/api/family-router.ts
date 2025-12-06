@@ -1,7 +1,12 @@
 import { eq, and, sql, asc } from "drizzle-orm";
 import { TRPCError } from "@trpc/server";
 import { protectedProcedure, t } from "./trpc";
-import { userTable, inviteTable } from "../db/schema";
+import {
+  userTable,
+  inviteTable,
+  transactionTable,
+  accountTable,
+} from "../db/schema";
 import { getDb } from "../services/db";
 import { getUserById } from "../db/user/get-user-by-id";
 import { userCacheSet } from "../services/user-cache";
@@ -11,6 +16,8 @@ import { generateInviteCode } from "../services/generate-invoice-code";
 import { getFamilyOwner } from "../db/user/get-family-owner";
 import { notifyViaTelegram } from "../services/notifications/notify-via-telegram";
 import { getUserDisplayName } from "../services/user-display";
+import { currencySchema } from "../db/enums";
+import { convertWithLiveRate } from "../services/money/exchange-rate-api";
 
 export const familyRouter = t.router({
   listMembers: protectedProcedure.query(async ({ ctx }) => {
@@ -193,4 +200,94 @@ export const familyRouter = t.router({
         inviter,
       };
     }),
+
+  getBaseCurrency: protectedProcedure.query(async ({ ctx }) => {
+    const db = getDb();
+    const userId = ctx.userId;
+
+    const result = await db
+      .select({ baseCurrency: userTable.baseCurrency })
+      .from(userTable)
+      .where(eq(userTable.id, userId))
+      .limit(1);
+
+    return result[0]?.baseCurrency ?? "USD";
+  }),
+
+  updateBaseCurrency: protectedProcedure
+    .input(
+      z.object({
+        baseCurrency: currencySchema,
+      }),
+    )
+    .mutation(async ({ ctx, input }) => {
+      const db = getDb();
+      const familyId = ctx.familyId;
+
+      // Update baseCurrency for all family members
+      await db
+        .update(userTable)
+        .set({ baseCurrency: input.baseCurrency })
+        .where(eq(userTable.familyId, familyId));
+
+      return { success: true };
+    }),
+
+  recalculateTransactions: protectedProcedure.mutation(async ({ ctx }) => {
+    const db = getDb();
+    const familyId = ctx.familyId;
+
+    // Get the family's base currency
+    const userResult = await db
+      .select({ baseCurrency: userTable.baseCurrency })
+      .from(userTable)
+      .where(eq(userTable.familyId, familyId))
+      .limit(1);
+
+    const baseCurrency = userResult[0]?.baseCurrency ?? "USD";
+
+    // Get all transactions for this family
+    const transactions = await db
+      .select({
+        id: transactionTable.id,
+        amount: transactionTable.amount,
+        currency: transactionTable.currency,
+        createdAt: transactionTable.createdAt,
+      })
+      .from(transactionTable)
+      .innerJoin(accountTable, eq(transactionTable.accountId, accountTable.id))
+      .where(eq(accountTable.familyId, familyId));
+
+    // Recalculate each transaction's base amount
+    let updatedCount = 0;
+    for (const transaction of transactions) {
+      try {
+        const newBaseAmount = await convertWithLiveRate(
+          transaction.amount,
+          transaction.currency,
+          baseCurrency,
+          transaction.createdAt,
+        );
+
+        await db
+          .update(transactionTable)
+          .set({ usdAmount: newBaseAmount })
+          .where(eq(transactionTable.id, transaction.id));
+
+        updatedCount++;
+      } catch (error) {
+        console.error(
+          `Failed to recalculate transaction ${transaction.id}:`,
+          error,
+        );
+        // Continue with other transactions even if one fails
+      }
+    }
+
+    return {
+      success: true,
+      updatedCount,
+      totalCount: transactions.length,
+    };
+  }),
 });

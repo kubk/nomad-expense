@@ -1,12 +1,13 @@
 import { getDb } from "../../services/db";
 import { transactionTable } from "../schema";
-import { createMoneyFull } from "../../services/money/money";
+import { createMoneyFullWithLiveRate } from "../../services/money/money";
 import { applyImportRules } from "../../services/transaction-import/import-rules";
 import { getRulesByAccountId } from "../transaction-import-rule/get-rules-by-account-id";
 import { getAccountByFamilyId } from "../account/get-account-by-family-id";
 import { getUserById } from "../user/get-user-by-id";
 import { notifyViaTelegram } from "../../services/notifications/notify-via-telegram";
 import { getUserDisplayName } from "../../services/user-display";
+import { getFamilyBaseCurrency } from "../user/get-family-base-currency";
 import type { TransactionType } from "../enums";
 
 export async function createTransactionWithRules(
@@ -26,11 +27,19 @@ export async function createTransactionWithRules(
   }
 
   const account = accountResult.account;
+  const baseCurrency = await getFamilyBaseCurrency(familyId);
 
-  const money = createMoneyFull({
-    amountCents: amountCents,
-    currency: account.currency,
-  });
+  // Use the transaction date for exchange rate, or current date if not provided
+  const transactionDate = createdAt ?? new Date();
+
+  const money = await createMoneyFullWithLiveRate(
+    {
+      amountCents: amountCents,
+      currency: account.currency,
+    },
+    baseCurrency,
+    transactionDate,
+  );
 
   const importRules = await getRulesByAccountId(db, accountId);
 

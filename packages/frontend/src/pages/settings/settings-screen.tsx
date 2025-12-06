@@ -8,6 +8,7 @@ import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ModeToggle } from "./mode-toggle";
+import { BaseCurrencySetting } from "./base-currency-setting";
 import { Page } from "../widgets/page";
 import { trpc } from "@/shared/api";
 import { useQuery } from "@tanstack/react-query";
@@ -61,6 +62,9 @@ export function SettingsScreen({ route }: { route: RouteByType<"settings"> }) {
             </div>
           </Button>
         </div>
+
+        {/* Base Currency Section */}
+        <BaseCurrencySetting />
 
         {/* Theme Section */}
         <div className="space-y-4">
