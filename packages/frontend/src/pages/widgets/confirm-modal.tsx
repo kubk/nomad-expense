@@ -1,3 +1,4 @@
+import type { ReactNode } from "react";
 import { Loader2Icon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
@@ -14,8 +15,8 @@ export function ConfirmModal({
   onClose: () => void;
   onConfirm: () => void;
   title: string;
-  description: string;
-  confirmText: string;
+  description: ReactNode;
+  confirmText: ReactNode;
   isLoading: boolean;
 }) {
   if (!isOpen) return null;

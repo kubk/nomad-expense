@@ -7,7 +7,8 @@ import { getDb, type DB } from "../services/db";
 import { transactionTypeSchema } from "../db/enums";
 import { getAccountByFamilyId } from "../db/account/get-account-by-family-id";
 import { TRPCError } from "@trpc/server";
-import { createMoneyFull } from "../services/money/money";
+import { createMoneyFullWithLiveRate } from "../services/money/money";
+import { getFamilyBaseCurrency } from "../db/user/get-family-base-currency";
 import { getMostUsedDescriptions } from "../services/transaction-descriptions";
 import { createTransactionWithRules } from "../db/transaction/create-transaction-with-rules";
 
@@ -452,10 +453,17 @@ export const expenseRouter = t.router({
         throw new TRPCError({ code: "NOT_FOUND" });
       }
 
-      const money = createMoneyFull({
-        amountHuman: input.amount,
-        currency: existingTransactionResult.currency,
-      });
+      const baseCurrency = await getFamilyBaseCurrency(familyId);
+      const transactionDate = new Date(input.createdAt);
+
+      const money = await createMoneyFullWithLiveRate(
+        {
+          amountHuman: input.amount,
+          currency: existingTransactionResult.currency,
+        },
+        baseCurrency,
+        transactionDate,
+      );
 
       await db
         .update(transactionTable)
@@ -463,7 +471,7 @@ export const expenseRouter = t.router({
           description: input.description,
           amount: money.amountCents,
           usdAmount: money.baseAmountCents,
-          createdAt: new Date(input.createdAt),
+          createdAt: transactionDate,
           type: input.type,
           isCountable: input.isCountable,
         })
@@ -528,18 +536,14 @@ export const expenseRouter = t.router({
         throw new TRPCError({ code: "UNAUTHORIZED" });
       }
 
-      const account = accountResult.account;
-
-      const money = createMoneyFull({
-        amountHuman: input.amount,
-        currency: account.currency,
-      });
+      // Convert human amount to cents
+      const amountCents = Math.round(input.amount * 100);
 
       await createTransactionWithRules(
         input.accountId,
         familyId,
         input.description,
-        money.amountCents,
+        amountCents,
         input.type,
         ctx.userId,
         input.createdAt ? new Date(input.createdAt) : undefined,
