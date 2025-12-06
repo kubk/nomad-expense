@@ -3,10 +3,36 @@ import { beforeEach } from "vitest";
 import { PgTable } from "drizzle-orm/pg-core";
 import { setEnv } from "../../services/env";
 import { getDb } from "../../services/db";
-import { createMoneyFull } from "../../services/money/money";
+import { createMoneyFullWithLiveRate } from "../../services/money/money";
+import { convert } from "../../services/money/exchange-rate-mock-api";
+import type { SupportedCurrency } from "../../services/money/currency-converter";
 import { DateTime, Settings } from "luxon";
 
 Settings.throwOnInvalid = true;
+
+// Helper to mimic the old createMoneyFull behavior using mock converter
+async function createMoneyFullMock(
+  params:
+    | { amountHuman: number; currency: SupportedCurrency }
+    | { amountCents: number; currency: SupportedCurrency },
+  baseCurrency: SupportedCurrency = "USD",
+) {
+  const mockConverter = async (
+    amountInCents: number,
+    fromCurrency: SupportedCurrency,
+    toCurrency: SupportedCurrency,
+    _date: Date | "latest",
+  ) => {
+    return convert(amountInCents, fromCurrency, toCurrency);
+  };
+
+  return createMoneyFullWithLiveRate(
+    params,
+    baseCurrency,
+    "latest",
+    mockConverter,
+  );
+}
 
 export const testNow = DateTime.fromISO("2025-01-17");
 
@@ -109,20 +135,20 @@ async function seed() {
   ]);
 
   // Add test transactions
-  const migrosMoney = createMoneyFull({ amountHuman: 5.5, currency: "TRY" });
-  const digitalOceanMoney = createMoneyFull({
+  const migrosMoney = await createMoneyFullMock({ amountHuman: 5.5, currency: "TRY" });
+  const digitalOceanMoney = await createMoneyFullMock({
     amountHuman: 55.5,
     currency: "TRY",
   });
-  const ukCertMoney = createMoneyFull({ amountHuman: 55.5, currency: "TRY" });
+  const ukCertMoney = await createMoneyFullMock({ amountHuman: 55.5, currency: "TRY" });
 
-  const amazonMoney = createMoneyFull({ amountHuman: 10, currency: "USD" });
-  const usdtMoney = createMoneyFull({ amountHuman: 2000, currency: "USD" });
-  const digitalOceanUsdMoney = createMoneyFull({
+  const amazonMoney = await createMoneyFullMock({ amountHuman: 10, currency: "USD" });
+  const usdtMoney = await createMoneyFullMock({ amountHuman: 2000, currency: "USD" });
+  const digitalOceanUsdMoney = await createMoneyFullMock({
     amountHuman: 100,
     currency: "USD",
   });
-  const italkiMoney = createMoneyFull({ amountHuman: 500, currency: "USD" });
+  const italkiMoney = await createMoneyFullMock({ amountHuman: 500, currency: "USD" });
 
   await db.insert(schema.transactionTable).values([
     // TRY account transactions

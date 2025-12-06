@@ -90,7 +90,7 @@ export async function convertWithLiveRate(
   amountInCents: number,
   fromCurrency: SupportedCurrency,
   toCurrency: SupportedCurrency,
-  date: Date | "latest" = "latest",
+  date: Date | "latest",
 ): Promise<number> {
   if (fromCurrency === toCurrency) {
     return amountInCents;

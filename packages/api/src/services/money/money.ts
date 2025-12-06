@@ -1,4 +1,4 @@
-import { convert, SupportedCurrency } from "./currency-converter";
+import type { SupportedCurrency } from "./currency-converter";
 import { convertWithLiveRate } from "./exchange-rate-api";
 
 export type MoneyFull = {
@@ -8,38 +8,25 @@ export type MoneyFull = {
   baseCurrency: SupportedCurrency;
 };
 
-export function createMoneyFull(
-  params:
-    | { amountHuman: number; currency: SupportedCurrency }
-    | { amountCents: number; currency: SupportedCurrency },
-  baseCurrency: SupportedCurrency = "USD",
-): MoneyFull {
-  const amountCents =
-    "amountHuman" in params
-      ? Math.round(params.amountHuman * 100)
-      : params.amountCents;
-
-  return {
-    amountCents,
-    currency: params.currency,
-    baseAmountCents: convert(amountCents, params.currency, baseCurrency),
-    baseCurrency,
-  };
-}
-
 export async function createMoneyFullWithLiveRate(
   params:
     | { amountHuman: number; currency: SupportedCurrency }
     | { amountCents: number; currency: SupportedCurrency },
   baseCurrency: SupportedCurrency,
   date: Date | "latest",
+  converter: (
+    amountInCents: number,
+    fromCurrency: SupportedCurrency,
+    toCurrency: SupportedCurrency,
+    date: Date | "latest",
+  ) => Promise<number> = convertWithLiveRate,
 ): Promise<MoneyFull> {
   const amountCents =
     "amountHuman" in params
       ? Math.round(params.amountHuman * 100)
       : params.amountCents;
 
-  const baseAmountCents = await convertWithLiveRate(
+  const baseAmountCents = await converter(
     amountCents,
     params.currency,
     baseCurrency,
