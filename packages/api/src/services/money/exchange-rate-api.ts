@@ -1,4 +1,4 @@
-import type { SupportedCurrency } from "./currency-converter";
+import type { SupportedCurrency } from "./currency";
 
 type ExchangeRates = Record<string, number>;
 

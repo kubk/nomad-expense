@@ -1,7 +1,7 @@
 import { getDb } from "../../services/db";
 import { userTable } from "../../db/schema";
 import { eq } from "drizzle-orm";
-import type { SupportedCurrency } from "../../services/money/currency-converter";
+import type { SupportedCurrency } from "../../services/money/currency";
 
 export async function getFamilyBaseCurrency(
   familyId: string,

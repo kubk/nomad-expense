@@ -4,7 +4,7 @@ export {
   type SupportedCurrency,
   SUPPORTED_CURRENCIES,
   type CurrencyInfo,
-} from "./services/money/currency-converter";
+} from "./services/money/currency";
 import type { inferRouterInputs, inferRouterOutputs } from "@trpc/server";
 import {
   accountColorSchema,

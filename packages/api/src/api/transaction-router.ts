@@ -7,7 +7,7 @@ import { getDb, type DB } from "../services/db";
 import { transactionTypeSchema } from "../db/enums";
 import { getAccountByFamilyId } from "../db/account/get-account-by-family-id";
 import { TRPCError } from "@trpc/server";
-import { createMoneyFullWithLiveRate } from "../services/money/money";
+import { createMoney } from "../services/money/money";
 import { getFamilyBaseCurrency } from "../db/user/get-family-base-currency";
 import { getMostUsedDescriptions } from "../services/transaction-descriptions";
 import { createTransactionWithRules } from "../db/transaction/create-transaction-with-rules";
@@ -456,7 +456,7 @@ export const expenseRouter = t.router({
       const baseCurrency = await getFamilyBaseCurrency(familyId);
       const transactionDate = new Date(input.createdAt);
 
-      const money = await createMoneyFullWithLiveRate(
+      const money = await createMoney(
         {
           amountHuman: input.amount,
           currency: existingTransactionResult.currency,
