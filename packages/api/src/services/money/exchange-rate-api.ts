@@ -45,7 +45,7 @@ async function fetchFromCloudflare(
   return response.json();
 }
 
-export async function fetchExchangeRate(
+async function fetchExchangeRate(
   fromCurrency: SupportedCurrency,
   toCurrency: SupportedCurrency,
   date: Date | "latest" = "latest",
