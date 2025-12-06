@@ -17,21 +17,6 @@ function formatDateForApi(date: Date): string {
   return `${year}-${month}-${day}`;
 }
 
-async function fetchWithTimeout(
-  url: string,
-  timeoutMs: number = 5000,
-): Promise<Response> {
-  const controller = new AbortController();
-  const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
-
-  try {
-    const response = await fetch(url, { signal: controller.signal });
-    return response;
-  } finally {
-    clearTimeout(timeoutId);
-  }
-}
-
 async function fetchFromJsDelivr(
   baseCurrency: string,
   date: Date | "latest",
@@ -39,7 +24,7 @@ async function fetchFromJsDelivr(
   const dateStr = date === "latest" ? "latest" : formatDateForApi(date);
   const url = `${JSDELIVR_BASE_URL}@${dateStr}/v1/currencies/${baseCurrency.toLowerCase()}.min.json`;
 
-  const response = await fetchWithTimeout(url);
+  const response = await fetch(url);
   if (!response.ok) {
     throw new Error(`jsDelivr API error: ${response.status}`);
   }
@@ -53,7 +38,7 @@ async function fetchFromCloudflare(
   const dateStr = date === "latest" ? "latest" : formatDateForApi(date);
   const url = `${CLOUDFLARE_BASE_URL.replace("{date}", dateStr)}/v1/currencies/${baseCurrency.toLowerCase()}.min.json`;
 
-  const response = await fetchWithTimeout(url);
+  const response = await fetch(url);
   if (!response.ok) {
     throw new Error(`Cloudflare API error: ${response.status}`);
   }
