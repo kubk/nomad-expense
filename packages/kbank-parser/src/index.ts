@@ -32,6 +32,10 @@ app.post("/parse", async (c) => {
       return c.json({ error: "Invalid file upload" }, 400);
     }
 
+    if (file.type !== "application/pdf") {
+      console.log("File must be a PDF. Uploaded file type:", file.type);
+    }
+
     const buffer = Buffer.from(await file.arrayBuffer());
     const password = c.req.query("password") || "";
     const parser = createKasikornParser(password);

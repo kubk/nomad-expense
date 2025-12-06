@@ -26,7 +26,9 @@ export const botRouter = t.router({
     bot.on("message", onMessage);
     bot.on("callback_query:data", onCallbackQuery);
 
-    const handleWebhook = webhookCallback(bot, "cloudflare-mod");
+    const handleWebhook = webhookCallback(bot, "cloudflare-mod", {
+      timeoutMilliseconds: 60_000,
+    });
 
     try {
       return await handleWebhook(ctx.req);
