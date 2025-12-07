@@ -5,8 +5,8 @@ import { telegramAuthMethod } from "api";
 export const authQueryKey = "authQuery";
 
 export function getAuthToken() {
-  if (env.VITE_STAGE === "local" && env.VITE_AUTH_QUERY) {
-    return telegramAuthMethod.loginWidget + env.VITE_AUTH_QUERY;
+  if (env.VITE_STAGE === "local" && env.VITE_USER_ID) {
+    return telegramAuthMethod.u + env.VITE_USER_ID;
   }
   const webApp = getWebApp();
   if (webApp) {

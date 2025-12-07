@@ -8,11 +8,13 @@ import { MonthlyChartLoader } from "./monthly-chart-loader";
 import { useAccountIds } from "@/shared/hooks/use-account-ids";
 import { useRouter } from "@/shared/stacked-router/router";
 import { calculateMaxAmount } from "../../shared/chart-calculations";
+import { useBaseCurrency } from "@/shared/hooks/use-base-currency";
 
 export function MonthlyChart() {
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const { navigate } = useRouter();
   const accountIds = useAccountIds();
+  const baseCurrency = useBaseCurrency();
 
   const { data: overviewData, isLoading } = useQuery(
     trpc.expenses.overview.queryOptions(),
@@ -74,7 +76,7 @@ export function MonthlyChart() {
                     }}
                   >
                     <div className="mb-4 text-xs font-semibold text-foreground text-center font-mono">
-                      {formatAmount(month.usdAmount, "USD", {
+                      {formatAmount(month.usdAmount, baseCurrency, {
                         showFractions: false,
                       })}
                     </div>

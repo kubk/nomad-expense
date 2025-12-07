@@ -5,9 +5,11 @@ import { useQuery } from "@tanstack/react-query";
 import { useRouter } from "@/shared/stacked-router/router";
 import { getWebApp } from "@/shared/platform/telegram-platform";
 import { cn } from "@/lib/utils";
+import { useBaseCurrency } from "@/shared/hooks/use-base-currency";
 
 export function OverviewHeader() {
   const { navigate } = useRouter();
+  const baseCurrency = useBaseCurrency();
 
   const { data: overviewData, isLoading: isOverviewLoading } = useQuery(
     trpc.expenses.overview.queryOptions(),
@@ -33,7 +35,7 @@ export function OverviewHeader() {
               {isOverviewLoading ? (
                 <div className="animate-pulse bg-accent h-9 w-32 rounded" />
               ) : (
-                formatAmount(overviewData?.last30DaysTotal || 0, "USD", {
+                formatAmount(overviewData?.last30DaysTotal || 0, baseCurrency, {
                   showFractions: false,
                 })
               )}

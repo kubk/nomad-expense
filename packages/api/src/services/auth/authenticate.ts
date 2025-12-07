@@ -6,6 +6,8 @@ import { validateTelegramMiniAppData } from "./validate-telegram-mini-app-data";
 import { telegramAuthMethod } from "./telegram-auth-method";
 import { UserTelegramType } from "./schema";
 import { User } from "grammy/types";
+import { getEnv } from "../env";
+import { getUserById } from "../../db/user/get-user-by-id";
 
 export async function authenticate(
   input: { type: "api"; req: Request } | { type: "bot"; botUser: User },
@@ -28,6 +30,25 @@ export async function authenticate(
       telegramUser = await validateTelegramMiniAppData(
         authQuery.slice(telegramAuthMethod.miniApp.length),
       );
+    }
+    if (
+      getEnv().STAGE === "local" &&
+      authQuery.startsWith(telegramAuthMethod.u)
+    ) {
+      const userId = authQuery.slice(telegramAuthMethod.u.length);
+      const user = await getUserById(userId);
+
+      if (user && user.telegramId) {
+        telegramUser = {
+          id: Number(user.telegramId),
+          username: user.username || undefined,
+          firstName: user.name || "",
+          lastName: undefined,
+          start: null,
+          languageCode: undefined,
+          photoUrl: user.avatarUrl || undefined,
+        };
+      }
     }
   } else if (input.type === "bot") {
     const { botUser } = input;

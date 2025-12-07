@@ -33,6 +33,7 @@ import { UploadStatementButton } from "./upload-statement-button";
 import { useInvalidateTransactions } from "@/shared/hooks/use-invalidate-transactions";
 import { CountableSwitch } from "./countable-switch";
 import { QuickTitles } from "./quick-titles";
+import { BaseCurrencyInfo } from "./base-currency-info";
 
 export type TransactionForm = {
   description: string;
@@ -404,6 +405,14 @@ export function TransactionFormScreen({
                 formData={formData}
                 setFormData={setFormData}
                 isTransactionLoading={isTransactionLoading}
+              />
+            ) : null}
+
+            {isEdit && transaction ? (
+              <BaseCurrencyInfo
+                amount={transaction.amount}
+                currency={transaction.currency}
+                usdAmount={transaction.usdAmount}
               />
             ) : null}
           </div>
