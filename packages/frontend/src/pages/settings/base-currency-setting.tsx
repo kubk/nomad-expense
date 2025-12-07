@@ -55,37 +55,32 @@ export function BaseCurrencySetting() {
 
   const isUpdating = updateCurrencyMutation.isPending;
 
-  if (isLoading) {
-    return (
-      <div className="space-y-2">
-        <Label>Base currency</Label>
-        <div className="h-9 bg-muted animate-pulse rounded-md" />
-      </div>
-    );
-  }
-
   return (
     <div className="space-y-4">
       <div className="space-y-2">
         <Label>Base currency</Label>
-        <Select
-          value={currentCurrency}
-          onValueChange={handleCurrencyChange}
-          disabled={isUpdating}
-        >
-          <SelectTrigger className="w-full">
-            <SelectValue placeholder="Select currency" />
-          </SelectTrigger>
-          <SelectContent>
-            {SUPPORTED_CURRENCIES.map((currency) => (
-              <SelectItem key={currency.code} value={currency.code}>
-                {currency.symbol} {currency.code} - {currency.name}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
+        {isLoading ? (
+          <div className="h-9 bg-muted animate-pulse rounded-md" />
+        ) : (
+          <Select
+            value={currentCurrency}
+            onValueChange={handleCurrencyChange}
+            disabled={isUpdating}
+          >
+            <SelectTrigger className="w-full">
+              <SelectValue placeholder="Select currency" />
+            </SelectTrigger>
+            <SelectContent>
+              {SUPPORTED_CURRENCIES.map((currency) => (
+                <SelectItem key={currency.code} value={currency.code}>
+                  {currency.symbol} {currency.code} - {currency.name}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        )}
         <p className="text-xs text-muted-foreground">
-          All transaction totals will be displayed in this currency
+          All transaction stats will be displayed in this currency
         </p>
       </div>
 

@@ -1,7 +1,6 @@
 import { getEnv } from "../services/env";
 import { publicProcedure } from "./trpc";
 import { t } from "./trpc";
-import { userRouter } from "./user-router";
 import { expenseRouter } from "./transaction-router";
 import { accountRouter } from "./account-router";
 import { familyRouter } from "./family-router";
@@ -14,7 +13,6 @@ export const router = t.router({
       stage: getEnv().STAGE,
     };
   }),
-  users: userRouter,
   expenses: expenseRouter,
   accounts: accountRouter,
   bot: botRouter,

@@ -4,6 +4,7 @@ import { formatDisplayDate } from "@/shared/format-display-date";
 import { AccountBadge } from "../accounts/account-badge";
 import { cn } from "@/lib/utils";
 import { useRouter } from "@/shared/stacked-router/router";
+import { useBaseCurrency } from "@/shared/hooks/use-base-currency";
 
 export function TransactionItem({
   transaction,
@@ -13,6 +14,7 @@ export function TransactionItem({
   borderBottom?: boolean;
 }) {
   const { navigate } = useRouter();
+  const baseCurrency = useBaseCurrency();
   const isIncome = transaction.type === "income";
 
   const handleClick = () => {
@@ -58,7 +60,7 @@ export function TransactionItem({
           <span>{isIncome ? "+" : ""}</span>
           <span>{formatAmount(transaction.amount, transaction.currency)}</span>
         </div>
-        {transaction.currency !== "USD" && (
+        {transaction.currency !== baseCurrency && (
           <div
             className={cn(
               "flex items-center gap-1 text-xs font-mono",
@@ -68,7 +70,7 @@ export function TransactionItem({
             )}
           >
             <span>{isIncome ? "+" : ""}</span>
-            <span>{formatAmount(transaction.usdAmount, "USD")}</span>
+            <span>{formatAmount(transaction.usdAmount, baseCurrency)}</span>
           </div>
         )}
       </div>

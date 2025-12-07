@@ -41,6 +41,8 @@ When a user changes the base currency in settings:
 - `packages/api/src/db/user/get-family-base-currency.ts` - Helper to get family's base currency
 - `packages/api/src/api/family-router.ts` - API endpoints
 - `packages/frontend/src/pages/settings/base-currency-setting.tsx` - Settings UI
+- `packages/frontend/src/shared/hooks/use-base-currency.ts` - React hook to access the family's base currency
+- `packages/frontend/src/shared/currency-formatter.ts` - Currency formatting utilities (`formatAmount`, `getCurrencySymbol`)
 
 ## Money Conversion Architecture
 
