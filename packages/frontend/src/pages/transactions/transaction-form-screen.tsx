@@ -81,6 +81,10 @@ export function TransactionFormScreen({
     trpc.expenses.updateTransaction.mutationOptions({
       onSuccess: () => {
         invalidateTransactions();
+        if (!transactionId) return;
+        queryClient.invalidateQueries({
+          queryKey: trpc.expenses.getTransaction.queryKey({ id: transactionId }),
+        })
       },
     }),
   );
