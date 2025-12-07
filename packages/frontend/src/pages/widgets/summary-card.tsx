@@ -3,6 +3,7 @@ import { formatAmount } from "../../shared/currency-formatter";
 import { TransactionFilters } from "api";
 import { Skeleton } from "@/components/ui/skeleton";
 import { getShortMonthName } from "../../shared/date-utils";
+import { useBaseCurrency } from "@/shared/hooks/use-base-currency";
 
 export function SummaryCard({
   onFiltersClick,
@@ -17,6 +18,8 @@ export function SummaryCard({
   totalIncome: number;
   isLoading: boolean;
 }) {
+  const baseCurrency = useBaseCurrency();
+
   const getAccountsLabel = () => {
     return `${appliedFilters.accounts.length} account${appliedFilters.accounts.length > 1 ? "s" : ""}`;
   };
@@ -83,7 +86,7 @@ export function SummaryCard({
               <Skeleton className="h-8 w-22" />
             ) : (
               <div className="text-2xl font-bold text-foreground font-mono">
-                {formatAmount(totalAmount, "USD", {
+                {formatAmount(totalAmount, baseCurrency, {
                   showFractions: false,
                 })}
               </div>
@@ -103,7 +106,7 @@ export function SummaryCard({
               <div className="text-2xl flex items-center gap-1 font-bold text-green-600 dark:text-green-400 font-mono">
                 <span>+</span>
                 <span>
-                  {formatAmount(totalIncome, "USD", {
+                  {formatAmount(totalIncome, baseCurrency, {
                     showFractions: false,
                   })}
                 </span>

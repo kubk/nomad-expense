@@ -1,4 +1,4 @@
-import { eq, and, sql, asc } from "drizzle-orm";
+import { eq, and, sql, asc, inArray } from "drizzle-orm";
 import { TRPCError } from "@trpc/server";
 import { protectedProcedure, t } from "./trpc";
 import {
@@ -238,35 +238,105 @@ export const familyRouter = t.router({
         )
         .where(eq(accountTable.familyId, familyId));
 
-      // Recalculate each transaction's base amount
-      let updatedCount = 0;
-      for (const transaction of transactions) {
-        try {
-          const newBaseAmount = await convertWithLiveRate(
-            transaction.amount,
-            transaction.currency,
-            newBaseCurrency,
-            transaction.createdAt,
+      if (transactions.length === 0) {
+        return {
+          success: true,
+          updatedCount: 0,
+          totalCount: 0,
+        };
+      }
+
+      // Convert transactions in batches to avoid overwhelming the API
+      const CONVERSION_BATCH_SIZE = 50;
+      const successfulConversions: { id: string; newBaseAmount: number }[] = [];
+      let processedCount = 0;
+
+      console.log(`Converting ${transactions.length} transactions...`);
+
+      for (let i = 0; i < transactions.length; i += CONVERSION_BATCH_SIZE) {
+        const batch = transactions.slice(i, i + CONVERSION_BATCH_SIZE);
+
+        const batchResults = await Promise.all(
+          batch.map(async (transaction) => {
+            try {
+              const newBaseAmount = await convertWithLiveRate(
+                transaction.amount,
+                transaction.currency,
+                newBaseCurrency,
+                transaction.createdAt,
+              );
+              return { id: transaction.id, newBaseAmount, success: true };
+            } catch (error) {
+              console.error(
+                `Failed to convert transaction ${transaction.id}:`,
+                {
+                  id: transaction.id,
+                  amount: transaction.amount,
+                  fromCurrency: transaction.currency,
+                  toCurrency: newBaseCurrency,
+                  date: transaction.createdAt,
+                },
+                error,
+              );
+              return {
+                id: transaction.id,
+                newBaseAmount: null,
+                success: false,
+              };
+            }
+          }),
+        );
+
+        for (const result of batchResults) {
+          if (result.success && result.newBaseAmount !== null) {
+            successfulConversions.push({
+              id: result.id,
+              newBaseAmount: result.newBaseAmount,
+            });
+          }
+        }
+
+        processedCount += batch.length;
+        if (
+          processedCount % 100 === 0 ||
+          processedCount === transactions.length
+        ) {
+          console.log(
+            `Converted ${processedCount}/${transactions.length} transactions`,
+          );
+        }
+      }
+
+      // Batch update using SQL CASE statement
+      if (successfulConversions.length > 0) {
+        const BATCH_SIZE = 500;
+        for (let i = 0; i < successfulConversions.length; i += BATCH_SIZE) {
+          const batch = successfulConversions.slice(i, i + BATCH_SIZE);
+          const batchIds = batch.map((r) => r.id);
+
+          const caseStatement = sql.join(
+            batch.map((r) => sql`WHEN ${r.id} THEN ${r.newBaseAmount}`),
+            sql` `,
           );
 
           await db
             .update(transactionTable)
-            .set({ usdAmount: newBaseAmount })
-            .where(eq(transactionTable.id, transaction.id));
+            .set({
+              usdAmount: sql<number>`CASE ${transactionTable.id} ${caseStatement} END::integer`,
+            })
+            .where(inArray(transactionTable.id, batchIds));
 
-          updatedCount++;
-        } catch (error) {
-          console.error(
-            `Failed to recalculate transaction ${transaction.id}:`,
-            error,
-          );
-          // Continue with other transactions even if one fails
+          if (i + BATCH_SIZE < successfulConversions.length) {
+            console.log(
+              `Updated ${i + batch.length} of ${successfulConversions.length} transactions...`,
+            );
+          }
         }
       }
 
       return {
         success: true,
-        updatedCount,
+        updatedCount: successfulConversions.length,
         totalCount: transactions.length,
       };
     }),
