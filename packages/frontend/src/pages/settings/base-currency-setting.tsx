@@ -13,6 +13,7 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { AlertTriangleIcon, LoaderIcon, RefreshCwIcon } from "lucide-react";
 import { trpc, queryClient } from "@/shared/api";
 import { ConfirmModal } from "../widgets/confirm-modal";
+import { toast } from "sonner";
 
 export function BaseCurrencySetting() {
   const [showConfirmModal, setShowConfirmModal] = useState(false);
@@ -39,6 +40,9 @@ export function BaseCurrencySetting() {
         });
         setShowConfirmModal(false);
         setPendingCurrency(null);
+      },
+      onError: (error) => {
+        toast.error(error.message || "Failed to update base currency");
       },
     }),
   );
