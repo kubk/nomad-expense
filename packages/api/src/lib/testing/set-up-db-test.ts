@@ -17,16 +17,7 @@ async function createMoneyFullMock(
     | { amountCents: number; currency: SupportedCurrency },
   baseCurrency: SupportedCurrency = "USD",
 ) {
-  const mockConverter = async (
-    amountInCents: number,
-    fromCurrency: SupportedCurrency,
-    toCurrency: SupportedCurrency,
-    _date: Date | "latest",
-  ) => {
-    return convert(amountInCents, fromCurrency, toCurrency);
-  };
-
-  return createMoney(params, baseCurrency, "latest", mockConverter);
+  return createMoney(params, baseCurrency, "latest", convert);
 }
 
 export const testNow = DateTime.fromISO("2025-01-17");
