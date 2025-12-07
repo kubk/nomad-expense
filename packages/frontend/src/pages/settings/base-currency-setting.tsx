@@ -30,9 +30,6 @@ export function BaseCurrencySetting() {
           queryKey: trpc.family.getBaseCurrency.queryKey(),
         });
         queryClient.invalidateQueries({
-          queryKey: trpc.expenses.transactionsList.queryKey(),
-        });
-        queryClient.invalidateQueries({
           queryKey: trpc.expenses.overview.queryKey(),
         });
         queryClient.invalidateQueries({
