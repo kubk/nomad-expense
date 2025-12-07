@@ -26,9 +26,17 @@ export function BaseCurrencySetting() {
     trpc.family.updateBaseCurrency.mutationOptions({
       onSuccess: () => {
         queryClient.invalidateQueries({
-          queryKey: ["family", "getBaseCurrency"],
+          queryKey: trpc.family.getBaseCurrency.queryKey(),
         });
-        queryClient.invalidateQueries({ queryKey: ["expenses"] });
+        queryClient.invalidateQueries({
+          queryKey: trpc.expenses.transactionsList.queryKey(),
+        });
+        queryClient.invalidateQueries({
+          queryKey: trpc.expenses.overview.queryKey(),
+        });
+        queryClient.invalidateQueries({
+          queryKey: trpc.expenses.transactionsByMonth.queryKey(),
+        });
         setShowConfirmModal(false);
         setPendingCurrency(null);
       },
@@ -120,7 +128,7 @@ export function BaseCurrencySetting() {
           ) : (
             <span className="flex items-center gap-2">
               <RefreshCwIcon className="size-4" />
-              Change and recalculate
+              Recalculate
             </span>
           )
         }
