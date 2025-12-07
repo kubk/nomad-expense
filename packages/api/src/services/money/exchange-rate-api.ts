@@ -83,12 +83,23 @@ function createApiFetcher(
 const fetchJsDelivrRate = createApiFetcher(fetchFromJsDelivr);
 const fetchCloudflareRate = createApiFetcher(fetchFromCloudflare);
 
-// Rate fetchers in order of priority
-const RATE_FETCHERS: RateFetcher[] = [
+// The currency API only has data from 2024 onwards
+// For older dates, skip HTTP requests and use mock rates directly
+const LIVE_API_MIN_YEAR = 2024;
+
+function shouldUseLiveApi(date: Date): boolean {
+  return date.getFullYear() >= LIVE_API_MIN_YEAR;
+}
+
+// Rate fetchers in order of priority (for recent dates)
+const LIVE_RATE_FETCHERS: RateFetcher[] = [
   fetchJsDelivrRate,
   fetchCloudflareRate,
   fetchMockRate,
 ];
+
+// For old dates, only use mock rates (no HTTP requests)
+const FALLBACK_RATE_FETCHERS: RateFetcher[] = [fetchMockRate];
 
 // In-memory cache for exchange rates
 // Key format: "fromCurrency:toCurrency:YYYY-MM-DD"
@@ -117,7 +128,12 @@ async function fetchExchangeRate(
     return cachedRate;
   }
 
-  for (const fetcher of RATE_FETCHERS) {
+  // Use live API fetchers for recent dates, fallback for older dates
+  const fetchers = shouldUseLiveApi(date)
+    ? LIVE_RATE_FETCHERS
+    : FALLBACK_RATE_FETCHERS;
+
+  for (const fetcher of fetchers) {
     const rate = await fetcher(fromCurrency, toCurrency, date);
     if (rate !== null) {
       exchangeRateCache.set(cacheKey, rate);
