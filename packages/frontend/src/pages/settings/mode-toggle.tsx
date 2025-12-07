@@ -1,7 +1,6 @@
 import { MoonIcon, SunIcon } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useTheme } from "../widgets/theme-provider";
-import { cn } from "@/lib/utils";
 
 export function ModeToggle() {
   const { theme, setTheme } = useTheme();
@@ -20,24 +19,22 @@ export function ModeToggle() {
   ];
 
   return (
-    <div className="flex rounded-lg border p-1 bg-muted">
-      {themes.map(({ name, value, icon: Icon }) => (
-        <Button
-          key={value}
-          variant={theme === value ? "default" : "ghost"}
-          size="sm"
-          onClick={() => setTheme(value)}
-          className={cn(
-            "flex-1 flex flex-col items-center gap-1 h-auto py-2 px-3",
-            theme === value
-              ? "bg-background text-foreground shadow-sm !hover:none"
-              : "",
-          )}
-        >
-          <Icon className="h-4 w-4" />
-          <span className="text-xs">{name}</span>
-        </Button>
-      ))}
-    </div>
+    <Tabs
+      value={theme}
+      onValueChange={(value) => setTheme(value as "light" | "dark")}
+    >
+      <TabsList className="w-full grid grid-cols-2 h-auto">
+        {themes.map(({ name, value, icon: Icon }) => (
+          <TabsTrigger
+            key={value}
+            value={value}
+            className="flex flex-col gap-1 py-2"
+          >
+            <Icon className="h-4 w-4" />
+            <span className="text-xs">{name}</span>
+          </TabsTrigger>
+        ))}
+      </TabsList>
+    </Tabs>
   );
 }
