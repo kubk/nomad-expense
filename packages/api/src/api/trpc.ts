@@ -30,7 +30,6 @@ export const t = initTRPC.context<Context>().create({
       getEnv().STAGE === "production"
     ) {
       return {
-        ...shape,
         message: "Internal server error",
       };
     }
