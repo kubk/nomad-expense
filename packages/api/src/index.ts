@@ -26,11 +26,6 @@ export default {
       req: request,
       router,
       createContext,
-      onError: ({ error }) => {
-        if (error.code === "INTERNAL_SERVER_ERROR") {
-          console.error(error);
-        }
-      },
     });
 
     return addCorsHeaders(response);
