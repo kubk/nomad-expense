@@ -27,12 +27,12 @@
 			"service": "kbank"
 		}
 	],
-    "limits": {
-        "cpu_ms": 300000 // 5 minutes
-    },
 	"env": {
 		"production": {
 			"name": "expense-tracker-api",
+			"limits": {
+				"cpu_ms": 300000 // 5 minutes
+			},
 			"hyperdrive": [
 				{
 					"binding": "HYPERDRIVE",
