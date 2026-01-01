@@ -8,6 +8,8 @@ const envSchema = z
     STAGE: z.enum(["local", "production"]),
     FRONTEND_URL: z.string(),
     TELEGRAM_BOT_TOKEN: z.string(),
+    OPENAI_BASE_URL: z.string(),
+    OPENAI_TOKEN: z.string(),
   })
   .required();
 
