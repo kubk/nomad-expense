@@ -1,7 +1,7 @@
 import { createOpenAI } from "@ai-sdk/openai";
 import { generateText, Output } from "ai";
 import { z } from "zod";
-import { TZDate } from "@date-fns/tz";
+import { DateTime } from "luxon";
 import { getEnv } from "../env";
 import { currencySchema, transactionTypeSchema } from "../../db/enums";
 import { assert } from "../../lib/typescript/assert";
@@ -64,7 +64,10 @@ You must return ALL transactions found in the image with correct date`,
   return result.output;
 }
 
-export const parseImageStatement: ParseTransactionFn = async (file, timezone) => {
+export const parseImageStatement: ParseTransactionFn = async (
+  file,
+  timezone,
+) => {
   const arrayBuffer = await file.arrayBuffer();
   const base64 = Buffer.from(arrayBuffer).toString("base64");
   const transactions = await parseImageBase64(base64);
@@ -74,7 +77,7 @@ export const parseImageStatement: ParseTransactionFn = async (file, timezone) =>
       description: t.description,
       amountCents: Math.round(t.amountHuman * 100),
       currency: t.currency,
-      createdAt: new TZDate(t.createdAt, timezone),
+      createdAt: DateTime.fromISO(t.createdAt, { zone: timezone }).toJSDate(),
       type: t.type,
     }),
   );
