@@ -58,7 +58,6 @@ export function UploadStatementButton({ accountId }: { accountId: string }) {
       <input
         ref={fileInputRef}
         type="file"
-        accept=".pdf,.csv"
         onChange={handleFileSelect}
         className="hidden"
       />

@@ -34,7 +34,13 @@ export const accountColor = [
 
 export const accountColorSchema = z.enum(accountColor);
 
-export const bank = ["Wise", "YapiKredi", "Kasikorn", "Tinkoff"] as const;
+export const bank = [
+  "Wise",
+  "YapiKredi",
+  "Kasikorn",
+  "Tinkoff",
+  "Image",
+] as const;
 export const bankSchema = z.enum(bank);
 
 export const currency = [
