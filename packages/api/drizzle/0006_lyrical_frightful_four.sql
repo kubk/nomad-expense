@@ -1,0 +1,1 @@
+ALTER TYPE "public"."bank" ADD VALUE 'Image';

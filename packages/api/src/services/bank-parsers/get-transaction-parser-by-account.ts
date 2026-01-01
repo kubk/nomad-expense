@@ -2,6 +2,7 @@ import { AccountFromFamily } from "../../db/account/get-account-by-family-id";
 import { ParseTransactionFn } from "./parsed-transaction";
 import { parseWiseStatement } from "./wise-parser";
 import { createKasikornParser } from "./create-kasikorn-parser";
+import { parseImageStatement } from "./image-parser";
 import { getAccountMeta } from "../../db/account/account-meta";
 
 export function getTransactionParserByAccount(
@@ -16,6 +17,8 @@ export function getTransactionParserByAccount(
         throw new Error("Invalid account meta");
       }
       return createKasikornParser(meta.pdfPassword);
+    case "Image":
+      return parseImageStatement;
     default:
       throw new Error("Unsupported bank type: " + account.bankType);
   }
