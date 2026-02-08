@@ -14,6 +14,7 @@ describe("health-router", () => {
     const result = await caller.status();
     expect(result).toMatchInlineSnapshot(`
       {
+        "db": "ok",
         "stage": "local",
         "status": "ok",
       }
