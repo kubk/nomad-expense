@@ -20,7 +20,7 @@ if [ -n "$1" ]; then
     fi
 else
     # No argument provided, find all test files
-    test_files=$(find ./src -name "*.test.ts")
+    test_files=$(find ./src -name "*.test.ts" ! -name "*.eval.test.ts")
 fi
 
 for test_file in $test_files

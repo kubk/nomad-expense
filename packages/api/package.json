@@ -15,6 +15,7 @@
     "db:generate": "dotenvx run -f .dev.vars -- drizzle-kit generate",
     "db:migrate": "dotenvx run -f .dev.vars -- tsx migrate.ts",
     "db:studio": "dotenvx run -f .dev.vars -- npx drizzle-kit studio",
+    "test:eval": "npx dotenvx run -f .env.test -- vitest run --project eval",
     "--- test ---": "",
     "test:db:generate": "dotenvx run -f .env.test -- drizzle-kit generate",
     "test:db:migrate": "dotenvx run -f .env.test -- tsx migrate.ts",
