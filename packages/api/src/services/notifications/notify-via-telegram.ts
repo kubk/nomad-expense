@@ -70,8 +70,11 @@ export async function notifyViaTelegram(payload: NotificationPayload) {
 
         let message: string;
         if (payload.type === "newTransaction") {
-          const amount = (payload.money.amountCents / 100).toFixed(2);
-          message = `💸 ${amount} ${payload.money.currency} spent on *${payload.description}* by ${payload.transactionAuthor}`;
+          const isIncome = payload.money.amountCents > 0;
+          const amount = (Math.abs(payload.money.amountCents) / 100).toFixed(2);
+          const emoji = isIncome ? "💰" : "💸";
+          const verb = isIncome ? "received" : "spent";
+          message = `${emoji} ${amount} ${payload.money.currency} ${verb} on *${payload.description}* by ${payload.transactionAuthor}`;
         } else {
           message = `📊 *${payload.transactionAuthor}* uploaded a bank statement for *${payload.bankAccountName}*\n`;
           message += `📥 Added: ${payload.newTransactions} transaction${payload.newTransactions !== 1 ? "s" : ""}\n`;
