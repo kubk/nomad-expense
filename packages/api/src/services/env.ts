@@ -25,8 +25,8 @@ export function getEnv() {
 }
 
 export function setEnv(envInput: any) {
-  if ("HYPERDRIVE" in envInput) {
-    envInput.DB_URL = envInput.HYPERDRIVE.connectionString;
-  }
+  // if ("HYPERDRIVE" in envInput) {
+  //   envInput.DB_URL = envInput.HYPERDRIVE.connectionString;
+  // }
   env = envSchema.parse(envInput);
 }
