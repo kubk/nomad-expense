@@ -3,6 +3,7 @@ import { getDb } from "../db";
 import { userTable } from "../../db/schema";
 import { getBot } from "../telegram/get-bot";
 import type { Money } from "../money/money";
+import type { TransactionType } from "../../db/enums";
 
 export type NotificationPayload =
   | {
@@ -17,6 +18,7 @@ export type NotificationPayload =
       transactionAuthor: string;
       description: string;
       money: Money;
+      transactionType: TransactionType;
     }
   | {
       type: "uploadedBankStatement";
@@ -70,7 +72,7 @@ export async function notifyViaTelegram(payload: NotificationPayload) {
 
         let message: string;
         if (payload.type === "newTransaction") {
-          const isIncome = payload.money.amountCents > 0;
+          const isIncome = payload.transactionType === "income";
           const amount = (Math.abs(payload.money.amountCents) / 100).toFixed(2);
           const emoji = isIncome ? "💰" : "💸";
           const verb = isIncome ? "received" : "spent";
