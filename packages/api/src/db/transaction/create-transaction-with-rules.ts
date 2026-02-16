@@ -77,6 +77,7 @@ export async function createTransactionWithRules(
       transactionAuthor: getUserDisplayName(author),
       description,
       money,
+      transactionType,
     });
   }
 
