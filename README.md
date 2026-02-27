@@ -1,9 +1,11 @@
-# Nomad Expense
-
-A family expense tracking app with Telegram bot integration, multi-currency support, and bank statement import.
+<h1 align="center">Nomad Expense</h1>
 
 <p align="center">
   <img src="docs/expense-preview.png" alt="Nomad Expense" width="700" />
+</p>
+
+<p align="center">
+  A family expense tracking app with multi-currency support and bank statement import&nbsp;·&nbsp;<a href="https://t.me/expense_tracker_turkey_bot">Telegram Bot</a>
 </p>
 
 ## Features
