@@ -5,7 +5,7 @@
 </p>
 
 <p align="center">
-  A family expense tracking app with multi-currency support and bank statement import&nbsp;·&nbsp;<a href="https://t.me/expense_tracker_turkey_bot">Telegram Bot</a>
+  Family expense tracker as a Telegram mini app&nbsp;·&nbsp;<a href="https://t.me/expense_tracker_turkey_bot">Try it</a>
 </p>
 
 ## Features
