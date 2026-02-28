@@ -24,7 +24,7 @@
 
 | Layer | Technology |
 |-------|-----------|
-| Frontend | React 19, Tailwind CSS v4, shadcn/ui, MobX, TanStack Query |
+| Frontend | React 19, Tailwind CSS v4, shadcn/ui, TanStack Query |
 | Backend | tRPC on Cloudflare Workers |
 | Database | PostgreSQL with Drizzle ORM |
 | Auth | Telegram OAuth + Mini App |
