@@ -1,6 +1,7 @@
 import { MoonIcon, SunIcon } from "lucide-react";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useTheme } from "../widgets/theme-provider";
+import { haptic } from "@/shared/platform/haptics";
 
 export function ModeToggle() {
   const { theme, setTheme } = useTheme();
@@ -21,7 +22,10 @@ export function ModeToggle() {
   return (
     <Tabs
       value={theme}
-      onValueChange={(value) => setTheme(value as "light" | "dark")}
+      onValueChange={(value) => {
+        haptic("selection");
+        setTheme(value as "light" | "dark");
+      }}
     >
       <TabsList className="w-full grid grid-cols-2 h-auto">
         {themes.map(({ name, value, icon: Icon }) => (

@@ -33,6 +33,7 @@ import { RouteByType, useRouter } from "@/shared/stacked-router/router";
 import { isFormRoute } from "@/shared/stacked-router/routes";
 import { Label } from "@/components/ui/label";
 import { FormActionButton } from "@/components/ui/form-action-button";
+import { haptic } from "@/shared/platform/haptics";
 
 function invalidateAccounts() {
   queryClient.invalidateQueries({
@@ -113,6 +114,7 @@ export function AccountFormScreen({
 
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
+    haptic("light");
     try {
       if (isEdit && accountId) {
         await updateAccountMutation.mutateAsync({
@@ -204,12 +206,13 @@ export function AccountFormScreen({
                   id={`color-${color.id}`}
                   type="button"
                   className="relative w-14 h-14 rounded-lg flex-shrink-0 flex items-center justify-center"
-                  onClick={() =>
+                  onClick={() => {
+                    haptic("selection");
                     setFormData((prev) => ({
                       ...prev,
                       color: color.id,
-                    }))
-                  }
+                    }));
+                  }}
                 >
                   <div
                     className={cn("absolute inset-0 rounded-lg", color.bg)}
@@ -230,12 +233,13 @@ export function AccountFormScreen({
               <Label>Currency</Label>
               <Select
                 value={formData.currency}
-                onValueChange={(value) =>
+                onValueChange={(value) => {
+                  haptic("selection");
                   setFormData((prev) => ({
                     ...prev,
                     currency: value as SupportedCurrency,
-                  }))
-                }
+                  }));
+                }}
               >
                 <SelectTrigger className="w-full">
                   <SelectValue>
@@ -282,7 +286,10 @@ export function AccountFormScreen({
                   Advanced
                 </FormActionButton>
                 <FormActionButton
-                  onClick={() => setShowDeleteConfirm(true)}
+                  onClick={() => {
+                    haptic("heavy");
+                    setShowDeleteConfirm(true);
+                  }}
                   icon={<Trash2Icon className="h-4 w-4" />}
                 >
                   Delete

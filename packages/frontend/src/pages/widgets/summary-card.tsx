@@ -4,6 +4,7 @@ import { TransactionFilters } from "api";
 import { Skeleton } from "@/components/ui/skeleton";
 import { getShortMonthName } from "../../shared/date-utils";
 import { useBaseCurrency } from "@/shared/hooks/use-base-currency";
+import { haptic } from "@/shared/platform/haptics";
 
 export function SummaryCard({
   onFiltersClick,
@@ -46,7 +47,10 @@ export function SummaryCard({
   return (
     <button
       className="w-full bg-card shadow-sm rounded-xl active:scale-95 transition-transform"
-      onClick={onFiltersClick}
+      onClick={() => {
+        haptic("light");
+        onFiltersClick();
+      }}
     >
       <div className="p-4 rounded-md">
         {/* Pills and Filter Button Row */}

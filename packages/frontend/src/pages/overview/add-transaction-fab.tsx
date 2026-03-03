@@ -2,6 +2,7 @@ import { PlusIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useRouter } from "@/shared/stacked-router/router";
 import { platform } from "@/shared/platform/platforms";
+import { haptic } from "@/shared/platform/haptics";
 
 export function AddTransactionFab() {
   const { navigate } = useRouter();
@@ -12,7 +13,10 @@ export function AddTransactionFab() {
       style={{
         bottom: 92 + platform.safeAreaInset().bottom,
       }}
-      onClick={() => navigate({ type: "accountPicker" })}
+      onClick={() => {
+        haptic("light");
+        navigate({ type: "accountPicker" });
+      }}
     >
       <PlusIcon className="size-6" />
     </Button>

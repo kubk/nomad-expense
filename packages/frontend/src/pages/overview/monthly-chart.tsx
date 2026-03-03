@@ -9,6 +9,7 @@ import { useAccountIds } from "@/shared/hooks/use-account-ids";
 import { useRouter } from "@/shared/stacked-router/router";
 import { calculateMaxAmount } from "../../shared/chart-calculations";
 import { useBaseCurrency } from "@/shared/hooks/use-base-currency";
+import { haptic } from "@/shared/platform/haptics";
 
 export function MonthlyChart() {
   const scrollContainerRef = useRef<HTMLDivElement>(null);
@@ -60,6 +61,7 @@ export function MonthlyChart() {
                     key={month.month}
                     className="flex flex-col cursor-pointer items-center min-w-[64px]"
                     onClick={() => {
+                      haptic("selection");
                       navigate({
                         type: "transactions",
                         filters: {

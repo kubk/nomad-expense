@@ -5,6 +5,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { DateTime } from "luxon";
 import { generateInviteUrl } from "./generate-invite-url";
 import { copyToClipboard } from "../../shared/copy-to-clipboard";
+import { haptic } from "@/shared/platform/haptics";
 
 export function InviteLinkCard({
   invite,
@@ -21,6 +22,7 @@ export function InviteLinkCard({
 
   const handleCopy = () => {
     copyToClipboard(inviteUrl, () => {
+      haptic("success");
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
     });
