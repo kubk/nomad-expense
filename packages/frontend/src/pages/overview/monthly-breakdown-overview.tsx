@@ -3,6 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { MonthlyChart } from "./monthly-chart";
 import { useAccountIds } from "@/shared/hooks/use-account-ids";
 import { useRouter } from "@/shared/stacked-router/router";
+import { haptic } from "@/shared/platform/haptics";
 
 export function MonthlyBreakdownOverview() {
   const accountIds = useAccountIds();
@@ -16,7 +17,8 @@ export function MonthlyBreakdownOverview() {
             <CardTitle className="text-base">Monthly breakdown</CardTitle>
             <span
               className="text-primary/70 -mr-3 inline-flex items-center text-sm font-medium cursor-pointer active:scale-95 transition-transform"
-              onClick={() =>
+              onClick={() => {
+                haptic("light");
                 navigate({
                   type: "monthlyBreakdownFull",
                   filters: {
@@ -24,8 +26,8 @@ export function MonthlyBreakdownOverview() {
                     date: { type: "months", value: 6 },
                     order: { field: "createdAt", direction: "desc" },
                   },
-                })
-              }
+                });
+              }}
             >
               View all
               <ChevronRightIcon className="w-3 h-3 ml-1" />

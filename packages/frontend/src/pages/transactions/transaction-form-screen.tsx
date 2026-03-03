@@ -34,6 +34,7 @@ import { useInvalidateTransactions } from "@/shared/hooks/use-invalidate-transac
 import { CountableSwitch } from "./countable-switch";
 import { QuickTitles } from "./quick-titles";
 import { BaseCurrencyInfo } from "./base-currency-info";
+import { haptic } from "@/shared/platform/haptics";
 
 export type TransactionForm = {
   description: string;
@@ -142,6 +143,7 @@ export function TransactionFormScreen({
 
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
+    haptic("light");
 
     const getCreatedAt = () => {
       if (!formData.date || !formData.time) {
@@ -222,11 +224,13 @@ export function TransactionFormScreen({
               ) : (
                 <Tabs
                   value={formData.type}
-                  onValueChange={(value) =>
+                  onValueChange={(value) => {
+                    haptic("selection");
                     setFormData((prev) => ({
                       ...prev,
                       type: value as TransactionType,
-                    }))
+                    }));
+                  }
                   }
                 >
                   <TabsList className="grid w-full grid-cols-2">
@@ -333,6 +337,7 @@ export function TransactionFormScreen({
                         mode="single"
                         selected={formData.date}
                         onSelect={(date) => {
+                          haptic("selection");
                           setFormData((prev) => ({
                             ...prev,
                             date,
@@ -390,7 +395,10 @@ export function TransactionFormScreen({
                         Repeat
                       </FormActionButton>
                       <FormActionButton
-                        onClick={() => setShowDeleteConfirm(true)}
+                        onClick={() => {
+                          haptic("heavy");
+                          setShowDeleteConfirm(true);
+                        }}
                         icon={<Trash2Icon className="h-4 w-4" />}
                       >
                         Delete

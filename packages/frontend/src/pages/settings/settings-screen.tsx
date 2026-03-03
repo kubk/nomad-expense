@@ -20,6 +20,7 @@ import { useState } from "react";
 import { platform } from "@/shared/platform/platforms";
 import { links } from "api";
 import { getWebApp } from "@/shared/platform/telegram-platform";
+import { haptic } from "@/shared/platform/haptics";
 
 export function SettingsScreen({ route }: { route: RouteByType<"settings"> }) {
   const { navigate } = useRouter();
@@ -41,7 +42,10 @@ export function SettingsScreen({ route }: { route: RouteByType<"settings"> }) {
         <div className="space-y-4">
           <Label>Family</Label>
           <Button
-            onClick={() => navigate({ type: "family" })}
+            onClick={() => {
+              haptic("light");
+              navigate({ type: "family" });
+            }}
             variant="outline"
             className="w-full justify-between"
           >
@@ -78,6 +82,7 @@ export function SettingsScreen({ route }: { route: RouteByType<"settings"> }) {
           <div className="space-y-4">
             <Button
               onClick={() => {
+                haptic("light");
                 platform.openInternalLink(links.channel);
               }}
               variant="outline"
@@ -94,7 +99,10 @@ export function SettingsScreen({ route }: { route: RouteByType<"settings"> }) {
           {!getWebApp() && (
             <div className="space-y-4">
               <Button
-                onClick={() => setShowLogoutModal(true)}
+                onClick={() => {
+                  haptic("heavy");
+                  setShowLogoutModal(true);
+                }}
                 variant="outline"
                 className="w-full justify-start"
               >

@@ -8,6 +8,7 @@ import { toast } from "sonner";
 import { useRouter } from "@/shared/stacked-router/router";
 import { storeUploadResult } from "@/shared/upload-result-storage";
 import { useInvalidateTransactions } from "@/shared/hooks/use-invalidate-transactions";
+import { haptic } from "@/shared/platform/haptics";
 
 export function UploadStatementButton({ accountId }: { accountId: string }) {
   const { data: accounts = [] } = useQuery(trpc.accounts.list.queryOptions());
@@ -34,11 +35,13 @@ export function UploadStatementButton({ accountId }: { accountId: string }) {
       if (result.type === "success") {
         const key = storeUploadResult(result.added, result.removed);
         invalidateTransactions();
+        haptic("success");
         toast.success(
           `Bank statement uploaded! Removed ${result.removed?.length || 0}, added ${result.added?.length || 0} transactions`,
         );
         navigate({ type: "statementUploadResult", key }, { replace: true });
       } else {
+        haptic("error");
         toast.error(result.message || "Upload failed");
       }
     } finally {

@@ -23,6 +23,7 @@ import { TransactionFilters } from "api";
 import { trpc } from "@/shared/api";
 import { useQuery } from "@tanstack/react-query";
 import { CustomDatePicker } from "./custom-date-picker";
+import { haptic } from "@/shared/platform/haptics";
 
 export function FiltersDrawer({
   open,
@@ -54,6 +55,7 @@ export function FiltersDrawer({
   ];
 
   const handleAccountToggle = (account: string) => {
+    haptic("selection");
     setFilterForm((prev) => ({
       ...prev,
       accounts: prev.accounts.includes(account)
@@ -63,6 +65,7 @@ export function FiltersDrawer({
   };
 
   const handleSelectAllAccounts = () => {
+    haptic("selection");
     const allAccountIds = accounts.map((account) => account.id);
     const areAllSelected = allAccountIds.every((id) =>
       filterForm.accounts.includes(id),
@@ -75,6 +78,7 @@ export function FiltersDrawer({
   };
 
   const handleMonthsChange = (months: number) => {
+    haptic("selection");
     setFilterForm((prev) => ({
       ...prev,
       date: { type: "months", value: months },
@@ -82,6 +86,7 @@ export function FiltersDrawer({
   };
 
   const handleApply = (filters: TransactionFilters) => {
+    haptic("medium");
     onApply(filters);
     onOpenChange(false);
   };
@@ -107,6 +112,7 @@ export function FiltersDrawer({
   };
 
   const handleDescriptionTypeChange = (type: "includes" | "exact") => {
+    haptic("selection");
     setFilterForm((prev) => ({
       ...prev,
       description: prev.description ? { ...prev.description, type } : undefined,
@@ -117,6 +123,7 @@ export function FiltersDrawer({
     field: "createdAt" | "amount",
     direction: "asc" | "desc",
   ) => {
+    haptic("selection");
     setFilterForm((prev) => ({
       ...prev,
       order: { field, direction },

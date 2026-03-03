@@ -3,6 +3,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { trpc } from "@/shared/api";
 import { useQuery } from "@tanstack/react-query";
 import { TransactionType } from "api";
+import { haptic } from "@/shared/platform/haptics";
 
 export function QuickTitles({
   accountId,
@@ -48,7 +49,10 @@ export function QuickTitles({
             key={title}
             variant="outline"
             className="cursor-pointer py-[5px] flex-shrink-0"
-            onClick={() => onTitleClick(title)}
+            onClick={() => {
+              haptic("selection");
+              onTitleClick(title);
+            }}
           >
             {title}
           </Badge>

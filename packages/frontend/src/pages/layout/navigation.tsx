@@ -9,6 +9,7 @@ import { cn } from "@/lib/utils";
 import { useRouter } from "@/shared/stacked-router/router";
 import { Route } from "@/shared/stacked-router/routes";
 import { platform } from "@/shared/platform/platforms";
+import { haptic } from "@/shared/platform/haptics";
 
 export function Navigation() {
   const { currentRoute, navigate } = useRouter();
@@ -75,7 +76,10 @@ export function Navigation() {
               return (
                 <button
                   key={routeKey}
-                  onClick={() => navigate(route)}
+                  onClick={() => {
+                    haptic("selection");
+                    navigate(route);
+                  }}
                   className={cn(
                     "flex flex-col items-center gap-1 px-3 py-2 rounded-lg transition-colors",
                     isActive

@@ -11,6 +11,7 @@ import { useState, type Dispatch, type SetStateAction } from "react";
 import { TransactionForm } from "./transaction-form-screen";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Switch } from "@/components/ui/switch";
+import { haptic } from "@/shared/platform/haptics";
 
 export function CountableSwitch({
   formData,
@@ -33,12 +34,13 @@ export function CountableSwitch({
             ) : (
               <Switch
                 checked={!formData.isCountable}
-                onCheckedChange={(checked) =>
+                onCheckedChange={(checked) => {
+                  haptic("selection");
                   setFormData((prev) => ({
                     ...prev,
                     isCountable: !checked,
-                  }))
-                }
+                  }));
+                }}
               />
             )}
             <span className="text-sm text-muted-foreground">

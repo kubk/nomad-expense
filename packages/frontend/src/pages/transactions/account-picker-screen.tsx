@@ -7,6 +7,7 @@ import { useQuery } from "@tanstack/react-query";
 import { RouteByType, useRouter } from "@/shared/stacked-router/router";
 import { isFormRoute } from "@/shared/stacked-router/routes";
 import { NoAccountsEmptyState } from "../widgets/no-accounts-empty-state";
+import { haptic } from "@/shared/platform/haptics";
 
 export function AccountPickerScreen({
   route,
@@ -34,6 +35,7 @@ export function AccountPickerScreen({
               key={account.id}
               className="bg-card rounded-2xl shadow-sm p-4 text-left active:scale-95 transition-transform"
               onClick={() => {
+                haptic("selection");
                 navigate({ type: "transactionForm", accountId: account.id });
               }}
             >

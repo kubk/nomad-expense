@@ -4,6 +4,7 @@ import { ArrowLeftIcon } from "lucide-react";
 import { getWebApp } from "@/shared/platform/telegram-platform";
 import { cn } from "@/lib/utils";
 import { isFormRoute } from "@/shared/stacked-router/routes";
+import { haptic } from "@/shared/platform/haptics";
 
 export function PageHeader({
   title,
@@ -23,7 +24,10 @@ export function PageHeader({
       >
         <div className="absolute left-4">
           <button
-            onClick={pop}
+            onClick={() => {
+              haptic("light");
+              pop();
+            }}
             className={cn(
               "bg-background flex items-center gap-1.5 font-medium text-sm shadow-sm rounded-full py-1.5 px-3 active:scale-95 transition-transform",
               {

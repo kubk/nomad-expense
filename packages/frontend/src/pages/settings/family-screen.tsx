@@ -9,6 +9,7 @@ import { useState } from "react";
 import { FamilyHelp } from "./family-help";
 import { RouteByType } from "@/shared/stacked-router/router";
 import { isFormRoute } from "@/shared/stacked-router/routes";
+import { haptic } from "@/shared/platform/haptics";
 
 export function FamilyScreen({ route }: { route: RouteByType<"family"> }) {
   const [isHelpOpen, setIsHelpOpen] = useState(false);
@@ -29,6 +30,7 @@ export function FamilyScreen({ route }: { route: RouteByType<"family"> }) {
   );
 
   const handleGenerateInvite = () => {
+    haptic("light");
     generateInviteMutation.mutate();
   };
 

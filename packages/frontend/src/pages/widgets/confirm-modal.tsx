@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 import { Loader2Icon } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { haptic } from "@/shared/platform/haptics";
 
 export function ConfirmModal({
   isOpen,
@@ -41,7 +42,10 @@ export function ConfirmModal({
             variant="destructive"
             className="flex-1"
             size={"lg"}
-            onClick={onConfirm}
+            onClick={() => {
+              haptic("heavy");
+              onConfirm();
+            }}
             disabled={isLoading}
             type={"button"}
           >

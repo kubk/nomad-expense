@@ -5,6 +5,7 @@ import { AccountBadge } from "../accounts/account-badge";
 import { cn } from "@/lib/utils";
 import { useRouter } from "@/shared/stacked-router/router";
 import { useBaseCurrency } from "@/shared/hooks/use-base-currency";
+import { haptic } from "@/shared/platform/haptics";
 
 export function TransactionItem({
   transaction,
@@ -18,6 +19,7 @@ export function TransactionItem({
   const isIncome = transaction.type === "income";
 
   const handleClick = () => {
+    haptic("selection");
     navigate({ type: "transactionForm", transactionId: transaction.id });
   };
 

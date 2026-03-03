@@ -10,6 +10,7 @@ import {
   getMonthNumbers,
   isMonthInFuture,
 } from "@/shared/date-utils";
+import { haptic } from "@/shared/platform/haptics";
 
 type CustomDateValue = { year: number; month: number };
 
@@ -50,6 +51,7 @@ export function CustomDatePicker({
   };
 
   const toggleMonth = (year: number, month: number) => {
+    haptic("selection");
     setSelectedMonths((prev) => {
       const exists = prev.find((m) => m.year === year && m.month === month);
       if (exists) {
@@ -61,6 +63,7 @@ export function CustomDatePicker({
   };
 
   const toggleYear = (year: number) => {
+    haptic("selection");
     const isFullySelected = isYearFullySelected(year);
 
     if (isFullySelected) {
@@ -83,6 +86,7 @@ export function CustomDatePicker({
   };
 
   const handleApply = () => {
+    haptic("medium");
     onApply({
       ...filters,
       date: {
