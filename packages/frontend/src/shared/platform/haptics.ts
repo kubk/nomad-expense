@@ -1,4 +1,5 @@
 import type { WebHaptics, defaultPatterns } from "web-haptics";
+import { getWebApp } from "./telegram-platform";
 
 export type HapticType =
   | "error"
@@ -9,21 +10,49 @@ export type HapticType =
   | "heavy"
   | "selection";
 
+const isMobile = () =>
+  window.matchMedia && window.matchMedia("(max-width: 600px)").matches;
+
 let webHaptics:
   | { instance: WebHaptics; patterns: typeof defaultPatterns }
   | undefined;
 
-const isMobile = () =>
-  window.matchMedia && window.matchMedia("(max-width: 600px)").matches;
+if (!getWebApp()) {
+  import("web-haptics").then(({ WebHaptics, defaultPatterns }) => {
+    webHaptics = {
+      instance: new WebHaptics(),
+      patterns: defaultPatterns,
+    };
+  });
+}
 
-import("web-haptics").then(({ WebHaptics, defaultPatterns }) => {
-  webHaptics = {
-    instance: new WebHaptics(),
-    patterns: defaultPatterns,
-  };
-});
+const telegramHaptic = (type: HapticType) => {
+  const webApp = getWebApp();
+  if (!webApp) return;
 
-export const haptic = (type: HapticType) => {
+  const tgPlatform = webApp.platform;
+  if (tgPlatform !== "ios" && tgPlatform !== "android") return;
+
+  switch (type) {
+    case "error":
+    case "success":
+    case "warning":
+      webApp.HapticFeedback.notificationOccurred(type);
+      break;
+    case "light":
+    case "medium":
+    case "heavy":
+      webApp.HapticFeedback.impactOccurred(type);
+      break;
+    case "selection":
+      webApp.HapticFeedback.selectionChanged();
+      break;
+    default:
+      return type satisfies never;
+  }
+};
+
+const browserHaptic = (type: HapticType) => {
   if (!isMobile() || !webHaptics) return;
 
   const { instance, patterns } = webHaptics;
@@ -54,3 +83,5 @@ export const haptic = (type: HapticType) => {
       return type satisfies never;
   }
 };
+
+export const haptic = getWebApp() ? telegramHaptic : browserHaptic;
