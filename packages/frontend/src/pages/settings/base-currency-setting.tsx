@@ -14,6 +14,7 @@ import { AlertTriangleIcon, LoaderIcon, RefreshCwIcon } from "lucide-react";
 import { trpc, queryClient } from "@/shared/api";
 import { ConfirmModal } from "../widgets/confirm-modal";
 import { toast } from "sonner";
+import { haptic } from "@/shared/platform/haptics";
 
 export function BaseCurrencySetting() {
   const [showConfirmModal, setShowConfirmModal] = useState(false);
@@ -45,6 +46,7 @@ export function BaseCurrencySetting() {
   );
 
   const handleCurrencyChange = (value: string) => {
+    haptic("selection");
     setPendingCurrency(value as Currency);
     setShowConfirmModal(true);
   };

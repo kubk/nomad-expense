@@ -28,6 +28,7 @@ import { Footer } from "../widgets/footer";
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { DrawerDescription } from "@/components/ui/drawer";
+import { haptic } from "@/shared/platform/haptics";
 
 const MotionFooter = motion.create(Footer);
 
@@ -56,10 +57,12 @@ export function AccountsScreen({ route }: { route: RouteByType<"accounts"> }) {
 
   const handleAccountClick = (accountId: string) => {
     if (isReorderMode) return; // Don't navigate in reorder mode
+    haptic("selection");
     navigate({ type: "accountForm", accountId });
   };
 
   const handleAddAccountClick = () => {
+    haptic("light");
     navigate({ type: "accountForm" });
   };
 
@@ -79,6 +82,7 @@ export function AccountsScreen({ route }: { route: RouteByType<"accounts"> }) {
 
   const moveAccount = (index: number, direction: "up" | "down") => {
     if (!reorderedAccounts) return;
+    haptic("selection");
     const newAccounts = [...reorderedAccounts];
     const targetIndex = direction === "up" ? index - 1 : index + 1;
 

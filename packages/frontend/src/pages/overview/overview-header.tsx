@@ -6,6 +6,7 @@ import { useRouter } from "@/shared/stacked-router/router";
 import { getWebApp } from "@/shared/platform/telegram-platform";
 import { cn } from "@/lib/utils";
 import { useBaseCurrency } from "@/shared/hooks/use-base-currency";
+import { haptic } from "@/shared/platform/haptics";
 
 export function OverviewHeader() {
   const { navigate } = useRouter();
@@ -44,6 +45,7 @@ export function OverviewHeader() {
           <div
             className="self-center flex -space-x-2 cursor-pointer active:scale-95 transition-transform"
             onClick={() => {
+              haptic("light");
               navigate({ type: "family" });
             }}
           >
