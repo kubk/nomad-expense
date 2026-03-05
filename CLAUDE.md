@@ -23,5 +23,5 @@ Always install dependencies in their respective workspace package.json files, no
 ### Public Code Export
 - This repo has a public mirror at `kubk/nomad-expense` on GitHub
 - After pushing changes to main, run `bash export-public-code.sh` to sync the public repo
-- The script uses `git-filter` with `gitexporter.config.json` to exclude private files (env files, test fixtures, CI workflows) and force-pushes to the public repo
+- The script uses `git-filter` with `git-filter.config.json` to exclude private files (env files, test fixtures, CI workflows) and force-pushes to the public repo
 
