@@ -1,4 +1,5 @@
 import { Platform } from "./platforms";
+import { lockOrientationWhenPortrait } from "./lock-orientation-when-portrait";
 
 export function getWebApp() {
   const webApp = window.Telegram?.WebApp;
@@ -17,6 +18,7 @@ export function createTelegramPlatform(): Platform {
       webApp.ready();
       webApp.expand();
       webApp.disableVerticalSwipes();
+      lockOrientationWhenPortrait();
     },
     safeAreaInset() {
       return {
