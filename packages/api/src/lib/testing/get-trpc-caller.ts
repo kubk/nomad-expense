@@ -3,7 +3,7 @@ import { router } from "../../api/router";
 import { getUserById } from "../../db/user/get-user-by-id";
 import { fixtures } from "./set-up-db-test";
 
-export const createCaller = t.createCallerFactory(router);
+const createCaller = t.createCallerFactory(router);
 
 type UserName = keyof typeof fixtures.users;
 

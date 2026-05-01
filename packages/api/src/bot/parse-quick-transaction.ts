@@ -10,14 +10,14 @@ type ParseError = {
   currency?: string;
 };
 
-export type SuccessResult = {
+type SuccessResult = {
   amountCents: number;
   account: AccountSelect;
   description?: string;
   transactionType?: TransactionType;
 };
 
-export type ParseQuickTransactionResult = SuccessResult | ParseError;
+type ParseQuickTransactionResult = SuccessResult | ParseError;
 
 export const parseQuickTransaction = (
   text: string,

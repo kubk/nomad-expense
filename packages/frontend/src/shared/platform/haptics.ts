@@ -1,7 +1,7 @@
 import type { WebHaptics, defaultPatterns } from "web-haptics";
 import { getWebApp } from "./telegram-platform";
 
-export type HapticType =
+type HapticType =
   | "error"
   | "success"
   | "warning"

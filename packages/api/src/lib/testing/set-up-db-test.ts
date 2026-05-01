@@ -236,7 +236,7 @@ async function seed() {
   ]);
 }
 
-export function setTestEnvs() {
+function setTestEnvs() {
   // @ts-expect-error
   const env = import.meta.env;
   setEnv(env);

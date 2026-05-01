@@ -7,9 +7,6 @@ export const transactionImportRuleType = [
   "MakeUncountable",
   "FilterTransactionName",
 ] as const;
-export const transactionImportRuleTypeSchema = z.enum(
-  transactionImportRuleType,
-);
 
 export const transactionType = ["expense", "income"] as const;
 export const transactionTypeSchema = z.enum(transactionType);

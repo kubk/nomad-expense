@@ -21,7 +21,7 @@ export async function createContext({
   };
 }
 
-export type Context = Awaited<ReturnType<typeof createContext>>;
+type Context = Awaited<ReturnType<typeof createContext>>;
 
 export const t = initTRPC.context<Context>().create({
   errorFormatter: ({ shape, error }) => {

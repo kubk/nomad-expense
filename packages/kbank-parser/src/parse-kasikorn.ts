@@ -1,7 +1,7 @@
 import { assembleTransactions } from "./assemble-transactions.ts";
 
-export const ITEM_SEPARATOR = "___";
-export const ROW_SEPARATOR = "\n\t\n\n";
+const ITEM_SEPARATOR = "___";
+const ROW_SEPARATOR = "\n\t\n\n";
 
 const renderPage = (pageData: any) => {
   const options = {

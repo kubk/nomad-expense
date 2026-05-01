@@ -2,7 +2,7 @@ import { env } from "./env";
 import { getWebApp } from "./platform/telegram-platform";
 import { telegramAuthMethod } from "api";
 
-export const authQueryKey = "authQuery";
+const authQueryKey = "authQuery";
 
 export function getAuthToken() {
   if (env.VITE_STAGE === "local" && env.VITE_USER_ID) {

@@ -12,7 +12,7 @@ import { notifyViaTelegram } from "../notifications/notify-via-telegram";
 import { getUserDisplayName } from "../user-display";
 import { getFamilyBaseCurrency } from "../../db/user/get-family-base-currency";
 
-export type ImportResult = {
+type ImportResult = {
   removed: TransactionFull[];
   added: TransactionFull[];
 };

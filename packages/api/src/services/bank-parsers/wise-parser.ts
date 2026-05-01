@@ -8,9 +8,7 @@ import Papa from "papaparse";
 import { DateTime } from "luxon";
 import { interpretDateInTimezone } from "../transaction-import/interpret-date-in-tz";
 
-export async function parseCsvFromFile(
-  file: File,
-): Promise<Record<string, string>[]> {
+async function parseCsvFromFile(file: File): Promise<Record<string, string>[]> {
   const content = await file.text();
 
   const result = Papa.parse<Record<string, string>>(content, {

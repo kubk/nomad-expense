@@ -2,10 +2,6 @@
 
 let ctx: ExecutionContext | null = null;
 
-export function setWorkerContext(ctxInput: ExecutionContext) {
-  ctx = ctxInput;
-}
-
 export function runInBackground(promise: Promise<any>) {
   if (!ctx) {
     return;

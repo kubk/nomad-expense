@@ -4,7 +4,7 @@ import { eq } from "drizzle-orm";
 import { DB } from "../../services/db";
 import { transactionTypeSchema } from "../enums";
 
-export const userBotStateSchema = z
+const userBotStateSchema = z
   .discriminatedUnion("type", [
     z.object({
       type: z.literal("uploadStatement"),
@@ -20,10 +20,6 @@ export const userBotStateSchema = z
   .nullable();
 
 type UserBotState = z.infer<typeof userBotStateSchema>;
-
-export function createUserBotState(state: UserBotState): UserBotState {
-  return state;
-}
 
 export function setUserBotState(
   db: DB,

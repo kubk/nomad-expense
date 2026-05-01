@@ -5,7 +5,7 @@ import { getBot } from "../telegram/get-bot";
 import type { Money } from "../money/money";
 import type { TransactionType } from "../../db/enums";
 
-export type NotificationPayload =
+type NotificationPayload =
   | {
       type: "userJoinedYourFamily";
       targetUserId: string;

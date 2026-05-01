@@ -1,10 +1,7 @@
 import { TransactionImportRule } from "../../db/db-types";
 import { TransactionFull } from "../../db/db-types";
 
-export type TransactionLimited = Pick<
-  TransactionFull,
-  "description" | "isCountable"
->;
+type TransactionLimited = Pick<TransactionFull, "description" | "isCountable">;
 
 function makeTransactionUncountableRule<T extends TransactionLimited>(
   transaction: T,

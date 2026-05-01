@@ -2,7 +2,7 @@ import React from "react";
 import { motion, type Transition } from "framer-motion";
 import type { Route } from "./routes";
 
-export type AnimationType = "horizontal-slide" | "stacked-slide" | "scale";
+type AnimationType = "horizontal-slide" | "stacked-slide" | "scale";
 
 const getAnimationProps = (
   animationType: AnimationType,
