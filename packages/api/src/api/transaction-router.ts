@@ -14,6 +14,7 @@ import { createTransactionWithRules } from "../db/transaction/create-transaction
 
 const transactionFilterSchema = z.object({
   accounts: z.array(z.string()),
+  transactionType: z.optional(transactionTypeSchema),
   description: z.optional(
     z.object({
       input: z.string(),
@@ -51,6 +52,11 @@ const getFilteredTransactions = async (
 
   // Account filter
   conditions.push(inArray(accountTable.id, input.accounts));
+
+  // Transaction type filter
+  if (input.transactionType) {
+    conditions.push(eq(transactionTable.type, input.transactionType));
+  }
 
   // Description filter
   if (input.description) {
@@ -294,8 +300,13 @@ export const expenseRouter = t.router({
         }
       });
 
-      // Convert to array and sort based on order filter (expenses only for main data)
-      const filteredMonthlyData = Object.values(monthlyExpenseTotals)
+      const monthlyDisplayTotals =
+        input.transactionType === "income"
+          ? monthlyIncomeTotals
+          : monthlyExpenseTotals;
+
+      // Convert to array and sort based on order filter.
+      const filteredMonthlyData = Object.values(monthlyDisplayTotals)
         .map((monthData) => ({
           month: `${monthData.shortMonth} ${monthData.year}`,
           shortMonth: monthData.shortMonth,

@@ -19,11 +19,29 @@ import {
   CreditCardIcon,
   ArrowUpDownIcon,
 } from "lucide-react";
-import { TransactionFilters } from "api";
+import {
+  transactionType,
+  transactionTypeLabels,
+  type TransactionFilters,
+  type TransactionType,
+} from "api";
 import { trpc } from "@/shared/api";
 import { useQuery } from "@tanstack/react-query";
 import { CustomDatePicker } from "./custom-date-picker";
 import { haptic } from "@/shared/platform/haptics";
+
+type TransactionTypeFilterValue = "all" | TransactionType;
+
+const transactionTypeOptions: ReadonlyArray<{
+  value: TransactionTypeFilterValue;
+  label: string;
+}> = [
+  { value: "all", label: "All" },
+  ...transactionType.map((value) => ({
+    value,
+    label: transactionTypeLabels[value],
+  })),
+];
 
 export function FiltersDrawer({
   open,
@@ -82,6 +100,14 @@ export function FiltersDrawer({
     setFilterForm((prev) => ({
       ...prev,
       date: { type: "months", value: months },
+    }));
+  };
+
+  const handleTransactionTypeChange = (value: TransactionTypeFilterValue) => {
+    haptic("selection");
+    setFilterForm((prev) => ({
+      ...prev,
+      transactionType: value === "all" ? undefined : value,
     }));
   };
 
@@ -159,16 +185,18 @@ export function FiltersDrawer({
             ) : (
               <>
                 <div>
-                  <div className="flex items-center gap-2 mb-2">
-                    <SearchIcon className="size-4 text-muted-foreground" />
-                    <h3 className="font-medium">Description</h3>
-                  </div>
                   <div className="flex gap-2">
-                    <Input
-                      placeholder="Search transactions..."
-                      value={filterForm.description?.input || ""}
-                      onChange={(e) => handleDescriptionChange(e.target.value)}
-                    />
+                    <div className="relative flex-1">
+                      <SearchIcon className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
+                      <Input
+                        placeholder="Search transactions..."
+                        value={filterForm.description?.input || ""}
+                        onChange={(e) =>
+                          handleDescriptionChange(e.target.value)
+                        }
+                        className="pl-9"
+                      />
+                    </div>
                     {filterForm.description && (
                       <Tabs
                         value={filterForm.description.type}
@@ -190,6 +218,27 @@ export function FiltersDrawer({
                     )}
                   </div>
                 </div>
+
+                <Tabs
+                  value={filterForm.transactionType ?? "all"}
+                  onValueChange={(value) =>
+                    handleTransactionTypeChange(
+                      value as TransactionTypeFilterValue,
+                    )
+                  }
+                >
+                  <TabsList className="w-full">
+                    {transactionTypeOptions.map((option) => (
+                      <TabsTrigger
+                        key={option.value}
+                        value={option.value}
+                        className="flex-1"
+                      >
+                        {option.label}
+                      </TabsTrigger>
+                    ))}
+                  </TabsList>
+                </Tabs>
 
                 <div className="pt-2">
                   <div className="flex items-center justify-between mb-2">

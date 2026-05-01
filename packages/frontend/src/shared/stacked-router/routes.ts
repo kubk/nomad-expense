@@ -1,9 +1,11 @@
 import * as v from "valibot";
+import { transactionType } from "api";
 
 const toNumberSchema = v.pipe(v.unknown(), v.transform(Number), v.number());
 
 const transactionFiltersSchema = v.object({
   accounts: v.array(v.string()),
+  transactionType: v.optional(v.picklist(transactionType)),
   description: v.optional(
     v.object({
       input: v.string(),
