@@ -11,6 +11,7 @@ import {
   bank,
   bankSchema,
   currencySchema,
+  transactionType,
   transactionSourceSchema,
   transactionTypeSchema,
 } from "./db/enums";
@@ -30,10 +31,14 @@ export type Account = RouterOutputs["accounts"]["list"][0];
 export type MonthlyData = MonthlyBreakdownFull["data"][0];
 
 export type AccountColor = z.infer<typeof accountColorSchema>;
-export { bank };
+export { bank, transactionType };
 export type Bank = z.infer<typeof bankSchema>;
 export type Currency = z.infer<typeof currencySchema>;
 export type TransactionType = z.infer<typeof transactionTypeSchema>;
+export const transactionTypeLabels = {
+  expense: "Expense",
+  income: "Income",
+} satisfies Record<TransactionType, string>;
 export type TransactionSource = z.infer<typeof transactionSourceSchema>;
 
 export { telegramAuthMethod } from "./services/auth/telegram-auth-method";

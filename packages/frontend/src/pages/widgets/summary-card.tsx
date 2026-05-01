@@ -1,6 +1,11 @@
-import { FilterIcon, CalendarIcon, WalletIcon } from "lucide-react";
+import {
+  FilterIcon,
+  CalendarIcon,
+  WalletIcon,
+  CircleDollarSignIcon,
+} from "lucide-react";
 import { formatAmount } from "../../shared/currency-formatter";
-import { TransactionFilters } from "api";
+import { transactionTypeLabels, type TransactionFilters } from "api";
 import { Skeleton } from "@/components/ui/skeleton";
 import { getShortMonthName } from "../../shared/date-utils";
 import { useBaseCurrency } from "@/shared/hooks/use-base-currency";
@@ -64,6 +69,12 @@ export function SummaryCard({
               <WalletIcon className="w-3 h-3" />
               {getAccountsLabel()}
             </div>
+            {appliedFilters.transactionType && (
+              <div className="bg-muted whitespace-nowrap text-muted-foreground px-3 py-1.5 rounded-full text-xs font-medium flex items-center gap-1.5">
+                <CircleDollarSignIcon className="w-3 h-3" />
+                {transactionTypeLabels[appliedFilters.transactionType]}
+              </div>
+            )}
             {appliedFilters.description && (
               <div className="bg-muted whitespace-nowrap text-muted-foreground px-3 py-1.5 rounded-full text-xs font-medium">
                 {appliedFilters.description.type === "exact"
