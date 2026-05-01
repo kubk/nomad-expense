@@ -28,7 +28,7 @@ const FULL_MONTH_NAMES = [
   "December",
 ] as const;
 
-export const MONTHS_IN_YEAR = 12;
+const MONTHS_IN_YEAR = 12;
 
 export const getShortMonthName = (monthNumber: number): string => {
   return SHORT_MONTH_NAMES[monthNumber - 1];

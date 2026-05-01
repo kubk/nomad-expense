@@ -23,5 +23,3 @@ export const router = t.router({
   bot: botRouter,
   family: familyRouter,
 });
-
-export type AppRouter = typeof router;

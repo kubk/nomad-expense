@@ -1,9 +1,9 @@
-import { expect, it, describe, vi, beforeEach } from "vitest";
+import { expect, it, describe, vi } from "vitest";
 import { setUpDbTest, fixtures } from "../lib/testing/set-up-db-test";
 import { getCaller } from "../lib/testing/get-trpc-caller";
 import { notifyViaTelegram } from "../services/notifications/notify-via-telegram";
 import { getDb } from "../services/db";
-import { userTable, transactionTable, accountTable } from "../db/schema";
+import { transactionTable, accountTable } from "../db/schema";
 import { eq } from "drizzle-orm";
 
 vi.mock("../services/notifications/notify-via-telegram", () => ({

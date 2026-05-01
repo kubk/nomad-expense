@@ -8,7 +8,7 @@ type Transaction = {
   currency: "THB";
 };
 
-export const ITEM_SEPARATOR = "___";
+const ITEM_SEPARATOR = "___";
 
 // Max amount of row a transaction can occupy in parsed PDF result
 const MAX_TRANSACTION_ROW = 5;
@@ -19,11 +19,11 @@ const isStartOfTransactionRow = (row: string | null) => {
   return (row || "").match(/^\d{2}-\d{2}-\d\d?/);
 };
 
-export const isLookingLikeMoney = (moneyString: string) => {
+const isLookingLikeMoney = (moneyString: string) => {
   return !!moneyString.match(/^\d+(,\d+)?[.]\d\d$/);
 };
 
-export const parseMoney = (moneyString?: string) => {
+const parseMoney = (moneyString?: string) => {
   if (!moneyString || !isLookingLikeMoney(moneyString)) {
     throw new Error(
       `Unsupported money ${moneyString}. Type: ${typeof moneyString}`,

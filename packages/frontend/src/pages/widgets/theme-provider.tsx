@@ -1,8 +1,8 @@
 import { createContext, useContext, useEffect, useState } from "react";
 
-export type Theme = "dark" | "light" | "system";
+type Theme = "dark" | "light" | "system";
 
-export type ThemeProviderContextValue = {
+type ThemeProviderContextValue = {
   theme: Theme;
   setTheme: (theme: Theme) => void;
 };
@@ -11,7 +11,7 @@ const ThemeProviderContext = createContext<
   ThemeProviderContextValue | undefined
 >(undefined);
 
-export type ThemeProviderProps = {
+type ThemeProviderProps = {
   children: React.ReactNode;
   defaultTheme?: Theme;
   storageKey?: string;
