@@ -5,7 +5,7 @@
     "dev": "npx concurrently --kill-others-on-fail \"npm run start -w=api\" \"npm run start -w=frontend\"",
     "prettier:fix": "git ls-files -mo --exclude-standard -- './packages' | grep -E '\\.(ts|tsx)$' | xargs -I {} prettier --write {}",
     "prettier:fix:full": "prettier --write \"./packages/**/*.+(ts|tsx)\"",
-    "knip": "knip",
+    "knip": "knip --reporter compact",
     "typecheck": "npm run typecheck --workspaces",
     "test": "npm run test --workspaces",
     "export-public-code": "./export-public-code.sh"
