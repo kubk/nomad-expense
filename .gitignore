@@ -161,3 +161,4 @@ dist
 
 tsconfig.tsbuildinfo
 .DS_Store
+packages/api/.env.production.secrets
