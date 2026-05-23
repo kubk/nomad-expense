@@ -12,6 +12,7 @@ import { RouteByType } from "@/shared/stacked-router/router";
 import { useRouter } from "@/shared/stacked-router/router";
 import { isFormRoute } from "@/shared/stacked-router/routes";
 import { calculateMaxAmount } from "../../shared/chart-calculations";
+import { useTranslation } from "@/translations/translation-provider";
 
 export function MonthlyBreakdownFull({
   route,
@@ -20,6 +21,7 @@ export function MonthlyBreakdownFull({
 }) {
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const { navigate } = useRouter();
+  const { t } = useTranslation();
   const accountIds = useAccountIds();
 
   const filters: TransactionFilters = route.filters
@@ -40,7 +42,7 @@ export function MonthlyBreakdownFull({
   const totalIncome = transactionsData?.totalIncome || 0;
 
   return (
-    <Page title="Monthly breakdown" isForm={isFormRoute(route)}>
+    <Page title={t("overviewMonthlyBreakdown")} isForm={isFormRoute(route)}>
       <SummaryCard
         isLoading={isLoading}
         onFiltersClick={() => setIsDrawerOpen(true)}

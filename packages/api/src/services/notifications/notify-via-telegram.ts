@@ -4,6 +4,8 @@ import { userTable } from "../../db/schema";
 import { getBot } from "../telegram/get-bot";
 import type { Money } from "../money/money";
 import type { TransactionType } from "../../db/enums";
+import { getTranslation } from "../../translations/translations";
+import { userCacheGet } from "../user-cache";
 
 type NotificationPayload =
   | {
@@ -48,7 +50,8 @@ export async function notifyViaTelegram(payload: NotificationPayload) {
         return;
       }
 
-      const message = `🎉 ${payload.newMemberName} has joined your family!`;
+      const { t } = getTranslation(await userCacheGet(targetUser.telegramId));
+      const message = t("userJoinedFamily", payload.newMemberName);
       await bot.api.sendMessage(targetUser.telegramId, message);
     } else {
       // Notify all family members except the author
@@ -69,18 +72,35 @@ export async function notifyViaTelegram(payload: NotificationPayload) {
 
       for (const recipient of recipients) {
         if (!recipient.telegramId) continue;
+        const { t } = getTranslation(await userCacheGet(recipient.telegramId));
 
         let message: string;
         if (payload.type === "newTransaction") {
           const isIncome = payload.transactionType === "income";
           const amount = (Math.abs(payload.money.amountCents) / 100).toFixed(2);
-          const emoji = isIncome ? "💰" : "💸";
-          const verb = isIncome ? "received" : "spent";
-          message = `${emoji} ${amount} ${payload.money.currency} ${verb} on *${payload.description}* by ${payload.transactionAuthor}`;
+          message = isIncome
+            ? t(
+                "transactionReceived",
+                amount,
+                payload.money.currency,
+                payload.description,
+                payload.transactionAuthor,
+              )
+            : t(
+                "transactionSpent",
+                amount,
+                payload.money.currency,
+                payload.description,
+                payload.transactionAuthor,
+              );
         } else {
-          message = `📊 *${payload.transactionAuthor}* uploaded a bank statement for *${payload.bankAccountName}*\n`;
-          message += `📥 Added: ${payload.newTransactions} transaction${payload.newTransactions !== 1 ? "s" : ""}\n`;
-          message += `🗑️ Removed: ${payload.removedTransactions} transaction${payload.removedTransactions !== 1 ? "s" : ""}`;
+          message = t(
+            "uploadedBankStatement",
+            payload.transactionAuthor,
+            payload.bankAccountName,
+            payload.newTransactions,
+            payload.removedTransactions,
+          );
         }
 
         await bot.api.sendMessage(recipient.telegramId, message, {

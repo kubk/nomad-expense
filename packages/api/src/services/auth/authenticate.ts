@@ -8,10 +8,11 @@ import { UserTelegramType } from "./schema";
 import { User } from "grammy/types";
 import { getEnv } from "../env";
 import { getUserById } from "../../db/user/get-user-by-id";
+import { getLanguage } from "../../translations/translations";
 
 export async function authenticate(
   input: { type: "api"; req: Request } | { type: "bot"; botUser: User },
-): Promise<{ userId: string; familyId: string } | null> {
+): Promise<{ userId: string; familyId: string; language?: string } | null> {
   let telegramUser: UserTelegramType | null = null;
 
   if (input.type === "api") {
@@ -68,10 +69,21 @@ export async function authenticate(
   }
 
   const telegramId = String(telegramUser.id);
+  const language = getLanguage(telegramUser);
 
   const cachedUser = await userCacheGet(telegramId);
   if (cachedUser) {
-    return cachedUser;
+    runInBackground(
+      userCacheSet(telegramId, {
+        userId: cachedUser.userId,
+        familyId: cachedUser.familyId,
+        language,
+      }),
+    );
+    return {
+      ...cachedUser,
+      language,
+    };
   }
 
   const user = await upsertUserByTelegramData(telegramUser);
@@ -80,11 +92,13 @@ export async function authenticate(
     userCacheSet(telegramId, {
       userId: user.id,
       familyId: user.familyId,
+      language,
     }),
   );
 
   return {
     userId: user.id,
     familyId: user.familyId,
+    language,
   };
 }

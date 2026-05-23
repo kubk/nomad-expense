@@ -19,6 +19,7 @@ import { getUserDisplayName } from "../services/user-display";
 import { currencySchema } from "../db/enums";
 import { convertWithLiveRate } from "../services/money/exchange-rate-api";
 import { getFamilyBaseCurrency } from "../db/user/get-family-base-currency";
+import { getTranslation } from "../translations/translations";
 
 export const familyRouter = t.router({
   listMembers: protectedProcedure.query(async ({ ctx }) => {
@@ -112,6 +113,7 @@ export const familyRouter = t.router({
     .mutation(async ({ ctx, input }) => {
       const db = getDb();
       const userId = ctx.userId;
+      const { t } = getTranslation(ctx);
 
       // Find valid invite
       const invite = await db
@@ -129,21 +131,21 @@ export const familyRouter = t.router({
       if (!inviteResult) {
         throw new TRPCError({
           code: "BAD_REQUEST",
-          message: "Invalid invite code",
+          message: t("invalidInviteCode"),
         });
       }
 
       if (inviteResult.usedAt) {
         throw new TRPCError({
           code: "BAD_REQUEST",
-          message: "This invite has already been used",
+          message: t("inviteAlreadyUsed"),
         });
       }
 
       if (new Date(inviteResult.expiresAt) < new Date()) {
         throw new TRPCError({
           code: "BAD_REQUEST",
-          message: "This invite has expired",
+          message: t("inviteExpired"),
         });
       }
 
@@ -183,6 +185,7 @@ export const familyRouter = t.router({
         await userCacheSet(user.telegramId, {
           userId,
           familyId: inviteResult.familyId,
+          language: ctx.language,
         });
       }
 

@@ -1,6 +1,7 @@
 import { useBaseCurrency } from "@/shared/hooks/use-base-currency";
 import { formatAmount } from "@/shared/currency-formatter";
 import { SupportedCurrency } from "api";
+import { useTranslation } from "@/translations/translation-provider";
 
 export function BaseCurrencyInfo({
   amount,
@@ -12,6 +13,7 @@ export function BaseCurrencyInfo({
   usdAmount: number;
 }) {
   const baseCurrency = useBaseCurrency();
+  const { t } = useTranslation();
 
   if (currency === baseCurrency) {
     return null;
@@ -25,7 +27,7 @@ export function BaseCurrencyInfo({
         {formatAmount(usdAmount, baseCurrency)}
       </span>
       <span className="text-xs text-muted-foreground">
-        Rate: 1 {baseCurrency} = {rate.toFixed(2)} {currency}
+        {t("transactionsRate", baseCurrency, rate.toFixed(2), currency)}
       </span>
     </div>
   );

@@ -7,10 +7,12 @@ import { getWebApp } from "@/shared/platform/telegram-platform";
 import { cn } from "@/lib/utils";
 import { useBaseCurrency } from "@/shared/hooks/use-base-currency";
 import { haptic } from "@/shared/platform/haptics";
+import { useTranslation } from "@/translations/translation-provider";
 
 export function OverviewHeader() {
   const { navigate } = useRouter();
   const baseCurrency = useBaseCurrency();
+  const { t } = useTranslation();
 
   const { data: overviewData, isLoading: isOverviewLoading } = useQuery(
     trpc.expenses.overview.queryOptions(),
@@ -30,7 +32,7 @@ export function OverviewHeader() {
         <div className="flex items-start justify-between">
           <div>
             <p className="text-foreground/70 text-sm mb-1">
-              Expenses · Last 30 days
+              {t("overviewExpensesLast30Days")}
             </p>
             <div className="text-3xl text-foreground font-bold font-mono">
               {isOverviewLoading ? (

@@ -18,6 +18,7 @@ export async function createContext({
     resHeaders,
     userId: authResult?.userId || null,
     familyId: authResult?.familyId || null,
+    language: authResult?.language || "en",
   };
 }
 
@@ -48,6 +49,7 @@ const isAuthed = t.middleware(async ({ ctx, next }) => {
       ...ctx,
       userId: ctx.userId,
       familyId: ctx.familyId,
+      language: ctx.language,
     },
   });
 });

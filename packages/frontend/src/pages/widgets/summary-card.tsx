@@ -5,11 +5,12 @@ import {
   CircleDollarSignIcon,
 } from "lucide-react";
 import { formatAmount } from "../../shared/currency-formatter";
-import { transactionTypeLabels, type TransactionFilters } from "api";
+import { type TransactionFilters } from "api";
 import { Skeleton } from "@/components/ui/skeleton";
 import { getShortMonthName } from "../../shared/date-utils";
 import { useBaseCurrency } from "@/shared/hooks/use-base-currency";
 import { haptic } from "@/shared/platform/haptics";
+import { useTranslation } from "@/translations/translation-provider";
 
 export function SummaryCard({
   onFiltersClick,
@@ -25,15 +26,15 @@ export function SummaryCard({
   isLoading: boolean;
 }) {
   const baseCurrency = useBaseCurrency();
+  const { t } = useTranslation();
 
   const getAccountsLabel = () => {
-    return `${appliedFilters.accounts.length} account${appliedFilters.accounts.length > 1 ? "s" : ""}`;
+    return t("filtersAccountCount", appliedFilters.accounts.length);
   };
 
   const getDateLabel = () => {
     if (appliedFilters.date.type === "months") {
-      if (appliedFilters.date.value === 1) return "Last month";
-      return `Last ${appliedFilters.date.value} months`;
+      return t("filtersLastMonths", appliedFilters.date.value);
     }
     if (appliedFilters.date.type === "custom") {
       const months = appliedFilters.date.value;
@@ -42,11 +43,11 @@ export function SummaryCard({
       }
       const years = [...new Set(months.map((m) => m.year))];
       if (years.length === 1) {
-        return `${years[0]} (${months.length} months)`;
+        return t("filtersYearMonths", years[0], months.length);
       }
-      return `Custom (${months.length} months)`;
+      return t("filtersCustomMonths", months.length);
     }
-    return "All time";
+    return t("filtersAllTime");
   };
 
   return (
@@ -72,14 +73,22 @@ export function SummaryCard({
             {appliedFilters.transactionType && (
               <div className="bg-muted whitespace-nowrap text-muted-foreground px-3 py-1.5 rounded-full text-xs font-medium flex items-center gap-1.5">
                 <CircleDollarSignIcon className="w-3 h-3" />
-                {transactionTypeLabels[appliedFilters.transactionType]}
+                {appliedFilters.transactionType === "expense"
+                  ? t("transactionTypeExpense")
+                  : t("transactionTypeIncome")}
               </div>
             )}
             {appliedFilters.description && (
               <div className="bg-muted whitespace-nowrap text-muted-foreground px-3 py-1.5 rounded-full text-xs font-medium">
                 {appliedFilters.description.type === "exact"
-                  ? `Description is '${appliedFilters.description.input}'`
-                  : `Description contains '${appliedFilters.description.input}'`}
+                  ? t(
+                      "filtersDescriptionExact",
+                      appliedFilters.description.input,
+                    )
+                  : t(
+                      "filtersDescriptionContains",
+                      appliedFilters.description.input,
+                    )}
               </div>
             )}
           </div>
@@ -94,7 +103,7 @@ export function SummaryCard({
             <div className="flex items-center gap-2 mb-2">
               <div className="w-2 h-2 bg-destructive rounded-full"></div>
               <span className="text-xs font-medium text-muted-foreground">
-                Expenses
+                {t("summaryExpenses")}
               </span>
             </div>
             {isLoading ? (
@@ -112,7 +121,7 @@ export function SummaryCard({
             <div className="flex items-center gap-2 mb-2">
               <div className="w-2 h-2 bg-green-500 dark:bg-green-400 rounded-full"></div>
               <span className="text-xs font-medium text-muted-foreground">
-                Income
+                {t("summaryIncome")}
               </span>
             </div>
             {isLoading ? (

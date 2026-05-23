@@ -35,6 +35,7 @@ import { CountableSwitch } from "./countable-switch";
 import { QuickTitles } from "./quick-titles";
 import { BaseCurrencyInfo } from "./base-currency-info";
 import { haptic } from "@/shared/platform/haptics";
+import { useTranslation } from "@/translations/translation-provider";
 
 export type TransactionForm = {
   description: string;
@@ -52,6 +53,7 @@ export function TransactionFormScreen({
   route: RouteByType<"transactionForm">;
 }) {
   const { pop, navigate } = useRouter();
+  const { t } = useTranslation();
   const transactionId = route.transactionId;
   const isEdit = Boolean(transactionId);
 
@@ -84,8 +86,10 @@ export function TransactionFormScreen({
         invalidateTransactions();
         if (!transactionId) return;
         queryClient.invalidateQueries({
-          queryKey: trpc.expenses.getTransaction.queryKey({ id: transactionId }),
-        })
+          queryKey: trpc.expenses.getTransaction.queryKey({
+            id: transactionId,
+          }),
+        });
       },
     }),
   );
@@ -210,7 +214,11 @@ export function TransactionFormScreen({
   return (
     <Page
       title={
-        <PageHeader title={isEdit ? "Edit transaction" : "Add transaction"} />
+        <PageHeader
+          title={
+            isEdit ? t("transactionsEditTitle") : t("transactionsAddTitle")
+          }
+        />
       }
       isForm={isFormRoute(route)}
     >
@@ -230,12 +238,15 @@ export function TransactionFormScreen({
                       ...prev,
                       type: value as TransactionType,
                     }));
-                  }
-                  }
+                  }}
                 >
                   <TabsList className="grid w-full grid-cols-2">
-                    <TabsTrigger value="expense">Expense</TabsTrigger>
-                    <TabsTrigger value="income">Income</TabsTrigger>
+                    <TabsTrigger value="expense">
+                      {t("transactionTypeExpense")}
+                    </TabsTrigger>
+                    <TabsTrigger value="income">
+                      {t("transactionTypeIncome")}
+                    </TabsTrigger>
                   </TabsList>
                 </Tabs>
               )}
@@ -243,7 +254,9 @@ export function TransactionFormScreen({
 
             {/* Amount input for both edit and create modes */}
             <div className="flex flex-col gap-2">
-              <label className="text-sm font-medium">Amount</label>
+              <label className="text-sm font-medium">
+                {t("transactionsAmount")}
+              </label>
               <div className="flex gap-3">
                 {isTransactionLoading ? (
                   <>
@@ -294,7 +307,7 @@ export function TransactionFormScreen({
                 <Skeleton className="h-9 w-full" />
               ) : (
                 <Input
-                  placeholder="Groceries"
+                  placeholder={t("transactionsDescriptionPlaceholder")}
                   value={formData.description}
                   onChange={(e) =>
                     setFormData((prev) => ({
@@ -310,7 +323,7 @@ export function TransactionFormScreen({
             <div className="flex gap-4">
               <div className="flex flex-col gap-3 flex-1">
                 <Label htmlFor="date-picker" className="px-1">
-                  Date
+                  {t("transactionsDate")}
                 </Label>
                 {isTransactionLoading ? (
                   <Skeleton className="h-9 w-full" />
@@ -325,7 +338,7 @@ export function TransactionFormScreen({
                       >
                         {formData.date
                           ? formData.date.toLocaleDateString()
-                          : "Select date"}
+                          : t("transactionsSelectDate")}
                         <ChevronDownIcon className="h-4 w-4" />
                       </Button>
                     </PopoverTrigger>
@@ -350,7 +363,7 @@ export function TransactionFormScreen({
               </div>
               <div className="flex flex-col gap-3 flex-1">
                 <Label htmlFor="time-picker" className="px-1">
-                  Time
+                  {t("transactionsTime")}
                 </Label>
                 {isTransactionLoading ? (
                   <Skeleton className="h-9 w-full" />
@@ -392,7 +405,7 @@ export function TransactionFormScreen({
                           isTransactionLoading
                         }
                       >
-                        Repeat
+                        {t("transactionsRepeat")}
                       </FormActionButton>
                       <FormActionButton
                         onClick={() => {
@@ -401,7 +414,7 @@ export function TransactionFormScreen({
                         }}
                         icon={<Trash2Icon className="h-4 w-4" />}
                       >
-                        Delete
+                        {t("delete")}
                       </FormActionButton>
                     </>
                   )}
@@ -433,9 +446,9 @@ export function TransactionFormScreen({
             isOpen={showDeleteConfirm}
             onClose={() => setShowDeleteConfirm(false)}
             onConfirm={handleDelete}
-            title="Delete transaction"
-            description="This will permanently delete this transaction. This action cannot be undone."
-            confirmText="Delete"
+            title={t("transactionsDeleteTitle")}
+            description={t("transactionsDeleteDescription")}
+            confirmText={t("delete")}
             isLoading={deleteTransactionMutation.isPending}
           />
         </div>
@@ -448,7 +461,7 @@ export function TransactionFormScreen({
             disabled={isSaving || isTransactionLoading}
           >
             <ArrowLeftIcon className="w-4 h-4" />
-            Back
+            {t("back")}
           </Button>
           <Button
             size="lg"
@@ -464,7 +477,7 @@ export function TransactionFormScreen({
             {isSaving ? (
               <Loader2Icon className="h-4 w-4 animate-spin" />
             ) : (
-              "Save"
+              t("save")
             )}
           </Button>
         </Footer>

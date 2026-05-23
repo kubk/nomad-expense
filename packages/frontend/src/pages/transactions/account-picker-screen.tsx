@@ -8,6 +8,7 @@ import { RouteByType, useRouter } from "@/shared/stacked-router/router";
 import { isFormRoute } from "@/shared/stacked-router/routes";
 import { NoAccountsEmptyState } from "../widgets/no-accounts-empty-state";
 import { haptic } from "@/shared/platform/haptics";
+import { useTranslation } from "@/translations/translation-provider";
 
 export function AccountPickerScreen({
   route,
@@ -18,9 +19,10 @@ export function AccountPickerScreen({
     trpc.accounts.list.queryOptions(),
   );
   const { navigate } = useRouter();
+  const { t } = useTranslation();
 
   return (
-    <Page title="Select account" isForm={isFormRoute(route)}>
+    <Page title={t("accountsSelectTitle")} isForm={isFormRoute(route)}>
       <div className="flex flex-col gap-3">
         {accounts.length === 0 && !isLoading ? (
           <div className="mt-[35%]">

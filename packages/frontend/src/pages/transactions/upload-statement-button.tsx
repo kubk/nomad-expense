@@ -9,8 +9,10 @@ import { useRouter } from "@/shared/stacked-router/router";
 import { storeUploadResult } from "@/shared/upload-result-storage";
 import { useInvalidateTransactions } from "@/shared/hooks/use-invalidate-transactions";
 import { haptic } from "@/shared/platform/haptics";
+import { useTranslation } from "@/translations/translation-provider";
 
 export function UploadStatementButton({ accountId }: { accountId: string }) {
+  const { t } = useTranslation();
   const { data: accounts = [] } = useQuery(trpc.accounts.list.queryOptions());
   const account = accounts.find((a) => a.id === accountId);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -37,12 +39,16 @@ export function UploadStatementButton({ accountId }: { accountId: string }) {
         invalidateTransactions();
         haptic("success");
         toast.success(
-          `Bank statement uploaded! Removed ${result.removed?.length || 0}, added ${result.added?.length || 0} transactions`,
+          t(
+            "uploadStatementSuccess",
+            result.removed?.length || 0,
+            result.added?.length || 0,
+          ),
         );
         navigate({ type: "statementUploadResult", key }, { replace: true });
       } else {
         haptic("error");
-        toast.error(result.message || "Upload failed");
+        toast.error(result.message || t("uploadStatementFailed"));
       }
     } finally {
       setIsUploading(false);
@@ -75,7 +81,7 @@ export function UploadStatementButton({ accountId }: { accountId: string }) {
         onClick={handleClick}
         disabled={isUploading}
       >
-        {isUploading ? "Uploading..." : "Upload statement"}
+        {isUploading ? t("uploadStatementUploading") : t("uploadStatement")}
       </FormActionButton>
     </>
   );

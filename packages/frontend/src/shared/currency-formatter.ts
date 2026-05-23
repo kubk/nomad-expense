@@ -9,7 +9,9 @@ export function getCurrencySymbol(currencyCode: SupportedCurrency): string {
 export function formatAmount(
   amountInCents: number,
   currency: SupportedCurrency,
-  options: { showFractions?: boolean } = { showFractions: true },
+  options: { showFractions?: boolean } = {
+    showFractions: true,
+  },
 ): string {
   // Convert from integer cents to decimal amount
   const decimalAmount = amountInCents / 100;

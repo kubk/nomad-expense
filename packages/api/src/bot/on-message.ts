@@ -13,6 +13,7 @@ import { getMostUsedDescriptions } from "../services/transaction-descriptions";
 import { createTransactionWithRules } from "../db/transaction/create-transaction-with-rules";
 import { downloadTelegramFileAsBuffer } from "./download-telegram-file-as-buffer";
 import { getEnv } from "../services/env";
+import { getTranslation } from "../translations/translations";
 
 export async function onMessage(ctx: Context) {
   if (!ctx.from || !ctx.message) {
@@ -25,6 +26,7 @@ export async function onMessage(ctx: Context) {
   if (!authResult) {
     return;
   }
+  const { t } = getTranslation(authResult);
 
   sendIsTyping(ctx);
 
@@ -38,9 +40,7 @@ export async function onMessage(ctx: Context) {
     );
 
     if (!selectedAccount) {
-      await ctx.reply(
-        withCancelText("Invalid account selection. Please try again"),
-      );
+      await ctx.reply(withCancelText(t("invalidAccountSelection"), authResult));
       return;
     }
 
@@ -50,9 +50,7 @@ export async function onMessage(ctx: Context) {
     );
     if (fileBuffer.type === "error") {
       console.error("Failed to process file", fileBuffer.message);
-      await ctx.reply(
-        withCancelText("Failed to process file. Please try again"),
-      );
+      await ctx.reply(withCancelText(t("failedProcessFile"), authResult));
       return;
     }
 
@@ -69,20 +67,14 @@ export async function onMessage(ctx: Context) {
       const addedCount = importResult.added.length;
       const removedCount = importResult.removed.length;
 
-      let resultMessage = `✅ Import completed!\n\n`;
-      resultMessage += `📥 Added: ${addedCount} transaction${addedCount !== 1 ? "s" : ""}\n\n`;
-      resultMessage += `🗑️ Removed: ${removedCount} transaction${removedCount !== 1 ? "s" : ""}`;
-
-      await ctx.reply(resultMessage, {
+      await ctx.reply(t("importCompleted", addedCount, removedCount), {
         reply_markup: { remove_keyboard: true },
       });
 
       await setUserBotState(db, ctx.from.id.toString(), null);
     } catch (error) {
       console.error("Transaction import error:", error);
-      await ctx.reply(
-        "❌ Failed to import transactions. Please check your file format and try again.",
-      );
+      await ctx.reply(t("failedImportTransactions"));
 
       await setUserBotState(db, ctx.from.id.toString(), null);
     }
@@ -93,7 +85,7 @@ export async function onMessage(ctx: Context) {
     const description = ctx.message.text.trim();
 
     if (!description) {
-      await ctx.reply(withCancelText("Enter a valid description"));
+      await ctx.reply(withCancelText(t("enterValidDescription"), authResult));
       return;
     }
 
@@ -107,13 +99,13 @@ export async function onMessage(ctx: Context) {
         authResult.userId,
       );
 
-      await ctx.reply("✅ Transaction added successfully!", {
+      await ctx.reply(t("transactionAdded"), {
         reply_markup: { remove_keyboard: true },
       });
       await setUserBotState(db, ctx.from.id.toString(), null);
     } catch (error) {
       console.error("Transaction creation error:", error);
-      await ctx.reply("❌ Failed to create transaction. Please try again.");
+      await ctx.reply(t("failedCreateTransaction"));
       await setUserBotState(db, ctx.from.id.toString(), null);
     }
     return;
@@ -123,9 +115,9 @@ export async function onMessage(ctx: Context) {
     const userAccounts = await getFamilyAccounts(db, authResult.familyId);
 
     if (userAccounts.length === 0) {
-      await ctx.reply("You have no accounts yet. Please add one in the app", {
+      await ctx.reply(t("noAccountsYet"), {
         reply_markup: new InlineKeyboard().webApp(
-          "📱 Create account",
+          t("createAccount"),
           getEnv().FRONTEND_URL + "?type=accountPicker",
         ),
       });
@@ -139,20 +131,19 @@ export async function onMessage(ctx: Context) {
       let errorMessage = "";
       switch (parseResult.error) {
         case "invalid_input":
-          errorMessage =
-            "Invalid format. Use: [amount] [currency] [description]\n\nExample: 10 USD coffee";
+          errorMessage = t("invalidTransactionFormat");
           break;
         case "invalid_number":
-          errorMessage = "Amount must be a positive number";
+          errorMessage = t("amountMustBePositive");
           break;
         case "invalid_currency":
-          errorMessage = `Currency '${parseResult.currency}' is not supported`;
+          errorMessage = t("unsupportedCurrency", parseResult.currency ?? "");
           break;
         case "no_account_for_currency":
-          errorMessage = `You have no ${parseResult.currency} account. Create one in the app first`;
+          errorMessage = t("noAccountForCurrency", parseResult.currency ?? "");
           break;
       }
-      await ctx.reply(withCancelText(errorMessage));
+      await ctx.reply(withCancelText(errorMessage, authResult));
     } else {
       // If we have transaction type and description, create transaction immediately
       if (parseResult.transactionType && parseResult.description) {
@@ -166,13 +157,13 @@ export async function onMessage(ctx: Context) {
             authResult.userId,
           );
 
-          await ctx.reply("✅ Transaction added successfully!", {
+          await ctx.reply(t("transactionAdded"), {
             reply_markup: { remove_keyboard: true },
           });
           return;
         } catch (error) {
           console.error("Transaction creation error:", error);
-          await ctx.reply("❌ Failed to create transaction. Please try again.");
+          await ctx.reply(t("failedCreateTransaction"));
           return;
         }
       }
@@ -194,13 +185,15 @@ export async function onMessage(ctx: Context) {
 
         if (mostUsedDescriptions.length > 0) {
           await ctx.reply(
-            withCancelText("Type or select transaction description"),
+            withCancelText(t("typeOrSelectTransactionDescription"), authResult),
             {
               reply_markup: buildReplyKeyboard(mostUsedDescriptions),
             },
           );
         } else {
-          await ctx.reply(withCancelText("Type transaction description"));
+          await ctx.reply(
+            withCancelText(t("typeTransactionDescription"), authResult),
+          );
         }
         return;
       }
@@ -211,9 +204,7 @@ export async function onMessage(ctx: Context) {
     const accounts = await getFamilyImportableAccounts(db, authResult.familyId);
 
     if (accounts.length === 0) {
-      await ctx.reply(
-        "You have no importable accounts. To add one, open the app, select an account > Advanced and choose a bank type",
-      );
+      await ctx.reply(t("noImportableAccounts"));
       return;
     }
 
@@ -226,12 +217,12 @@ export async function onMessage(ctx: Context) {
       accounts.map((account) => account.name),
     );
 
-    await ctx.reply(withCancelText("Select an account"), {
+    await ctx.reply(withCancelText(t("selectAccount"), authResult), {
       reply_markup: accountsKeyboard,
     });
 
     return;
   }
 
-  await ctx.reply("Command not recognized");
+  await ctx.reply(t("commandNotRecognized"));
 }

@@ -11,6 +11,7 @@ import {
   isMonthInFuture,
 } from "@/shared/date-utils";
 import { haptic } from "@/shared/platform/haptics";
+import { useTranslation } from "@/translations/translation-provider";
 
 type CustomDateValue = { year: number; month: number };
 
@@ -23,6 +24,7 @@ export function CustomDatePicker({
   onApply: (filters: TransactionFilters) => void;
   onBack: () => void;
 }) {
+  const { t } = useTranslation();
   const availableYears = useAvailableYears();
 
   const [selectedMonths, setSelectedMonths] = useState<CustomDateValue[]>(
@@ -108,7 +110,7 @@ export function CustomDatePicker({
         >
           <ChevronLeftIcon className="size-4" />
         </Button>
-        <h3 className="font-medium">Custom date range</h3>
+        <h3 className="font-medium">{t("filtersCustomDateRange")}</h3>
       </div>
 
       {/* Years and Months */}
@@ -172,10 +174,10 @@ export function CustomDatePicker({
       {/* Actions */}
       <div className="flex flex-col gap-2 py-4">
         <Button size="lg" onClick={handleApply}>
-          Apply filters
+          {t("applyFilters")}
         </Button>
         <Button size="lg" variant="outline" onClick={onBack}>
-          Back
+          {t("back")}
         </Button>
       </div>
     </div>

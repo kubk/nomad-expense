@@ -1,5 +1,12 @@
-export const withCancelText = (text: string) => {
-  return `${text}
+import {
+  getTranslation,
+  type LanguageSource,
+} from "../translations/translations";
 
-Or click /cancel to cancel the operation`;
+export const withCancelText = (
+  text: string,
+  languageSource?: LanguageSource,
+) => {
+  const { t } = getTranslation(languageSource);
+  return t("cancelHint", text);
 };

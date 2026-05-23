@@ -8,6 +8,7 @@ import {
   Drawer,
   DrawerClose,
   DrawerContent,
+  DrawerDescription,
   DrawerFooter,
   DrawerHeader,
   DrawerTitle,
@@ -303,6 +304,7 @@ function DropDrawerContent({
                     <ChevronLeftIcon className="h-5 w-5" />
                   </button>
                   <DrawerTitle>{submenuTitle || "Submenu"}</DrawerTitle>
+                  <DrawerDescription />
                 </div>
               </DrawerHeader>
               <div className="flex-1 relative overflow-y-auto max-h-[70vh]">
@@ -333,6 +335,7 @@ function DropDrawerContent({
             <>
               <DrawerHeader className="sr-only">
                 <DrawerTitle>Menu</DrawerTitle>
+                <DrawerDescription />
               </DrawerHeader>
               <div className="overflow-y-auto pt-2 px-2 max-h-[70vh]">
                 <AnimatePresence

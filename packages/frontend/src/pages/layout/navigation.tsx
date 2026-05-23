@@ -10,9 +10,11 @@ import { useRouter } from "@/shared/stacked-router/router";
 import { Route } from "@/shared/stacked-router/routes";
 import { platform } from "@/shared/platform/platforms";
 import { haptic } from "@/shared/platform/haptics";
+import { useTranslation } from "@/translations/translation-provider";
 
 export function Navigation() {
   const { currentRoute, navigate } = useRouter();
+  const { t } = useTranslation();
 
   const shouldHide =
     currentRoute.type === "monthlyBreakdownFull" ||
@@ -33,25 +35,25 @@ export function Navigation() {
       routeKey: "overview",
       route: { type: "main" },
       icon: ChartNoAxesColumnIcon,
-      label: "Overview",
+      label: t("navOverview"),
     },
     {
       routeKey: "transactions",
       route: { type: "transactions" },
       icon: ListPlusIcon,
-      label: "Transactions",
+      label: t("navTransactions"),
     },
     {
       routeKey: "accounts",
       route: { type: "accounts" },
       icon: WalletIcon,
-      label: "Accounts",
+      label: t("navAccounts"),
     },
     {
       routeKey: "settings",
       route: { type: "settings" },
       icon: SettingsIcon,
-      label: "Settings",
+      label: t("navSettings"),
     },
   ];
 

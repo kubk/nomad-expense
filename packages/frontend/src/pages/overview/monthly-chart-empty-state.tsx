@@ -1,4 +1,8 @@
+import { useTranslation } from "@/translations/translation-provider";
+
 export function MonthlyChartEmptyState() {
+  const { t } = useTranslation();
+
   return (
     <div className="flex flex-col items-center justify-center">
       <div className="w-full mb-6">
@@ -12,9 +16,11 @@ export function MonthlyChartEmptyState() {
           ))}
         </div>
       </div>
-      <h3 className="text-md font-semibold text-foreground">No transactions</h3>
+      <h3 className="text-md font-semibold text-foreground">
+        {t("overviewNoTransactions")}
+      </h3>
       <p className="text-xs text-muted-foreground text-center mt-1">
-        Add your first expense to see your spending patterns
+        {t("overviewNoTransactionsDescription")}
       </p>
     </div>
   );
