@@ -99,7 +99,7 @@ export const en = {
   accountsEditTitle: "Edit account",
   accountsAddTitle: "Add account",
   accountsName: "Account Name",
-  accountsNamePlaceholder: "Enter account name",
+  accountsNamePlaceholder: "",
   accountsColor: "Color",
   accountsCurrency: "Currency",
   accountsTransaction: "Transaction",
