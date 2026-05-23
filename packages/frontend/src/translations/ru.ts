@@ -113,7 +113,7 @@ export const ru: Translation = {
   accountsEditTitle: "Редактировать счет",
   accountsAddTitle: "Добавить счет",
   accountsName: "Название счета",
-  accountsNamePlaceholder: "Введите название счета",
+  accountsNamePlaceholder: "",
   accountsColor: "Цвет",
   accountsCurrency: "Валюта",
   accountsTransaction: "Транзакция",
