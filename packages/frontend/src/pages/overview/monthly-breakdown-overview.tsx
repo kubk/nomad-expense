@@ -4,17 +4,21 @@ import { MonthlyChart } from "./monthly-chart";
 import { useAccountIds } from "@/shared/hooks/use-account-ids";
 import { useRouter } from "@/shared/stacked-router/router";
 import { haptic } from "@/shared/platform/haptics";
+import { useTranslation } from "@/translations/translation-provider";
 
 export function MonthlyBreakdownOverview() {
   const accountIds = useAccountIds();
   const { navigate } = useRouter();
+  const { t } = useTranslation();
 
   return (
     <div className="px-4 -mt-14">
       <Card className="shadow-sm border-0 gap-0 py-4">
         <CardHeader className="pb-3">
           <div className="flex justify-between items-center">
-            <CardTitle className="text-base">Monthly breakdown</CardTitle>
+            <CardTitle className="text-base">
+              {t("overviewMonthlyBreakdown")}
+            </CardTitle>
             <span
               className="text-primary/70 -mr-3 inline-flex items-center text-sm font-medium cursor-pointer active:scale-95 transition-transform"
               onClick={() => {
@@ -29,7 +33,7 @@ export function MonthlyBreakdownOverview() {
                 });
               }}
             >
-              View all
+              {t("overviewViewAll")}
               <ChevronRightIcon className="w-3 h-3 ml-1" />
             </span>
           </div>

@@ -10,8 +10,10 @@ import { FamilyHelp } from "./family-help";
 import { RouteByType } from "@/shared/stacked-router/router";
 import { isFormRoute } from "@/shared/stacked-router/routes";
 import { haptic } from "@/shared/platform/haptics";
+import { useTranslation } from "@/translations/translation-provider";
 
 export function FamilyScreen({ route }: { route: RouteByType<"family"> }) {
+  const { t } = useTranslation();
   const [isHelpOpen, setIsHelpOpen] = useState(false);
 
   const { data: members, isLoading: isMembersLoading } = useQuery(
@@ -35,13 +37,13 @@ export function FamilyScreen({ route }: { route: RouteByType<"family"> }) {
   };
 
   return (
-    <Page title="Family" isForm={isFormRoute(route)}>
+    <Page title={t("familyTitle")} isForm={isFormRoute(route)}>
       <div className="space-y-6">
         {/* Invite Section */}
         <div className="space-y-4">
           <div className="flex items-center gap-2">
             <h2 className="text-lg font-semibold text-foreground">
-              Invite to family
+              {t("familyInviteTitle")}
             </h2>
             <CircleQuestionMarkIcon
               onClick={() => setIsHelpOpen(true)}
@@ -54,7 +56,7 @@ export function FamilyScreen({ route }: { route: RouteByType<"family"> }) {
           {!activeInvite && (
             <div className="bg-accent rounded-xl p-4 text-center space-y-3">
               <p className="text-muted-foreground text-sm">
-                Invite people to your family to have shared expenses
+                {t("familyInviteDescription")}
               </p>
               <Button
                 onClick={handleGenerateInvite}
@@ -63,8 +65,8 @@ export function FamilyScreen({ route }: { route: RouteByType<"family"> }) {
               >
                 <PlusIcon className="size-4" />
                 {generateInviteMutation.isPending
-                  ? "Generating..."
-                  : "Generate invite"}
+                  ? t("familyGeneratingInvite")
+                  : t("familyGenerateInvite")}
               </Button>
             </div>
           )}
@@ -74,7 +76,7 @@ export function FamilyScreen({ route }: { route: RouteByType<"family"> }) {
         <div className="space-y-4">
           <div className="flex items-center gap-2">
             <h2 className="text-lg font-semibold text-foreground">
-              Family members
+              {t("familyMembers")}
             </h2>
             {!isMembersLoading && (
               <span className="text-sm text-muted-foreground">

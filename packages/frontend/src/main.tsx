@@ -7,16 +7,19 @@ import { ThemeProvider } from "./pages/widgets/theme-provider";
 import { App } from "./pages/layout/app";
 import { RouterProvider } from "./shared/stacked-router/router";
 import { queryClient } from "./shared/api";
+import { TranslationProvider } from "./translations/translation-provider";
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
     <ThemeProvider>
-      <QueryClientProvider client={queryClient}>
-        <RouterProvider>
-          <App />
-        </RouterProvider>
-        <Toaster />
-      </QueryClientProvider>
+      <TranslationProvider>
+        <QueryClientProvider client={queryClient}>
+          <RouterProvider>
+            <App />
+          </RouterProvider>
+          <Toaster />
+        </QueryClientProvider>
+      </TranslationProvider>
     </ThemeProvider>
   </StrictMode>,
 );

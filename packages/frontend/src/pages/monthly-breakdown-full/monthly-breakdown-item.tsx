@@ -1,6 +1,7 @@
 import { MonthlyData } from "api";
 import { formatAmount } from "../../shared/currency-formatter";
 import { useBaseCurrency } from "@/shared/hooks/use-base-currency";
+import { getShortMonthName } from "@/shared/date-utils";
 
 export function MonthlyBreakdownItem({
   month,
@@ -28,7 +29,7 @@ export function MonthlyBreakdownItem({
         <div className="space-y-3">
           <div className="flex items-center justify-between">
             <div className="font-medium text-foreground">
-              {month.shortMonth} {month.year}
+              {getShortMonthName(month.monthNumber)} {month.year}
             </div>
             <div className="font-semibold text-foreground font-mono">
               {formatAmount(month.usdAmount, baseCurrency)}

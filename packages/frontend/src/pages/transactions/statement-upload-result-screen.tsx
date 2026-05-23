@@ -4,19 +4,21 @@ import { Page } from "../widgets/page";
 import { RouteByType } from "@/shared/stacked-router/router";
 import { isFormRoute } from "@/shared/stacked-router/routes";
 import { getUploadResult } from "@/shared/upload-result-storage";
+import { useTranslation } from "@/translations/translation-provider";
 
 export function StatementUploadResultScreen({
   route,
 }: {
   route: RouteByType<"statementUploadResult">;
 }) {
+  const { t } = useTranslation();
   const uploadResult = getUploadResult(route.key);
 
   if (!uploadResult) {
     return (
-      <Page title="Upload Result" isForm={isFormRoute(route)}>
+      <Page title={t("uploadResultTitle")} isForm={isFormRoute(route)}>
         <div className="flex items-center justify-center py-8">
-          <p className="text-muted-foreground">No upload results found.</p>
+          <p className="text-muted-foreground">{t("uploadResultMissing")}</p>
         </div>
       </Page>
     );
@@ -31,12 +33,12 @@ export function StatementUploadResultScreen({
   );
 
   return (
-    <Page title="Upload Result" isForm={isFormRoute(route)}>
+    <Page title={t("uploadResultTitle")} isForm={isFormRoute(route)}>
       <div className="space-y-4">
         {sortedAdded.length > 0 && (
           <div>
             <div className="text-sm font-medium pb-2 pl-2">
-              Added transactions ({sortedAdded.length})
+              {t("uploadResultAdded", sortedAdded.length)}
             </div>
             <Card className="border-0 p-0 shadow-sm">
               <CardContent className="p-0">
@@ -55,7 +57,7 @@ export function StatementUploadResultScreen({
         {sortedRemoved.length > 0 && (
           <div>
             <div className="text-sm font-medium pb-2 pl-2">
-              Removed transactions ({sortedRemoved.length})
+              {t("uploadResultRemoved", sortedRemoved.length)}
             </div>
             <Card className="border-0 p-0 shadow-sm">
               <CardContent className="p-0">
@@ -75,7 +77,7 @@ export function StatementUploadResultScreen({
           <Card>
             <CardContent className="py-8">
               <p className="text-center text-muted-foreground">
-                No transactions were added or removed.
+                {t("uploadResultEmpty")}
               </p>
             </CardContent>
           </Card>

@@ -7,6 +7,7 @@ import {
   DrawerTitle,
 } from "@/components/ui/drawer";
 import { EyeIcon, UsersIcon } from "lucide-react";
+import { useTranslation } from "@/translations/translation-provider";
 
 export function FamilyHelp({
   open,
@@ -15,6 +16,8 @@ export function FamilyHelp({
   open: boolean;
   onOpenChange: (open: boolean) => void;
 }) {
+  const { t } = useTranslation();
+
   return (
     <Drawer open={open} onOpenChange={onOpenChange}>
       <DrawerContent>
@@ -31,11 +34,10 @@ export function FamilyHelp({
               </div>
               <div>
                 <p className="text-md font-medium text-foreground mb-0.5">
-                  Share expenses together
+                  {t("familyHelpShareTitle")}
                 </p>
                 <p className="text-sm text-muted-foreground">
-                  When you invite someone to your family, they'll be able to see
-                  and add transactions to all your shared bank accounts
+                  {t("familyHelpShareDescription")}
                 </p>
               </div>
             </div>
@@ -46,11 +48,10 @@ export function FamilyHelp({
               </div>
               <div>
                 <p className="text-md font-medium text-foreground mb-0.5">
-                  Everyone sees everything
+                  {t("familyHelpVisibilityTitle")}
                 </p>
                 <p className="text-sm text-muted-foreground">
-                  All family members can see all transactions and accounts. Only
-                  invite people you trust
+                  {t("familyHelpVisibilityDescription")}
                 </p>
               </div>
             </div>
@@ -62,7 +63,7 @@ export function FamilyHelp({
               className="w-full"
               size="lg"
             >
-              Got it
+              {t("gotIt")}
             </Button>
           </div>
         </div>

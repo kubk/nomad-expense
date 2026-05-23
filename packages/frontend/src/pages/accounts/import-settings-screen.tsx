@@ -17,6 +17,7 @@ import { isFormRoute } from "@/shared/stacked-router/routes";
 import { Label } from "@/components/ui/label";
 import { Skeleton } from "@/components/ui/skeleton";
 import { bank, type Bank } from "api";
+import { useTranslation } from "@/translations/translation-provider";
 
 function getTimezones() {
   return [
@@ -51,6 +52,7 @@ export function ImportSettingsScreen({
   route: RouteByType<"importSettings">;
 }) {
   const { pop } = useRouter();
+  const { t } = useTranslation();
   const { accountId } = route;
 
   const [formData, setFormData] = useState<Form>({
@@ -96,10 +98,10 @@ export function ImportSettingsScreen({
   };
 
   return (
-    <Page title="Import settings" isForm={isFormRoute(route)}>
+    <Page title={t("importSettingsTitle")} isForm={isFormRoute(route)}>
       <div className="flex-1 space-y-6">
         <div className="flex flex-col gap-2">
-          <Label>Bank type</Label>
+          <Label>{t("importSettingsBankType")}</Label>
           {isAccountsLoading ? (
             <Skeleton className="h-9 w-full" />
           ) : (
@@ -110,10 +112,10 @@ export function ImportSettingsScreen({
               }}
             >
               <SelectTrigger className="w-full">
-                <SelectValue placeholder="Select bank type" />
+                <SelectValue placeholder={t("importSettingsSelectBankType")} />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="None">None</SelectItem>
+                <SelectItem value="None">{t("none")}</SelectItem>
                 {bank.map((bankType) => (
                   <SelectItem key={bankType} value={bankType}>
                     {bankType}
@@ -126,7 +128,7 @@ export function ImportSettingsScreen({
 
         {formData.bankType !== "None" && (
           <div className="flex flex-col gap-2">
-            <Label>Timezone</Label>
+            <Label>{t("importSettingsTimezone")}</Label>
             <Select
               value={formData.timezone}
               onValueChange={(value: string) =>
@@ -134,7 +136,7 @@ export function ImportSettingsScreen({
               }
             >
               <SelectTrigger className="w-full">
-                <SelectValue placeholder="Select timezone" />
+                <SelectValue placeholder={t("importSettingsSelectTimezone")} />
               </SelectTrigger>
               <SelectContent>
                 {getTimezones().map((timezone) => (
@@ -157,7 +159,7 @@ export function ImportSettingsScreen({
           disabled={updateImportSettingsMutation.isPending}
         >
           <ArrowLeftIcon className="w-4 h-4" />
-          Back
+          {t("back")}
         </Button>
         <Button
           size="lg"
@@ -168,7 +170,7 @@ export function ImportSettingsScreen({
           {updateImportSettingsMutation.isPending ? (
             <Loader2Icon className="h-4 w-4 animate-spin" />
           ) : (
-            "Save"
+            t("save")
           )}
         </Button>
       </Footer>

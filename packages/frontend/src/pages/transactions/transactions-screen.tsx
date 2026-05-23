@@ -12,6 +12,7 @@ import { RouteByType, useRouter } from "@/shared/stacked-router/router";
 import { isFormRoute } from "@/shared/stacked-router/routes";
 import { VList } from "virtua";
 import { FilterIcon } from "lucide-react";
+import { useTranslation } from "@/translations/translation-provider";
 
 export function TransactionsScreen({
   route,
@@ -20,6 +21,7 @@ export function TransactionsScreen({
 }) {
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const { navigate } = useRouter();
+  const { t } = useTranslation();
   const accountIds = useAccountIds();
 
   const filters: TransactionFilters = route.filters
@@ -39,7 +41,7 @@ export function TransactionsScreen({
   const totalIncome = transactionsData?.totalIncome || 0;
 
   return (
-    <Page title="Transactions" isForm={isFormRoute(route)}>
+    <Page title={t("transactionsTitle")} isForm={isFormRoute(route)}>
       <SummaryCard
         isLoading={isLoading}
         onFiltersClick={() => setIsDrawerOpen(true)}
@@ -86,10 +88,10 @@ export function TransactionsScreen({
                   <FilterIcon className="w-8 h-8 text-muted-foreground" />
                 </div>
                 <h3 className="text-lg font-medium text-foreground mb-2">
-                  No transactions found
+                  {t("transactionsNoFound")}
                 </h3>
                 <p className="text-sm text-muted-foreground text-center max-w-sm">
-                  Try updating your filters to see more transactions
+                  {t("transactionsNoFoundDescription")}
                 </p>
               </div>
             )}

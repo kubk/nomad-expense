@@ -24,6 +24,7 @@ export async function getCaller(options?: Options) {
     req: new Request("http://localhost:8787"),
     userId: user?.id || null,
     familyId: user?.familyId || null,
+    language: "en",
     resHeaders: headers,
   });
 }

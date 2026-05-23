@@ -2,18 +2,20 @@ import { MoonIcon, SunIcon } from "lucide-react";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useTheme } from "../widgets/theme-provider";
 import { haptic } from "@/shared/platform/haptics";
+import { useTranslation } from "@/translations/translation-provider";
 
 export function ModeToggle() {
   const { theme, setTheme } = useTheme();
+  const { t } = useTranslation();
 
   const themes = [
     {
-      name: "Light",
+      name: t("settingsLight"),
       value: "light" as const,
       icon: SunIcon,
     },
     {
-      name: "Dark",
+      name: t("settingsDark"),
       value: "dark" as const,
       icon: MoonIcon,
     },

@@ -15,8 +15,10 @@ import { trpc, queryClient } from "@/shared/api";
 import { ConfirmModal } from "../widgets/confirm-modal";
 import { toast } from "sonner";
 import { haptic } from "@/shared/platform/haptics";
+import { useTranslation } from "@/translations/translation-provider";
 
 export function BaseCurrencySetting() {
+  const { t } = useTranslation();
   const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [pendingCurrency, setPendingCurrency] = useState<Currency | null>(null);
 
@@ -40,7 +42,7 @@ export function BaseCurrencySetting() {
         setPendingCurrency(null);
       },
       onError: (error) => {
-        toast.error(error.message || "Failed to update base currency");
+        toast.error(error.message || t("baseCurrencyUpdateFailed"));
       },
     }),
   );
@@ -69,7 +71,7 @@ export function BaseCurrencySetting() {
   return (
     <div className="space-y-4">
       <div className="space-y-2">
-        <Label>Base currency</Label>
+        <Label>{t("baseCurrency")}</Label>
         {isLoading ? (
           <div className="h-9 bg-muted animate-pulse rounded-md" />
         ) : (
@@ -79,7 +81,7 @@ export function BaseCurrencySetting() {
             disabled={isUpdating}
           >
             <SelectTrigger className="w-full">
-              <SelectValue placeholder="Select currency" />
+              <SelectValue placeholder={t("baseCurrencySelect")} />
             </SelectTrigger>
             <SelectContent>
               {SUPPORTED_CURRENCIES.map((currency) => (
@@ -91,7 +93,7 @@ export function BaseCurrencySetting() {
           </Select>
         )}
         <p className="text-xs text-muted-foreground">
-          All transaction stats will be displayed in this currency
+          {t("baseCurrencyDescription")}
         </p>
       </div>
 
@@ -99,25 +101,23 @@ export function BaseCurrencySetting() {
         isOpen={showConfirmModal}
         onClose={handleCancelChange}
         onConfirm={handleConfirmChange}
-        title="Change base currency"
+        title={t("baseCurrencyChangeTitle")}
         description={
           <div className="space-y-4">
             <p>
-              Changing the base currency to{" "}
-              <strong>
-                {SUPPORTED_CURRENCIES.find((c) => c.code === pendingCurrency)
-                  ?.name ?? pendingCurrency}
-              </strong>{" "}
-              will recalculate all your transactions using historical exchange
-              rates.
+              {t(
+                "baseCurrencyChangeDescription",
+                SUPPORTED_CURRENCIES.find((c) => c.code === pendingCurrency)
+                  ?.name ??
+                  pendingCurrency ??
+                  "",
+              )}
             </p>
             <Alert>
               <AlertTriangleIcon className="size-4" />
-              <AlertTitle>This may take some time</AlertTitle>
+              <AlertTitle>{t("baseCurrencySlowTitle")}</AlertTitle>
               <AlertDescription>
-                Depending on the number of transactions, this operation may take
-                a while to complete. Please don't close the app while it's
-                running.
+                {t("baseCurrencySlowDescription")}
               </AlertDescription>
             </Alert>
           </div>
@@ -126,12 +126,12 @@ export function BaseCurrencySetting() {
           isUpdating ? (
             <span className="flex items-center gap-2">
               <LoaderIcon className="size-4 animate-spin" />
-              Recalculating...
+              {t("baseCurrencyRecalculating")}
             </span>
           ) : (
             <span className="flex items-center gap-2">
               <RefreshCwIcon className="size-4" />
-              Recalculate
+              {t("baseCurrencyRecalculate")}
             </span>
           )
         }

@@ -2,6 +2,7 @@ import type { ReactNode } from "react";
 import { Loader2Icon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { haptic } from "@/shared/platform/haptics";
+import { useTranslation } from "@/translations/translation-provider";
 
 export function ConfirmModal({
   isOpen,
@@ -20,6 +21,8 @@ export function ConfirmModal({
   confirmText: ReactNode;
   isLoading: boolean;
 }) {
+  const { t } = useTranslation();
+
   if (!isOpen) return null;
 
   return (
@@ -36,7 +39,7 @@ export function ConfirmModal({
             size={"lg"}
             type={"button"}
           >
-            Cancel
+            {t("cancel")}
           </Button>
           <Button
             variant="destructive"

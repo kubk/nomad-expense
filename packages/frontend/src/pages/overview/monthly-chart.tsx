@@ -10,6 +10,7 @@ import { useRouter } from "@/shared/stacked-router/router";
 import { calculateMaxAmount } from "../../shared/chart-calculations";
 import { useBaseCurrency } from "@/shared/hooks/use-base-currency";
 import { haptic } from "@/shared/platform/haptics";
+import { getShortMonthName } from "@/shared/date-utils";
 
 export function MonthlyChart() {
   const scrollContainerRef = useRef<HTMLDivElement>(null);
@@ -94,7 +95,7 @@ export function MonthlyChart() {
                     </div>
 
                     <div className="mt-2 text-xs font-medium text-foreground cursor-pointer">
-                      {month.shortMonth}
+                      {getShortMonthName(month.monthNumber)}
                     </div>
                   </div>
                 );

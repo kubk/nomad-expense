@@ -1,41 +1,19 @@
-const SHORT_MONTH_NAMES = [
-  "Jan",
-  "Feb",
-  "Mar",
-  "Apr",
-  "May",
-  "Jun",
-  "Jul",
-  "Aug",
-  "Sep",
-  "Oct",
-  "Nov",
-  "Dec",
-] as const;
-
-const FULL_MONTH_NAMES = [
-  "January",
-  "February",
-  "March",
-  "April",
-  "May",
-  "June",
-  "July",
-  "August",
-  "September",
-  "October",
-  "November",
-  "December",
-] as const;
-
 const MONTHS_IN_YEAR = 12;
 
+const getMonthDate = (monthNumber: number) => {
+  return new Date(2020, monthNumber - 1, 1);
+};
+
 export const getShortMonthName = (monthNumber: number): string => {
-  return SHORT_MONTH_NAMES[monthNumber - 1];
+  return new Intl.DateTimeFormat(undefined, { month: "short" }).format(
+    getMonthDate(monthNumber),
+  );
 };
 
 export const getFullMonthName = (monthNumber: number): string => {
-  return FULL_MONTH_NAMES[monthNumber - 1];
+  return new Intl.DateTimeFormat(undefined, { month: "long" }).format(
+    getMonthDate(monthNumber),
+  );
 };
 
 export const getMonthNumbers = (): number[] => {

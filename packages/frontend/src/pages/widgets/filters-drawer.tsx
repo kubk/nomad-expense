@@ -21,7 +21,6 @@ import {
 } from "lucide-react";
 import {
   transactionType,
-  transactionTypeLabels,
   type TransactionFilters,
   type TransactionType,
 } from "api";
@@ -29,19 +28,9 @@ import { trpc } from "@/shared/api";
 import { useQuery } from "@tanstack/react-query";
 import { CustomDatePicker } from "./custom-date-picker";
 import { haptic } from "@/shared/platform/haptics";
+import { useTranslation } from "@/translations/translation-provider";
 
 type TransactionTypeFilterValue = "all" | TransactionType;
-
-const transactionTypeOptions: ReadonlyArray<{
-  value: TransactionTypeFilterValue;
-  label: string;
-}> = [
-  { value: "all", label: "All" },
-  ...transactionType.map((value) => ({
-    value,
-    label: transactionTypeLabels[value],
-  })),
-];
 
 export function FiltersDrawer({
   open,
@@ -54,6 +43,7 @@ export function FiltersDrawer({
   filters: TransactionFilters;
   onApply: (filters: TransactionFilters) => void;
 }) {
+  const { t } = useTranslation();
   const [filterForm, setFilterForm] = useState<TransactionFilters>(filters);
   const [showCustomDatePicker, setShowCustomDatePicker] = useState(false);
   const { data: accounts = [] } = useQuery(trpc.accounts.list.queryOptions());
@@ -66,10 +56,24 @@ export function FiltersDrawer({
     onOpenChange(newOpen);
   };
 
+  const transactionTypeOptions: ReadonlyArray<{
+    value: TransactionTypeFilterValue;
+    label: string;
+  }> = [
+    { value: "all", label: t("filtersAll") },
+    ...transactionType.map((value) => ({
+      value,
+      label:
+        value === "expense"
+          ? t("transactionTypeExpense")
+          : t("transactionTypeIncome"),
+    })),
+  ];
+
   const timePeriods = [
-    { value: 1, label: "Last 30 days" },
-    { value: 3, label: "Last 90 days" },
-    { value: 6, label: "Last 6 months" },
+    { value: 1, label: t("filtersLastDays", 30) },
+    { value: 3, label: t("filtersLastDays", 90) },
+    { value: 6, label: t("filtersLastMonths", 6) },
   ];
 
   const handleAccountToggle = (account: string) => {
@@ -189,7 +193,7 @@ export function FiltersDrawer({
                     <div className="relative flex-1">
                       <SearchIcon className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
                       <Input
-                        placeholder="Search transactions..."
+                        placeholder={t("filtersSearchPlaceholder")}
                         value={filterForm.description?.input || ""}
                         onChange={(e) =>
                           handleDescriptionChange(e.target.value)
@@ -208,10 +212,10 @@ export function FiltersDrawer({
                       >
                         <TabsList className="w-full">
                           <TabsTrigger value="includes" className="flex-1">
-                            Contains
+                            {t("filtersContains")}
                           </TabsTrigger>
                           <TabsTrigger value="exact" className="flex-1">
-                            Exact
+                            {t("filtersExact")}
                           </TabsTrigger>
                         </TabsList>
                       </Tabs>
@@ -244,7 +248,7 @@ export function FiltersDrawer({
                   <div className="flex items-center justify-between mb-2">
                     <div className="flex items-center gap-2">
                       <CalendarIcon className="size-4 text-muted-foreground" />
-                      <h3 className="font-medium">Time period</h3>
+                      <h3 className="font-medium">{t("filtersTimePeriod")}</h3>
                     </div>
                   </div>
                   <div className="flex overflow-x-auto pb-3 gap-2">
@@ -275,7 +279,7 @@ export function FiltersDrawer({
                       {filterForm.date.type === "custom" && (
                         <CheckIcon className="size-3" />
                       )}
-                      Custom
+                      {t("filtersCustom")}
                     </Badge>
                   </div>
                 </div>
@@ -284,7 +288,9 @@ export function FiltersDrawer({
                   <div className="flex items-center justify-between mb-2">
                     <div className="flex items-center gap-2">
                       <CreditCardIcon className="size-4 text-muted-foreground" />
-                      <h3 className="font-medium">Bank accounts</h3>
+                      <h3 className="font-medium">
+                        {t("filtersBankAccounts")}
+                      </h3>
                     </div>
                     {accounts.length > 1 && (
                       <Button
@@ -296,8 +302,8 @@ export function FiltersDrawer({
                         {accounts.every((account) =>
                           filterForm.accounts.includes(account.id),
                         )
-                          ? "Deselect all"
-                          : "Select all"}
+                          ? t("filtersDeselectAll")
+                          : t("filtersSelectAll")}
                       </Button>
                     )}
                   </div>
@@ -326,7 +332,7 @@ export function FiltersDrawer({
                   <div className="flex items-center justify-between mb-2">
                     <div className="flex items-center gap-2">
                       <ArrowUpDownIcon className="size-4 text-muted-foreground" />
-                      <h3 className="font-medium">Sort by</h3>
+                      <h3 className="font-medium">{t("filtersSortBy")}</h3>
                     </div>
                   </div>
                   <div className="flex overflow-x-auto gap-2 pb-3">
@@ -341,7 +347,7 @@ export function FiltersDrawer({
                         handleBadgeOrderChange("createdAt", "desc")
                       }
                     >
-                      Newest first
+                      {t("filtersNewestFirst")}
                     </Badge>
                     <Badge
                       variant={
@@ -352,7 +358,7 @@ export function FiltersDrawer({
                       className="cursor-pointer px-3 py-1.5 text-sm whitespace-nowrap flex-shrink-0"
                       onClick={() => handleBadgeOrderChange("createdAt", "asc")}
                     >
-                      Oldest first
+                      {t("filtersOldestFirst")}
                     </Badge>
                     <Badge
                       variant={
@@ -363,7 +369,7 @@ export function FiltersDrawer({
                       className="cursor-pointer px-3 py-1.5 text-sm whitespace-nowrap flex-shrink-0"
                       onClick={() => handleBadgeOrderChange("amount", "desc")}
                     >
-                      Highest amount
+                      {t("filtersHighestAmount")}
                     </Badge>
                     <Badge
                       variant={
@@ -372,7 +378,7 @@ export function FiltersDrawer({
                       className="cursor-pointer px-3 py-1.5 text-sm whitespace-nowrap flex-shrink-0"
                       onClick={() => handleBadgeOrderChange("amount", "asc")}
                     >
-                      Lowest amount
+                      {t("filtersLowestAmount")}
                     </Badge>
                   </div>
                 </div>
@@ -384,11 +390,11 @@ export function FiltersDrawer({
             <DrawerFooter className="flex-row border-t [&_button]:flex-1">
               <DrawerClose asChild>
                 <Button size="lg" variant="outline">
-                  Cancel
+                  {t("cancel")}
                 </Button>
               </DrawerClose>
               <Button size="lg" onClick={() => handleApply(filterForm)}>
-                Apply filters
+                {t("applyFilters")}
               </Button>
             </DrawerFooter>
           )}

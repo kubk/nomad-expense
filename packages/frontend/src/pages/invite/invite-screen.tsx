@@ -9,9 +9,11 @@ import { useMutation } from "@tanstack/react-query";
 import { getUserDisplayNameWithUsername } from "@/shared/user-display";
 import { RouteByType } from "@/shared/stacked-router/router";
 import { useRouter } from "@/shared/stacked-router/router";
+import { useTranslation } from "@/translations/translation-provider";
 
 export function InviteScreen({ route }: { route: RouteByType<"invite"> }) {
   const { navigate } = useRouter();
+  const { t } = useTranslation();
   const joinFamilyMutation = useMutation(
     trpc.family.joinFamily.mutationOptions(),
   );
@@ -32,8 +34,8 @@ export function InviteScreen({ route }: { route: RouteByType<"invite"> }) {
 
   if (joinFamilyMutation.isError || !inviteCode) {
     const errorMessage = !inviteCode
-      ? "No invite code provided"
-      : joinFamilyMutation.error?.message || "Failed to join family";
+      ? t("inviteNoCode")
+      : joinFamilyMutation.error?.message || t("inviteJoinFailed");
 
     return <InviteError errorMessage={errorMessage} />;
   }
@@ -42,7 +44,7 @@ export function InviteScreen({ route }: { route: RouteByType<"invite"> }) {
   const inviter = joinFamilyMutation.data?.inviter;
   const inviterName = inviter
     ? getUserDisplayNameWithUsername(inviter)
-    : "Someone";
+    : t("inviteSomeone");
 
   return (
     <div className="min-h-screen flex items-center bg-muted justify-center p-4">
@@ -54,17 +56,16 @@ export function InviteScreen({ route }: { route: RouteByType<"invite"> }) {
             </div>
             <div className="space-y-4">
               <h1 className="text-2xl font-semibold text-foreground">
-                Welcome to the family!
+                {t("inviteWelcomeTitle")}
               </h1>
               <div className="space-y-2">
                 <p className="text-muted-foreground">
-                  Shared access with{" "}
                   <span className="font-medium text-foreground">
-                    {inviterName}
+                    {t("inviteSharedAccessWith", inviterName)}
                   </span>
                 </p>
                 <p className="text-sm text-muted-foreground">
-                  You can manage this in settings
+                  {t("inviteManageInSettings")}
                 </p>
               </div>
             </div>
@@ -72,7 +73,7 @@ export function InviteScreen({ route }: { route: RouteByType<"invite"> }) {
               onClick={() => navigate({ type: "main" })}
               className="w-full"
             >
-              OK
+              {t("ok")}
             </Button>
           </div>
         </CardContent>

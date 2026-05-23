@@ -6,6 +6,7 @@ import { cn } from "@/lib/utils";
 import { useRouter } from "@/shared/stacked-router/router";
 import { useBaseCurrency } from "@/shared/hooks/use-base-currency";
 import { haptic } from "@/shared/platform/haptics";
+import { useTranslation } from "@/translations/translation-provider";
 
 export function TransactionItem({
   transaction,
@@ -16,6 +17,7 @@ export function TransactionItem({
 }) {
   const { navigate } = useRouter();
   const baseCurrency = useBaseCurrency();
+  const { t } = useTranslation();
   const isIncome = transaction.type === "income";
 
   const handleClick = () => {
@@ -44,7 +46,10 @@ export function TransactionItem({
         </div>
         <div className="flex items-center gap-2">
           <p className="text-xs text-muted-foreground">
-            {formatDisplayDate(transaction.createdAt)}
+            {formatDisplayDate(transaction.createdAt, {
+              today: t("dateToday"),
+              yesterday: t("dateYesterday"),
+            })}
           </p>
           <AccountBadge accountId={transaction.accountId} />
         </div>

@@ -5,6 +5,7 @@ const CACHE_TTL_SECONDS = 31536000; // 1 year
 type UserCacheData = {
   userId: string;
   familyId: string;
+  language?: string;
 };
 
 const getUserCacheKey = (telegramId: string): string => {

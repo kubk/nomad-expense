@@ -4,9 +4,11 @@ import { TransactionItem } from "../widgets/transaction-item";
 import { trpc } from "../../shared/api";
 import { useQuery } from "@tanstack/react-query";
 import { useRouter } from "@/shared/stacked-router/router";
+import { useTranslation } from "@/translations/translation-provider";
 
 export function RecentTransactionsOverview() {
   const { navigate } = useRouter();
+  const { t } = useTranslation();
   const { data: overviewData, isLoading } = useQuery(
     trpc.expenses.overview.queryOptions(),
   );
@@ -20,12 +22,14 @@ export function RecentTransactionsOverview() {
   return (
     <div className="px-4 mt-6">
       <div className="flex justify-between items-center mb-3">
-        <h2 className="font-semibold pl-4 text-foreground">Recent</h2>
+        <h2 className="font-semibold pl-4 text-foreground">
+          {t("overviewRecent")}
+        </h2>
         <button
           onClick={() => navigate({ type: "transactions" })}
           className="text-primary/70 active:scale-95 transition-transform duration-150 inline-flex items-center text-sm font-medium"
         >
-          See all
+          {t("overviewSeeAll")}
           <ChevronRightIcon className="w-4 h-4 ml-1" />
         </button>
       </div>

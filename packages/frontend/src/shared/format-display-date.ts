@@ -1,4 +1,10 @@
-export const formatDisplayDate = (dateString: string): string => {
+export const formatDisplayDate = (
+  dateString: string,
+  options: {
+    today: string;
+    yesterday: string;
+  },
+): string => {
   const transactionDate = new Date(dateString);
   const today = new Date();
   const yesterday = new Date(today.getTime() - 24 * 60 * 60 * 1000);
@@ -9,9 +15,9 @@ export const formatDisplayDate = (dateString: string): string => {
   transactionDate.setHours(0, 0, 0, 0);
 
   if (transactionDate.getTime() === today.getTime()) {
-    return "Today";
+    return options.today;
   } else if (transactionDate.getTime() === yesterday.getTime()) {
-    return "Yesterday";
+    return options.yesterday;
   } else {
     return new Date(dateString).toLocaleDateString(undefined, {
       month: "short",

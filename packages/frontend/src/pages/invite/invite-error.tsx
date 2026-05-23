@@ -2,9 +2,11 @@ import { XCircleIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { useRouter } from "@/shared/stacked-router/router";
+import { useTranslation } from "@/translations/translation-provider";
 
 export function InviteError({ errorMessage }: { errorMessage: string }) {
   const { navigate } = useRouter();
+  const { t } = useTranslation();
 
   return (
     <div className="min-h-screen bg-background flex items-center justify-center p-4">
@@ -16,7 +18,7 @@ export function InviteError({ errorMessage }: { errorMessage: string }) {
             </div>
             <div className="space-y-4">
               <h1 className="text-2xl font-semibold text-foreground">
-                Invalid invite
+                {t("inviteInvalidTitle")}
               </h1>
               <p className="text-muted-foreground">{errorMessage}</p>
             </div>
@@ -24,7 +26,7 @@ export function InviteError({ errorMessage }: { errorMessage: string }) {
               onClick={() => navigate({ type: "main" })}
               className="w-full"
             >
-              Go to Overview
+              {t("inviteGoToOverview")}
             </Button>
           </div>
         </CardContent>

@@ -12,6 +12,7 @@ import { TransactionForm } from "./transaction-form-screen";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Switch } from "@/components/ui/switch";
 import { haptic } from "@/shared/platform/haptics";
+import { useTranslation } from "@/translations/translation-provider";
 
 export function CountableSwitch({
   formData,
@@ -22,6 +23,7 @@ export function CountableSwitch({
   setFormData: Dispatch<SetStateAction<TransactionForm>>;
   isTransactionLoading: boolean;
 }) {
+  const { t } = useTranslation();
   const [isHelpOpen, setIsHelpOpen] = useState(false);
 
   return (
@@ -44,7 +46,7 @@ export function CountableSwitch({
               />
             )}
             <span className="text-sm text-muted-foreground">
-              Exclude from totals
+              {t("transactionsExcludeFromTotals")}
             </span>
           </label>
           <CircleQuestionMarkIcon
@@ -72,12 +74,10 @@ export function CountableSwitch({
               </div>
               <div>
                 <p className="text-md font-medium text-foreground mb-0.5">
-                  Why exclude transactions?
+                  {t("transactionsExcludeHelpTitle")}
                 </p>
                 <p className="text-sm text-muted-foreground">
-                  When you transfer money between your accounts, it's not really
-                  spending - it's just moving money. Mark these transactions as
-                  "excluded" so they don't affect your spending totals.
+                  {t("transactionsExcludeHelpDescription")}
                 </p>
               </div>
             </div>
@@ -88,7 +88,7 @@ export function CountableSwitch({
                 className="w-full"
                 size="lg"
               >
-                Got it
+                {t("gotIt")}
               </Button>
             </div>
           </div>

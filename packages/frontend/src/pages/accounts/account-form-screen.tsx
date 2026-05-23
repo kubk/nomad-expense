@@ -34,6 +34,7 @@ import { isFormRoute } from "@/shared/stacked-router/routes";
 import { Label } from "@/components/ui/label";
 import { FormActionButton } from "@/components/ui/form-action-button";
 import { haptic } from "@/shared/platform/haptics";
+import { useTranslation } from "@/translations/translation-provider";
 
 function invalidateAccounts() {
   queryClient.invalidateQueries({
@@ -53,6 +54,7 @@ export function AccountFormScreen({
   route: RouteByType<"accountForm">;
 }) {
   const { navigate, pop } = useRouter();
+  const { t } = useTranslation();
   const accountId = route.accountId;
   const isEdit = Boolean(accountId);
 
@@ -175,15 +177,15 @@ export function AccountFormScreen({
 
   return (
     <Page
-      title={isEdit ? "Edit account" : "Add account"}
+      title={isEdit ? t("accountsEditTitle") : t("accountsAddTitle")}
       isForm={isFormRoute(route)}
     >
       <form onSubmit={handleSave}>
         <div className="flex-1 space-y-6">
           <div className="flex flex-col gap-2">
-            <Label>Account Name</Label>
+            <Label>{t("accountsName")}</Label>
             <Input
-              placeholder="Enter account name"
+              placeholder={t("accountsNamePlaceholder")}
               value={formData.name}
               onChange={(e) =>
                 setFormData((prev) => ({ ...prev, name: e.target.value }))
@@ -192,7 +194,7 @@ export function AccountFormScreen({
           </div>
 
           <div className="flex flex-col gap-2">
-            <Label>Color</Label>
+            <Label>{t("accountsColor")}</Label>
             <div
               className={cn(
                 "flex gap-3 pb-2",
@@ -230,7 +232,7 @@ export function AccountFormScreen({
 
           {!isEdit && (
             <div className="flex flex-col gap-3">
-              <Label>Currency</Label>
+              <Label>{t("accountsCurrency")}</Label>
               <Select
                 value={formData.currency}
                 onValueChange={(value) => {
@@ -271,19 +273,19 @@ export function AccountFormScreen({
                   onClick={handleCreateTransactionClick}
                   icon={<PlusIcon className="h-4 w-4" />}
                 >
-                  Transaction
+                  {t("accountsTransaction")}
                 </FormActionButton>
                 <FormActionButton
                   onClick={handleTransactionsClick}
                   icon={<ListPlusIcon className="h-4 w-4" />}
                 >
-                  Transactions
+                  {t("accountsTransactions")}
                 </FormActionButton>
                 <FormActionButton
                   onClick={handleImportClick}
                   icon={<WrenchIcon className="h-4 w-4" />}
                 >
-                  Advanced
+                  {t("accountsAdvanced")}
                 </FormActionButton>
                 <FormActionButton
                   onClick={() => {
@@ -292,7 +294,7 @@ export function AccountFormScreen({
                   }}
                   icon={<Trash2Icon className="h-4 w-4" />}
                 >
-                  Delete
+                  {t("delete")}
                 </FormActionButton>
               </div>
             </div>
@@ -303,9 +305,9 @@ export function AccountFormScreen({
           isOpen={showDeleteConfirm}
           onClose={() => setShowDeleteConfirm(false)}
           onConfirm={handleDelete}
-          title="Delete account"
-          description="This will permanently delete the account and all its transactions. This action cannot be undone."
-          confirmText="Delete"
+          title={t("accountsDeleteTitle")}
+          description={t("accountsDeleteDescription")}
+          confirmText={t("delete")}
           isLoading={deleteAccountMutation.isPending}
         />
 
@@ -318,7 +320,7 @@ export function AccountFormScreen({
             disabled={isLoading}
           >
             <ArrowLeftIcon className="w-4 h-4" />
-            Back
+            {t("back")}
           </Button>
           <Button
             size="lg"
@@ -328,7 +330,7 @@ export function AccountFormScreen({
             {isLoading ? (
               <Loader2Icon className="h-4 w-4 animate-spin" />
             ) : (
-              "Save"
+              t("save")
             )}
           </Button>
         </Footer>

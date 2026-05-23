@@ -6,6 +6,7 @@ import { DateTime } from "luxon";
 import { generateInviteUrl } from "./generate-invite-url";
 import { copyToClipboard } from "../../shared/copy-to-clipboard";
 import { haptic } from "@/shared/platform/haptics";
+import { useTranslation } from "@/translations/translation-provider";
 
 export function InviteLinkCard({
   invite,
@@ -15,6 +16,7 @@ export function InviteLinkCard({
     expiresAt: string;
   };
 }) {
+  const { t } = useTranslation();
   const [copied, setCopied] = useState(false);
 
   const inviteUrl = generateInviteUrl(invite.code);
@@ -32,10 +34,14 @@ export function InviteLinkCard({
     <Card className="py-4 bg-muted/50">
       <CardContent className="px-4 space-y-3">
         <div className="flex items-center justify-between">
-          <h3 className="font-medium text-foreground">Active invite</h3>
+          <h3 className="font-medium text-foreground">
+            {t("familyActiveInvite")}
+          </h3>
           <div className="flex items-center gap-1 text-xs text-muted-foreground">
             <ClockIcon className="size-3" />
-            <span>Expires {expiresAt.toRelative()}</span>
+            <span>
+              {t("familyInviteExpires", expiresAt.toRelative() ?? "")}
+            </span>
           </div>
         </div>
 
@@ -50,12 +56,12 @@ export function InviteLinkCard({
             {copied ? (
               <>
                 <CheckIcon className="size-4 mr-2" />
-                Copied!
+                {t("familyCopied")}
               </>
             ) : (
               <>
                 <CopyIcon className="size-4 mr-2" />
-                Copy link
+                {t("familyCopyLink")}
               </>
             )}
           </Button>

@@ -27,13 +27,14 @@ import { NoAccountsEmptyState } from "../widgets/no-accounts-empty-state";
 import { Footer } from "../widgets/footer";
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { DrawerDescription } from "@/components/ui/drawer";
 import { haptic } from "@/shared/platform/haptics";
+import { useTranslation } from "@/translations/translation-provider";
 
 const MotionFooter = motion.create(Footer);
 
 export function AccountsScreen({ route }: { route: RouteByType<"accounts"> }) {
   const { navigate } = useRouter();
+  const { t } = useTranslation();
   const [reorderedAccounts, setReorderedAccounts] = useState<
     typeof accounts | null
   >(null);
@@ -104,7 +105,7 @@ export function AccountsScreen({ route }: { route: RouteByType<"accounts"> }) {
         isForm={isFormRoute(route)}
         title={
           <PageHeader
-            title="Accounts"
+            title={t("accountsTitle")}
             rightSlot={
               !isReorderMode && showDropdown ? (
                 <DropDrawer>
@@ -114,20 +115,19 @@ export function AccountsScreen({ route }: { route: RouteByType<"accounts"> }) {
                     </Button>
                   </DropDrawerTrigger>
                   <DropDrawerContent align="end">
-                    <DrawerDescription />
                     <DropDrawerItem
                       className="cursor-pointer"
                       icon={<PlusIcon className="h-4 w-4" />}
                       onClick={handleAddAccountClick}
                     >
-                      Create account
+                      {t("accountsCreate")}
                     </DropDrawerItem>
                     <DropDrawerItem
                       className="cursor-pointer"
                       icon={<ArrowUpDownIcon className="h-4 w-4" />}
                       onClick={handleReorderClick}
                     >
-                      Reorder accounts
+                      {t("accountsReorder")}
                     </DropDrawerItem>
                   </DropDrawerContent>
                 </DropDrawer>
@@ -197,17 +197,21 @@ export function AccountsScreen({ route }: { route: RouteByType<"accounts"> }) {
                           </h3>
                           <div className="flex items-center gap-1 mt-1.5 text-xs text-muted-foreground">
                             <span>
-                              {account.transactionCount} transaction
-                              {account.transactionCount === 1 ? "" : "s"}
+                              {t(
+                                "accountsTransactionCount",
+                                account.transactionCount,
+                              )}
                             </span>
                             {account.lastTransactionDate && (
                               <>
                                 <span>·</span>
                                 <span>
-                                  Last:{" "}
-                                  {DateTime.fromISO(
-                                    account.lastTransactionDate,
-                                  ).toLocaleString(DateTime.DATE_SHORT)}
+                                  {t(
+                                    "accountsLastTransaction",
+                                    DateTime.fromISO(
+                                      account.lastTransactionDate,
+                                    ).toLocaleString(DateTime.DATE_SHORT),
+                                  )}
                                 </span>
                               </>
                             )}
@@ -274,7 +278,7 @@ export function AccountsScreen({ route }: { route: RouteByType<"accounts"> }) {
               size="lg"
               onClick={handleCancelReorder}
             >
-              Cancel
+              {t("cancel")}
             </Button>
             <Button
               variant="default"
@@ -286,7 +290,7 @@ export function AccountsScreen({ route }: { route: RouteByType<"accounts"> }) {
               {reorderMutation.isPending ? (
                 <Loader2 className="w-4 h-4 animate-spin" />
               ) : (
-                "Save"
+                t("save")
               )}
             </Button>
           </MotionFooter>

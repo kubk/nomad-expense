@@ -1,7 +1,10 @@
 import { LoaderIcon } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
+import { useTranslation } from "@/translations/translation-provider";
 
 export function InviteLoader() {
+  const { t } = useTranslation();
+
   return (
     <div className="min-h-screen bg-background flex items-center justify-center p-4">
       <Card className="w-full max-w-md">
@@ -12,10 +15,10 @@ export function InviteLoader() {
             </div>
             <div className="space-y-2">
               <h1 className="text-2xl font-semibold text-foreground">
-                Adding you to a family
+                {t("inviteAddingTitle")}
               </h1>
               <p className="text-muted-foreground">
-                Please wait while we set up your shared access...
+                {t("inviteAddingDescription")}
               </p>
             </div>
           </div>

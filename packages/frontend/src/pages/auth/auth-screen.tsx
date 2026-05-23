@@ -5,9 +5,11 @@ import { LoginButton } from "@telegram-auth/react";
 import { saveAuthToken } from "@/shared/auth-token";
 import { useRouter } from "@/shared/stacked-router/router";
 import { links } from "api";
+import { useTranslation } from "@/translations/translation-provider";
 
 export function AuthScreen({ route: _ }: { route: RouteByType<"auth"> }) {
   const { navigate } = useRouter();
+  const { t } = useTranslation();
 
   return (
     <div className="min-h-screen flex items-center bg-muted justify-center p-4">
@@ -23,9 +25,7 @@ export function AuthScreen({ route: _ }: { route: RouteByType<"auth"> }) {
                   Nomad Expense
                 </h1>
               </div>
-              <p className="text-muted-foreground">
-                Sign in to track your expenses
-              </p>
+              <p className="text-muted-foreground">{t("authSignIn")}</p>
             </div>
             <LoginButton
               showAvatar={false}
@@ -38,7 +38,7 @@ export function AuthScreen({ route: _ }: { route: RouteByType<"auth"> }) {
               }}
             />
             <p className="text-sm text-muted-foreground">
-              Secure login via Telegram
+              {t("authTelegramLogin")}
             </p>
           </div>
         </CardContent>
