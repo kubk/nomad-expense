@@ -3,7 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 
 export function useAvailableYears() {
   const { data: overviewData } = useQuery(
-    trpc.expenses.overview.queryOptions(),
+    trpc.expenses.overview.queryOptions({ cursor: 0 }),
   );
 
   return overviewData

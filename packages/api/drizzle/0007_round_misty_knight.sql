@@ -1,0 +1,1 @@
+ALTER TABLE "user" ADD COLUMN "monthly_breakdown_excluded_account_ids" jsonb DEFAULT '[]'::jsonb NOT NULL;

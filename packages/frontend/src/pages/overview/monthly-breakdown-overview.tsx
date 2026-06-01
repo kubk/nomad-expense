@@ -1,13 +1,28 @@
 import { ChevronRightIcon } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { MonthlyChart } from "./monthly-chart";
-import { useAccountIds } from "@/shared/hooks/use-account-ids";
 import { useRouter } from "@/shared/stacked-router/router";
 import { haptic } from "@/shared/platform/haptics";
 import { useTranslation } from "@/translations/translation-provider";
+import { useMonthlyBreakdownAccountIds } from "@/shared/hooks/use-monthly-breakdown-settings";
+import type { RouterOutputs } from "api";
 
-export function MonthlyBreakdownOverview() {
-  const accountIds = useAccountIds();
+type OverviewData = RouterOutputs["expenses"]["overview"];
+
+export function MonthlyBreakdownOverview({
+  overviewPages,
+  isLoading,
+  isFetchingPreviousPage,
+  hasPreviousPage,
+  fetchPreviousPage,
+}: {
+  overviewPages: OverviewData[];
+  isLoading: boolean;
+  isFetchingPreviousPage: boolean;
+  hasPreviousPage: boolean;
+  fetchPreviousPage: () => Promise<unknown>;
+}) {
+  const { includedAccountIds } = useMonthlyBreakdownAccountIds();
   const { navigate } = useRouter();
   const { t } = useTranslation();
 
@@ -26,7 +41,7 @@ export function MonthlyBreakdownOverview() {
                 navigate({
                   type: "monthlyBreakdownFull",
                   filters: {
-                    accounts: accountIds,
+                    accounts: includedAccountIds,
                     date: { type: "months", value: 6 },
                     order: { field: "createdAt", direction: "desc" },
                   },
@@ -39,7 +54,13 @@ export function MonthlyBreakdownOverview() {
           </div>
         </CardHeader>
         <CardContent className="pr-4 pt-1">
-          <MonthlyChart />
+          <MonthlyChart
+            overviewPages={overviewPages}
+            isLoading={isLoading}
+            isFetchingPreviousPage={isFetchingPreviousPage}
+            hasPreviousPage={hasPreviousPage}
+            fetchPreviousPage={fetchPreviousPage}
+          />
         </CardContent>
       </Card>
     </div>

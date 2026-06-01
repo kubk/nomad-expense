@@ -18,6 +18,8 @@ export function Navigation() {
 
   const shouldHide =
     currentRoute.type === "monthlyBreakdownFull" ||
+    currentRoute.type === "monthlyBreakdownSettings" ||
+    currentRoute.type === "monthlyBreakdownAccounts" ||
     currentRoute.type === "transactionForm" ||
     currentRoute.type === "accountPicker" ||
     currentRoute.type === "importSettings" ||

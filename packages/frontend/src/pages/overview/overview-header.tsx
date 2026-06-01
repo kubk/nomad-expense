@@ -1,6 +1,6 @@
 import { formatAmount } from "@/shared/currency-formatter";
 import { UserAvatar } from "@/components/user-avatar";
-import { trpc } from "../../shared/api";
+import { trpc } from "@/shared/api";
 import { useQuery } from "@tanstack/react-query";
 import { useRouter } from "@/shared/stacked-router/router";
 import { getWebApp } from "@/shared/platform/telegram-platform";
@@ -8,15 +8,20 @@ import { cn } from "@/lib/utils";
 import { useBaseCurrency } from "@/shared/hooks/use-base-currency";
 import { haptic } from "@/shared/platform/haptics";
 import { useTranslation } from "@/translations/translation-provider";
+import type { RouterOutputs } from "api";
 
-export function OverviewHeader() {
+type OverviewData = RouterOutputs["expenses"]["overview"];
+
+export function OverviewHeader({
+  overviewData,
+  isOverviewLoading,
+}: {
+  overviewData?: OverviewData;
+  isOverviewLoading: boolean;
+}) {
   const { navigate } = useRouter();
   const baseCurrency = useBaseCurrency();
   const { t } = useTranslation();
-
-  const { data: overviewData, isLoading: isOverviewLoading } = useQuery(
-    trpc.expenses.overview.queryOptions(),
-  );
 
   const { data: familyMembers, isLoading: isFamilyLoading } = useQuery(
     trpc.family.listMembers.queryOptions(),

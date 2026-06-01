@@ -1,5 +1,16 @@
 import { z } from "zod";
-import { eq, and, or, desc, gte, lte, inArray, sql, ilike } from "drizzle-orm";
+import {
+  eq,
+  and,
+  or,
+  desc,
+  gte,
+  lte,
+  inArray,
+  notInArray,
+  sql,
+  ilike,
+} from "drizzle-orm";
 import { DateTime } from "luxon";
 import { protectedProcedure, t } from "./trpc";
 import { transactionTable, accountTable } from "../db/schema";
@@ -11,6 +22,13 @@ import { createMoney } from "../services/money/money";
 import { getFamilyBaseCurrency } from "../db/user/get-family-base-currency";
 import { getMostUsedDescriptions } from "../services/transaction-descriptions";
 import { createTransactionWithRules } from "../db/transaction/create-transaction-with-rules";
+import { getFamilyMonthlyBreakdownExcludedAccountIds } from "../db/user/get-family-monthly-breakdown-excluded-account-ids";
+
+const monthlyBreakdownPageSize = 8;
+
+const overviewInputSchema = z.object({
+  cursor: z.number().int().min(0),
+});
 
 const transactionFilterSchema = z.object({
   accounts: z.array(z.string()),
@@ -127,120 +145,155 @@ const getFilteredTransactions = async (
     .where(and(...conditions));
 };
 
-export const expenseRouter = t.router({
-  overview: protectedProcedure.query(async ({ ctx }) => {
-    const db = getDb();
-    const familyId = ctx.familyId;
+const getMonthlyBreakdown = async ({
+  db,
+  familyId,
+  excludedAccountIds,
+  cursor,
+}: {
+  db: DB;
+  familyId: string;
+  excludedAccountIds: string[];
+  cursor: number;
+}) => {
+  const year = sql<number>`EXTRACT(YEAR FROM ${transactionTable.createdAt})::integer`;
+  const month = sql<number>`EXTRACT(MONTH FROM ${transactionTable.createdAt})::integer`;
+  const conditions = [
+    eq(accountTable.familyId, familyId),
+    eq(transactionTable.type, "expense"),
+    eq(transactionTable.isCountable, true),
+  ];
 
-    const allTransactionsDb = db
-      .select({
-        usdAmount: transactionTable.usdAmount,
-        createdAt: transactionTable.createdAt,
-      })
-      .from(transactionTable)
-      .innerJoin(accountTable, eq(transactionTable.accountId, accountTable.id))
-      .where(
-        and(
-          eq(accountTable.familyId, familyId),
-          eq(transactionTable.type, "expense"),
-          eq(transactionTable.isCountable, true),
-        ),
-      );
+  if (excludedAccountIds.length > 0) {
+    conditions.push(notInArray(accountTable.id, excludedAccountIds));
+  }
 
-    const last30ExpensesDb = db
-      .select({
-        total: sql<number>`COALESCE(SUM(${transactionTable.usdAmount}), 0)`,
-      })
-      .from(transactionTable)
-      .innerJoin(accountTable, eq(transactionTable.accountId, accountTable.id))
-      .where(
-        and(
-          eq(accountTable.familyId, familyId),
-          eq(transactionTable.type, "expense"),
-          eq(transactionTable.isCountable, true),
-          sql`${transactionTable.createdAt} >= NOW() - INTERVAL '30 days'`,
-        ),
-      );
+  const monthlyBreakdownDb = db
+    .select({
+      year,
+      monthNumber: month,
+      usdAmount: sql<number>`COALESCE(SUM(${transactionTable.usdAmount}), 0)::integer`,
+    })
+    .from(transactionTable)
+    .innerJoin(accountTable, eq(transactionTable.accountId, accountTable.id))
+    .where(and(...conditions))
+    .groupBy(year, month)
+    .orderBy(desc(year), desc(month));
 
-    const recentTransactionsDb = db
-      .select({
-        id: transactionTable.id,
-        description: transactionTable.description,
-        amount: transactionTable.amount,
-        currency: transactionTable.currency,
-        usdAmount: transactionTable.usdAmount,
-        createdAt: transactionTable.createdAt,
-        accountId: accountTable.id,
-        type: transactionTable.type,
-        isCountable: transactionTable.isCountable,
-      })
-      .from(transactionTable)
-      .innerJoin(accountTable, eq(transactionTable.accountId, accountTable.id))
-      .where(eq(accountTable.familyId, familyId))
-      .orderBy(desc(transactionTable.createdAt))
-      .limit(3);
+  const monthlyBreakdown = await monthlyBreakdownDb
+    .limit(monthlyBreakdownPageSize + 1)
+    .offset(cursor * monthlyBreakdownPageSize);
+  const hasPreviousPage = monthlyBreakdown.length > monthlyBreakdownPageSize;
+  const visibleMonthlyBreakdown = hasPreviousPage
+    ? monthlyBreakdown.slice(0, monthlyBreakdownPageSize)
+    : monthlyBreakdown;
 
-    const [allTransactions, last30DaysResult, recentTransactions] =
-      await Promise.all([
-        allTransactionsDb,
-        last30ExpensesDb,
-        recentTransactionsDb,
-      ]);
+  const data = visibleMonthlyBreakdown
+    .slice()
+    .reverse()
+    .map((monthData) => {
+      const shortMonth = DateTime.fromObject({
+        year: monthData.year,
+        month: monthData.monthNumber,
+        day: 1,
+      }).toFormat("MMM");
 
-    const last30DaysTotal = last30DaysResult[0]?.total || 0;
-
-    // Group transactions by month/year for overview
-    const monthlyTotals: {
-      [key: string]: {
-        usdAmount: number;
-        year: number;
-        month: number;
-        shortMonth: string;
+      return {
+        month: `${shortMonth} ${monthData.year}`,
+        shortMonth,
+        monthNumber: monthData.monthNumber,
+        usdAmount: monthData.usdAmount,
+        year: monthData.year,
       };
-    } = {};
+    });
 
-    allTransactions.forEach((transaction) => {
-      const dt = DateTime.fromJSDate(transaction.createdAt);
-      const monthKey = dt.toFormat("MMM yyyy");
-      const shortMonth = dt.toFormat("MMM");
-      const year = dt.year;
-      const month = dt.month;
+  return {
+    data,
+    previousCursor: hasPreviousPage ? cursor + 1 : undefined,
+  };
+};
 
-      if (!monthlyTotals[monthKey]) {
-        monthlyTotals[monthKey] = {
-          usdAmount: 0,
-          year,
-          month,
-          shortMonth,
+export const expenseRouter = t.router({
+  overview: protectedProcedure
+    .input(overviewInputSchema)
+    .query(async ({ ctx, input }) => {
+      const db = getDb();
+      const familyId = ctx.familyId;
+      const excludedAccountIds =
+        await getFamilyMonthlyBreakdownExcludedAccountIds(familyId);
+
+      const familyConditions = [eq(accountTable.familyId, familyId)];
+      const monthlyBreakdownDb = getMonthlyBreakdown({
+        db,
+        familyId,
+        excludedAccountIds,
+        cursor: input.cursor,
+      });
+
+      if (input.cursor > 0) {
+        const monthlyBreakdown = await monthlyBreakdownDb;
+
+        return {
+          overview: monthlyBreakdown,
+          last30DaysTotal: 0,
+          recentTransactions: [],
         };
       }
 
-      monthlyTotals[monthKey].usdAmount += transaction.usdAmount;
-    });
+      const last30ExpensesDb = db
+        .select({
+          total: sql<number>`COALESCE(SUM(${transactionTable.usdAmount}), 0)`,
+        })
+        .from(transactionTable)
+        .innerJoin(
+          accountTable,
+          eq(transactionTable.accountId, accountTable.id),
+        )
+        .where(
+          and(
+            ...familyConditions,
+            eq(transactionTable.type, "expense"),
+            eq(transactionTable.isCountable, true),
+            sql`${transactionTable.createdAt} >= NOW() - INTERVAL '30 days'`,
+          ),
+        );
 
-    // Convert to array and sort chronologically
-    const monthlyData = Object.values(monthlyTotals)
-      .sort((a, b) => {
-        const yearDiff = a.year - b.year;
-        if (yearDiff !== 0) return yearDiff;
-        return a.month - b.month;
-      })
-      .map((monthData) => ({
-        month: `${monthData.shortMonth} ${monthData.year}`,
-        shortMonth: monthData.shortMonth,
-        monthNumber: monthData.month,
-        usdAmount: monthData.usdAmount,
-        year: monthData.year,
-      }));
+      const recentTransactionsDb = db
+        .select({
+          id: transactionTable.id,
+          description: transactionTable.description,
+          amount: transactionTable.amount,
+          currency: transactionTable.currency,
+          usdAmount: transactionTable.usdAmount,
+          createdAt: transactionTable.createdAt,
+          accountId: accountTable.id,
+          type: transactionTable.type,
+          isCountable: transactionTable.isCountable,
+        })
+        .from(transactionTable)
+        .innerJoin(
+          accountTable,
+          eq(transactionTable.accountId, accountTable.id),
+        )
+        .where(and(...familyConditions))
+        .orderBy(desc(transactionTable.createdAt))
+        .limit(3);
 
-    return {
-      overview: {
-        data: monthlyData,
-      },
-      last30DaysTotal,
-      recentTransactions,
-    };
-  }),
+      const [monthlyBreakdown, last30DaysResult, recentTransactions] =
+        await Promise.all([
+          monthlyBreakdownDb,
+          last30ExpensesDb,
+          recentTransactionsDb,
+        ]);
+
+      const last30DaysTotal = last30DaysResult[0]?.total || 0;
+
+      return {
+        overview: monthlyBreakdown,
+        last30DaysTotal,
+        recentTransactions,
+      };
+    }),
 
   transactionsByMonth: protectedProcedure
     .input(transactionFilterSchema)

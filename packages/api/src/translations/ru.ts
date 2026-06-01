@@ -17,7 +17,7 @@ export const ru: Translation = {
 Или нажмите /cancel, чтобы отменить действие`,
   operationCancelled: "❌ Действие отменено",
   openApp: "📱 Открыть приложение",
-  telegramGroup: "Группа Telegram",
+  telegramGroup: "Канал Telegram",
   startCaption: "Учитывайте траты по разным счетам и семьям",
 
   invalidAccountSelection: "Неверный счет. Попробуйте еще раз",
