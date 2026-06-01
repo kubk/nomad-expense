@@ -56,7 +56,7 @@ export const ru: Translation = {
   overviewNoTransactions: "Нет транзакций",
   overviewNoTransactionsDescription:
     "Добавьте первую трату, чтобы увидеть структуру трат",
-  monthlyBreakdownSettingsTitle: "Настройки по месяцам",
+  monthlyBreakdownSettingsTitle: "Разбивка по месяцам",
   monthlyBreakdownSettingsIncludedAccounts: "Учитывать счета",
   monthlyBreakdownAccountsTitle: "Учитывать счета",
 
