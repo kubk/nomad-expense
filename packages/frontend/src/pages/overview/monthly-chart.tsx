@@ -8,7 +8,7 @@ import { calculateMaxAmount } from "../../shared/chart-calculations";
 import { useBaseCurrency } from "@/shared/hooks/use-base-currency";
 import { haptic } from "@/shared/platform/haptics";
 import { getShortMonthName } from "@/shared/date-utils";
-import { useMonthlyBreakdownAccountIds } from "@/shared/hooks/use-monthly-breakdown-settings";
+import { useAccountIds } from "@/shared/hooks/use-account-ids";
 import { LoaderCircleIcon } from "lucide-react";
 import type { RouterOutputs } from "api";
 
@@ -32,7 +32,7 @@ export function MonthlyChart({
   const previousScrollWidthRef = useRef<number | undefined>(undefined);
   const previousScrollLeftRef = useRef(0);
   const { navigate } = useRouter();
-  const { includedAccountIds } = useMonthlyBreakdownAccountIds();
+  const accountIds = useAccountIds();
   const baseCurrency = useBaseCurrency();
 
   const sortedMonthlyData = overviewPages.flatMap((page) => page.overview.data);
@@ -118,7 +118,7 @@ export function MonthlyChart({
                       navigate({
                         type: "transactions",
                         filters: {
-                          accounts: includedAccountIds,
+                          accounts: accountIds,
                           date: {
                             type: "custom",
                             value: [
