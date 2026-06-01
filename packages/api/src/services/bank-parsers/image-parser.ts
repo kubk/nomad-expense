@@ -7,13 +7,6 @@ import { currencySchema, transactionTypeSchema } from "../../db/enums";
 import { assert } from "../../lib/typescript/assert";
 import { ParsedTransaction, ParseTransactionFn } from "./parsed-transaction";
 
-function createOpenAiModel(model: string) {
-  return createOpenAI({
-    baseURL: getEnv().OPENAI_BASE_URL,
-    apiKey: getEnv().OPENAI_TOKEN,
-  })(model);
-}
-
 const imageTransactionSchema = z.object({
   description: z.string(),
   amountHuman: z
@@ -32,7 +25,10 @@ async function parseImageBase64(
   const currencyList = currencySchema.options.join(", ");
 
   const result = await generateText({
-    model: createOpenAiModel("gpt-4.1-2025-04-14"),
+    model: createOpenAI({
+      baseURL: getEnv().OPENAI_BASE_URL,
+      apiKey: getEnv().OPENAI_TOKEN,
+    })("gpt-4.1-2025-04-14"),
     output: Output.array({ element: imageTransactionSchema }),
     messages: [
       {

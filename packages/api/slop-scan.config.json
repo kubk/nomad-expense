@@ -1,0 +1,11 @@
+{
+  "rules": {
+    "tests.duplicate-mock-setup": { "enabled": false },
+    "defensive.error-swallowing": { "enabled": false },
+    "defensive.error-obscuring": { "enabled": false },
+    "structure.directory-fanout-hotspot": { "enabled": false },
+    "structure.barrel-density": { "enabled": false },
+    "structure.over-fragmentation": { "enabled": false },
+    "defensive.empty-catch": { "enabled": false }
+  }
+}

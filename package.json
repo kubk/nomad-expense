@@ -6,6 +6,7 @@
     "prettier:fix": "git ls-files -mo --exclude-standard -- './packages' | grep -E '\\.(ts|tsx)$' | xargs -I {} prettier --write {}",
     "prettier:fix:full": "prettier --write \"./packages/**/*.+(ts|tsx)\"",
     "knip": "knip --reporter compact",
+    "dead-code": "concurrently -n knip,slop-api,slop-frontend -c magenta,green,blue \"knip --reporter compact\" \"slop-scan scan packages/api --lint\" \"slop-scan scan packages/frontend --lint\"",
     "typecheck": "npm run typecheck --workspaces",
     "test": "npm run test --workspaces",
     "export-public-code": "./export-public-code.sh"
@@ -19,6 +20,7 @@
   "devDependencies": {
     "concurrently": "^9.1.2",
     "knip": "^6.9.0",
-    "prettier": "^3.5.3"
+    "prettier": "^3.5.3",
+    "slop-scan": "^0.3.0"
   }
 }
