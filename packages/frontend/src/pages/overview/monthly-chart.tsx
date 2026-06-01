@@ -1,41 +1,88 @@
 import { useEffect, useRef } from "react";
 import { formatAmount } from "../../shared/currency-formatter";
-import { trpc } from "../../shared/api";
-import { useQuery } from "@tanstack/react-query";
 import { cn } from "@/lib/utils";
 import { MonthlyChartEmptyState } from "./monthly-chart-empty-state";
 import { MonthlyChartLoader } from "./monthly-chart-loader";
-import { useAccountIds } from "@/shared/hooks/use-account-ids";
 import { useRouter } from "@/shared/stacked-router/router";
 import { calculateMaxAmount } from "../../shared/chart-calculations";
 import { useBaseCurrency } from "@/shared/hooks/use-base-currency";
 import { haptic } from "@/shared/platform/haptics";
 import { getShortMonthName } from "@/shared/date-utils";
+import { useMonthlyBreakdownAccountIds } from "@/shared/hooks/use-monthly-breakdown-settings";
+import { LoaderCircleIcon } from "lucide-react";
+import type { RouterOutputs } from "api";
 
-export function MonthlyChart() {
+type OverviewData = RouterOutputs["expenses"]["overview"];
+
+export function MonthlyChart({
+  overviewPages,
+  isLoading,
+  isFetchingPreviousPage,
+  hasPreviousPage,
+  fetchPreviousPage,
+}: {
+  overviewPages: OverviewData[];
+  isLoading: boolean;
+  isFetchingPreviousPage: boolean;
+  hasPreviousPage: boolean;
+  fetchPreviousPage: () => Promise<unknown>;
+}) {
   const scrollContainerRef = useRef<HTMLDivElement>(null);
+  const didScrollToLatestRef = useRef(false);
+  const previousScrollWidthRef = useRef<number | undefined>(undefined);
+  const previousScrollLeftRef = useRef(0);
   const { navigate } = useRouter();
-  const accountIds = useAccountIds();
+  const { includedAccountIds } = useMonthlyBreakdownAccountIds();
   const baseCurrency = useBaseCurrency();
 
-  const { data: overviewData, isLoading } = useQuery(
-    trpc.expenses.overview.queryOptions(),
-  );
-
-  const sortedMonthlyData = overviewData?.overview.data || [];
+  const sortedMonthlyData = overviewPages.flatMap((page) => page.overview.data);
   const maxAmount = calculateMaxAmount(sortedMonthlyData);
 
   useEffect(() => {
-    // Scroll to the right on mount
-    if (scrollContainerRef.current) {
-      scrollContainerRef.current.scrollLeft =
-        scrollContainerRef.current.scrollWidth;
+    const scrollContainer = scrollContainerRef.current;
+
+    if (isLoading || !scrollContainer || sortedMonthlyData.length === 0) {
+      return;
     }
-  }, [sortedMonthlyData]);
+
+    if (!didScrollToLatestRef.current) {
+      scrollContainer.scrollLeft = scrollContainer.scrollWidth;
+      didScrollToLatestRef.current = true;
+      return;
+    }
+
+    if (previousScrollWidthRef.current !== undefined) {
+      scrollContainer.scrollLeft =
+        scrollContainer.scrollWidth -
+        previousScrollWidthRef.current +
+        previousScrollLeftRef.current;
+      previousScrollWidthRef.current = undefined;
+    }
+  }, [isLoading, sortedMonthlyData.length]);
+
+  const handleScroll = () => {
+    const scrollContainer = scrollContainerRef.current;
+
+    if (
+      !scrollContainer ||
+      scrollContainer.scrollLeft > 24 ||
+      !hasPreviousPage ||
+      isFetchingPreviousPage
+    ) {
+      return;
+    }
+
+    previousScrollWidthRef.current = scrollContainer.scrollWidth;
+    previousScrollLeftRef.current = scrollContainer.scrollLeft;
+    fetchPreviousPage().catch(() => {
+      previousScrollWidthRef.current = undefined;
+    });
+  };
 
   return (
     <div
       ref={scrollContainerRef}
+      onScroll={handleScroll}
       className={cn(
         !isLoading &&
           "overflow-x-auto scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100",
@@ -53,6 +100,11 @@ export function MonthlyChart() {
 
           return (
             <div className="flex items-end pb-4 min-w-max">
+              {isFetchingPreviousPage ? (
+                <div className="flex h-[153px] min-w-8 items-center justify-center pr-2">
+                  <LoaderCircleIcon className="size-5 animate-spin text-muted-foreground" />
+                </div>
+              ) : null}
               {sortedMonthlyData.map((month) => {
                 const heightPercentage = (month.usdAmount / maxAmount) * 100;
                 const barHeight = (heightPercentage / 100) * 100; // 100px max height
@@ -66,7 +118,7 @@ export function MonthlyChart() {
                       navigate({
                         type: "transactions",
                         filters: {
-                          accounts: accountIds,
+                          accounts: includedAccountIds,
                           date: {
                             type: "custom",
                             value: [

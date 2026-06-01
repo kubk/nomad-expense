@@ -1,5 +1,7 @@
 import { TransactionsScreen } from "../transactions/transactions-screen";
 import { MonthlyBreakdownFull } from "../monthly-breakdown-full/monthly-breakdown-full";
+import { MonthlyBreakdownAccountsScreen } from "../monthly-breakdown-full/monthly-breakdown-accounts-screen";
+import { MonthlyBreakdownSettingsScreen } from "../monthly-breakdown-full/monthly-breakdown-settings-screen";
 import { AccountsScreen } from "../accounts/accounts-screen";
 import { AccountFormScreen } from "../accounts/account-form-screen";
 import { ImportSettingsScreen } from "../accounts/import-settings-screen";
@@ -68,6 +70,12 @@ export function App() {
           break;
         case "monthlyBreakdownFull":
           ScreenComponent = <MonthlyBreakdownFull {...props} />;
+          break;
+        case "monthlyBreakdownSettings":
+          ScreenComponent = <MonthlyBreakdownSettingsScreen {...props} />;
+          break;
+        case "monthlyBreakdownAccounts":
+          ScreenComponent = <MonthlyBreakdownAccountsScreen {...props} />;
           break;
         case "accounts":
           ScreenComponent = <AccountsScreen {...props} />;

@@ -5,7 +5,11 @@ import { platform } from "@/shared/platform/platforms";
 import { haptic } from "@/shared/platform/haptics";
 
 export function AddTransactionFab() {
-  const { navigate } = useRouter();
+  const { currentRoute, navigate } = useRouter();
+
+  if (currentRoute.type !== "main") {
+    return null;
+  }
 
   return (
     <Button

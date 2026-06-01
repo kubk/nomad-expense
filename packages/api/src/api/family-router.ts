@@ -20,6 +20,7 @@ import { currencySchema } from "../db/enums";
 import { convertWithLiveRate } from "../services/money/exchange-rate-api";
 import { getFamilyBaseCurrency } from "../db/user/get-family-base-currency";
 import { getTranslation } from "../translations/translations";
+import { getFamilyMonthlyBreakdownExcludedAccountIds } from "../db/user/get-family-monthly-breakdown-excluded-account-ids";
 
 export const familyRouter = t.router({
   listMembers: protectedProcedure.query(async ({ ctx }) => {
@@ -342,5 +343,45 @@ export const familyRouter = t.router({
         updatedCount: successfulConversions.length,
         totalCount: transactions.length,
       };
+    }),
+
+  getMonthlyBreakdownExcludedAccountIds: protectedProcedure.query(
+    async ({ ctx }) => {
+      return getFamilyMonthlyBreakdownExcludedAccountIds(ctx.familyId);
+    },
+  ),
+
+  updateMonthlyBreakdownExcludedAccountIds: protectedProcedure
+    .input(
+      z.object({
+        excludedAccountIds: z.array(z.string()),
+      }),
+    )
+    .mutation(async ({ ctx, input }) => {
+      const db = getDb();
+      const familyId = ctx.familyId;
+      const uniqueAccountIds = [...new Set(input.excludedAccountIds)];
+
+      const familyAccounts =
+        uniqueAccountIds.length === 0
+          ? []
+          : await db
+              .select({ id: accountTable.id })
+              .from(accountTable)
+              .where(
+                and(
+                  eq(accountTable.familyId, familyId),
+                  inArray(accountTable.id, uniqueAccountIds),
+                ),
+              );
+
+      const excludedAccountIds = familyAccounts.map((account) => account.id);
+
+      await db
+        .update(userTable)
+        .set({ monthlyBreakdownExcludedAccountIds: excludedAccountIds })
+        .where(eq(userTable.familyId, familyId));
+
+      return excludedAccountIds;
     }),
 });

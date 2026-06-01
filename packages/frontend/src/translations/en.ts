@@ -45,6 +45,9 @@ export const en = {
   overviewNoTransactions: "No transactions",
   overviewNoTransactionsDescription:
     "Add your first expense to see your spending patterns",
+  monthlyBreakdownSettingsTitle: "Monthly breakdown settings",
+  monthlyBreakdownSettingsIncludedAccounts: "Included accounts",
+  monthlyBreakdownAccountsTitle: "Included accounts",
 
   settingsTitle: "Settings",
   settingsFamily: "Family",

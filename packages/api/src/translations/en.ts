@@ -11,7 +11,7 @@ export const en = {
 Or click /cancel to cancel the operation`,
   operationCancelled: "❌ Operation cancelled",
   openApp: "📱 Open App",
-  telegramGroup: "Telegram group",
+  telegramGroup: "Telegram channel",
   startCaption: "Track your expenses across different accounts and families",
 
   invalidAccountSelection: "Invalid account selection. Please try again",

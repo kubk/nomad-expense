@@ -10,6 +10,7 @@ import {
   pgEnum,
   jsonb,
 } from "drizzle-orm/pg-core";
+import { sql } from "drizzle-orm";
 import {
   accountColor,
   bank,
@@ -53,6 +54,13 @@ export const userTable = pgTable(
     isFamilyNotified: boolean("is_family_notified").notNull().default(true),
     // Base currency for the family (synced across all family members)
     baseCurrency: currencyEnum("base_currency").notNull().default("USD"),
+    // Monthly breakdown excluded accounts for the family (synced across all family members)
+    monthlyBreakdownExcludedAccountIds: jsonb(
+      "monthly_breakdown_excluded_account_ids",
+    )
+      .$type<string[]>()
+      .notNull()
+      .default(sql`'[]'::jsonb`),
     name: varchar("name"),
     username: varchar("username"),
     avatarUrl: text("avatar_url"),

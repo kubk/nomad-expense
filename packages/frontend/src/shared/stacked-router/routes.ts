@@ -46,6 +46,12 @@ export const routeSchema = v.variant("type", [
     filters: v.optional(transactionFiltersSchema),
   }),
   v.object({
+    type: v.literal("monthlyBreakdownSettings"),
+  }),
+  v.object({
+    type: v.literal("monthlyBreakdownAccounts"),
+  }),
+  v.object({
     type: v.literal("accounts"),
   }),
   v.object({
@@ -90,6 +96,8 @@ export function isFormRoute(route: Route) {
     route.type === "accountForm" ||
     route.type === "importSettings" ||
     route.type === "transactionForm" ||
+    route.type === "monthlyBreakdownSettings" ||
+    route.type === "monthlyBreakdownAccounts" ||
     route.type === "settings" ||
     route.type === "family"
   );

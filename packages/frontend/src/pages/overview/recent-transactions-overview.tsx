@@ -1,17 +1,21 @@
 import { ChevronRightIcon } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { TransactionItem } from "../widgets/transaction-item";
-import { trpc } from "../../shared/api";
-import { useQuery } from "@tanstack/react-query";
 import { useRouter } from "@/shared/stacked-router/router";
 import { useTranslation } from "@/translations/translation-provider";
+import type { RouterOutputs } from "api";
 
-export function RecentTransactionsOverview() {
+type OverviewData = RouterOutputs["expenses"]["overview"];
+
+export function RecentTransactionsOverview({
+  overviewData,
+  isLoading,
+}: {
+  overviewData?: OverviewData;
+  isLoading: boolean;
+}) {
   const { navigate } = useRouter();
   const { t } = useTranslation();
-  const { data: overviewData, isLoading } = useQuery(
-    trpc.expenses.overview.queryOptions(),
-  );
 
   const recentTransactions = overviewData?.recentTransactions;
 
