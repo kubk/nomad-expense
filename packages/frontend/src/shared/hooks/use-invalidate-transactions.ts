@@ -6,7 +6,7 @@ export function useInvalidateTransactions() {
       queryKey: trpc.expenses.transactionsList.queryKey(),
     });
     queryClient.invalidateQueries({
-      queryKey: trpc.expenses.overview.queryKey(),
+      queryKey: trpc.expenses.overview.pathKey(),
     });
     queryClient.invalidateQueries({
       queryKey: trpc.expenses.transactionsByMonth.queryKey(),
