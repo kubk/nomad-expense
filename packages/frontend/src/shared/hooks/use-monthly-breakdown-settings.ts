@@ -2,7 +2,7 @@ import { useMemo } from "react";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { queryClient, trpc } from "@/shared/api";
 
-export function getIncludedAccountIds(
+function getIncludedAccountIds(
   accountIds: string[],
   excludedAccountIds: string[],
 ) {
@@ -12,7 +12,7 @@ export function getIncludedAccountIds(
   );
 }
 
-export function useMonthlyBreakdownExcludedAccountIds() {
+function useMonthlyBreakdownExcludedAccountIds() {
   const queryOptions =
     trpc.family.getMonthlyBreakdownExcludedAccountIds.queryOptions();
   const { data: excludedAccountIds = [], isLoading } = useQuery(queryOptions);
