@@ -494,11 +494,11 @@ export const expenseRouter = t.router({
       const db = getDb();
       const familyId = ctx.familyId;
 
-      // Verify transaction belongs to user and get account currency
+      // Verify transaction belongs to user and keep the transaction currency.
       const existingTransaction = await db
         .select({
           id: transactionTable.id,
-          currency: accountTable.currency,
+          currency: transactionTable.currency,
         })
         .from(transactionTable)
         .innerJoin(
