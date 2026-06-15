@@ -266,6 +266,8 @@ export function TransactionFormScreen({
                   <>
                     <Input
                       type="number"
+                      inputMode="decimal"
+                      enterKeyHint="done"
                       step="0.01"
                       placeholder="0.00"
                       value={formData.amount}
