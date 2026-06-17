@@ -29,8 +29,11 @@ import { useQuery } from "@tanstack/react-query";
 import { CustomDatePicker } from "./custom-date-picker";
 import { haptic } from "@/shared/platform/haptics";
 import { useTranslation } from "@/translations/translation-provider";
+import { cn } from "@/lib/utils";
 
 type TransactionTypeFilterValue = "all" | TransactionType;
+type TransactionOrderField = TransactionFilters["order"]["field"];
+type TransactionOrderDirection = TransactionFilters["order"]["direction"];
 
 export function FiltersDrawer({
   open,
@@ -47,6 +50,12 @@ export function FiltersDrawer({
   const [filterForm, setFilterForm] = useState<TransactionFilters>(filters);
   const [showCustomDatePicker, setShowCustomDatePicker] = useState(false);
   const { data: accounts = [] } = useQuery(trpc.accounts.list.queryOptions());
+  const selectedAccountIds = new Set(filterForm.accounts);
+  const selectedAccountCount = accounts.filter((account) =>
+    selectedAccountIds.has(account.id),
+  ).length;
+  const areAllAccountsSelected =
+    accounts.length > 0 && selectedAccountCount === accounts.length;
 
   useEffect(() => {
     setFilterForm(filters);
@@ -89,13 +98,10 @@ export function FiltersDrawer({
   const handleSelectAllAccounts = () => {
     haptic("selection");
     const allAccountIds = accounts.map((account) => account.id);
-    const areAllSelected = allAccountIds.every((id) =>
-      filterForm.accounts.includes(id),
-    );
 
     setFilterForm((prev) => ({
       ...prev,
-      accounts: areAllSelected ? [] : allAccountIds,
+      accounts: areAllAccountsSelected ? [] : allAccountIds,
     }));
   };
 
@@ -150,8 +156,8 @@ export function FiltersDrawer({
   };
 
   const handleBadgeOrderChange = (
-    field: "createdAt" | "amount",
-    direction: "asc" | "desc",
+    field: TransactionOrderField,
+    direction: TransactionOrderDirection,
   ) => {
     haptic("selection");
     setFilterForm((prev) => ({
@@ -161,14 +167,51 @@ export function FiltersDrawer({
   };
 
   const isOrderActive = (
-    field: "createdAt" | "amount",
-    direction: "asc" | "desc",
+    field: TransactionOrderField,
+    direction: TransactionOrderDirection,
   ) => {
     return (
       filterForm.order.field === field &&
       filterForm.order.direction === direction
     );
   };
+
+  const sortOptions: ReadonlyArray<{
+    field: TransactionOrderField;
+    direction: TransactionOrderDirection;
+    label: string;
+  }> = [
+    {
+      field: "createdAt",
+      direction: "desc",
+      label: t("filtersNewestFirst"),
+    },
+    {
+      field: "createdAt",
+      direction: "asc",
+      label: t("filtersOldestFirst"),
+    },
+    {
+      field: "amount",
+      direction: "desc",
+      label: t("filtersHighestAmount"),
+    },
+    {
+      field: "amount",
+      direction: "asc",
+      label: t("filtersLowestAmount"),
+    },
+  ];
+
+  const getChipClassName = (isActive: boolean) =>
+    cn(
+      "cursor-pointer px-3 py-1.5 text-sm whitespace-nowrap flex-shrink-0 flex items-center gap-2",
+      !isActive &&
+        "bg-muted text-muted-foreground hover:bg-muted/80 hover:text-foreground",
+    );
+
+  const getChipVariant = (isActive: boolean) =>
+    isActive ? "default" : "secondary";
 
   return (
     <Drawer open={open} onOpenChange={handleOpenChange}>
@@ -252,29 +295,30 @@ export function FiltersDrawer({
                     </div>
                   </div>
                   <div className="flex overflow-x-auto pb-3 gap-2">
-                    {timePeriods.map((period) => (
-                      <Badge
-                        key={period.value}
-                        variant={
-                          filterForm.date.type === "months" &&
-                          filterForm.date.value === period.value
-                            ? "default"
-                            : "secondary"
-                        }
-                        onClick={() => handleMonthsChange(period.value)}
-                        className="cursor-pointer px-3 py-1.5 text-sm whitespace-nowrap flex-shrink-0 flex items-center gap-2"
-                      >
-                        {period.label}
-                      </Badge>
-                    ))}
+                    {timePeriods.map((period) => {
+                      const isActive =
+                        filterForm.date.type === "months" &&
+                        filterForm.date.value === period.value;
+
+                      return (
+                        <Badge
+                          key={period.value}
+                          variant={getChipVariant(isActive)}
+                          onClick={() => handleMonthsChange(period.value)}
+                          className={getChipClassName(isActive)}
+                        >
+                          {period.label}
+                        </Badge>
+                      );
+                    })}
                     <Badge
-                      variant={
-                        filterForm.date.type === "custom"
-                          ? "default"
-                          : "secondary"
-                      }
+                      variant={getChipVariant(
+                        filterForm.date.type === "custom",
+                      )}
                       onClick={handleShowCustomDatePicker}
-                      className="cursor-pointer px-3 py-1.5 text-sm whitespace-nowrap flex-shrink-0 flex items-center gap-2"
+                      className={getChipClassName(
+                        filterForm.date.type === "custom",
+                      )}
                     >
                       {filterForm.date.type === "custom" && (
                         <CheckIcon className="size-3" />
@@ -290,6 +334,9 @@ export function FiltersDrawer({
                       <CreditCardIcon className="size-4 text-muted-foreground" />
                       <h3 className="font-medium">
                         {t("filtersBankAccounts")}
+                        <span className="ml-1 text-sm font-normal text-muted-foreground">
+                          · {selectedAccountCount}
+                        </span>
                       </h3>
                     </div>
                     {accounts.length > 1 && (
@@ -297,34 +344,30 @@ export function FiltersDrawer({
                         variant="ghost"
                         size="sm"
                         onClick={handleSelectAllAccounts}
-                        className="text-md h-6 px-2"
+                        className="text-md h-6 px-2 text-muted-foreground hover:text-foreground"
                       >
-                        {accounts.every((account) =>
-                          filterForm.accounts.includes(account.id),
-                        )
+                        {areAllAccountsSelected
                           ? t("filtersDeselectAll")
                           : t("filtersSelectAll")}
                       </Button>
                     )}
                   </div>
                   <div className="flex overflow-auto pb-3 gap-2">
-                    {accounts.map((account) => (
-                      <Badge
-                        key={account.id}
-                        variant={
-                          filterForm.accounts.includes(account.id)
-                            ? "default"
-                            : "secondary"
-                        }
-                        onClick={() => handleAccountToggle(account.id)}
-                        className="cursor-pointer px-3 py-1.5 text-sm whitespace-nowrap flex-shrink-0 flex items-center gap-2"
-                      >
-                        {filterForm.accounts.includes(account.id) && (
-                          <CheckIcon className="size-3" />
-                        )}
-                        {account.name}
-                      </Badge>
-                    ))}
+                    {accounts.map((account) => {
+                      const isActive = selectedAccountIds.has(account.id);
+
+                      return (
+                        <Badge
+                          key={account.id}
+                          variant={getChipVariant(isActive)}
+                          onClick={() => handleAccountToggle(account.id)}
+                          className={getChipClassName(isActive)}
+                        >
+                          {isActive && <CheckIcon className="size-3" />}
+                          {account.name}
+                        </Badge>
+                      );
+                    })}
                   </div>
                 </div>
 
@@ -336,50 +379,28 @@ export function FiltersDrawer({
                     </div>
                   </div>
                   <div className="flex overflow-x-auto gap-2 pb-3">
-                    <Badge
-                      variant={
-                        isOrderActive("createdAt", "desc")
-                          ? "default"
-                          : "secondary"
-                      }
-                      className="cursor-pointer px-3 py-1.5 text-sm whitespace-nowrap flex-shrink-0"
-                      onClick={() =>
-                        handleBadgeOrderChange("createdAt", "desc")
-                      }
-                    >
-                      {t("filtersNewestFirst")}
-                    </Badge>
-                    <Badge
-                      variant={
-                        isOrderActive("createdAt", "asc")
-                          ? "default"
-                          : "secondary"
-                      }
-                      className="cursor-pointer px-3 py-1.5 text-sm whitespace-nowrap flex-shrink-0"
-                      onClick={() => handleBadgeOrderChange("createdAt", "asc")}
-                    >
-                      {t("filtersOldestFirst")}
-                    </Badge>
-                    <Badge
-                      variant={
-                        isOrderActive("amount", "desc")
-                          ? "default"
-                          : "secondary"
-                      }
-                      className="cursor-pointer px-3 py-1.5 text-sm whitespace-nowrap flex-shrink-0"
-                      onClick={() => handleBadgeOrderChange("amount", "desc")}
-                    >
-                      {t("filtersHighestAmount")}
-                    </Badge>
-                    <Badge
-                      variant={
-                        isOrderActive("amount", "asc") ? "default" : "secondary"
-                      }
-                      className="cursor-pointer px-3 py-1.5 text-sm whitespace-nowrap flex-shrink-0"
-                      onClick={() => handleBadgeOrderChange("amount", "asc")}
-                    >
-                      {t("filtersLowestAmount")}
-                    </Badge>
+                    {sortOptions.map((option) => {
+                      const isActive = isOrderActive(
+                        option.field,
+                        option.direction,
+                      );
+
+                      return (
+                        <Badge
+                          key={`${option.field}-${option.direction}`}
+                          variant={getChipVariant(isActive)}
+                          className={getChipClassName(isActive)}
+                          onClick={() =>
+                            handleBadgeOrderChange(
+                              option.field,
+                              option.direction,
+                            )
+                          }
+                        >
+                          {option.label}
+                        </Badge>
+                      );
+                    })}
                   </div>
                 </div>
               </>

@@ -1,18 +1,10 @@
 import {
   PlusIcon,
   Loader2,
-  MoreVerticalIcon,
   ChevronUpIcon,
   ChevronDownIcon,
-  ArrowUpDownIcon,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import {
-  DropDrawer,
-  DropDrawerContent,
-  DropDrawerItem,
-  DropDrawerTrigger,
-} from "@/components/ui/dropdrawer";
 import { getCurrencySymbol } from "../../shared/currency-formatter";
 import { PageHeader } from "../widgets/page-header";
 import { trpc, queryClient } from "@/shared/api";
@@ -29,6 +21,7 @@ import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { haptic } from "@/shared/platform/haptics";
 import { useTranslation } from "@/translations/translation-provider";
+import { AccountsActionsMenu } from "./accounts-actions-menu";
 
 const MotionFooter = motion.create(Footer);
 
@@ -108,29 +101,10 @@ export function AccountsScreen({ route }: { route: RouteByType<"accounts"> }) {
             title={t("accountsTitle")}
             rightSlot={
               !isReorderMode && showDropdown ? (
-                <DropDrawer>
-                  <DropDrawerTrigger asChild>
-                    <Button variant="ghost" size="sm">
-                      <MoreVerticalIcon className="w-4 h-4" />
-                    </Button>
-                  </DropDrawerTrigger>
-                  <DropDrawerContent align="end">
-                    <DropDrawerItem
-                      className="cursor-pointer"
-                      icon={<PlusIcon className="h-4 w-4" />}
-                      onClick={handleAddAccountClick}
-                    >
-                      {t("accountsCreate")}
-                    </DropDrawerItem>
-                    <DropDrawerItem
-                      className="cursor-pointer"
-                      icon={<ArrowUpDownIcon className="h-4 w-4" />}
-                      onClick={handleReorderClick}
-                    >
-                      {t("accountsReorder")}
-                    </DropDrawerItem>
-                  </DropDrawerContent>
-                </DropDrawer>
+                <AccountsActionsMenu
+                  onCreateAccount={handleAddAccountClick}
+                  onReorderAccounts={handleReorderClick}
+                />
               ) : !isReorderMode ? (
                 <Button
                   variant="ghost"
