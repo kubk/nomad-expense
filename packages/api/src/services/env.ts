@@ -8,8 +8,7 @@ const envSchema = z
     STAGE: z.enum(["local", "production"]),
     FRONTEND_URL: z.string(),
     TELEGRAM_BOT_TOKEN: z.string(),
-    OPENAI_BASE_URL: z.string(),
-    OPENAI_TOKEN: z.string(),
+    AI_GATEWAY_API_KEY: z.string(),
   })
   .required();
 
@@ -24,7 +23,7 @@ export function getEnv() {
   return env;
 }
 
-export function setEnv(envInput: any) {
+export function setEnv(envInput: unknown) {
   // if ("HYPERDRIVE" in envInput) {
   //   envInput.DB_URL = envInput.HYPERDRIVE.connectionString;
   // }

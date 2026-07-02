@@ -1,5 +1,4 @@
-import { createOpenAI } from "@ai-sdk/openai";
-import { generateText, Output } from "ai";
+import { createGateway, generateText, Output } from "ai";
 import { z } from "zod";
 import { DateTime } from "luxon";
 import { getEnv } from "../env";
@@ -19,16 +18,18 @@ const imageTransactionSchema = z.object({
 
 type ImageTransaction = z.infer<typeof imageTransactionSchema>;
 
+const bankStatementModelId = "openai/gpt-4.1-2025-04-14";
+
 async function parseImageBase64(
   imageBase64: string,
 ): Promise<ImageTransaction[]> {
   const currencyList = currencySchema.options.join(", ");
+  const gateway = createGateway({
+    apiKey: getEnv().AI_GATEWAY_API_KEY,
+  });
 
   const result = await generateText({
-    model: createOpenAI({
-      baseURL: getEnv().OPENAI_BASE_URL,
-      apiKey: getEnv().OPENAI_TOKEN,
-    })("gpt-4.1-2025-04-14"),
+    model: gateway(bankStatementModelId),
     output: Output.array({ element: imageTransactionSchema }),
     messages: [
       {

@@ -40,7 +40,6 @@
     "wrangler": "^4.87.0"
   },
   "dependencies": {
-    "@ai-sdk/openai": "^3.0.2",
     "@dotenvx/dotenvx": "^1.39.1",
     "@neondatabase/serverless": "^0.10.4",
     "@trpc/server": "^11.4.3",
