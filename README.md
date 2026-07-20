@@ -1,10 +1,6 @@
 <h1 align="center">Nomad Expense</h1>
 
 <p align="center">
-  <img src="docs/expense-preview.png" alt="Nomad Expense" width="700" />
-</p>
-
-<p align="center">
   Family expense tracker as a Telegram mini app&nbsp;·&nbsp;<a href="https://t.me/expense_tracker_turkey_bot">Try it</a>
 </p>
 
