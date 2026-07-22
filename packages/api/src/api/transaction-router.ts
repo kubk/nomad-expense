@@ -638,7 +638,8 @@ export const expenseRouter = t.router({
 
       return getMostUsedDescriptions(
         db,
-        input.accountId,
+        familyId,
+        accountResult.account.currency,
         input.transactionType,
       );
     }),

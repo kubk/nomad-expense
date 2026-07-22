@@ -179,7 +179,8 @@ export async function onMessage(ctx: Context) {
 
         const mostUsedDescriptions = await getMostUsedDescriptions(
           db,
-          parseResult.account.id,
+          authResult.familyId,
+          parseResult.account.currency,
           parseResult.transactionType,
         );
 

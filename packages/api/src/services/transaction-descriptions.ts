@@ -1,11 +1,13 @@
 import { count, eq, and, desc } from "drizzle-orm";
 import type { DB } from "./db";
-import { transactionTable } from "../db/schema";
+import { accountTable, transactionTable } from "../db/schema";
 import type { TransactionType } from "../db/enums";
+import type { SupportedCurrency } from "./money/currency";
 
 export async function getMostUsedDescriptions(
   db: DB,
-  accountId: string,
+  familyId: string,
+  currency: SupportedCurrency,
   transactionType: TransactionType,
 ): Promise<string[]> {
   const descriptions = await db
@@ -14,9 +16,11 @@ export async function getMostUsedDescriptions(
       count: count(),
     })
     .from(transactionTable)
+    .innerJoin(accountTable, eq(transactionTable.accountId, accountTable.id))
     .where(
       and(
-        eq(transactionTable.accountId, accountId),
+        eq(accountTable.familyId, familyId),
+        eq(accountTable.currency, currency),
         eq(transactionTable.source, "manual"),
         eq(transactionTable.type, transactionType),
       ),
