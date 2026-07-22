@@ -2,6 +2,7 @@ import React, { useState, useCallback, useEffect } from "react";
 import { routeToUrl, urlToRoute } from "./url-convert";
 import "popstate-direction";
 import type { Route } from "./routes";
+import { getWebApp } from "../platform/telegram-platform";
 
 export type RouteByType<T extends Route["type"]> = Extract<Route, { type: T }>;
 
@@ -52,6 +53,26 @@ export const RouterProvider = ({ children }: { children: React.ReactNode }) => {
       return prev;
     });
   }, []);
+
+  const canGoBack = navigationStack.length > 1;
+
+  useEffect(() => {
+    const webApp = getWebApp();
+    if (!webApp) return;
+
+    if (!canGoBack) {
+      webApp.BackButton.hide();
+      return;
+    }
+
+    webApp.BackButton.onClick(pop);
+    webApp.BackButton.show();
+
+    return () => {
+      webApp.BackButton.offClick(pop);
+      webApp.BackButton.hide();
+    };
+  }, [canGoBack, pop]);
 
   useEffect(() => {
     const handleBack = () => {

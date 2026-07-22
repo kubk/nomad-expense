@@ -33,6 +33,7 @@ import { useInvalidateTransactions } from "@/shared/hooks/use-invalidate-transac
 import { CountableSwitch } from "./countable-switch";
 import { BaseCurrencyInfo } from "./base-currency-info";
 import { haptic } from "@/shared/platform/haptics";
+import { getWebApp } from "@/shared/platform/telegram-platform";
 import { useTranslation } from "@/translations/translation-provider";
 import { CreateTransactionScreen } from "./create-transaction-screen";
 
@@ -72,6 +73,7 @@ function UpdateTransactionScreen({
 }) {
   const { pop } = useRouter();
   const { t } = useTranslation();
+  const hasTelegramBackButton = Boolean(getWebApp());
 
   const [formData, setFormData] = useState<TransactionForm>({
     description: "",
@@ -416,17 +418,19 @@ function UpdateTransactionScreen({
             isLoading={deleteTransactionMutation.isPending}
           />
         </div>
-        <Footer>
-          <Button
-            size={"lg"}
-            variant="outline"
-            type="button"
-            onClick={pop}
-            disabled={isSaving || isTransactionLoading}
-          >
-            <ArrowLeftIcon className="w-4 h-4" />
-            {t("back")}
-          </Button>
+        <Footer className={hasTelegramBackButton ? "grid-cols-1" : undefined}>
+          {!hasTelegramBackButton ? (
+            <Button
+              size={"lg"}
+              variant="outline"
+              type="button"
+              onClick={pop}
+              disabled={isSaving || isTransactionLoading}
+            >
+              <ArrowLeftIcon className="w-4 h-4" />
+              {t("back")}
+            </Button>
+          ) : null}
           <Button
             size="lg"
             type="submit"

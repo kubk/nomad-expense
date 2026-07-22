@@ -15,6 +15,8 @@ export function PageHeader({
 }) {
   const { pop, currentRoute } = useRouter();
   const isForm = isFormRoute(currentRoute);
+  const hasTelegramBackButton = Boolean(getWebApp());
+
   return (
     <div className="sticky top-0">
       <div
@@ -22,23 +24,25 @@ export function PageHeader({
           "pt-1": getWebApp(),
         })}
       >
-        <div className="absolute left-4">
-          <button
-            onClick={() => {
-              haptic("light");
-              pop();
-            }}
-            className={cn(
-              "bg-background flex items-center gap-1.5 font-medium text-sm shadow-sm rounded-full py-1.5 px-3 active:scale-95 transition-transform",
-              {
-                "border shadow-xs": isForm,
-              },
-            )}
-          >
-            <ArrowLeftIcon className="h-4 w-4" />
-            Back
-          </button>
-        </div>
+        {!hasTelegramBackButton ? (
+          <div className="absolute left-4">
+            <button
+              onClick={() => {
+                haptic("light");
+                pop();
+              }}
+              className={cn(
+                "bg-background flex items-center gap-1.5 font-medium text-sm shadow-sm rounded-full py-1.5 px-3 active:scale-95 transition-transform",
+                {
+                  "border shadow-xs": isForm,
+                },
+              )}
+            >
+              <ArrowLeftIcon className="h-4 w-4" />
+              Back
+            </button>
+          </div>
+        ) : null}
 
         {title ? (
           <div

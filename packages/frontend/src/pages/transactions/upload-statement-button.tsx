@@ -70,7 +70,7 @@ export function UploadStatementButton({ accountId }: { accountId: string }) {
         className="hidden"
       />
       <button
-        className="-mx-2 flex items-center gap-1.5 rounded-full px-3 py-1.5 text-sm font-medium whitespace-nowrap disabled:opacity-50"
+        className="flex h-9 shrink-0 items-center gap-1.5 whitespace-nowrap rounded-full border bg-background px-3 text-sm font-medium shadow-xs transition-transform active:scale-95 disabled:opacity-50"
         onClick={handleClick}
         disabled={isUploading}
         type="button"

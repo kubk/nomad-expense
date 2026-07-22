@@ -16,7 +16,6 @@ import { isFormRoute } from "@/shared/stacked-router/routes";
 import { useTranslation } from "@/translations/translation-provider";
 import { NoAccountsEmptyState } from "../widgets/no-accounts-empty-state";
 import { Page } from "../widgets/page";
-import { PageHeader } from "../widgets/page-header";
 import { Footer } from "../widgets/footer";
 import { QuickTitles } from "./quick-titles";
 import { UploadStatementButton } from "./upload-statement-button";
@@ -171,10 +170,7 @@ export function CreateTransactionScreen({
 
   if (!areAccountsLoading && accounts.length === 0) {
     return (
-      <Page
-        title={<PageHeader title={t("transactionsAddTitle")} />}
-        isForm={isFormRoute(route)}
-      >
+      <Page isForm={isFormRoute(route)}>
         <div className="mt-[25%]">
           <NoAccountsEmptyState />
         </div>
@@ -183,94 +179,92 @@ export function CreateTransactionScreen({
   }
 
   return (
-    <Page
-      title={
-        <PageHeader
-          rightSlot={
-            selectedAccount && canUploadStatement ? (
-              <UploadStatementButton accountId={selectedAccount.id} />
-            ) : undefined
-          }
-        />
-      }
-      isForm={isFormRoute(route)}
-    >
-      <form className="flex min-h-full flex-col" onSubmit={handleSave}>
-        <Tabs
-          value={formData.type}
-          onValueChange={(value) => {
-            haptic("selection");
-            setFormData((current) => ({
-              ...current,
-              type: value as TransactionType,
-            }));
-          }}
-        >
-          <TabsList className="grid w-full grid-cols-2">
-            <TabsTrigger value="expense">
-              {t("transactionTypeExpense")}
-            </TabsTrigger>
-            <TabsTrigger value="income">
-              {t("transactionTypeIncome")}
-            </TabsTrigger>
-          </TabsList>
-        </Tabs>
-
-        <div className="flex flex-1 flex-col items-center justify-center px-2 py-8">
-          <div
-            className="flex min-h-20 max-w-full flex-nowrap items-baseline justify-center gap-2"
-            role="status"
-          >
-            <span
-              className={`${getAmountTextSize(formData.amount)} whitespace-nowrap font-semibold tabular-nums tracking-tight`}
-            >
-              {formData.amount || "0"}
-            </span>
-            <span className="min-w-6 shrink-0 whitespace-nowrap text-2xl font-medium text-muted-foreground">
-              {areAccountsLoaded && selectedAccount ? (
-                getCurrencySymbol(selectedAccount.currency)
-              ) : (
-                <span className="invisible">$</span>
-              )}
-            </span>
-          </div>
-
-          {!areAccountsLoaded || !selectedAccount ? (
-            <Skeleton className="mt-5 h-11 w-48 rounded-full" />
-          ) : (
-            <div className="mt-5 flex max-w-full items-center gap-2">
-              <AccountPickerDrawer
-                accounts={accounts}
-                selectedAccount={selectedAccount}
-                onSelect={handleAccountChange}
-              />
-            </div>
-          )}
-        </div>
-
-        <div className="space-y-3">
-          <Input
-            className="h-12 rounded-xl px-4 shadow-none"
-            placeholder={t("transactionsDescriptionPlaceholder")}
-            value={formData.description}
-            onChange={(event) =>
+    <Page isForm={isFormRoute(route)}>
+      <form className="flex h-full min-h-0 flex-col" onSubmit={handleSave}>
+        <div className="flex shrink-0 items-center gap-2">
+          <Tabs
+            className="min-w-0 flex-1"
+            value={formData.type}
+            onValueChange={(value) => {
+              haptic("selection");
               setFormData((current) => ({
                 ...current,
-                description: event.target.value,
-              }))
-            }
-          />
+                type: value as TransactionType,
+              }));
+            }}
+          >
+            <TabsList className="grid w-full grid-cols-2">
+              <TabsTrigger value="expense">
+                {t("transactionTypeExpense")}
+              </TabsTrigger>
+              <TabsTrigger value="income">
+                {t("transactionTypeIncome")}
+              </TabsTrigger>
+            </TabsList>
+          </Tabs>
 
-          <QuickTitles
-            titles={titles}
-            isLoading={!areQuickTitlesLoaded}
-            onTitleClick={(description) =>
-              setFormData((current) => ({ ...current, description }))
-            }
-          />
+          {selectedAccount && canUploadStatement ? (
+            <UploadStatementButton accountId={selectedAccount.id} />
+          ) : null}
         </div>
 
-        <div className="flex flex-col pb-3 pt-4">
+        <div className="flex min-h-0 flex-1 flex-col overflow-y-auto">
+          <div className="flex min-h-38 flex-1 flex-col items-center justify-center px-2 py-3">
+            <div
+              className="flex min-h-16 max-w-full flex-nowrap items-baseline justify-center gap-2"
+              role="status"
+            >
+              <span
+                className={`${getAmountTextSize(formData.amount)} whitespace-nowrap font-semibold tabular-nums tracking-tight`}
+              >
+                {formData.amount || "0"}
+              </span>
+              <span className="min-w-6 shrink-0 whitespace-nowrap text-2xl font-medium text-muted-foreground">
+                {areAccountsLoaded && selectedAccount ? (
+                  getCurrencySymbol(selectedAccount.currency)
+                ) : (
+                  <span className="invisible">$</span>
+                )}
+              </span>
+            </div>
+
+            {!areAccountsLoaded || !selectedAccount ? (
+              <Skeleton className="mt-3 h-11 w-48 shrink-0 rounded-full" />
+            ) : (
+              <div className="mt-3 flex max-w-full shrink-0 items-center gap-2">
+                <AccountPickerDrawer
+                  accounts={accounts}
+                  selectedAccount={selectedAccount}
+                  onSelect={handleAccountChange}
+                />
+              </div>
+            )}
+          </div>
+
+          <div className="shrink-0 space-y-3">
+            <Input
+              className="h-12 rounded-xl px-4 shadow-none"
+              placeholder={t("transactionsDescriptionPlaceholder")}
+              value={formData.description}
+              onChange={(event) =>
+                setFormData((current) => ({
+                  ...current,
+                  description: event.target.value,
+                }))
+              }
+            />
+
+            <QuickTitles
+              titles={titles}
+              isLoading={!areQuickTitlesLoaded}
+              onTitleClick={(description) =>
+                setFormData((current) => ({ ...current, description }))
+              }
+            />
+          </div>
+        </div>
+
+        <div className="flex shrink-0 flex-col pb-3 pt-4">
           <div className="grid grid-cols-3 gap-2">
             {keypadKeys.map((key) => (
               <Button
@@ -293,7 +287,6 @@ export function CreateTransactionScreen({
               <DeleteIcon className="size-5" />
             </Button>
           </div>
-
         </div>
 
         <Footer className="grid-cols-1">
