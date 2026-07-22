@@ -73,6 +73,7 @@ export const ru: Translation = {
   settingsTheme: "Тема",
   settingsLight: "Светлая",
   settingsDark: "Темная",
+  settingsSystem: "Системная",
   settingsTelegramGroup: "Группа Telegram",
   settingsLogout: "Выйти",
   settingsLogoutDescription: "Вы точно хотите выйти?",

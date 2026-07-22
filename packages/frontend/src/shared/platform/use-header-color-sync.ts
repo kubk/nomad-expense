@@ -3,12 +3,12 @@ import { useEffect } from "react";
 import { platform } from "./platforms";
 
 export function useHeaderColorSync() {
-  const { theme } = useTheme();
+  const { resolvedTheme } = useTheme();
   useEffect(() => {
-    if (theme === "dark") {
+    if (resolvedTheme === "dark") {
       platform.syncHeader("#262626");
     } else {
       platform.syncHeader("#f5f5f5");
     }
-  }, [theme]);
+  }, [resolvedTheme]);
 }

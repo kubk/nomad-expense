@@ -57,6 +57,7 @@ export const en = {
   settingsTheme: "Theme",
   settingsLight: "Light",
   settingsDark: "Dark",
+  settingsSystem: "System",
   settingsTelegramGroup: "Telegram group",
   settingsLogout: "Logout",
   settingsLogoutDescription: "Are you sure you want to logout?",
