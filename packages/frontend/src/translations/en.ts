@@ -146,7 +146,7 @@ export const en = {
   transactionsRate: (baseCurrency: string, rate: string, currency: string) =>
     `Rate: 1 ${baseCurrency} = ${rate} ${currency}`,
 
-  uploadStatement: "Upload statement",
+  uploadStatement: "Upload",
   uploadStatementUploading: "Uploading...",
   uploadStatementFailed: "Upload failed",
   uploadStatementSuccess: (removed: number, added: number) =>

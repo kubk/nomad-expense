@@ -10,7 +10,7 @@ export function PageHeader({
   title,
   rightSlot,
 }: {
-  title: string | ReactNode;
+  title?: string | ReactNode;
   rightSlot?: ReactNode;
 }) {
   const { pop, currentRoute } = useRouter();
@@ -40,16 +40,20 @@ export function PageHeader({
           </button>
         </div>
 
-        <div
-          className={cn(
-            "bg-background font-medium text-sm shadow-sm rounded-full py-1.5 px-4",
-            {
-              "border shadow-xs": isForm,
-            },
-          )}
-        >
-          {title}
-        </div>
+        {title ? (
+          <div
+            className={cn(
+              "bg-background font-medium text-sm shadow-sm rounded-full py-1.5 px-4",
+              {
+                "border shadow-xs": isForm,
+              },
+            )}
+          >
+            {title}
+          </div>
+        ) : (
+          <div className="h-[34px]" />
+        )}
 
         {rightSlot && (
           <div className="absolute right-4">

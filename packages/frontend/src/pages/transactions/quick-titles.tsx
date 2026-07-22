@@ -15,7 +15,7 @@ function TitleChip({
     <Badge
       asChild
       variant="outline"
-      className="h-11 rounded-xl border-0 bg-card px-4 text-sm shadow-sm"
+      className="h-11 rounded-xl bg-background px-4 text-sm shadow-xs"
     >
       <button
         type="button"

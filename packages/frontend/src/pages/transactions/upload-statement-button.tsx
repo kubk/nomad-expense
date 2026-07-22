@@ -1,5 +1,4 @@
-import { FilePlus2Icon, Loader2Icon } from "lucide-react";
-import { FormActionButton } from "@/components/ui/form-action-button";
+import { Loader2Icon, PlusIcon } from "lucide-react";
 import { trpc } from "@/shared/api";
 import { useQuery } from "@tanstack/react-query";
 import { uploadStatementFile } from "@/shared/upload-file";
@@ -70,19 +69,21 @@ export function UploadStatementButton({ accountId }: { accountId: string }) {
         onChange={handleFileSelect}
         className="hidden"
       />
-      <FormActionButton
-        icon={
-          isUploading ? (
-            <Loader2Icon className="h-4 w-4 animate-spin" />
-          ) : (
-            <FilePlus2Icon className="h-4 w-4" />
-          )
-        }
+      <button
+        className="-mx-2 flex items-center gap-1.5 rounded-full px-3 py-1.5 text-sm font-medium whitespace-nowrap disabled:opacity-50"
         onClick={handleClick}
         disabled={isUploading}
+        type="button"
       >
-        {isUploading ? t("uploadStatementUploading") : t("uploadStatement")}
-      </FormActionButton>
+        {isUploading ? (
+          <Loader2Icon className="size-4 animate-spin" />
+        ) : (
+          <PlusIcon className="size-4" />
+        )}
+        <span>
+          {isUploading ? t("uploadStatementUploading") : t("uploadStatement")}
+        </span>
+      </button>
     </>
   );
 }

@@ -4,13 +4,6 @@ import { useMutation, useQuery } from "@tanstack/react-query";
 import type { Account, TransactionType } from "api";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { getCurrencySymbol } from "@/shared/currency-formatter";
@@ -27,6 +20,7 @@ import { PageHeader } from "../widgets/page-header";
 import { Footer } from "../widgets/footer";
 import { QuickTitles } from "./quick-titles";
 import { UploadStatementButton } from "./upload-statement-button";
+import { AccountPickerDrawer } from "./account-picker-drawer";
 
 type CreateTransactionForm = {
   accountId: string;
@@ -85,7 +79,6 @@ export function CreateTransactionScreen({
     description: "",
     type: "expense",
   });
-
   const { data: accounts = [], isLoading: areAccountsLoading } = useQuery(
     trpc.accounts.list.queryOptions(),
   );
@@ -108,6 +101,11 @@ export function CreateTransactionScreen({
   const selectedAccount = accounts.find(
     (account) => account.id === formData.accountId,
   );
+  const canUploadStatement = Boolean(selectedAccount?.bankType);
+
+  const handleAccountChange = (accountId: string) => {
+    setFormData((current) => ({ ...current, accountId }));
+  };
 
   const { data: titles, isLoading: areTitlesLoading } = useQuery(
     trpc.expenses.getMostUsedDescriptions.queryOptions(
@@ -186,7 +184,15 @@ export function CreateTransactionScreen({
 
   return (
     <Page
-      title={<PageHeader title={t("transactionsAddTitle")} />}
+      title={
+        <PageHeader
+          rightSlot={
+            selectedAccount && canUploadStatement ? (
+              <UploadStatementButton accountId={selectedAccount.id} />
+            ) : undefined
+          }
+        />
+      }
       isForm={isFormRoute(route)}
     >
       <form className="flex min-h-full flex-col" onSubmit={handleSave}>
@@ -229,40 +235,22 @@ export function CreateTransactionScreen({
             </span>
           </div>
 
-          {!areAccountsLoaded ? (
-            <Skeleton className="mt-5 h-9 w-40 rounded-full" />
+          {!areAccountsLoaded || !selectedAccount ? (
+            <Skeleton className="mt-5 h-11 w-48 rounded-full" />
           ) : (
-            <Select
-              value={formData.accountId}
-              onValueChange={(accountId) => {
-                haptic("selection");
-                setFormData((current) => ({ ...current, accountId }));
-              }}
-            >
-              <SelectTrigger
-                className="mt-5 max-w-full rounded-full border-0 bg-muted/70 px-3 shadow-none"
-              >
-                <SelectValue>
-                  {selectedAccount
-                    ? `${selectedAccount.name} · ${selectedAccount.currency}`
-                    : t("accountsSelectTitle")}
-                </SelectValue>
-              </SelectTrigger>
-              <SelectContent>
-                {accounts.map((account) => (
-                  <SelectItem key={account.id} value={account.id}>
-                    {account.name} · {getCurrencySymbol(account.currency)}{" "}
-                    {account.currency}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            <div className="mt-5 flex max-w-full items-center gap-2">
+              <AccountPickerDrawer
+                accounts={accounts}
+                selectedAccount={selectedAccount}
+                onSelect={handleAccountChange}
+              />
+            </div>
           )}
         </div>
 
         <div className="space-y-3">
           <Input
-            className="h-12 rounded-xl px-4 shadow-sm"
+            className="h-12 rounded-xl px-4 shadow-none"
             placeholder={t("transactionsDescriptionPlaceholder")}
             value={formData.description}
             onChange={(event) =>
@@ -306,13 +294,6 @@ export function CreateTransactionScreen({
             </Button>
           </div>
 
-          {!areAccountsLoaded ? (
-            <Skeleton className="mt-3 h-11 w-full rounded-xl" />
-          ) : selectedAccount?.bankType ? (
-            <div className="mt-3 flex">
-              <UploadStatementButton accountId={selectedAccount.id} />
-            </div>
-          ) : null}
         </div>
 
         <Footer className="grid-cols-1">

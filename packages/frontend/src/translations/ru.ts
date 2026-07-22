@@ -160,7 +160,7 @@ export const ru: Translation = {
   transactionsRate: (baseCurrency, rate, currency) =>
     `Курс: 1 ${baseCurrency} = ${rate} ${currency}`,
 
-  uploadStatement: "Загрузить выписку",
+  uploadStatement: "Загрузить",
   uploadStatementUploading: "Загрузка...",
   uploadStatementFailed: "Не удалось загрузить",
   uploadStatementSuccess: (removed, added) =>
