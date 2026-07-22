@@ -20,7 +20,7 @@ import { ConfirmModal } from "../widgets/confirm-modal";
 import { useState } from "react";
 import { platform } from "@/shared/platform/platforms";
 import { links } from "api";
-import { getWebApp } from "@/shared/platform/telegram-platform";
+import { isTelegram } from "@/shared/platform/telegram-platform";
 import { haptic } from "@/shared/platform/haptics";
 import { useTranslation } from "@/translations/translation-provider";
 
@@ -105,7 +105,7 @@ export function SettingsScreen({ route }: { route: RouteByType<"settings"> }) {
             </Button>
           </div>
 
-          {!getWebApp() && (
+          {!isTelegram() && (
             <div className="space-y-4">
               <Button
                 onClick={() => {

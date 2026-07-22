@@ -1,7 +1,7 @@
 import { ReactNode } from "react";
 import { useRouter } from "@/shared/stacked-router/router";
 import { ArrowLeftIcon } from "lucide-react";
-import { getWebApp } from "@/shared/platform/telegram-platform";
+import { isTelegram } from "@/shared/platform/telegram-platform";
 import { cn } from "@/lib/utils";
 import { isFormRoute } from "@/shared/stacked-router/routes";
 import { haptic } from "@/shared/platform/haptics";
@@ -15,16 +15,15 @@ export function PageHeader({
 }) {
   const { pop, currentRoute } = useRouter();
   const isForm = isFormRoute(currentRoute);
-  const hasTelegramBackButton = Boolean(getWebApp());
 
   return (
     <div className="sticky top-0">
       <div
         className={cn("relative flex items-center justify-center p-4 pb-6", {
-          "pt-1": getWebApp(),
+          "pt-1": isTelegram(),
         })}
       >
-        {!hasTelegramBackButton ? (
+        {!isTelegram() ? (
           <div className="absolute left-4">
             <button
               onClick={() => {

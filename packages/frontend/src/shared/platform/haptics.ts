@@ -1,5 +1,5 @@
 import type { WebHaptics, defaultPatterns } from "web-haptics";
-import { getWebApp } from "./telegram-platform";
+import { getWebApp, isTelegram } from "./telegram-platform";
 
 type HapticType =
   | "error"
@@ -17,7 +17,7 @@ let webHaptics:
   | { instance: WebHaptics; patterns: typeof defaultPatterns }
   | undefined;
 
-if (!getWebApp()) {
+if (!isTelegram()) {
   import("web-haptics").then(({ WebHaptics, defaultPatterns }) => {
     webHaptics = {
       instance: new WebHaptics(),
@@ -84,4 +84,4 @@ const browserHaptic = (type: HapticType) => {
   }
 };
 
-export const haptic = getWebApp() ? telegramHaptic : browserHaptic;
+export const haptic = isTelegram() ? telegramHaptic : browserHaptic;

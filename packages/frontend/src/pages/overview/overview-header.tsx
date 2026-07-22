@@ -3,7 +3,7 @@ import { UserAvatar } from "@/components/user-avatar";
 import { trpc } from "@/shared/api";
 import { useQuery } from "@tanstack/react-query";
 import { useRouter } from "@/shared/stacked-router/router";
-import { getWebApp } from "@/shared/platform/telegram-platform";
+import { isTelegram } from "@/shared/platform/telegram-platform";
 import { cn } from "@/lib/utils";
 import { useBaseCurrency } from "@/shared/hooks/use-base-currency";
 import { haptic } from "@/shared/platform/haptics";
@@ -30,7 +30,7 @@ export function OverviewHeader({
   return (
     <div
       className={cn("text-primary-foreground bg-muted px-4 pb-6 pt-4 pb-18", {
-        "pt-1": getWebApp(),
+        "pt-1": isTelegram(),
       })}
     >
       <div className="bg-background backdrop-blur dark:border shadow-sm rounded-2xl p-4">

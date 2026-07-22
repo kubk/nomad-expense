@@ -10,12 +10,14 @@ import { getCurrencySymbol } from "@/shared/currency-formatter";
 import { queryClient, trpc } from "@/shared/api";
 import { useInvalidateTransactions } from "@/shared/hooks/use-invalidate-transactions";
 import { haptic } from "@/shared/platform/haptics";
+import { isTelegram } from "@/shared/platform/telegram-platform";
 import type { RouteByType } from "@/shared/stacked-router/router";
 import { useRouter } from "@/shared/stacked-router/router";
 import { isFormRoute } from "@/shared/stacked-router/routes";
 import { useTranslation } from "@/translations/translation-provider";
 import { NoAccountsEmptyState } from "../widgets/no-accounts-empty-state";
 import { Page } from "../widgets/page";
+import { PageHeader } from "../widgets/page-header";
 import { Footer } from "../widgets/footer";
 import { QuickTitles } from "./quick-titles";
 import { UploadStatementButton } from "./upload-statement-button";
@@ -170,7 +172,10 @@ export function CreateTransactionScreen({
 
   if (!areAccountsLoading && accounts.length === 0) {
     return (
-      <Page isForm={isFormRoute(route)}>
+      <Page
+        title={!isTelegram() ? <PageHeader /> : undefined}
+        isForm={isFormRoute(route)}
+      >
         <div className="mt-[25%]">
           <NoAccountsEmptyState />
         </div>
@@ -179,7 +184,10 @@ export function CreateTransactionScreen({
   }
 
   return (
-    <Page isForm={isFormRoute(route)}>
+    <Page
+      title={!isTelegram() ? <PageHeader /> : undefined}
+      isForm={isFormRoute(route)}
+    >
       <form className="flex h-full min-h-0 flex-col" onSubmit={handleSave}>
         <div className="flex shrink-0 items-center gap-2">
           <Tabs

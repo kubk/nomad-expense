@@ -17,7 +17,7 @@ import { isFormRoute } from "@/shared/stacked-router/routes";
 import { Label } from "@/components/ui/label";
 import { Skeleton } from "@/components/ui/skeleton";
 import { bank, type Bank } from "api";
-import { getWebApp } from "@/shared/platform/telegram-platform";
+import { isTelegram } from "@/shared/platform/telegram-platform";
 import { useTranslation } from "@/translations/translation-provider";
 
 function getTimezones() {
@@ -54,7 +54,6 @@ export function ImportSettingsScreen({
 }) {
   const { pop } = useRouter();
   const { t } = useTranslation();
-  const hasTelegramBackButton = Boolean(getWebApp());
   const { accountId } = route;
 
   const [formData, setFormData] = useState<Form>({
@@ -152,8 +151,8 @@ export function ImportSettingsScreen({
         )}
       </div>
 
-      <Footer className={hasTelegramBackButton ? "grid-cols-1" : undefined}>
-        {!hasTelegramBackButton ? (
+      <Footer className={isTelegram() ? "grid-cols-1" : undefined}>
+        {!isTelegram() ? (
           <Button
             size="lg"
             variant="outline"

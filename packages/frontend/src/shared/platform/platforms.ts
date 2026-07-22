@@ -1,5 +1,5 @@
 import { createBrowserPlatform } from "./browser-platform";
-import { createTelegramPlatform, getWebApp } from "./telegram-platform";
+import { createTelegramPlatform, isTelegram } from "./telegram-platform";
 
 export type Platform = {
   initialize(): void;
@@ -8,6 +8,6 @@ export type Platform = {
   openInternalLink(link: string): void;
 };
 
-export const platform = getWebApp()
+export const platform = isTelegram()
   ? createTelegramPlatform()
   : createBrowserPlatform();

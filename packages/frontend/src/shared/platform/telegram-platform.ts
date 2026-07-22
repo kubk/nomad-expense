@@ -7,6 +7,10 @@ export function getWebApp() {
   return null;
 }
 
+export function isTelegram() {
+  return getWebApp() !== null;
+}
+
 export function createTelegramPlatform(): Platform {
   const webApp = getWebApp();
   if (!webApp) {

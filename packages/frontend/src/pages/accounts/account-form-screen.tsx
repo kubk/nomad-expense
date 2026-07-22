@@ -34,7 +34,7 @@ import { isFormRoute } from "@/shared/stacked-router/routes";
 import { Label } from "@/components/ui/label";
 import { FormActionButton } from "@/components/ui/form-action-button";
 import { haptic } from "@/shared/platform/haptics";
-import { getWebApp } from "@/shared/platform/telegram-platform";
+import { isTelegram } from "@/shared/platform/telegram-platform";
 import { useTranslation } from "@/translations/translation-provider";
 
 function invalidateAccounts() {
@@ -56,7 +56,6 @@ export function AccountFormScreen({
 }) {
   const { navigate, pop } = useRouter();
   const { t } = useTranslation();
-  const hasTelegramBackButton = Boolean(getWebApp());
   const accountId = route.accountId;
   const isEdit = Boolean(accountId);
 
@@ -313,8 +312,8 @@ export function AccountFormScreen({
           isLoading={deleteAccountMutation.isPending}
         />
 
-        <Footer className={hasTelegramBackButton ? "grid-cols-1" : undefined}>
-          {!hasTelegramBackButton ? (
+        <Footer className={isTelegram() ? "grid-cols-1" : undefined}>
+          {!isTelegram() ? (
             <Button
               size="lg"
               variant="outline"
