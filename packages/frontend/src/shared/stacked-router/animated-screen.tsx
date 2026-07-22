@@ -101,7 +101,7 @@ export const AnimatedScreen = ({
 
   return (
     <motion.div
-      className="absolute inset-0"
+      className="absolute inset-x-0 bottom-0 top-[calc(var(--tg-safe-area-inset-top,0px)_+_var(--tg-content-safe-area-inset-top,0px))]"
       animate={animationProps.animate}
       initial={animationProps.initial}
       exit={animationProps.exit}
