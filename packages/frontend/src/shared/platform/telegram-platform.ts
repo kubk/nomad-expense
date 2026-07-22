@@ -17,6 +17,12 @@ export function createTelegramPlatform(): Platform {
     initialize() {
       webApp.ready();
       webApp.expand();
+      if (
+        webApp.isVersionAtLeast("8.0") &&
+        (webApp.platform === "ios" || webApp.platform === "android")
+      ) {
+        webApp.requestFullscreen();
+      }
       webApp.disableVerticalSwipes();
       lockOrientationWhenPortrait();
     },

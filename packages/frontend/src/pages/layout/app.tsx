@@ -18,12 +18,10 @@ import { useCallback, useEffect } from "react";
 import { Route } from "@/shared/stacked-router/routes";
 import { AnimatedScreen } from "@/shared/stacked-router/animated-screen";
 import { StatementUploadResultScreen } from "../transactions/statement-upload-result-screen";
-import { platform } from "@/shared/platform/platforms";
 import { useHeaderColorSync } from "@/shared/platform/use-header-color-sync";
 import { getAuthToken } from "@/shared/auth-token";
 
 export function App() {
-  useEffect(platform.initialize, []);
   useHeaderColorSync();
   const { navigationStack, navigate, pop } = useRouter();
 

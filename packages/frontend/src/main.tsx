@@ -8,6 +8,9 @@ import { App } from "./pages/layout/app";
 import { RouterProvider } from "./shared/stacked-router/router";
 import { queryClient } from "./shared/api";
 import { TranslationProvider } from "./translations/translation-provider";
+import { platform } from "./shared/platform/platforms";
+
+platform.initialize();
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
