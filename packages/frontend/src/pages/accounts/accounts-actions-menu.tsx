@@ -116,8 +116,6 @@ export function AccountsActionsMenu({
         ref={triggerRef}
         variant="ghost"
         size="sm"
-        aria-haspopup="menu"
-        aria-expanded={isOpen}
         onClick={() => setIsOpen((open) => !open)}
       >
         <MoreVerticalIcon className="w-4 h-4" />

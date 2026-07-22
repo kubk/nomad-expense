@@ -63,9 +63,6 @@ export const routeSchema = v.variant("type", [
     accountId: v.string(),
   }),
   v.object({
-    type: v.literal("accountPicker"),
-  }),
-  v.object({
     type: v.literal("transactionForm"),
     transactionId: v.optional(v.string()),
     accountId: v.optional(v.string()),

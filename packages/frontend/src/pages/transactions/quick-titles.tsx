@@ -1,36 +1,63 @@
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
-import { trpc } from "@/shared/api";
-import { useQuery } from "@tanstack/react-query";
-import { TransactionType } from "api";
 import { haptic } from "@/shared/platform/haptics";
 
-export function QuickTitles({
-  accountId,
-  transactionType,
+const skeletonWidths = [88, 112, 136, 104, 128, 96, 144, 120];
+
+function TitleChip({
+  title,
   onTitleClick,
 }: {
-  accountId: string;
-  transactionType: TransactionType;
+  title: string;
   onTitleClick: (title: string) => void;
 }) {
-  const { data: titles, isLoading } = useQuery(
-    trpc.expenses.getMostUsedDescriptions.queryOptions({
-      accountId,
-      transactionType,
-    }),
+  return (
+    <Badge
+      asChild
+      variant="outline"
+      className="h-11 rounded-xl border-0 bg-card px-4 text-sm shadow-sm"
+    >
+      <button
+        type="button"
+        onClick={() => {
+          haptic("selection");
+          onTitleClick(title);
+        }}
+      >
+        {title}
+      </button>
+    </Badge>
   );
+}
 
+export function QuickTitles({
+  titles,
+  isLoading,
+  onTitleClick,
+}: {
+  titles: string[] | undefined;
+  isLoading: boolean;
+  onTitleClick: (title: string) => void;
+}) {
   if (isLoading) {
+    const skeletonRows = [
+      skeletonWidths.filter((_, index) => index % 2 === 0),
+      skeletonWidths.filter((_, index) => index % 2 === 1),
+    ];
+
     return (
-      <div className="overflow-x-auto">
-        <div className="flex gap-2 pb-2">
-          {Array.from({ length: 8 }).map((_, index) => (
-            <Skeleton
-              key={index}
-              className="h-7 rounded-md flex-shrink-0"
-              style={{ width: `${60 + Math.random() * 40}px` }}
-            />
+      <div className="-mx-4 overflow-x-auto px-4">
+        <div className="flex w-max flex-col gap-2 pb-2 pt-0.5">
+          {skeletonRows.map((row, rowIndex) => (
+            <div key={rowIndex} className="flex gap-2">
+              {row.map((width, index) => (
+                <Skeleton
+                  key={`${rowIndex}-${index}`}
+                  className="h-11 rounded-xl"
+                  style={{ width }}
+                />
+              ))}
+            </div>
           ))}
         </div>
       </div>
@@ -41,21 +68,24 @@ export function QuickTitles({
     return null;
   }
 
+  const titleRows = [
+    titles.filter((_, index) => index % 2 === 0),
+    titles.filter((_, index) => index % 2 === 1),
+  ];
+
   return (
-    <div className="overflow-x-auto">
-      <div className="flex gap-2 pb-2">
-        {titles.map((title) => (
-          <Badge
-            key={title}
-            variant="outline"
-            className="cursor-pointer py-[5px] flex-shrink-0"
-            onClick={() => {
-              haptic("selection");
-              onTitleClick(title);
-            }}
-          >
-            {title}
-          </Badge>
+    <div className="-mx-4 overflow-x-auto px-4">
+      <div className="flex w-max flex-col gap-2 pb-2 pt-0.5">
+        {titleRows.map((row, rowIndex) => (
+          <div key={rowIndex} className="flex gap-2">
+            {row.map((title) => (
+              <TitleChip
+                key={title}
+                title={title}
+                onTitleClick={onTitleClick}
+              />
+            ))}
+          </div>
         ))}
       </div>
     </div>

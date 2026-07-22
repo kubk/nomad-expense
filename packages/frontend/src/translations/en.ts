@@ -128,6 +128,7 @@ export const en = {
   transactionsEditTitle: "Edit transaction",
   transactionsAmount: "Amount",
   transactionsDescriptionPlaceholder: "Groceries",
+  transactionsAddAction: "Add transaction",
   transactionsDate: "Date",
   transactionsTime: "Time",
   transactionsSelectDate: "Select date",

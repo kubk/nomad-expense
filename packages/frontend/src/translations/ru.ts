@@ -142,6 +142,7 @@ export const ru: Translation = {
   transactionsEditTitle: "Редактировать транзакцию",
   transactionsAmount: "Сумма",
   transactionsDescriptionPlaceholder: "Продукты",
+  transactionsAddAction: "Добавить транзакцию",
   transactionsDate: "Дата",
   transactionsTime: "Время",
   transactionsSelectDate: "Выберите дату",

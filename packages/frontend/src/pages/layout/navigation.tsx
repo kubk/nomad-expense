@@ -21,7 +21,6 @@ export function Navigation() {
     currentRoute.type === "monthlyBreakdownSettings" ||
     currentRoute.type === "monthlyBreakdownAccounts" ||
     currentRoute.type === "transactionForm" ||
-    currentRoute.type === "accountPicker" ||
     currentRoute.type === "importSettings" ||
     currentRoute.type === "accountForm" ||
     currentRoute.type === "auth" ||

@@ -24,18 +24,17 @@ import { ConfirmModal } from "../widgets/confirm-modal";
 import { Footer } from "../widgets/footer";
 import { trpc, queryClient } from "@/shared/api";
 import { useQuery, useMutation } from "@tanstack/react-query";
-import { TransactionType } from "api";
+import type { TransactionType } from "api";
 import { DateTime } from "luxon";
 import { getCurrencySymbol } from "@/shared/currency-formatter";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { FormActionButton } from "@/components/ui/form-action-button";
-import { UploadStatementButton } from "./upload-statement-button";
 import { useInvalidateTransactions } from "@/shared/hooks/use-invalidate-transactions";
 import { CountableSwitch } from "./countable-switch";
-import { QuickTitles } from "./quick-titles";
 import { BaseCurrencyInfo } from "./base-currency-info";
 import { haptic } from "@/shared/platform/haptics";
 import { useTranslation } from "@/translations/translation-provider";
+import { CreateTransactionScreen } from "./create-transaction-screen";
 
 export type TransactionForm = {
   description: string;
@@ -52,14 +51,31 @@ export function TransactionFormScreen({
 }: {
   route: RouteByType<"transactionForm">;
 }) {
-  const { pop, navigate } = useRouter();
+  if (!route.transactionId) {
+    return <CreateTransactionScreen route={route} />;
+  }
+
+  return (
+    <UpdateTransactionScreen
+      route={route}
+      transactionId={route.transactionId}
+    />
+  );
+}
+
+function UpdateTransactionScreen({
+  route,
+  transactionId,
+}: {
+  route: RouteByType<"transactionForm">;
+  transactionId: string;
+}) {
+  const { pop } = useRouter();
   const { t } = useTranslation();
-  const transactionId = route.transactionId;
-  const isEdit = Boolean(transactionId);
 
   const [formData, setFormData] = useState<TransactionForm>({
     description: "",
-    accountId: route.accountId || "",
+    accountId: "",
     amount: "",
     date: new Date(),
     time: DateTime.now().toFormat("HH:mm"),
@@ -69,10 +85,7 @@ export function TransactionFormScreen({
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
   const { data: transaction } = useQuery(
-    trpc.expenses.getTransaction.queryOptions(
-      { id: transactionId! },
-      { enabled: Boolean(transactionId) },
-    ),
+    trpc.expenses.getTransaction.queryOptions({ id: transactionId }),
   );
 
   const { data: accounts = [] } = useQuery(trpc.accounts.list.queryOptions());
@@ -89,17 +102,6 @@ export function TransactionFormScreen({
           queryKey: trpc.expenses.getTransaction.queryKey({
             id: transactionId,
           }),
-        });
-      },
-    }),
-  );
-
-  const createTransactionMutation = useMutation(
-    trpc.expenses.createTransaction.mutationOptions({
-      onSuccess: () => {
-        invalidateTransactions();
-        queryClient.invalidateQueries({
-          queryKey: trpc.accounts.list.queryKey(),
         });
       },
     }),
@@ -163,32 +165,18 @@ export function TransactionFormScreen({
       return dateTime.toISO() || new Date().toISOString();
     };
 
-    if (isEdit && transactionId) {
-      await updateTransactionMutation.mutateAsync({
-        id: transactionId,
-        description: formData.description,
-        amount: parseFloat(formData.amount),
-        createdAt: getCreatedAt(),
-        type: formData.type,
-        isCountable: formData.isCountable,
-      });
-      pop();
-    } else {
-      await createTransactionMutation.mutateAsync({
-        accountId: formData.accountId,
-        description: formData.description,
-        amount: parseFloat(formData.amount),
-        type: formData.type,
-        createdAt: getCreatedAt(),
-      });
-
-      navigate({ type: "main" });
-    }
+    await updateTransactionMutation.mutateAsync({
+      id: transactionId,
+      description: formData.description,
+      amount: parseFloat(formData.amount),
+      createdAt: getCreatedAt(),
+      type: formData.type,
+      isCountable: formData.isCountable,
+    });
+    pop();
   };
 
   const handleDelete = async () => {
-    if (!transactionId) return;
-
     await deleteTransactionMutation.mutateAsync({ id: transactionId });
   };
 
@@ -206,20 +194,13 @@ export function TransactionFormScreen({
 
   const isSaving =
     updateTransactionMutation.isPending ||
-    createTransactionMutation.isPending ||
     repeatTransactionMutation.isPending;
 
-  const isTransactionLoading = isEdit && !transaction;
+  const isTransactionLoading = !transaction;
 
   return (
     <Page
-      title={
-        <PageHeader
-          title={
-            isEdit ? t("transactionsEditTitle") : t("transactionsAddTitle")
-          }
-        />
-      }
+      title={<PageHeader title={t("transactionsEditTitle")} />}
       isForm={isFormRoute(route)}
     >
       <form onSubmit={handleSave}>
@@ -252,7 +233,7 @@ export function TransactionFormScreen({
               )}
             </div>
 
-            {/* Amount input for both edit and create modes */}
+            {/* Amount input */}
             <div className="flex flex-col gap-2">
               <label className="text-sm font-medium">
                 {t("transactionsAmount")}
@@ -281,10 +262,7 @@ export function TransactionFormScreen({
                     />
                     <div className="text-lg text-muted-foreground min-w-16 flex items-center justify-center">
                       {(() => {
-                        const currencyCode =
-                          isEdit && transaction
-                            ? transaction.currency
-                            : selectedAccount?.currency;
+                        const currencyCode = transaction?.currency;
                         if (!currencyCode) return "";
                         const symbol = getCurrencySymbol(currencyCode);
                         return `${symbol} · ${currencyCode}`;
@@ -296,15 +274,6 @@ export function TransactionFormScreen({
             </div>
 
             <div className="flex flex-col gap-2">
-              {!isEdit && !isTransactionLoading && formData.accountId && (
-                <QuickTitles
-                  accountId={formData.accountId}
-                  transactionType={formData.type}
-                  onTitleClick={(title) =>
-                    setFormData((prev) => ({ ...prev, description: title }))
-                  }
-                />
-              )}
               {isTransactionLoading ? (
                 <Skeleton className="h-9 w-full" />
               ) : (
@@ -390,44 +359,37 @@ export function TransactionFormScreen({
               {isTransactionLoading && <Skeleton className="h-11" />}
               {!isTransactionLoading && (
                 <div className="flex gap-3">
-                  {isEdit && (
-                    <>
-                      <FormActionButton
-                        onClick={handleRepeat}
-                        icon={
-                          repeatTransactionMutation.isPending ? (
-                            <Loader2Icon className="h-4 w-4 animate-spin" />
-                          ) : (
-                            <RepeatIcon className="h-4 w-4" />
-                          )
-                        }
-                        disabled={
-                          repeatTransactionMutation.isPending ||
-                          isSaving ||
-                          isTransactionLoading
-                        }
-                      >
-                        {t("transactionsRepeat")}
-                      </FormActionButton>
-                      <FormActionButton
-                        onClick={() => {
-                          haptic("heavy");
-                          setShowDeleteConfirm(true);
-                        }}
-                        icon={<Trash2Icon className="h-4 w-4" />}
-                      >
-                        {t("delete")}
-                      </FormActionButton>
-                    </>
-                  )}
-                  {formData.accountId && !isEdit ? (
-                    <UploadStatementButton accountId={formData.accountId} />
-                  ) : null}
+                  <FormActionButton
+                    onClick={handleRepeat}
+                    icon={
+                      repeatTransactionMutation.isPending ? (
+                        <Loader2Icon className="h-4 w-4 animate-spin" />
+                      ) : (
+                        <RepeatIcon className="h-4 w-4" />
+                      )
+                    }
+                    disabled={
+                      repeatTransactionMutation.isPending ||
+                      isSaving ||
+                      isTransactionLoading
+                    }
+                  >
+                    {t("transactionsRepeat")}
+                  </FormActionButton>
+                  <FormActionButton
+                    onClick={() => {
+                      haptic("heavy");
+                      setShowDeleteConfirm(true);
+                    }}
+                    icon={<Trash2Icon className="h-4 w-4" />}
+                  >
+                    {t("delete")}
+                  </FormActionButton>
                 </div>
               )}
             </div>
 
-            {isEdit && selectedAccount?.bankType ? (
+            {selectedAccount?.bankType ? (
               <CountableSwitch
                 formData={formData}
                 setFormData={setFormData}
@@ -435,7 +397,7 @@ export function TransactionFormScreen({
               />
             ) : null}
 
-            {isEdit && transaction ? (
+            {transaction ? (
               <BaseCurrencyInfo
                 amount={transaction.amount}
                 currency={transaction.currency}
@@ -471,7 +433,6 @@ export function TransactionFormScreen({
             disabled={
               !formData.description.trim() ||
               !formData.amount.trim() ||
-              (!isEdit && !formData.accountId) ||
               isSaving ||
               isTransactionLoading
             }

@@ -1,4 +1,4 @@
-import { eq, and, asc, max, count } from "drizzle-orm";
+import { eq, and, asc, max, count, sql } from "drizzle-orm";
 import { protectedProcedure, t } from "./trpc";
 import { accountTable, transactionTable } from "../db/schema";
 import { getDb } from "../services/db";
@@ -21,6 +21,10 @@ export const accountRouter = t.router({
         timezone: accountTable.timezone,
         lastTransactionDate: max(transactionTable.createdAt),
         transactionCount: count(transactionTable.id),
+        recentManualCount: sql<number>`COUNT(${transactionTable.id}) FILTER (
+          WHERE ${transactionTable.source} = 'manual'
+            AND ${transactionTable.createdAt} >= NOW() - INTERVAL '3 months'
+        )::integer`,
       })
       .from(accountTable)
       .leftJoin(

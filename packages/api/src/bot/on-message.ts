@@ -118,7 +118,7 @@ export async function onMessage(ctx: Context) {
       await ctx.reply(t("noAccountsYet"), {
         reply_markup: new InlineKeyboard().webApp(
           t("createAccount"),
-          getEnv().FRONTEND_URL + "?type=accountPicker",
+          getEnv().FRONTEND_URL + "?type=accountForm",
         ),
       });
       return;

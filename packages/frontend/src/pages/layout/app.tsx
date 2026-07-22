@@ -17,7 +17,6 @@ import { useRouter } from "@/shared/stacked-router/router";
 import { useCallback, useEffect } from "react";
 import { Route } from "@/shared/stacked-router/routes";
 import { AnimatedScreen } from "@/shared/stacked-router/animated-screen";
-import { AccountPickerScreen } from "../transactions/account-picker-screen";
 import { StatementUploadResultScreen } from "../transactions/statement-upload-result-screen";
 import { platform } from "@/shared/platform/platforms";
 import { useHeaderColorSync } from "@/shared/platform/use-header-color-sync";
@@ -61,9 +60,6 @@ export function App() {
           break;
         case "transactionForm":
           ScreenComponent = <TransactionFormScreen {...props} />;
-          break;
-        case "accountPicker":
-          ScreenComponent = <AccountPickerScreen {...props} />;
           break;
         case "transactions":
           ScreenComponent = <TransactionsScreen {...props} />;

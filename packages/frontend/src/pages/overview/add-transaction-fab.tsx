@@ -19,7 +19,7 @@ export function AddTransactionFab() {
       }}
       onClick={() => {
         haptic("light");
-        navigate({ type: "accountPicker" });
+        navigate({ type: "transactionForm" });
       }}
     >
       <PlusIcon className="size-6" />
