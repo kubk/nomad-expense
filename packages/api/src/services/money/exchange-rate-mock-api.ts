@@ -30,6 +30,7 @@ const STATIC_RATES_TO_USD: Partial<Record<SupportedCurrency, number>> = {
   KZT: 450.0,
   PHP: 56.0,
   MMK: 2100.0,
+  VND: 26300.0,
   USDT: 1.0,
   BTC: 0.000023,
   ETH: 0.00037,

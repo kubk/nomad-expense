@@ -72,6 +72,7 @@ export const currency = [
   "KZT",
   "PHP",
   "MMK",
+  "VND",
   "USDT",
   "BTC",
   "ETH",

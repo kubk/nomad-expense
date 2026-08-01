@@ -15,6 +15,17 @@ describe("exchange-rate-api", () => {
     expect(result).toBe(10000);
   });
 
+  it("should convert VND using fallback rates", async () => {
+    const result = await convertWithLiveRate(
+      2630000,
+      "VND",
+      "USD",
+      new Date("2023-01-01"),
+    );
+
+    expect(result).toBe(100);
+  });
+
   it("try > rub for 2021 (uses yearly fallback rates)", async () => {
     const date = new Date("2021-06-15");
     // 1000 TRY cents = 10 TRY

@@ -40,6 +40,7 @@ export const SUPPORTED_CURRENCIES: CurrencyInfo[] = [
   { code: "KZT", name: "Kazakhstani Tenge", symbol: "₸" },
   { code: "PHP", name: "Philippine Peso", symbol: "₱" },
   { code: "MMK", name: "Myanmar Kyat", symbol: "K" },
+  { code: "VND", name: "Vietnamese Dong", symbol: "₫" },
   { code: "USDT", name: "Tether", symbol: "₮" },
   { code: "BTC", name: "Bitcoin", symbol: "₿" },
   { code: "ETH", name: "Ethereum", symbol: "Ξ" },
