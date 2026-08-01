@@ -50,13 +50,13 @@ export const ru: Translation = {
   selectAccount: "Выберите счет",
   commandNotRecognized: "Команда не распознана",
 
-  userJoinedFamily: (name) => `🎉 ${name} присоединился к вашей семье!`,
+  userJoinedFamily: (name) => `🎉 ${name} теперь в вашей семье!`,
   transactionReceived: (amount, currency, description, author) =>
     `💰 ${amount} ${currency} получено: *${description}*, автор: ${author}`,
   transactionSpent: (amount, currency, description, author) =>
     `💸 ${amount} ${currency} потрачено: *${description}*, автор: ${author}`,
   uploadedBankStatement: (author, accountName, added, removed) =>
-    `📊 *${author}* загрузил выписку для *${accountName}*
+    `📊 *${author}* загрузил(а) выписку для *${accountName}*
 📥 Добавлено: ${added} ${transaction(added)}
 🗑️ Удалено: ${removed} ${transaction(removed)}`,
 
