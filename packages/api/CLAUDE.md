@@ -13,7 +13,7 @@ Always use the custom test script when running tests in the API package:
 ./bin/test-api.sh src/api/upload-statement-handler.test.ts
 ```
 
-**Important**: Do NOT use `npm test` or `vitest` directly. The `test-api.sh` script:
+**Important**: Do NOT use `pnpm test` or `vitest` directly. The `test-api.sh` script:
 - Handles database migrations before running tests
 - Runs tests sequentially to avoid database concurrency issues
 - Properly sets up the test environment with `.env.test` configuration

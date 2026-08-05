@@ -7,7 +7,7 @@
 
 set -e
 
-npm run test:db:migrate
+pnpm run test:db:migrate
 
 # Check if a specific test file argument is provided
 if [ -n "$1" ]; then
@@ -27,7 +27,7 @@ for test_file in $test_files
 do
     echo "Running tests in $test_file"
 
-    npx dotenvx run -f .env.test -- vitest run "$test_file"
+    pnpm exec dotenvx run -f .env.test -- vitest run "$test_file"
 
     if [ $? -ne 0 ]; then
         echo "Tests failed in $test_file"

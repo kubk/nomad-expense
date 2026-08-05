@@ -6,11 +6,14 @@ WORKDIR /app
 
 ENV TZ=UTC
 
-COPY package*.json ./
+COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
+COPY packages/kbank-parser/package.json ./packages/kbank-parser/package.json
 
-RUN if [ "$INSTALL_DEV" = "true" ]; then npm install; else npm install --omit=dev; fi
+RUN corepack enable && if [ "$INSTALL_DEV" = "true" ]; then pnpm install --filter kbank-parser --frozen-lockfile; else pnpm install --filter kbank-parser --prod --frozen-lockfile; fi
 
-COPY . .
+COPY packages/kbank-parser ./packages/kbank-parser
+
+WORKDIR /app/packages/kbank-parser
 
 EXPOSE 3094
 

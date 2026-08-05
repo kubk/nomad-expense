@@ -5,7 +5,7 @@
 		"deploy": "wrangler deploy",
 		"start": "wrangler dev",
 		"test": "echo 1",
-		"typecheck": "npx tsc -b --noEmit",
+		"typecheck": "tsc -b --noEmit",
 		"cf-typegen": "wrangler types"
 	},
 	"devDependencies": {

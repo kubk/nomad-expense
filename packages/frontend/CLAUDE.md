@@ -5,9 +5,9 @@ This is a React-based expense tracking application built with TypeScript, Tailwi
 ### Development Commands
 
 ```bash
-npm run start      # Start dev server
-npm run build      # Build for production
-npm run typecheck  # TypeScript type checking
+pnpm run start      # Start dev server
+pnpm run build      # Build for production
+pnpm run typecheck  # TypeScript type checking
 ```
 
 ### Tech Stack

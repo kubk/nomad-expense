@@ -1,19 +1,17 @@
 {
   "name": "fullstack-serverless",
   "version": "1.0.0",
+  "packageManager": "pnpm@9.15.0",
   "scripts": {
-    "dev": "npx concurrently --kill-others-on-fail \"npm run start -w=api\" \"npm run start -w=frontend\"",
+    "dev": "concurrently --kill-others-on-fail \"pnpm --filter api run start\" \"pnpm --filter frontend run start\"",
     "prettier:fix": "git ls-files -mo --exclude-standard -- './packages' | grep -E '\\.(ts|tsx)$' | xargs -I {} prettier --write {}",
     "prettier:fix:full": "prettier --write \"./packages/**/*.+(ts|tsx)\"",
     "knip": "knip --reporter compact",
     "dead-code": "concurrently -n knip,slop-api,slop-frontend -c magenta,green,blue \"knip --reporter compact\" \"slop-scan scan packages/api --lint\" \"slop-scan scan packages/frontend --lint\"",
-    "typecheck": "npm run typecheck --workspaces",
-    "test": "npm run test --workspaces",
+    "typecheck": "pnpm --recursive run typecheck",
+    "test": "pnpm --recursive run test",
     "export-public-code": "./export-public-code.sh"
   },
-  "workspaces": [
-    "./packages/*"
-  ],
   "keywords": [],
   "author": "",
   "license": "ISC",

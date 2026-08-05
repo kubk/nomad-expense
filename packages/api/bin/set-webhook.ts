@@ -2,12 +2,12 @@ import { getEnv, setEnv } from "../src/services/env";
 import { getBot } from "../src/services/telegram/get-bot";
 
 /**
- * npx dotenvx run -f .dev.vars -- npx tsx bin/set-webhook.ts https://causal-magpie-closing.ngrok-free.app/bot.webhook
- * npx dotenvx run -f .dev.vars -- npx tsx bin/set-webhook.ts https://the-website.com/bot.webhook
+ * pnpm exec dotenvx run -f .dev.vars -- tsx bin/set-webhook.ts https://causal-magpie-closing.ngrok-free.app/bot.webhook
+ * pnpm exec dotenvx run -f .dev.vars -- tsx bin/set-webhook.ts https://the-website.com/bot.webhook
  */
 async function setWebhook(url: string) {
   if (!url) {
-    console.error("Usage: npx tsx bin/set-webhook.ts <WEBHOOK_URL>");
+    console.error("Usage: pnpm exec tsx bin/set-webhook.ts <WEBHOOK_URL>");
     process.exit(1);
   }
   try {
