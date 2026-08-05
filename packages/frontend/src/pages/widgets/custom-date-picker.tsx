@@ -25,7 +25,7 @@ export function CustomDatePicker({
   onBack: () => void;
 }) {
   const { t } = useTranslation();
-  const availableYears = useAvailableYears();
+  const availableYears = useAvailableYears(filters.accounts);
 
   const [selectedMonths, setSelectedMonths] = useState<CustomDateValue[]>(
     () => {

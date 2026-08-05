@@ -214,6 +214,33 @@ const getMonthlyBreakdown = async ({
 };
 
 export const expenseRouter = t.router({
+  availableYears: protectedProcedure
+    .input(z.object({ accounts: z.array(z.string()) }))
+    .query(async ({ ctx, input }) => {
+      if (input.accounts.length === 0) {
+        return [];
+      }
+
+      const year = sql<number>`EXTRACT(YEAR FROM ${transactionTable.createdAt})::integer`;
+      const years = await getDb()
+        .select({ year })
+        .from(transactionTable)
+        .innerJoin(
+          accountTable,
+          eq(transactionTable.accountId, accountTable.id),
+        )
+        .where(
+          and(
+            eq(accountTable.familyId, ctx.familyId),
+            inArray(accountTable.id, input.accounts),
+          ),
+        )
+        .groupBy(year)
+        .orderBy(desc(year));
+
+      return years.map((result) => result.year);
+    }),
+
   overview: protectedProcedure
     .input(overviewInputSchema)
     .query(async ({ ctx, input }) => {
