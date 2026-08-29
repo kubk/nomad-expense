@@ -34,7 +34,7 @@ importers:
         version: 11.5.0(typescript@5.9.2)
       ai:
         specifier: ^6.0.5
-        version: 6.0.5(zod@3.25.76)
+        version: 6.0.5(zod@4.5.2)
       better-sqlite3:
         specifier: ^12.2.0
         version: 12.2.0
@@ -51,8 +51,8 @@ importers:
         specifier: ^5.5.3
         version: 5.5.3
       zod:
-        specifier: ^3.24.2
-        version: 3.25.76
+        specifier: ^4.5.2
+        version: 4.5.2
     devDependencies:
       '@types/luxon':
         specifier: ^3.7.1
@@ -4463,21 +4463,24 @@ packages:
   zod@4.4.1:
     resolution: {integrity: sha512-a6ENMBBGZBsnlSebQ/eKCguSBeGKSf4O7BPnqVPmYGtpBYI7VSqoVqw+QcB7kPRjbqPwhYTpFbVj/RqNz/CT0Q==}
 
+  zod@4.5.2:
+    resolution: {integrity: sha512-XkYXCol10+ba/6F/cueWV+TezUeOqXW0hdeJt5CdXjTYeAgAQg5N03RQdJ80mhfFE72+pblvYMW4wy2Qp4Qbrg==}
+
 snapshots:
 
-  '@ai-sdk/gateway@3.0.4(zod@3.25.76)':
+  '@ai-sdk/gateway@3.0.4(zod@4.5.2)':
     dependencies:
       '@ai-sdk/provider': 3.0.1
-      '@ai-sdk/provider-utils': 4.0.2(zod@3.25.76)
+      '@ai-sdk/provider-utils': 4.0.2(zod@4.5.2)
       '@vercel/oidc': 3.0.5
-      zod: 3.25.76
+      zod: 4.5.2
 
-  '@ai-sdk/provider-utils@4.0.2(zod@3.25.76)':
+  '@ai-sdk/provider-utils@4.0.2(zod@4.5.2)':
     dependencies:
       '@ai-sdk/provider': 3.0.1
       '@standard-schema/spec': 1.1.0
       eventsource-parser: 3.0.6
-      zod: 3.25.76
+      zod: 4.5.2
 
   '@ai-sdk/provider@3.0.1':
     dependencies:
@@ -6440,13 +6443,13 @@ snapshots:
 
   acorn@8.17.0: {}
 
-  ai@6.0.5(zod@3.25.76):
+  ai@6.0.5(zod@4.5.2):
     dependencies:
-      '@ai-sdk/gateway': 3.0.4(zod@3.25.76)
+      '@ai-sdk/gateway': 3.0.4(zod@4.5.2)
       '@ai-sdk/provider': 3.0.1
-      '@ai-sdk/provider-utils': 4.0.2(zod@3.25.76)
+      '@ai-sdk/provider-utils': 4.0.2(zod@4.5.2)
       '@opentelemetry/api': 1.9.0
-      zod: 3.25.76
+      zod: 4.5.2
 
   ajv@6.15.0:
     dependencies:
@@ -6800,8 +6803,8 @@ snapshots:
       '@babel/parser': 7.28.3
       eslint: 10.5.0(jiti@2.7.0)
       hermes-parser: 0.25.1
-      zod: 4.4.1
-      zod-validation-error: 4.0.2(zod@4.4.1)
+      zod: 3.25.76
+      zod-validation-error: 4.0.2(zod@3.25.76)
     transitivePeerDependencies:
       - supports-color
 
@@ -8118,10 +8121,12 @@ snapshots:
       cookie: 1.1.1
       youch-core: 0.3.3
 
-  zod-validation-error@4.0.2(zod@4.4.1):
+  zod-validation-error@4.0.2(zod@3.25.76):
     dependencies:
-      zod: 4.4.1
+      zod: 3.25.76
 
   zod@3.25.76: {}
 
   zod@4.4.1: {}
+
+  zod@4.5.2: {}
