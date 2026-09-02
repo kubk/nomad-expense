@@ -5,6 +5,7 @@ import { getEnv } from "../env";
 import { currencySchema, transactionTypeSchema } from "../../db/enums";
 import { assert } from "../../lib/typescript/assert";
 import { ParsedTransaction, ParseTransactionFn } from "./parsed-transaction";
+import { inferImageTransactionDate } from "./infer-image-transaction-date";
 
 const imageTransactionSchema = z.object({
   description: z.string(),
@@ -22,6 +23,7 @@ const bankStatementModelId = "openai/gpt-4.1-2025-04-14";
 
 async function parseImageBase64(
   imageBase64: string,
+  referenceDate: DateTime,
 ): Promise<ImageTransaction[]> {
   const currencyList = currencySchema.options.join(", ");
   const gateway = createGateway({
@@ -48,6 +50,9 @@ async function parseImageBase64(
 - createdAt: the transaction date in ISO 8601 format (YYYY-MM-DDTHH:mm:ss)
 - type: "expense" for purchases/withdrawals, "income" for deposits/refunds
 
+The current date in the bank account timezone is ${referenceDate.toISODate()}.
+The transaction year is likely not visible in supported bank screenshots. If it is not visible, use the current year unless that would put the transaction in the future; in that case, use the previous year.
+
 There might be multiple transactions with the same name, but different dates and amounts, don't confuse them.
 
 You must return ALL transactions found in the image with correct date`,
@@ -67,14 +72,19 @@ export const parseImageStatement: ParseTransactionFn = async (
 ) => {
   const arrayBuffer = await file.arrayBuffer();
   const base64 = Buffer.from(arrayBuffer).toString("base64");
-  const transactions = await parseImageBase64(base64);
+  const referenceDate = DateTime.now().setZone(timezone);
+  const transactions = await parseImageBase64(base64, referenceDate);
 
   return transactions.map(
     (t): ParsedTransaction => ({
       description: t.description,
       amountCents: Math.round(t.amountHuman * 100),
       currency: t.currency,
-      createdAt: DateTime.fromISO(t.createdAt, { zone: timezone }).toJSDate(),
+      createdAt: inferImageTransactionDate({
+        dateIso: t.createdAt,
+        timezone,
+        referenceDate,
+      }),
       type: t.type,
     }),
   );
