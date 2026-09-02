@@ -83,6 +83,7 @@ export const accountTable = pgTable(
     timezone: varchar("timezone").notNull().default("UTC"),
     meta: jsonb("meta"),
     sort: integer("sort").notNull().default(0),
+    isHidden: boolean("is_hidden").notNull().default(false),
   },
   (table) => [index("idx_account_family_id").on(table.familyId)],
 );

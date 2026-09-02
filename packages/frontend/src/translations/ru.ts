@@ -26,6 +26,7 @@ export const ru: Translation = {
   applyFilters: "Применить фильтры",
   gotIt: "Понятно",
   none: "Нет",
+  somethingWentWrong: "Произошла ошибка",
 
   language: "Язык",
 
@@ -112,6 +113,9 @@ export const ru: Translation = {
   accountsTitle: "Счета",
   accountsCreate: "Создать счет",
   accountsReorder: "Изменить порядок",
+  accountsHiddenAccounts: "Скрытые счета",
+  accountsHideHidden: "Скрыть",
+  accountsShowAccount: "Показать счет",
   accountsNoAccounts: "Нет счетов",
   accountsNoAccountsDescription: "Создайте первый счет, чтобы начать",
   accountsEditTitle: "Редактировать счет",

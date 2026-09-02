@@ -4,6 +4,7 @@ import { accountTable, transactionTable } from "../db/schema";
 import { getDb } from "../services/db";
 import { z } from "zod";
 import { accountColorSchema, bankSchema, currencySchema } from "../db/enums";
+import { TRPCError } from "@trpc/server";
 
 export const accountRouter = t.router({
   list: protectedProcedure.query(async ({ ctx }) => {
@@ -17,6 +18,7 @@ export const accountRouter = t.router({
         currency: accountTable.currency,
         color: accountTable.color,
         sort: accountTable.sort,
+        isHidden: accountTable.isHidden,
         bankType: accountTable.bankType,
         timezone: accountTable.timezone,
         lastTransactionDate: max(transactionTable.createdAt),
@@ -38,6 +40,7 @@ export const accountRouter = t.router({
         accountTable.currency,
         accountTable.color,
         accountTable.sort,
+        accountTable.isHidden,
         accountTable.bankType,
         accountTable.createdAt,
       )
@@ -136,6 +139,36 @@ export const accountRouter = t.router({
         .returning({ id: accountTable.id });
 
       const result = results[0];
+
+      return result;
+    }),
+
+  setHidden: protectedProcedure
+    .input(
+      z.object({
+        id: z.string(),
+        isHidden: z.boolean(),
+      }),
+    )
+    .mutation(async ({ ctx, input }) => {
+      const db = getDb();
+
+      const results = await db
+        .update(accountTable)
+        .set({ isHidden: input.isHidden })
+        .where(
+          and(
+            eq(accountTable.familyId, ctx.familyId),
+            eq(accountTable.id, input.id),
+          ),
+        )
+        .returning({
+          id: accountTable.id,
+          isHidden: accountTable.isHidden,
+        });
+
+      const result = results[0];
+      if (!result) throw new TRPCError({ code: "NOT_FOUND" });
 
       return result;
     }),

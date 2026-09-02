@@ -1,0 +1,1 @@
+ALTER TABLE "account" ADD COLUMN "is_hidden" boolean DEFAULT false NOT NULL;

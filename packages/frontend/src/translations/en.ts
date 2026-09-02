@@ -15,6 +15,7 @@ export const en = {
   applyFilters: "Apply filters",
   gotIt: "Got it",
   none: "None",
+  somethingWentWrong: "Something went wrong",
 
   language: "Language",
 
@@ -97,6 +98,9 @@ export const en = {
   accountsTitle: "Accounts",
   accountsCreate: "Create account",
   accountsReorder: "Reorder accounts",
+  accountsHiddenAccounts: "Hidden accounts",
+  accountsHideHidden: "Hide",
+  accountsShowAccount: "Show account",
   accountsNoAccounts: "No accounts",
   accountsNoAccountsDescription:
     "Please create your first account to get started",
