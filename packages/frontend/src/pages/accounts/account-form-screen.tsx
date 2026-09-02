@@ -223,7 +223,7 @@ export function AccountFormScreen({
                   {formData.color === color.id && (
                     <CheckIcon
                       strokeWidth={4}
-                      className={cn("w-4 h-4 relative", color.text)}
+                      className={cn("w-5 h-5 relative", color.text)}
                     />
                   )}
                 </button>
