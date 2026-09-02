@@ -49,6 +49,7 @@
     "grammy": "^1.38.2",
     "luxon": "^3.7.1",
     "papaparse": "^5.5.3",
+    "read-excel-file": "^9.3.10",
     "zod": "^4.5.2"
   }
 }

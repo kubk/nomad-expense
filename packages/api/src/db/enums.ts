@@ -33,6 +33,7 @@ export const accountColorSchema = z.enum(accountColor);
 
 export const bank = [
   "Wise",
+  "Ether.fi",
   "YapiKredi",
   "Kasikorn",
   "Tinkoff",
