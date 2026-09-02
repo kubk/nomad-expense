@@ -52,6 +52,9 @@ export function CustomDatePicker({
     );
   };
 
+  const areAllYearsSelected =
+    availableYears.length > 0 && availableYears.every(isYearFullySelected);
+
   const toggleMonth = (year: number, month: number) => {
     haptic("selection");
     setSelectedMonths((prev) => {
@@ -87,6 +90,23 @@ export function CustomDatePicker({
     }
   };
 
+  const toggleAllYears = () => {
+    haptic("selection");
+
+    if (areAllYearsSelected) {
+      setSelectedMonths([]);
+      return;
+    }
+
+    setSelectedMonths(
+      availableYears.flatMap((year) =>
+        monthNumbers
+          .filter((month) => !isMonthInFuture(year, month))
+          .map((month) => ({ year, month })),
+      ),
+    );
+  };
+
   const handleApply = () => {
     haptic("medium");
     onApply({
@@ -101,16 +121,28 @@ export function CustomDatePicker({
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex items-center gap-3">
+      <div className="flex items-center justify-between gap-3">
+        <div className="flex items-center gap-3">
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={onBack}
+            className="h-8 w-8 p-0"
+          >
+            <ChevronLeftIcon className="size-4" />
+          </Button>
+          <h3 className="font-medium">{t("filtersCustomDateRange")}</h3>
+        </div>
         <Button
           variant="ghost"
           size="sm"
-          onClick={onBack}
-          className="h-8 w-8 p-0"
+          onClick={toggleAllYears}
+          className="text-md h-6 px-2 text-muted-foreground hover:text-foreground"
         >
-          <ChevronLeftIcon className="size-4" />
+          {areAllYearsSelected
+            ? t("filtersDeselectAll")
+            : t("filtersSelectAllYears")}
         </Button>
-        <h3 className="font-medium">{t("filtersCustomDateRange")}</h3>
       </div>
 
       {/* Years and Months */}

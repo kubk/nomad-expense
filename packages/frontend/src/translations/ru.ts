@@ -192,6 +192,7 @@ export const ru: Translation = {
   filtersCustom: "Выбрать",
   filtersBankAccounts: "Счета",
   filtersSelectAll: "Выбрать все",
+  filtersSelectAllYears: "Все года",
   filtersDeselectAll: "Снять выбор",
   filtersSortBy: "Сортировка",
   filtersNewestFirst: "Сначала новые",

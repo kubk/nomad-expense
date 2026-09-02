@@ -175,6 +175,7 @@ export const en = {
   filtersCustom: "Custom",
   filtersBankAccounts: "Bank accounts",
   filtersSelectAll: "Select all",
+  filtersSelectAllYears: "Select all",
   filtersDeselectAll: "Deselect all",
   filtersSortBy: "Sort by",
   filtersNewestFirst: "Newest first",
