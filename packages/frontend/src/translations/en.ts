@@ -24,7 +24,6 @@ export const en = {
   navAccounts: "Accounts",
   navSettings: "Settings",
 
-  authSignIn: "Sign in to track your expenses",
   authTelegramLogin: "Secure login via Telegram",
   authContinueWithTelegram: "Continue with Telegram",
   authTelegramSignInFailed: "Could not sign in with Telegram. Please try again.",

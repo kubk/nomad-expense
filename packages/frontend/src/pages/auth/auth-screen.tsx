@@ -1,8 +1,9 @@
 import { useEffect, useState } from "react";
 import { useMutation, useQuery } from "@tanstack/react-query";
-import { Loader2Icon, ReceiptIcon, SendIcon } from "lucide-react";
+import { Loader2Icon, ReceiptIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import { TelegramIcon } from "@/components/telegram-icon";
 import { trpc } from "@/shared/api";
 import { RouteByType, useRouter } from "@/shared/stacked-router/router";
 import { saveAuthToken } from "@/shared/auth-token";
@@ -149,19 +150,18 @@ export function AuthScreen({ route: _ }: { route: RouteByType<"auth"> }) {
                   Nomad Expense
                 </h1>
               </div>
-              <p className="text-muted-foreground">{t("authSignIn")}</p>
             </div>
             <Button
               type="button"
               size="lg"
               disabled={!isReady || isSigningIn}
               onClick={signInWithTelegram}
-              className="h-10 min-w-44 rounded-lg bg-[#3390ec] px-4 font-normal text-white shadow-none hover:bg-[#2f85d5]"
+              className="h-12 min-w-52 rounded-lg bg-[#3390ec] px-5 text-base font-normal text-white shadow-none hover:bg-[#2f85d5]"
             >
               {isSigningIn ? (
                 <Loader2Icon className="size-5 animate-spin" />
               ) : (
-                <SendIcon className="size-5" />
+                <TelegramIcon />
               )}
               {t("authContinueWithTelegram")}
             </Button>
