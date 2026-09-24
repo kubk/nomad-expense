@@ -1,7 +1,7 @@
 <h1 align="center">Nomad Expense</h1>
 
 <p align="center">
-  Family expense tracker as a Telegram mini app&nbsp;·&nbsp;<a href="https://t.me/expense_tracker_turkey_bot">Try it</a>
+  Family expense tracker as a Telegram mini app&nbsp;·&nbsp;<a href="https://t.me/expense_tracker_turkey_bot">Mini App</a>&nbsp;·&nbsp;<a href="https://expense-tracker-frontend.7gorbachevm.workers.dev/">Web</a>
 </p>
 
 ## Features
@@ -27,4 +27,3 @@
 | AI | GPT-4 Vision for statement OCR |
 | Bot | grammy.js |
 | Deploy | Cloudflare Workers, GitHub Actions CI/CD |
-
