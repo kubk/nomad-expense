@@ -13,7 +13,7 @@ export function AddTransactionFab() {
 
   return (
     <div
-      className="fixed inset-x-0 mx-auto flex w-full max-w-md justify-end px-4 pointer-events-none"
+      className="app-shell-fixed flex justify-end px-4 pointer-events-none"
       style={{
         bottom: 92 + platform.safeAreaInset().bottom,
       }}

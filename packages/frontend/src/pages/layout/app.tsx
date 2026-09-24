@@ -113,7 +113,7 @@ export function App() {
   );
 
   return (
-    <div className="max-w-md mx-auto relative app-container overflow-hidden">
+    <div className="app-shell relative app-container overflow-hidden">
       <AnimatePresence initial={false} mode="sync">
         {navigationStack.map((route, index) =>
           renderScreen(route, index, navigationStack),

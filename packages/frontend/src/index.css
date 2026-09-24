@@ -44,6 +44,7 @@
 
 :root {
   --radius: 0.625rem;
+  --app-shell-max-width: 28rem;
   --background: oklch(1 0 0);
   --foreground: oklch(0.145 0 0);
   --card: oklch(1 0 0);
@@ -127,6 +128,22 @@
 
 .app-container {
   @apply h-screen;
+}
+
+.app-shell {
+  width: 100%;
+  max-width: var(--app-shell-max-width);
+  margin-inline: auto;
+}
+
+.app-shell-fixed {
+  position: fixed;
+}
+
+.app-shell-fixed:not([data-vaul-drawer-direction="left"]):not(
+    [data-vaul-drawer-direction="right"]
+  ) {
+  inset-inline: max(0px, calc((100vw - var(--app-shell-max-width)) / 2));
 }
 
 @supports (-webkit-touch-callout: none) {

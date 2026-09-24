@@ -71,7 +71,7 @@ export function Navigation() {
           style={{
             paddingBottom: platform.safeAreaInset().bottom,
           }}
-          className="fixed inset-x-0 bottom-0 mx-auto w-full max-w-md bg-background border-t border-border"
+          className="app-shell-fixed bottom-0 bg-background border-t border-border"
         >
           <div className="flex justify-around items-center py-3">
             {navItems.map(({ routeKey, route, icon: Icon, label }) => {
