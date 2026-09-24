@@ -8,6 +8,7 @@ const envSchema = z
     STAGE: z.enum(["local", "production"]),
     FRONTEND_URL: z.string(),
     TELEGRAM_BOT_TOKEN: z.string(),
+    TELEGRAM_OIDC_CLIENT_ID: z.string().regex(/^\d+$/),
     AI_GATEWAY_API_KEY: z.string(),
   })
   .required();

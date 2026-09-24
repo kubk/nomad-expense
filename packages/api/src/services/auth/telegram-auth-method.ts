@@ -1,5 +1,5 @@
 export const telegramAuthMethod = {
-  loginWidget: "loginWidget",
+  browser: "browser",
   u: "u",
   miniApp: "miniApp",
 };

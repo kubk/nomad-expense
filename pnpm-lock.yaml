@@ -47,6 +47,9 @@ importers:
       grammy:
         specifier: ^1.38.2
         version: 1.38.2
+      jose:
+        specifier: ^6.2.12
+        version: 6.2.12
       luxon:
         specifier: ^3.7.1
         version: 3.7.2
@@ -126,9 +129,6 @@ importers:
       '@tanstack/react-query':
         specifier: ^5.101.0
         version: 5.101.0(react@19.2.7)
-      '@telegram-auth/react':
-        specifier: ^1.0.4
-        version: 1.0.4(react@19.2.7)
       '@trpc/client':
         specifier: ^11.4.3
         version: 11.5.1(@trpc/server@11.5.0(typescript@6.0.3))(typescript@6.0.3)
@@ -2518,12 +2518,6 @@ packages:
     peerDependencies:
       react: ^18 || ^19
 
-  '@telegram-auth/react@1.0.4':
-    resolution: {integrity: sha512-VPCIrA6h5+w69S1QvB/k2PphmAA9E8BSqEX4WMSE1P7KxexKl/VRdoTRKSsSx1/In94S+R7FufbjLrRMnEGEKg==}
-    deprecated: 'Deprecated in favour of Telegram''s OpenID Connect login: https://core.telegram.org/bots/telegram-login — migration guide: https://github.com/manzoorwanijk/telegram-auth/blob/main/MIGRATION.md'
-    peerDependencies:
-      react: '>=18'
-
   '@trpc/client@11.5.1':
     resolution: {integrity: sha512-7I6JJ1I1lxv3S87ht3FAIZi0XxQa7hnQ9K+Oo5BH7cGO8ZtWe9Ftq6ItdkuDfpsnsRPcR2h158AMWbNs/iptqg==}
     peerDependencies:
@@ -3432,6 +3426,9 @@ packages:
   jiti@2.7.0:
     resolution: {integrity: sha512-AC/7JofJvZGrrneWNaEnJeOLUx+JlGt7tNa0wZiRPT4MY1wmfKjt2+6O2p2uz2+skll8OZZmJMNqeke7kKbNgQ==}
     hasBin: true
+
+  jose@6.2.12:
+    resolution: {integrity: sha512-9NiFmJEex0sy2Dk58j2UGBSHgUs2ypF9eZSu4L6vjOX3Dp96Sw1F3uL+H+D1sx02jZZdzUT0HgvCy59CuvXcWw==}
 
   js-tokens@10.0.0:
     resolution: {integrity: sha512-lM/UBzQmfJRo9ABXbPWemivdCW8V2G8FHaHdypQaIy523snUjog0W71ayWXTjiR+ixeMyVHN2XcpnTd/liPg/Q==}
@@ -6199,10 +6196,6 @@ snapshots:
       '@tanstack/query-core': 5.101.0
       react: 19.2.7
 
-  '@telegram-auth/react@1.0.4(react@19.2.7)':
-    dependencies:
-      react: 19.2.7
-
   '@trpc/client@11.5.1(@trpc/server@11.5.0(typescript@6.0.3))(typescript@6.0.3)':
     dependencies:
       '@trpc/server': 11.5.0(typescript@6.0.3)
@@ -7156,6 +7149,8 @@ snapshots:
   isexe@3.1.1: {}
 
   jiti@2.7.0: {}
+
+  jose@6.2.12: {}
 
   js-tokens@10.0.0: {}
 

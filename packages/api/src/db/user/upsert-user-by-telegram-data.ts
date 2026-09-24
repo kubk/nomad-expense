@@ -1,3 +1,4 @@
+import { sql } from "drizzle-orm";
 import { getDb } from "../../services/db";
 import { userTable } from "../../db/schema";
 import { type UserTelegramType } from "../../services/auth/schema";
@@ -6,7 +7,10 @@ function mergeName(firstName: string, lastName?: string) {
   return firstName + (lastName ? ` ${lastName}` : "");
 }
 
-export async function upsertUserByTelegramData(telegramData: UserTelegramType) {
+export async function upsertUserByTelegramData(
+  telegramData: UserTelegramType,
+  browserToken?: string,
+) {
   const db = getDb();
   const newFamilyId = crypto.randomUUID();
 
@@ -17,6 +21,7 @@ export async function upsertUserByTelegramData(telegramData: UserTelegramType) {
       name: mergeName(telegramData.firstName, telegramData.lastName),
       username: telegramData.username,
       avatarUrl: telegramData.photoUrl,
+      browserToken,
       familyId: newFamilyId,
       initialFamilyId: newFamilyId,
     })
@@ -26,6 +31,9 @@ export async function upsertUserByTelegramData(telegramData: UserTelegramType) {
         name: mergeName(telegramData.firstName, telegramData.lastName),
         username: telegramData.username,
         avatarUrl: telegramData.photoUrl,
+        browserToken: browserToken
+          ? sql`coalesce(nullif(${userTable.browserToken}, ''), excluded.browser_token)`
+          : undefined,
       },
     })
     .returning();

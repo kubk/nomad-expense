@@ -1,14 +1,14 @@
-import { validateTelegramLoginWidgetData } from "./validate-telegram-login-widget";
 import { upsertUserByTelegramData } from "../../db/user/upsert-user-by-telegram-data";
 import { userCacheGet, userCacheSet } from "../user-cache";
 import { runInBackground } from "../run-in-background";
 import { validateTelegramMiniAppData } from "./validate-telegram-mini-app-data";
 import { telegramAuthMethod } from "./telegram-auth-method";
-import { UserTelegramType } from "./schema";
-import { User } from "grammy/types";
+import type { UserTelegramType } from "./schema";
+import type { User } from "grammy/types";
 import { getEnv } from "../env";
 import { getUserById } from "../../db/user/get-user-by-id";
 import { getLanguage } from "../../translations/translations";
+import { getUserByBrowserToken } from "../../db/user/get-user-by-browser-token";
 
 export async function authenticate(
   input: { type: "api"; req: Request } | { type: "bot"; botUser: User },
@@ -17,26 +17,43 @@ export async function authenticate(
 
   if (input.type === "api") {
     const { req } = input;
-    const authQuery = req.headers.get("Authorization");
-    if (!authQuery) {
+    const authorization = req.headers.get("Authorization");
+    if (!authorization) {
       return null;
     }
 
-    if (authQuery.startsWith(telegramAuthMethod.loginWidget)) {
-      telegramUser = validateTelegramLoginWidgetData(
-        authQuery.slice(telegramAuthMethod.loginWidget.length),
+    if (authorization.startsWith(`${telegramAuthMethod.browser} `)) {
+      const browserToken = authorization.slice(
+        telegramAuthMethod.browser.length + 1,
       );
-    }
-    if (authQuery.startsWith(telegramAuthMethod.miniApp)) {
+      const user = /^[a-f0-9]{64}$/.test(browserToken)
+        ? await getUserByBrowserToken(browserToken)
+        : null;
+      const telegramId = Number(user?.telegramId);
+      if (
+        user?.telegramId &&
+        Number.isSafeInteger(telegramId) &&
+        telegramId > 0
+      ) {
+        telegramUser = {
+          id: telegramId,
+          username: user.username || undefined,
+          firstName: user.name || "",
+          lastName: undefined,
+          start: null,
+          languageCode: undefined,
+          photoUrl: user.avatarUrl || undefined,
+        };
+      }
+    } else if (authorization.startsWith(telegramAuthMethod.miniApp)) {
       telegramUser = await validateTelegramMiniAppData(
-        authQuery.slice(telegramAuthMethod.miniApp.length),
+        authorization.slice(telegramAuthMethod.miniApp.length),
       );
-    }
-    if (
+    } else if (
       getEnv().STAGE === "local" &&
-      authQuery.startsWith(telegramAuthMethod.u)
+      authorization.startsWith(telegramAuthMethod.u)
     ) {
-      const userId = authQuery.slice(telegramAuthMethod.u.length);
+      const userId = authorization.slice(telegramAuthMethod.u.length);
       const user = await getUserById(userId);
 
       if (user && user.telegramId) {

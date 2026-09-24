@@ -37,6 +37,9 @@ export const ru: Translation = {
 
   authSignIn: "Войдите, чтобы отслеживать траты",
   authTelegramLogin: "Безопасный вход через Telegram",
+  authContinueWithTelegram: "Продолжить через Telegram",
+  authTelegramSignInFailed: "Не удалось войти через Telegram. Попробуйте ещё раз.",
+  authTelegramUnavailable: "Вход через Telegram временно недоступен.",
 
   inviteAddingTitle: "Добавляем вас в семью",
   inviteAddingDescription: "Подождите, пока мы настраиваем общий доступ...",

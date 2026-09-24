@@ -26,6 +26,9 @@ export const en = {
 
   authSignIn: "Sign in to track your expenses",
   authTelegramLogin: "Secure login via Telegram",
+  authContinueWithTelegram: "Continue with Telegram",
+  authTelegramSignInFailed: "Could not sign in with Telegram. Please try again.",
+  authTelegramUnavailable: "Telegram login is temporarily unavailable.",
 
   inviteAddingTitle: "Adding you to a family",
   inviteAddingDescription: "Please wait while we set up your shared access...",

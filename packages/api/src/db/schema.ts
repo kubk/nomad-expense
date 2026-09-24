@@ -65,6 +65,7 @@ export const userTable = pgTable(
     username: varchar("username"),
     avatarUrl: text("avatar_url"),
     telegramId: varchar("telegram_id").unique(),
+    browserToken: text("browser_token").unique(),
     isAdmin: boolean("is_admin").notNull().default(false),
     botState: jsonb("bot_state"),
   },

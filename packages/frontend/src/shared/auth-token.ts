@@ -2,7 +2,9 @@ import { env } from "./env";
 import { getWebApp } from "./platform/telegram-platform";
 import { telegramAuthMethod } from "api";
 
-const authQueryKey = "authQuery";
+const authTokenKey = "authToken";
+
+localStorage.removeItem("authQuery");
 
 export function getAuthToken() {
   if (env.VITE_STAGE === "local" && env.VITE_USER_ID) {
@@ -12,16 +14,14 @@ export function getAuthToken() {
   if (webApp) {
     return telegramAuthMethod.miniApp + webApp.initData;
   }
-  const authQueryValue = localStorage.getItem(authQueryKey) || "";
-  if (!authQueryValue) return "";
-
-  return telegramAuthMethod.loginWidget + authQueryValue;
+  const authToken = localStorage.getItem(authTokenKey) || "";
+  return authToken ? `${telegramAuthMethod.browser} ${authToken}` : "";
 }
 
-export function saveAuthToken(authQuery: string) {
-  localStorage.setItem(authQueryKey, authQuery);
+export function saveAuthToken(authToken: string) {
+  localStorage.setItem(authTokenKey, authToken);
 }
 
 export function clearAuthToken() {
-  localStorage.removeItem(authQueryKey);
+  localStorage.removeItem(authTokenKey);
 }

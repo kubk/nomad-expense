@@ -6,6 +6,7 @@ import { t } from "./trpc";
 import { expenseRouter } from "./transaction-router";
 import { accountRouter } from "./account-router";
 import { familyRouter } from "./family-router";
+import { telegramSignin, telegramSigninConfig } from "./telegram-signin-router";
 import { botRouter } from "./bot-router";
 
 export const router = t.router({
@@ -22,4 +23,6 @@ export const router = t.router({
   accounts: accountRouter,
   bot: botRouter,
   family: familyRouter,
+  telegramSigninConfig,
+  telegramSignin,
 });
