@@ -175,9 +175,6 @@ export function AuthScreen({ route: _ }: { route: RouteByType<"auth"> }) {
                 {t("authTelegramSignInFailed")}
               </p>
             )}
-            <p className="text-sm text-muted-foreground">
-              {t("authTelegramLogin")}
-            </p>
           </div>
         </CardContent>
       </Card>

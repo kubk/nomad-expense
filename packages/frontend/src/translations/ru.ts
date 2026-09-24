@@ -35,7 +35,6 @@ export const ru: Translation = {
   navAccounts: "Счета",
   navSettings: "Настройки",
 
-  authTelegramLogin: "Безопасный вход через Telegram",
   authContinueWithTelegram: "Продолжить через Telegram",
   authTelegramSignInFailed: "Не удалось войти через Telegram. Попробуйте ещё раз.",
   authTelegramUnavailable: "Вход через Telegram временно недоступен.",

@@ -24,7 +24,6 @@ export const en = {
   navAccounts: "Accounts",
   navSettings: "Settings",
 
-  authTelegramLogin: "Secure login via Telegram",
   authContinueWithTelegram: "Continue with Telegram",
   authTelegramSignInFailed: "Could not sign in with Telegram. Please try again.",
   authTelegramUnavailable: "Telegram login is temporarily unavailable.",
