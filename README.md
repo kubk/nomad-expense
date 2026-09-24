@@ -1,7 +1,11 @@
 <h1 align="center">Nomad Expense</h1>
 
 <p align="center">
-  Family expense tracker as a Telegram mini app&nbsp;·&nbsp;<a href="https://t.me/expense_tracker_turkey_bot">Mini App</a>&nbsp;·&nbsp;<a href="https://expense-tracker-frontend.7gorbachevm.workers.dev/">Web</a>
+  <img src="https://nomad-expense.7gorbachevm.workers.dev/img/preview.png" alt="Nomad Expense" width="700" />
+</p>
+
+<p align="center">
+  Family expense tracker in Telegram &nbsp;·&nbsp;<a href="https://t.me/expense_tracker_turkey_bot">Mini App</a>&nbsp;·&nbsp;<a href="https://nomad-expense.7gorbachevm.workers.dev/">Web</a>
 </p>
 
 ## Features

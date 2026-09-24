@@ -1,5 +1,5 @@
 {
-    "name": "expense-tracker-frontend",
+    "name": "nomad-expense",
     "compatibility_date": "2025-06-12",
     "assets": {
         "directory": "./dist",
@@ -7,7 +7,7 @@
     },
     "env": {
         "production": {
-            "name": "expense-tracker-frontend"
+            "name": "nomad-expense"
         }
     }
 }

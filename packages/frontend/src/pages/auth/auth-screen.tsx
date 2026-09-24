@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useMutation, useQuery } from "@tanstack/react-query";
-import { Loader2Icon, ReceiptIcon } from "lucide-react";
+import { Loader2Icon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { TelegramIcon } from "@/components/telegram-icon";
@@ -143,9 +143,11 @@ export function AuthScreen({ route: _ }: { route: RouteByType<"auth"> }) {
           <div className="flex flex-col items-center space-y-4 text-center">
             <div className="space-y-2">
               <div className="mb-2 flex items-center justify-center gap-3">
-                <div className="flex size-10 flex-shrink-0 items-center justify-center rounded-full bg-primary/10">
-                  <ReceiptIcon className="size-5 text-primary" />
-                </div>
+                <img
+                  src="/img/logo.png"
+                  alt=""
+                  className="size-10 shrink-0 rounded-xl object-cover"
+                />
                 <h1 className="text-2xl font-semibold text-foreground">
                   Nomad Expense
                 </h1>

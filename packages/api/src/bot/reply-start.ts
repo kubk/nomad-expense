@@ -15,7 +15,7 @@ export async function replyStart(ctx: Context) {
   inlineKeyboard.url(t("telegramGroup"), links.channel);
 
   await ctx.replyWithPhoto(
-    "https://expense-tracker-frontend.7gorbachevm.workers.dev/img/preview.png",
+    "https://nomad-expense.7gorbachevm.workers.dev/img/preview.png",
     {
       caption: t("startCaption"),
       reply_markup: inlineKeyboard,
