@@ -6,11 +6,11 @@
 
 ## Features
 
-💱 **Multi-Currency Accounts** — Create accounts in multiple currencies (including crypto). All amounts auto-convert to your family's base currency using live exchange rates.
+💱 **Multi-Currency Accounts** — Create accounts in multiple currencies (including crypto). All amounts auto-convert to your family's base currency using live exchange rates
 
-🤖 **Telegram Bot** — Log expenses on the go. Send `100 THB Coffee` and the bot parses it, picks the account, and saves the transaction. Upload bank statements directly in chat.
+🤖 **Telegram Bot** — Log expenses on the go. Send `100 THB Coffee` and the bot will save it
 
-🏦 **Bank Statement Import** — Import PDF bank statements. Upload a screenshot of any statement and GPT-4 Vision extracts the transactions automatically.
+🏦 **Bank Statement Import** — Import PDF bank statements. Upload a screenshot of any statement and AI will extracts the transactions automatically
 
 👨‍👩‍👧‍👦 **Family Sharing** — Invite family members. Everyone sees shared accounts, transactions, and gets Telegram notifications when someone logs an expense.
 
