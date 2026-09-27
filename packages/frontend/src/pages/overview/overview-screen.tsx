@@ -3,11 +3,10 @@ import { OverviewHeader } from "./overview-header";
 import { MonthlyBreakdownOverview } from "./monthly-breakdown-overview";
 import { AddTransactionFab } from "./add-transaction-fab";
 import { cn } from "@/lib/utils";
-import { RouteByType } from "@/shared/stacked-router/router";
 import { trpc } from "@/shared/api";
 import { useInfiniteQuery } from "@tanstack/react-query";
 
-export function OverviewScreen({ route: _ }: { route: RouteByType<"main"> }) {
+export function OverviewScreen() {
   const overviewQuery = useInfiniteQuery(
     trpc.expenses.overview.infiniteQueryOptions(
       { cursor: 0 },

@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import {
   Trash2Icon,
   Loader2Icon,
@@ -24,7 +24,7 @@ import { ConfirmModal } from "../widgets/confirm-modal";
 import { Footer } from "../widgets/footer";
 import { trpc, queryClient } from "@/shared/api";
 import { useQuery, useMutation } from "@tanstack/react-query";
-import type { TransactionType } from "api";
+import type { RouterOutputs, TransactionType } from "api";
 import { DateTime } from "luxon";
 import { getCurrencySymbol } from "@/shared/currency-formatter";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -46,6 +46,8 @@ export type TransactionForm = {
   type: TransactionType;
   isCountable: boolean;
 };
+
+type TransactionDetails = NonNullable<RouterOutputs["expenses"]["getTransaction"]>;
 
 export function TransactionFormScreen({
   route,
@@ -71,23 +73,58 @@ function UpdateTransactionScreen({
   route: RouteByType<"transactionForm">;
   transactionId: string;
 }) {
-  const { pop } = useRouter();
-  const { t } = useTranslation();
-
-  const [formData, setFormData] = useState<TransactionForm>({
-    description: "",
-    accountId: "",
-    amount: "",
-    date: new Date(),
-    time: DateTime.now().toFormat("HH:mm"),
-    type: "expense",
-    isCountable: true,
-  });
-  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
-
   const { data: transaction } = useQuery(
     trpc.expenses.getTransaction.queryOptions({ id: transactionId }),
   );
+
+  return (
+    <UpdateTransactionForm
+      key={transaction ? JSON.stringify(transaction) : "loading"}
+      route={route}
+      transactionId={transactionId}
+      transaction={transaction}
+    />
+  );
+}
+
+function UpdateTransactionForm({
+  route,
+  transactionId,
+  transaction,
+}: {
+  route: RouteByType<"transactionForm">;
+  transactionId: string;
+  transaction?: TransactionDetails;
+}) {
+  const { pop } = useRouter();
+  const { t } = useTranslation();
+
+  const [formData, setFormData] = useState<TransactionForm>(() => {
+    if (transaction) {
+      const transactionDateTime = DateTime.fromISO(transaction.createdAt);
+
+      return {
+        description: transaction.description,
+        accountId: transaction.accountId,
+        amount: (transaction.amount / 100).toString(),
+        date: transactionDateTime.toJSDate(),
+        time: transactionDateTime.toFormat("HH:mm"),
+        type: transaction.type,
+        isCountable: transaction.isCountable,
+      };
+    }
+
+    return {
+      description: "",
+      accountId: "",
+      amount: "",
+      date: new Date(),
+      time: DateTime.now().toFormat("HH:mm"),
+      type: "expense",
+      isCountable: true,
+    };
+  });
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
   const { data: accounts = [] } = useQuery(trpc.accounts.list.queryOptions());
   const selectedAccount = accounts.find((acc) => acc.id === formData.accountId);
@@ -128,25 +165,6 @@ function UpdateTransactionScreen({
       },
     }),
   );
-
-  useEffect(() => {
-    if (transaction) {
-      // Parse ISO timestamp string using luxon
-      const transactionDateTime = DateTime.fromISO(transaction.createdAt);
-      const transactionDate = transactionDateTime.toJSDate();
-      const timeString = transactionDateTime.toFormat("HH:mm");
-
-      setFormData({
-        description: transaction.description,
-        accountId: transaction.accountId,
-        amount: (transaction.amount / 100).toString(),
-        date: transactionDate,
-        time: timeString,
-        type: transaction.type,
-        isCountable: transaction.isCountable,
-      });
-    }
-  }, [transaction]);
 
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();

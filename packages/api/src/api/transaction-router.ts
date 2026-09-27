@@ -26,6 +26,65 @@ import { getFamilyMonthlyBreakdownExcludedAccountIds } from "../db/user/get-fami
 
 const monthlyBreakdownPageSize = 8;
 
+const transactionSelection = {
+  id: transactionTable.id,
+  description: transactionTable.description,
+  amount: transactionTable.amount,
+  currency: transactionTable.currency,
+  usdAmount: transactionTable.usdAmount,
+  createdAt: transactionTable.createdAt,
+  accountId: accountTable.id,
+  type: transactionTable.type,
+  isCountable: transactionTable.isCountable,
+};
+
+const getTransactionForFamily = (
+  db: DB,
+  transactionId: string,
+  familyId: string,
+) =>
+  db
+    .select(transactionSelection)
+    .from(transactionTable)
+    .innerJoin(accountTable, eq(transactionTable.accountId, accountTable.id))
+    .where(
+      and(
+        eq(transactionTable.id, transactionId),
+        eq(accountTable.familyId, familyId),
+      ),
+    );
+
+const getRequiredTransactionForFamily = async (
+  db: DB,
+  transactionId: string,
+  familyId: string,
+) => {
+  const [transaction] = await getTransactionForFamily(
+    db,
+    transactionId,
+    familyId,
+  );
+
+  if (!transaction) {
+    throw new TRPCError({ code: "NOT_FOUND" });
+  }
+
+  return transaction;
+};
+
+const getAuthorizedFamilyAccount = async (
+  db: DB,
+  accountId: string,
+  familyId: string,
+) => {
+  const accountResult = await getAccountByFamilyId(db, accountId, familyId);
+  if (accountResult.type === "notFound") {
+    throw new TRPCError({ code: "UNAUTHORIZED" });
+  }
+
+  return accountResult.account;
+};
+
 const overviewInputSchema = z.object({
   cursor: z.number().int().min(0),
 });
@@ -129,17 +188,7 @@ const getFilteredTransactions = async (
   }
 
   return db
-    .select({
-      id: transactionTable.id,
-      description: transactionTable.description,
-      amount: transactionTable.amount,
-      currency: transactionTable.currency,
-      usdAmount: transactionTable.usdAmount,
-      createdAt: transactionTable.createdAt,
-      accountId: accountTable.id,
-      type: transactionTable.type,
-      isCountable: transactionTable.isCountable,
-    })
+    .select(transactionSelection)
     .from(transactionTable)
     .innerJoin(accountTable, eq(transactionTable.accountId, accountTable.id))
     .where(and(...conditions));
@@ -286,17 +335,7 @@ export const expenseRouter = t.router({
         );
 
       const recentTransactionsDb = db
-        .select({
-          id: transactionTable.id,
-          description: transactionTable.description,
-          amount: transactionTable.amount,
-          currency: transactionTable.currency,
-          usdAmount: transactionTable.usdAmount,
-          createdAt: transactionTable.createdAt,
-          accountId: accountTable.id,
-          type: transactionTable.type,
-          isCountable: transactionTable.isCountable,
-        })
+        .select(transactionSelection)
         .from(transactionTable)
         .innerJoin(
           accountTable,
@@ -474,29 +513,11 @@ export const expenseRouter = t.router({
       const db = getDb();
       const familyId = ctx.familyId;
 
-      const transaction = await db
-        .select({
-          id: transactionTable.id,
-          description: transactionTable.description,
-          amount: transactionTable.amount,
-          currency: transactionTable.currency,
-          usdAmount: transactionTable.usdAmount,
-          createdAt: transactionTable.createdAt,
-          accountId: accountTable.id,
-          type: transactionTable.type,
-          isCountable: transactionTable.isCountable,
-        })
-        .from(transactionTable)
-        .innerJoin(
-          accountTable,
-          eq(transactionTable.accountId, accountTable.id),
-        )
-        .where(
-          and(
-            eq(transactionTable.id, input.id),
-            eq(accountTable.familyId, familyId),
-          ),
-        );
+      const transaction = await getTransactionForFamily(
+        db,
+        input.id,
+        familyId,
+      );
 
       const transactionResult = transaction[0];
       if (!transactionResult) {
@@ -522,27 +543,11 @@ export const expenseRouter = t.router({
       const familyId = ctx.familyId;
 
       // Verify transaction belongs to user and keep the transaction currency.
-      const existingTransaction = await db
-        .select({
-          id: transactionTable.id,
-          currency: transactionTable.currency,
-        })
-        .from(transactionTable)
-        .innerJoin(
-          accountTable,
-          eq(transactionTable.accountId, accountTable.id),
-        )
-        .where(
-          and(
-            eq(transactionTable.id, input.id),
-            eq(accountTable.familyId, familyId),
-          ),
-        );
-
-      const existingTransactionResult = existingTransaction[0];
-      if (!existingTransactionResult) {
-        throw new TRPCError({ code: "NOT_FOUND" });
-      }
+      const existingTransactionResult = await getRequiredTransactionForFamily(
+        db,
+        input.id,
+        familyId,
+      );
 
       const baseCurrency = await getFamilyBaseCurrency(familyId);
       const transactionDate = new Date(input.createdAt);
@@ -578,24 +583,7 @@ export const expenseRouter = t.router({
       const familyId = ctx.familyId;
 
       // Verify transaction belongs to user
-      const existingTransaction = await db
-        .select({ id: transactionTable.id })
-        .from(transactionTable)
-        .innerJoin(
-          accountTable,
-          eq(transactionTable.accountId, accountTable.id),
-        )
-        .where(
-          and(
-            eq(transactionTable.id, input.id),
-            eq(accountTable.familyId, familyId),
-          ),
-        );
-
-      const existingTransactionResult = existingTransaction[0];
-      if (!existingTransactionResult) {
-        throw new TRPCError({ code: "NOT_FOUND" });
-      }
+      await getRequiredTransactionForFamily(db, input.id, familyId);
 
       await db
         .delete(transactionTable)
@@ -618,14 +606,7 @@ export const expenseRouter = t.router({
       const db = getDb();
       const familyId = ctx.familyId;
 
-      const accountResult = await getAccountByFamilyId(
-        db,
-        input.accountId,
-        familyId,
-      );
-      if (accountResult.type === "notFound") {
-        throw new TRPCError({ code: "UNAUTHORIZED" });
-      }
+      await getAuthorizedFamilyAccount(db, input.accountId, familyId);
 
       // Convert human amount to cents
       const amountCents = Math.round(input.amount * 100);
@@ -654,19 +635,16 @@ export const expenseRouter = t.router({
       const db = getDb();
       const familyId = ctx.familyId;
 
-      const accountResult = await getAccountByFamilyId(
+      const account = await getAuthorizedFamilyAccount(
         db,
         input.accountId,
         familyId,
       );
-      if (accountResult.type === "notFound") {
-        throw new TRPCError({ code: "UNAUTHORIZED" });
-      }
 
       return getMostUsedDescriptions(
         db,
         familyId,
-        accountResult.account.currency,
+        account.currency,
         input.transactionType,
       );
     }),

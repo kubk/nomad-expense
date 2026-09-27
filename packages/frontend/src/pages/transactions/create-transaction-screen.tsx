@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { DeleteIcon, Loader2Icon } from "lucide-react";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import type { Account, TransactionType } from "api";
@@ -84,23 +84,16 @@ export function CreateTransactionScreen({
     trpc.accounts.list.queryOptions(),
   );
 
-  useEffect(() => {
-    const hasSelectedAccount = accounts.some(
-      (account) => account.id === formData.accountId,
-    );
-    if (hasSelectedAccount || accounts.length === 0) return;
-
-    const defaultManualAccount = getDefaultManualAccount(accounts);
-    if (!defaultManualAccount) return;
-
-    setFormData((current) => ({
-      ...current,
-      accountId: defaultManualAccount.id,
-    }));
-  }, [accounts, formData.accountId]);
-
-  const selectedAccount = accounts.find(
+  const hasSelectedAccount = accounts.some(
     (account) => account.id === formData.accountId,
+  );
+  const defaultManualAccount = getDefaultManualAccount(accounts);
+  const selectedAccountId =
+    !hasSelectedAccount && accounts.length > 0
+      ? (defaultManualAccount?.id ?? formData.accountId)
+      : formData.accountId;
+  const selectedAccount = accounts.find(
+    (account) => account.id === selectedAccountId,
   );
   const canUploadStatement = Boolean(selectedAccount?.bankType);
 
@@ -140,7 +133,7 @@ export function CreateTransactionScreen({
     haptic("light");
 
     await createTransactionMutation.mutateAsync({
-      accountId: formData.accountId,
+      accountId: selectedAccount?.id ?? formData.accountId,
       amount: Number(formData.amount),
       description: formData.description.trim(),
       type: formData.type,

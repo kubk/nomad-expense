@@ -3,7 +3,10 @@ import { SettingsIcon } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { MonthlyBreakdownItem } from "./monthly-breakdown-item";
-import { SummaryCard } from "../widgets/summary-card";
+import {
+  TransactionFiltersSummary,
+  TransactionListSkeleton,
+} from "../widgets/summary-card";
 import { FiltersDrawer } from "../widgets/filters-drawer";
 import { trpc } from "../../shared/api";
 import { useQuery } from "@tanstack/react-query";
@@ -52,6 +55,8 @@ export function MonthlyBreakdownFull({
   );
   const isLoading = isMonthlyBreakdownAccountsLoading || isTransactionsLoading;
 
+  const openFilters = () => setIsDrawerOpen(true);
+
   const filteredMonthlyData = transactionsData?.data || [];
   const maxAmount = calculateMaxAmount(filteredMonthlyData);
   const totalExpenses = transactionsData?.totalExpenses || 0;
@@ -78,11 +83,11 @@ export function MonthlyBreakdownFull({
       }
       isForm={isFormRoute(route)}
     >
-      <SummaryCard
+      <TransactionFiltersSummary
         isLoading={isLoading}
-        onFiltersClick={() => setIsDrawerOpen(true)}
-        appliedFilters={filters}
-        totalAmount={totalExpenses}
+        onFiltersClick={openFilters}
+        filters={filters}
+        totalExpenses={totalExpenses}
         totalIncome={totalIncome}
       />
 
@@ -90,13 +95,7 @@ export function MonthlyBreakdownFull({
       <Card className="mt-4 shadow border-0 p-0">
         <CardContent className="p-0">
           {isLoading ? (
-            <div className="p-4">
-              <div className="animate-pulse space-y-3">
-                {[...Array(6)].map((_, i) => (
-                  <div key={i} className="bg-muted h-16 rounded"></div>
-                ))}
-              </div>
-            </div>
+            <TransactionListSkeleton />
           ) : (
             filteredMonthlyData.map((month, index) => (
               <MonthlyBreakdownItem

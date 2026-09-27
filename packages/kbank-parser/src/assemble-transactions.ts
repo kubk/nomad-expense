@@ -67,7 +67,7 @@ const tryParseMoney = (row: string, columns: string[]) => {
   for (let i = 1; i < 4; i++) {
     try {
       tmpMoney = parseMoney(columns[columns.length - i]);
-    } catch (e) {}
+    } catch {}
   }
   if (tmpMoney === undefined) {
     throw new Error("Unable to parse money from row: " + row);

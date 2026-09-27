@@ -1,9 +1,11 @@
 import { Platform } from "./platforms";
 
 function isStandaloneMode() {
+  const navigator = window.navigator as Navigator & { standalone?: boolean };
+
   return (
     window.matchMedia("(display-mode: standalone)").matches ||
-    (window.navigator as any).standalone === true
+    navigator.standalone === true
   );
 }
 

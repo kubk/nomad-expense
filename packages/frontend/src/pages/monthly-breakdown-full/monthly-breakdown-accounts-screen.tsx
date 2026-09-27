@@ -1,4 +1,4 @@
-import { useEffect, useState, type KeyboardEvent } from "react";
+import { useState, type KeyboardEvent } from "react";
 import { Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -26,6 +26,24 @@ export function MonthlyBreakdownAccountsScreen({
 }: {
   route: RouteByType<"monthlyBreakdownAccounts">;
 }) {
+  const settings = useMonthlyBreakdownAccountIds();
+
+  return (
+    <MonthlyBreakdownAccountsContent
+      key={JSON.stringify(settings.excludedAccountIds)}
+      route={route}
+      settings={settings}
+    />
+  );
+}
+
+function MonthlyBreakdownAccountsContent({
+  route,
+  settings,
+}: {
+  route: RouteByType<"monthlyBreakdownAccounts">;
+  settings: ReturnType<typeof useMonthlyBreakdownAccountIds>;
+}) {
   const { pop } = useRouter();
   const { t } = useTranslation();
   const {
@@ -34,14 +52,10 @@ export function MonthlyBreakdownAccountsScreen({
     isLoading,
     isSaving,
     setExcludedAccountIds,
-  } = useMonthlyBreakdownAccountIds();
-  const [draftExcludedAccountIds, setDraftExcludedAccountIds] = useState<
-    string[]
-  >([]);
-
-  useEffect(() => {
-    setDraftExcludedAccountIds(excludedAccountIds);
-  }, [excludedAccountIds]);
+  } = settings;
+  const [draftExcludedAccountIds, setDraftExcludedAccountIds] = useState(
+    excludedAccountIds,
+  );
 
   const isDirty = !areAccountIdsEqual(
     draftExcludedAccountIds,

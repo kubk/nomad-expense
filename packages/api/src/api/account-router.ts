@@ -6,6 +6,12 @@ import { z } from "zod";
 import { accountColorSchema, bankSchema, currencySchema } from "../db/enums";
 import { TRPCError } from "@trpc/server";
 
+const accountFamilyFilter = (familyId: string, accountId: string) =>
+  and(
+    eq(accountTable.familyId, familyId),
+    eq(accountTable.id, accountId),
+  );
+
 export const accountRouter = t.router({
   list: protectedProcedure.query(async ({ ctx }) => {
     const db = getDb();
@@ -105,17 +111,10 @@ export const accountRouter = t.router({
           name: input.name,
           color: input.color,
         })
-        .where(
-          and(
-            eq(accountTable.familyId, familyId),
-            eq(accountTable.id, input.id),
-          ),
-        )
+        .where(accountFamilyFilter(familyId, input.id))
         .returning({ id: accountTable.id });
 
-      const result = results[0];
-
-      return result;
+      return results[0];
     }),
 
   delete: protectedProcedure
@@ -130,17 +129,10 @@ export const accountRouter = t.router({
 
       const results = await db
         .delete(accountTable)
-        .where(
-          and(
-            eq(accountTable.familyId, familyId),
-            eq(accountTable.id, input.id),
-          ),
-        )
+        .where(accountFamilyFilter(familyId, input.id))
         .returning({ id: accountTable.id });
 
-      const result = results[0];
-
-      return result;
+      return results[0];
     }),
 
   setHidden: protectedProcedure
@@ -156,12 +148,7 @@ export const accountRouter = t.router({
       const results = await db
         .update(accountTable)
         .set({ isHidden: input.isHidden })
-        .where(
-          and(
-            eq(accountTable.familyId, ctx.familyId),
-            eq(accountTable.id, input.id),
-          ),
-        )
+        .where(accountFamilyFilter(ctx.familyId, input.id))
         .returning({
           id: accountTable.id,
           isHidden: accountTable.isHidden,
@@ -240,16 +227,9 @@ export const accountRouter = t.router({
           bankType: input.bankType,
           timezone: input.timezone,
         })
-        .where(
-          and(
-            eq(accountTable.familyId, familyId),
-            eq(accountTable.id, input.id),
-          ),
-        )
+        .where(accountFamilyFilter(familyId, input.id))
         .returning({ id: accountTable.id });
 
-      const result = results[0];
-
-      return result;
+      return results[0];
     }),
 });

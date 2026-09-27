@@ -65,10 +65,7 @@ export function AccountsActionsMenu({
   }, []);
 
   useLayoutEffect(() => {
-    if (!isOpen) {
-      setPosition(null);
-      return;
-    }
+    if (!isOpen) return;
 
     updatePosition();
   }, [isOpen, updatePosition]);

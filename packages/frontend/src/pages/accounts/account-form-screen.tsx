@@ -25,6 +25,7 @@ import { useQuery, useMutation } from "@tanstack/react-query";
 import { cn } from "@/lib/utils";
 import {
   SUPPORTED_CURRENCIES,
+  type Account,
   type SupportedCurrency,
   type AccountColor,
 } from "api";
@@ -54,20 +55,46 @@ export function AccountFormScreen({
 }: {
   route: RouteByType<"accountForm">;
 }) {
+  const { data: accounts = [] } = useQuery(trpc.accounts.list.queryOptions());
+  const existingAccount = accounts.find(
+    (account) => account.id === route.accountId,
+  );
+
+  return (
+    <AccountFormContent
+      key={existingAccount ? JSON.stringify(existingAccount) : "new"}
+      route={route}
+      existingAccount={existingAccount}
+    />
+  );
+}
+
+function AccountFormContent({
+  route,
+  existingAccount,
+}: {
+  route: RouteByType<"accountForm">;
+  existingAccount?: Account;
+}) {
   const { navigate, pop } = useRouter();
   const { t } = useTranslation();
   const accountId = route.accountId;
   const isEdit = Boolean(accountId);
 
-  const [formData, setFormData] = useState<Form>({
-    name: "",
-    color: accountColorsPalette[0].id,
-    currency: "USD",
-  });
+  const [formData, setFormData] = useState<Form>(() =>
+    existingAccount
+      ? {
+          name: existingAccount.name,
+          color: existingAccount.color,
+          currency: existingAccount.currency,
+        }
+      : {
+          name: "",
+          color: accountColorsPalette[0].id,
+          currency: "USD",
+        },
+  );
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
-
-  const { data: accounts = [] } = useQuery(trpc.accounts.list.queryOptions());
-  const existingAccount = accounts.find((account) => account.id === accountId);
 
   const createAccountMutation = useMutation(
     trpc.accounts.create.mutationOptions({
@@ -95,25 +122,20 @@ export function AccountFormScreen({
     }),
   );
 
-  useEffect(() => {
-    if (existingAccount) {
-      setFormData({
-        name: existingAccount.name,
-        color: existingAccount.color,
-        currency: existingAccount.currency,
-      });
+  const existingAccountColor = existingAccount?.color;
 
-      // Scroll to selected color when editing
-      setTimeout(() => {
-        const element = document.getElementById(
-          `color-${existingAccount.color}`,
-        );
-        if (element) {
-          element.scrollIntoView({ inline: "center" });
-        }
-      }, 300);
-    }
-  }, [existingAccount]);
+  useEffect(() => {
+    if (!existingAccountColor) return;
+
+    const timeoutId = setTimeout(() => {
+      const element = document.getElementById(
+        `color-${existingAccountColor}`,
+      );
+      element?.scrollIntoView({ inline: "center" });
+    }, 300);
+
+    return () => clearTimeout(timeoutId);
+  }, [existingAccountColor]);
 
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();

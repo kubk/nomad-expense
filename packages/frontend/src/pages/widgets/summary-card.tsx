@@ -12,7 +12,43 @@ import { useBaseCurrency } from "@/shared/hooks/use-base-currency";
 import { haptic } from "@/shared/platform/haptics";
 import { useTranslation } from "@/translations/translation-provider";
 
-export function SummaryCard({
+export function TransactionListSkeleton() {
+  return (
+    <div className="p-4">
+      <div className="animate-pulse space-y-3">
+        {Array.from({ length: 6 }, (_, index) => (
+          <div key={index} className="bg-muted h-16 rounded" />
+        ))}
+      </div>
+    </div>
+  );
+}
+
+export function TransactionFiltersSummary({
+  onFiltersClick,
+  filters,
+  totalExpenses,
+  totalIncome,
+  isLoading,
+}: {
+  onFiltersClick: () => void;
+  filters: TransactionFilters;
+  totalExpenses: number;
+  totalIncome: number;
+  isLoading: boolean;
+}) {
+  return (
+    <SummaryCard
+      onFiltersClick={onFiltersClick}
+      appliedFilters={filters}
+      totalAmount={totalExpenses}
+      totalIncome={totalIncome}
+      isLoading={isLoading}
+    />
+  );
+}
+
+function SummaryCard({
   onFiltersClick,
   appliedFilters,
   totalAmount,

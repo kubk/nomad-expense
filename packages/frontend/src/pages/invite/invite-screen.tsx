@@ -17,6 +17,7 @@ export function InviteScreen({ route }: { route: RouteByType<"invite"> }) {
   const joinFamilyMutation = useMutation(
     trpc.family.joinFamily.mutationOptions(),
   );
+  const joinFamily = joinFamilyMutation.mutate;
 
   const inviteCode = route.code;
 
@@ -25,8 +26,8 @@ export function InviteScreen({ route }: { route: RouteByType<"invite"> }) {
       return;
     }
 
-    joinFamilyMutation.mutate({ code: inviteCode });
-  }, [inviteCode]);
+    joinFamily({ code: inviteCode });
+  }, [inviteCode, joinFamily]);
 
   if (joinFamilyMutation.isPending) {
     return <InviteLoader />;

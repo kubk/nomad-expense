@@ -42,6 +42,33 @@ const useDropDrawerContext = () => {
   return context;
 };
 
+function isInsideDropDrawerGroup(element: HTMLElement | null) {
+  let parent = element?.parentElement;
+  while (parent) {
+    if (parent.hasAttribute("data-drop-drawer-group")) return true;
+    parent = parent.parentElement;
+  }
+
+  return false;
+}
+
+function useDropDrawerGroupState(isMobile: boolean) {
+  const itemRef = React.useRef<HTMLDivElement>(null);
+  const [isInsideGroup, setIsInsideGroup] = React.useState(false);
+
+  React.useEffect(() => {
+    if (!isMobile) return;
+
+    const timer = setTimeout(() => {
+      setIsInsideGroup(isInsideDropDrawerGroup(itemRef.current));
+    }, 0);
+
+    return () => clearTimeout(timer);
+  }, [isMobile]);
+
+  return { itemRef, isInsideGroup };
+}
+
 function DropDrawer({
   children,
   ...props
@@ -103,10 +130,9 @@ function DropDrawerContent({
     "forward" | "backward"
   >("forward");
 
-  // Create a ref to store submenu content by ID
-  const submenuContentRef = React.useRef<Map<string, React.ReactNode[]>>(
-    new Map(),
-  );
+  const [submenuContent, setSubmenuContent] = React.useState<
+    Map<string, React.ReactNode[]>
+  >(() => new Map());
 
   // Function to navigate to a submenu
   const navigateToSubmenu = React.useCallback((id: string, title: string) => {
@@ -141,7 +167,7 @@ function DropDrawerContent({
   // Function to register submenu content
   const registerSubmenuContent = React.useCallback(
     (id: string, content: React.ReactNode[]) => {
-      submenuContentRef.current.set(id, content);
+      setSubmenuContent((current) => new Map(current).set(id, content));
     },
     [],
   );
@@ -225,27 +251,14 @@ function DropDrawerContent({
   // Get submenu content (either from cache or extract it)
   const getSubmenuContent = React.useCallback(
     (id: string) => {
-      // Check if we have the content in our ref
-      const cachedContent = submenuContentRef.current.get(id || "");
+      const cachedContent = submenuContent.get(id);
       if (cachedContent && cachedContent.length > 0) {
         return cachedContent;
       }
 
-      // If not in cache, extract it
-      const submenuContent = extractSubmenuContent(children, id);
-
-      if (submenuContent.length === 0) {
-        return [];
-      }
-
-      // Store in cache for future use
-      if (id) {
-        submenuContentRef.current.set(id, submenuContent);
-      }
-
-      return submenuContent;
+      return extractSubmenuContent(children, id);
     },
-    [children, extractSubmenuContent],
+    [children, extractSubmenuContent, submenuContent],
   );
 
   // Animation variants for Framer Motion
@@ -404,43 +417,7 @@ function DropDrawerItem({
   icon?: React.ReactNode;
 }) {
   const { isMobile } = useDropDrawerContext();
-
-  // Define hooks outside of conditionals to follow React rules
-  // Check if this item is inside a group by looking at parent elements
-  const isInGroup = React.useCallback(
-    (element: HTMLElement | null): boolean => {
-      if (!element) return false;
-
-      // Check if any parent has a data-drop-drawer-group attribute
-      let parent = element.parentElement;
-      while (parent) {
-        if (parent.hasAttribute("data-drop-drawer-group")) {
-          return true;
-        }
-        parent = parent.parentElement;
-      }
-      return false;
-    },
-    [],
-  );
-
-  // Create a ref to check if the item is in a group
-  const itemRef = React.useRef<HTMLDivElement>(null);
-  const [isInsideGroup, setIsInsideGroup] = React.useState(false);
-
-  React.useEffect(() => {
-    // Only run this effect in mobile mode
-    if (!isMobile) return;
-
-    // Use a short timeout to ensure the DOM is fully rendered
-    const timer = setTimeout(() => {
-      if (itemRef.current) {
-        setIsInsideGroup(isInGroup(itemRef.current));
-      }
-    }, 0);
-
-    return () => clearTimeout(timer);
-  }, [isInGroup, isMobile]);
+  const { itemRef, isInsideGroup } = useDropDrawerGroupState(isMobile);
 
   if (isMobile) {
     const handleClick = (e: React.MouseEvent<HTMLDivElement>) => {
@@ -795,43 +772,7 @@ function DropDrawerSubTrigger({
 }) {
   const { isMobile } = useDropDrawerContext();
   const { navigateToSubmenu } = React.useContext(SubmenuContext);
-
-  // Define hooks outside of conditionals to follow React rules
-  // Check if this item is inside a group by looking at parent elements
-  const isInGroup = React.useCallback(
-    (element: HTMLElement | null): boolean => {
-      if (!element) return false;
-
-      // Check if any parent has a data-drop-drawer-group attribute
-      let parent = element.parentElement;
-      while (parent) {
-        if (parent.hasAttribute("data-drop-drawer-group")) {
-          return true;
-        }
-        parent = parent.parentElement;
-      }
-      return false;
-    },
-    [],
-  );
-
-  // Create a ref to check if the item is in a group
-  const itemRef = React.useRef<HTMLDivElement>(null);
-  const [isInsideGroup, setIsInsideGroup] = React.useState(false);
-
-  React.useEffect(() => {
-    // Only run this effect in mobile mode
-    if (!isMobile) return;
-
-    // Use a short timeout to ensure the DOM is fully rendered
-    const timer = setTimeout(() => {
-      if (itemRef.current) {
-        setIsInsideGroup(isInGroup(itemRef.current));
-      }
-    }, 0);
-
-    return () => clearTimeout(timer);
-  }, [isInGroup, isMobile]);
+  const { itemRef, isInsideGroup } = useDropDrawerGroupState(isMobile);
 
   if (isMobile) {
     // Find the parent submenu ID

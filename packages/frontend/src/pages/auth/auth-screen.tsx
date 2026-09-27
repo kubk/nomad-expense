@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { TelegramIcon } from "@/components/telegram-icon";
 import { trpc } from "@/shared/api";
-import { RouteByType, useRouter } from "@/shared/stacked-router/router";
+import { useRouter } from "@/shared/stacked-router/router";
 import { saveAuthToken } from "@/shared/auth-token";
 import { useTranslation } from "@/translations/translation-provider";
 
@@ -59,7 +59,7 @@ function loadTelegramLoginLibrary() {
   return telegramLoginLibraryPromise;
 }
 
-export function AuthScreen({ route: _ }: { route: RouteByType<"auth"> }) {
+export function AuthScreen() {
   const { navigate } = useRouter();
   const { t } = useTranslation();
   const configQuery = useQuery(trpc.telegramSigninConfig.queryOptions());

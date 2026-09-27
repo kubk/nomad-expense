@@ -7,7 +7,7 @@
     "prettier:fix": "git ls-files -mo --exclude-standard -- './packages' | grep -E '\\.(ts|tsx)$' | xargs -I {} prettier --write {}",
     "prettier:fix:full": "prettier --write \"./packages/**/*.+(ts|tsx)\"",
     "lint": "pnpm run \"/^lint:.*/\"",
-    "lint:jscpd": "jscpd packages/api/src packages/frontend/src packages/kbank-api/src packages/kbank-parser/src --min-lines 10 --min-tokens 50 --cross-formats js-ts --ignore \"**/*.test.*\" --exit-code 1 --no-colors --no-tips",
+    "lint:jscpd": "jscpd packages/api/src packages/frontend/src packages/kbank-api/src packages/kbank-parser/src --min-lines 10 --min-tokens 50 --cross-formats js-ts --ignore \"**/*.test.*\" --exit-code 1 --no-colors --no-tips --reporters ai",
     "lint:knip": "knip --reporter compact",
     "lint:oxlint": "oxlint",
     "dead-code": "concurrently -n knip,slop-api,slop-frontend -c magenta,green,blue \"knip --reporter compact\" \"slop-scan scan packages/api --lint\" \"slop-scan scan packages/frontend --lint\"",

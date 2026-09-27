@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import {
   Drawer,
   DrawerClose,
@@ -35,17 +35,25 @@ type TransactionTypeFilterValue = "all" | TransactionType;
 type TransactionOrderField = TransactionFilters["order"]["field"];
 type TransactionOrderDirection = TransactionFilters["order"]["direction"];
 
-export function FiltersDrawer({
-  open,
-  onOpenChange,
-  filters,
-  onApply,
-}: {
+type FiltersDrawerProps = {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   filters: TransactionFilters;
   onApply: (filters: TransactionFilters) => void;
-}) {
+};
+
+export function FiltersDrawer(props: FiltersDrawerProps) {
+  return (
+    <FiltersDrawerContent key={JSON.stringify(props.filters)} {...props} />
+  );
+}
+
+function FiltersDrawerContent({
+  open,
+  onOpenChange,
+  filters,
+  onApply,
+}: FiltersDrawerProps) {
   const { t } = useTranslation();
   const [filterForm, setFilterForm] = useState<TransactionFilters>(filters);
   const [showCustomDatePicker, setShowCustomDatePicker] = useState(false);
@@ -56,10 +64,6 @@ export function FiltersDrawer({
   ).length;
   const areAllAccountsSelected =
     accounts.length > 0 && selectedAccountCount === accounts.length;
-
-  useEffect(() => {
-    setFilterForm(filters);
-  }, [filters]);
 
   const handleOpenChange = (newOpen: boolean) => {
     onOpenChange(newOpen);

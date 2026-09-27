@@ -1,6 +1,9 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { TransactionItem } from "../widgets/transaction-item";
-import { SummaryCard } from "../widgets/summary-card";
+import {
+  TransactionFiltersSummary,
+  TransactionListSkeleton,
+} from "../widgets/summary-card";
 import { FiltersDrawer } from "../widgets/filters-drawer";
 import { useState } from "react";
 import { trpc } from "@/shared/api";
@@ -42,11 +45,11 @@ export function TransactionsScreen({
 
   return (
     <Page title={t("transactionsTitle")} isForm={isFormRoute(route)}>
-      <SummaryCard
+      <TransactionFiltersSummary
         isLoading={isLoading}
         onFiltersClick={() => setIsDrawerOpen(true)}
-        appliedFilters={filters}
-        totalAmount={totalExpenses}
+        filters={filters}
+        totalExpenses={totalExpenses}
         totalIncome={totalIncome}
       />
 
@@ -55,13 +58,7 @@ export function TransactionsScreen({
         <Card className="border-0 p-0 shadow-sm">
           <CardContent className="p-0">
             {isLoading ? (
-              <div className="p-4">
-                <div className="animate-pulse space-y-3">
-                  {[...Array(6)].map((_, i) => (
-                    <div key={i} className="bg-muted h-16 rounded"></div>
-                  ))}
-                </div>
-              </div>
+              <TransactionListSkeleton />
             ) : transactions.length >= 6 ? (
               <VList style={{ height: 600 }}>
                 {transactions.map((transaction, idx) => (

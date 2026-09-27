@@ -14,7 +14,7 @@ import { InviteScreen } from "../invite/invite-screen";
 import { AuthScreen } from "../auth/auth-screen";
 import { AnimatePresence } from "framer-motion";
 import { useRouter } from "@/shared/stacked-router/router";
-import { useCallback, useEffect } from "react";
+import { useEffect, type ReactNode } from "react";
 import { Route } from "@/shared/stacked-router/routes";
 import { AnimatedScreen } from "@/shared/stacked-router/animated-screen";
 import { StatementUploadResultScreen } from "../transactions/statement-upload-result-screen";
@@ -23,93 +23,70 @@ import { getAuthToken } from "@/shared/auth-token";
 
 export function App() {
   useHeaderColorSync();
-  const { navigationStack, navigate, pop } = useRouter();
+  const { navigationStack, navigate } = useRouter();
 
   useEffect(() => {
     if (!getAuthToken()) {
       navigate({ type: "auth" });
     }
-  }, []);
+  }, [navigate]);
 
-  const renderScreen = useCallback(
-    (route: Route, index: number, stack: Route[]) => {
-      const props = { route } as any;
+  const renderRouteContent = (route: Route): ReactNode => {
+    switch (route.type) {
+      case "main":
+        return <OverviewScreen />;
+      case "settings":
+        return <SettingsScreen route={route} />;
+      case "family":
+        return <FamilyScreen route={route} />;
+      case "invite":
+        return <InviteScreen route={route} />;
+      case "accountForm":
+        return <AccountFormScreen route={route} />;
+      case "importSettings":
+        return <ImportSettingsScreen route={route} />;
+      case "transactionForm":
+        return <TransactionFormScreen route={route} />;
+      case "transactions":
+        return <TransactionsScreen route={route} />;
+      case "monthlyBreakdownFull":
+        return <MonthlyBreakdownFull route={route} />;
+      case "monthlyBreakdownSettings":
+        return <MonthlyBreakdownSettingsScreen route={route} />;
+      case "monthlyBreakdownAccounts":
+        return <MonthlyBreakdownAccountsScreen route={route} />;
+      case "accounts":
+        return <AccountsScreen route={route} />;
+      case "auth":
+        return <AuthScreen />;
+      case "statementUploadResult":
+        return <StatementUploadResultScreen route={route} />;
+      default:
+        return route satisfies never;
+    }
+  };
 
-      let ScreenComponent;
-      const type = route.type;
-      switch (type) {
-        case "main":
-          ScreenComponent = <OverviewScreen {...props} />;
-          break;
-        case "settings":
-          ScreenComponent = <SettingsScreen {...props} />;
-          break;
-        case "family":
-          ScreenComponent = <FamilyScreen {...props} />;
-          break;
-        case "invite":
-          ScreenComponent = <InviteScreen {...props} />;
-          break;
-        case "accountForm":
-          ScreenComponent = <AccountFormScreen {...props} />;
-          break;
-        case "importSettings":
-          ScreenComponent = <ImportSettingsScreen {...props} />;
-          break;
-        case "transactionForm":
-          ScreenComponent = <TransactionFormScreen {...props} />;
-          break;
-        case "transactions":
-          ScreenComponent = <TransactionsScreen {...props} />;
-          break;
-        case "monthlyBreakdownFull":
-          ScreenComponent = <MonthlyBreakdownFull {...props} />;
-          break;
-        case "monthlyBreakdownSettings":
-          ScreenComponent = <MonthlyBreakdownSettingsScreen {...props} />;
-          break;
-        case "monthlyBreakdownAccounts":
-          ScreenComponent = <MonthlyBreakdownAccountsScreen {...props} />;
-          break;
-        case "accounts":
-          ScreenComponent = <AccountsScreen {...props} />;
-          break;
-        case "auth":
-          ScreenComponent = <AuthScreen {...props} />;
-          break;
-        case "statementUploadResult":
-          ScreenComponent = <StatementUploadResultScreen {...props} />;
-          break;
-        default:
-          return type satisfies never;
-      }
-
-      return (
-        <AnimatedScreen
-          key={`${type}-${index}`}
-          index={index}
-          stack={stack}
-          route={route}
-          transition={{
-            ease: "easeInOut",
-          }}
-          getAnimationConfig={(routeType) => {
-            if (
-              routeType === "settings" ||
-              routeType === "main" ||
-              routeType === "accounts" ||
-              routeType === "transactions"
-            ) {
-              return "scale";
-            }
-            return "horizontal-slide";
-          }}
-        >
-          {ScreenComponent}
-        </AnimatedScreen>
-      );
-    },
-    [navigate, pop],
+  const renderScreen = (route: Route, index: number, stack: Route[]) => (
+    <AnimatedScreen
+      key={`${route.type}-${index}`}
+      index={index}
+      stack={stack}
+      route={route}
+      transition={{ ease: "easeInOut" }}
+      getAnimationConfig={(routeType) => {
+        if (
+          routeType === "settings" ||
+          routeType === "main" ||
+          routeType === "accounts" ||
+          routeType === "transactions"
+        ) {
+          return "scale";
+        }
+        return "horizontal-slide";
+      }}
+    >
+      {renderRouteContent(route)}
+    </AnimatedScreen>
   );
 
   return (

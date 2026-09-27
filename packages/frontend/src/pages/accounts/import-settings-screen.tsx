@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { ArrowLeftIcon, Loader2Icon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -16,7 +16,7 @@ import { RouteByType, useRouter } from "@/shared/stacked-router/router";
 import { isFormRoute } from "@/shared/stacked-router/routes";
 import { Label } from "@/components/ui/label";
 import { Skeleton } from "@/components/ui/skeleton";
-import { bank, type Bank } from "api";
+import { bank, type Account, type Bank } from "api";
 import { isTelegram } from "@/shared/platform/telegram-platform";
 import { useTranslation } from "@/translations/translation-provider";
 
@@ -52,23 +52,52 @@ export function ImportSettingsScreen({
 }: {
   route: RouteByType<"importSettings">;
 }) {
-  const { pop } = useRouter();
-  const { t } = useTranslation();
-  const { accountId } = route;
-
-  const [formData, setFormData] = useState<Form>({
-    bankType: "None",
-    timezone: "UTC",
-  });
-
   const { data: accounts = [], isLoading: isAccountsLoading } = useQuery(
     trpc.accounts.list.queryOptions(),
   );
-  const existingAccount = accounts.find((account) => account.id === accountId);
+  const existingAccount = accounts.find(
+    (account) => account.id === route.accountId,
+  );
 
   if (!isAccountsLoading && !existingAccount) {
     return null;
   }
+
+  return (
+    <ImportSettingsForm
+      key={
+        existingAccount
+          ? JSON.stringify([
+              existingAccount.id,
+              existingAccount.bankType,
+              existingAccount.timezone,
+            ])
+          : "loading"
+      }
+      route={route}
+      existingAccount={existingAccount}
+      isAccountsLoading={isAccountsLoading}
+    />
+  );
+}
+
+function ImportSettingsForm({
+  route,
+  existingAccount,
+  isAccountsLoading,
+}: {
+  route: RouteByType<"importSettings">;
+  existingAccount?: Account;
+  isAccountsLoading: boolean;
+}) {
+  const { pop } = useRouter();
+  const { t } = useTranslation();
+  const { accountId } = route;
+
+  const [formData, setFormData] = useState<Form>(() => ({
+    bankType: existingAccount?.bankType || "None",
+    timezone: existingAccount?.timezone || "UTC",
+  }));
 
   const updateImportSettingsMutation = useMutation(
     trpc.accounts.updateImportSettings.mutationOptions({
@@ -80,15 +109,6 @@ export function ImportSettingsScreen({
       },
     }),
   );
-
-  useEffect(() => {
-    if (existingAccount) {
-      setFormData({
-        bankType: existingAccount.bankType || "None",
-        timezone: existingAccount.timezone || "UTC",
-      });
-    }
-  }, [existingAccount]);
 
   const handleSave = () => {
     updateImportSettingsMutation.mutate({
