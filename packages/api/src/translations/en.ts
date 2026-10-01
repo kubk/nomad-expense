@@ -22,8 +22,10 @@ Or click /cancel to cancel the operation`,
 📥 Added: ${added} ${transaction(added)}
 
 🗑️ Removed: ${removed} ${transaction(removed)}`,
-  failedImportTransactions:
-    "❌ Failed to import transactions. Please check your file format and try again.",
+  unsupportedStatementFormat: "❌ Unrecognized statement format",
+  failedParseTransactions:
+    "❌ Couldn't read transactions from this statement",
+  failedImportTransactions: "❌ Import failed. Please try again",
   enterValidDescription: "Enter a valid description",
   transactionAdded: "✅ Transaction added successfully!",
   failedCreateTransaction: "❌ Failed to create transaction. Please try again.",

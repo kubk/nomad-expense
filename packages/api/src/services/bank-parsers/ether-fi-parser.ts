@@ -6,6 +6,7 @@ import {
   type ParseTransactionFn,
   parsedTransactionSchema,
 } from "./parsed-transaction";
+import { StatementFormatError } from "./statement-import-error";
 
 const requiredHeaders = [
   "timestamp",
@@ -17,11 +18,16 @@ const requiredHeaders = [
 ] as const;
 
 const ignoredStatuses = new Set(["DECLINED", "FAILED", "CANCELLED"]);
-const etherFiStatusSchema = z.string().trim();
+const etherFiStatusSchema = z.string().trim().nullable();
 
 const etherFiRowSchema = z.object({
   timestamp: z.string().trim(),
-  type: z.enum(["card_spend", "card_refund", "affiliate_reward"]),
+  type: z.enum([
+    "card_spend",
+    "card_refund",
+    "affiliate_reward",
+    "affiliate_payout",
+  ]),
   description: z.string().trim().min(1),
   status: etherFiStatusSchema,
   amount: z.number().finite(),
@@ -35,16 +41,29 @@ const transactionTypeByEtherFiType = {
   card_spend: "expense",
   card_refund: "income",
   affiliate_reward: "income",
+  affiliate_payout: "income",
 } satisfies Record<EtherFiRow["type"], ParsedTransaction["type"]>;
 
 export const parseEtherFiStatement: ParseTransactionFn = async (file) => {
-  const sheet = await readSheet(file, "All Transactions", { trim: true });
+  let sheet: Row[];
+
+  try {
+    sheet = await readSheet(file, "All Transactions", { trim: true });
+  } catch (error) {
+    throw new StatementFormatError(
+      "Unable to read the Ether.fi transaction sheet",
+      error,
+    );
+  }
+
   const headerRowIndex = sheet.findIndex((row) =>
     requiredHeaders.every((header) => row.includes(header)),
   );
 
   if (headerRowIndex === -1) {
-    throw new Error("Unable to find Ether.fi transaction headers");
+    throw new StatementFormatError(
+      "Unable to find Ether.fi transaction headers",
+    );
   }
 
   const headers = sheet[headerRowIndex];
@@ -58,7 +77,7 @@ export const parseEtherFiStatement: ParseTransactionFn = async (file) => {
     const rowRecord = rowToRecord(headers, row);
     const status = etherFiStatusSchema.parse(rowRecord.status);
 
-    if (ignoredStatuses.has(status.toUpperCase())) {
+    if (status && ignoredStatuses.has(status.toUpperCase())) {
       continue;
     }
 

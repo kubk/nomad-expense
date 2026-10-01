@@ -7,6 +7,15 @@ import {
 import Papa from "papaparse";
 import { DateTime } from "luxon";
 import { interpretDateInTimezone } from "../transaction-import/interpret-date-in-tz";
+import { StatementFormatError } from "./statement-import-error";
+
+const requiredHeaders = [
+  "Amount",
+  "Currency",
+  "Merchant",
+  "Description",
+  "Date",
+] as const;
 
 async function parseCsvFromFile(file: File): Promise<Record<string, string>[]> {
   const content = await file.text();
@@ -19,9 +28,16 @@ async function parseCsvFromFile(file: File): Promise<Record<string, string>[]> {
   });
 
   if (result.errors.length > 0) {
-    throw new Error(
+    throw new StatementFormatError(
       `CSV parsing errors: ${result.errors.map((e) => e.message).join(", ")}`,
     );
+  }
+
+  if (
+    !result.meta.fields ||
+    !requiredHeaders.every((header) => result.meta.fields?.includes(header))
+  ) {
+    throw new StatementFormatError("Unable to find Wise transaction headers");
   }
 
   return result.data;

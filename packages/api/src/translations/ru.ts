@@ -28,8 +28,11 @@ export const ru: Translation = {
 📥 Добавлено: ${added} ${transaction(added)}
 
 🗑️ Удалено: ${removed} ${transaction(removed)}`,
+  unsupportedStatementFormat: "❌ Не удалось распознать формат выписки",
+  failedParseTransactions:
+    "❌ Не удалось прочитать транзакции из выписки",
   failedImportTransactions:
-    "❌ Не удалось импортировать транзакции. Проверьте формат файла и попробуйте еще раз.",
+    "❌ Не удалось импортировать выписку. Попробуйте снова",
   enterValidDescription: "Введите корректное описание",
   transactionAdded: "✅ Транзакция добавлена!",
   failedCreateTransaction:

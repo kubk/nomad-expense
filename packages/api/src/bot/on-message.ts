@@ -14,6 +14,10 @@ import { createTransactionWithRules } from "../db/transaction/create-transaction
 import { downloadTelegramFileAsBuffer } from "./download-telegram-file-as-buffer";
 import { getEnv } from "../services/env";
 import { getTranslation } from "../translations/translations";
+import {
+  StatementFormatError,
+  StatementParseError,
+} from "../services/bank-parsers/statement-import-error";
 
 export async function onMessage(ctx: Context) {
   if (!ctx.from || !ctx.message) {
@@ -74,7 +78,13 @@ export async function onMessage(ctx: Context) {
       await setUserBotState(db, ctx.from.id.toString(), null);
     } catch (error) {
       console.error("Transaction import error:", error);
-      await ctx.reply(t("failedImportTransactions"));
+      if (error instanceof StatementFormatError) {
+        await ctx.reply(t("unsupportedStatementFormat"));
+      } else if (error instanceof StatementParseError) {
+        await ctx.reply(t("failedParseTransactions"));
+      } else {
+        await ctx.reply(t("failedImportTransactions"));
+      }
 
       await setUserBotState(db, ctx.from.id.toString(), null);
     }

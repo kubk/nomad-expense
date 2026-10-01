@@ -4,6 +4,10 @@ import { getAccountByFamilyId } from "../db/account/get-account-by-family-id";
 import { jsonResponse } from "../lib/cloudflare/json-response";
 import { Transaction } from "../shared";
 import { importFile } from "../services/transaction-import/import-filte";
+import {
+  StatementFormatError,
+  StatementParseError,
+} from "../services/bank-parsers/statement-import-error";
 import { getTranslation } from "../translations/translations";
 
 export type UploadHandlerResponse =
@@ -68,6 +72,20 @@ export async function uploadStatementHandler(
   } catch (error) {
     console.error("Upload error:", error);
     const { t } = getTranslation(authResult);
+
+    if (error instanceof StatementFormatError) {
+      return jsonResponse(400, {
+        type: "error",
+        message: t("unsupportedStatementFormat"),
+      });
+    }
+
+    if (error instanceof StatementParseError) {
+      return jsonResponse(422, {
+        type: "error",
+        message: t("failedParseTransactions"),
+      });
+    }
 
     return jsonResponse(500, {
       type: "error",
