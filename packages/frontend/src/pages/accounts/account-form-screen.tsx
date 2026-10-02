@@ -2,13 +2,13 @@ import { useState, useEffect } from "react";
 import {
   CheckIcon,
   Trash2Icon,
-  Loader2Icon,
   ListPlusIcon,
   ArrowLeftIcon,
   PlusIcon,
   WrenchIcon,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { LoadingSwap } from "@/components/ui/loading-swap";
 import { Input } from "@/components/ui/input";
 import {
   Select,
@@ -352,11 +352,7 @@ function AccountFormContent({
             type="submit"
             disabled={!formData.name.trim() || isLoading}
           >
-            {isLoading ? (
-              <Loader2Icon className="h-4 w-4 animate-spin" />
-            ) : (
-              t("save")
-            )}
+            <LoadingSwap isLoading={isLoading}>{t("save")}</LoadingSwap>
           </Button>
         </Footer>
       </form>

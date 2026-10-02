@@ -91,14 +91,12 @@ export const ru: Translation = {
   baseCurrencySlowDescription:
     "В зависимости от количества транзакций пересчет может занять некоторое время. Не закрывайте приложение, пока он выполняется.",
   baseCurrencyRecalculate: "Пересчитать",
-  baseCurrencyRecalculating: "Пересчитываем...",
   baseCurrencyUpdateFailed: "Не удалось обновить базовую валюту",
 
   familyTitle: "Семья",
   familyInviteTitle: "Пригласить в семью",
   familyInviteDescription: "Пригласите людей в семью, чтобы вести общие траты",
   familyGenerateInvite: "Создать приглашение",
-  familyGeneratingInvite: "Создаем...",
   familyMembers: "Участники семьи",
   familyHelpShareTitle: "Ведите траты вместе",
   familyHelpShareDescription:
@@ -167,7 +165,6 @@ export const ru: Translation = {
     `Курс: 1 ${baseCurrency} = ${rate} ${currency}`,
 
   uploadStatement: "Загрузить",
-  uploadStatementUploading: "Загрузка...",
   uploadStatementFailed: "Не удалось загрузить",
   uploadStatementSuccess: (removed, added) =>
     `Выписка загружена. Удалено: ${removed} ${transaction(removed)}, добавлено: ${added} ${transaction(added)}`,

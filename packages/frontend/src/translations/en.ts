@@ -75,7 +75,6 @@ export const en = {
   baseCurrencySlowDescription:
     "Depending on the number of transactions, this operation may take a while to complete. Please don't close the app while it's running.",
   baseCurrencyRecalculate: "Recalculate",
-  baseCurrencyRecalculating: "Recalculating...",
   baseCurrencyUpdateFailed: "Failed to update base currency",
 
   familyTitle: "Family",
@@ -83,7 +82,6 @@ export const en = {
   familyInviteDescription:
     "Invite people to your family to have shared expenses",
   familyGenerateInvite: "Generate invite",
-  familyGeneratingInvite: "Generating...",
   familyMembers: "Family members",
   familyHelpShareTitle: "Share expenses together",
   familyHelpShareDescription:
@@ -153,7 +151,6 @@ export const en = {
     `Rate: 1 ${baseCurrency} = ${rate} ${currency}`,
 
   uploadStatement: "Upload",
-  uploadStatementUploading: "Uploading...",
   uploadStatementFailed: "Upload failed",
   uploadStatementSuccess: (removed: number, added: number) =>
     `Bank statement uploaded! Removed ${removed} ${transaction(removed)}, added ${added} ${transaction(added)}`,

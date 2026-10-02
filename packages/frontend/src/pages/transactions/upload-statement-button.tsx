@@ -1,4 +1,5 @@
-import { Loader2Icon, PlusIcon } from "lucide-react";
+import { PlusIcon } from "lucide-react";
+import { LoadingSwap } from "@/components/ui/loading-swap";
 import { trpc } from "@/shared/api";
 import { useQuery } from "@tanstack/react-query";
 import { uploadStatementFile } from "@/shared/upload-file";
@@ -75,14 +76,12 @@ export function UploadStatementButton({ accountId }: { accountId: string }) {
         disabled={isUploading}
         type="button"
       >
-        {isUploading ? (
-          <Loader2Icon className="size-4 animate-spin" />
-        ) : (
-          <PlusIcon className="size-4" />
-        )}
-        <span>
-          {isUploading ? t("uploadStatementUploading") : t("uploadStatement")}
-        </span>
+        <LoadingSwap isLoading={isUploading}>
+          <span className="inline-flex items-center gap-1.5">
+            <PlusIcon className="size-4" />
+            <span>{t("uploadStatement")}</span>
+          </span>
+        </LoadingSwap>
       </button>
     </>
   );

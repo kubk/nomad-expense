@@ -10,7 +10,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { AlertTriangleIcon, LoaderIcon, RefreshCwIcon } from "lucide-react";
+import { AlertTriangleIcon, RefreshCwIcon } from "lucide-react";
 import { trpc, queryClient } from "@/shared/api";
 import { ConfirmModal } from "../widgets/confirm-modal";
 import { toast } from "sonner";
@@ -123,17 +123,10 @@ export function BaseCurrencySetting() {
           </div>
         }
         confirmText={
-          isUpdating ? (
-            <span className="flex items-center gap-2">
-              <LoaderIcon className="size-4 animate-spin" />
-              {t("baseCurrencyRecalculating")}
-            </span>
-          ) : (
-            <span className="flex items-center gap-2">
-              <RefreshCwIcon className="size-4" />
-              {t("baseCurrencyRecalculate")}
-            </span>
-          )
+          <span className="flex items-center gap-2">
+            <RefreshCwIcon className="size-4" />
+            {t("baseCurrencyRecalculate")}
+          </span>
         }
         isLoading={isUpdating}
       />

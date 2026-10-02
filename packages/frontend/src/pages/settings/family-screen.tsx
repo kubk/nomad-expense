@@ -1,5 +1,6 @@
 import { PlusIcon, CircleQuestionMarkIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { LoadingSwap } from "@/components/ui/loading-swap";
 import { Page } from "../widgets/page";
 import { FamilyMemberItem } from "./family-member-item";
 import { InviteLinkCard } from "./invite-link-card";
@@ -63,10 +64,12 @@ export function FamilyScreen({ route }: { route: RouteByType<"family"> }) {
                 size="lg"
                 disabled={generateInviteMutation.isPending}
               >
-                <PlusIcon className="size-4" />
-                {generateInviteMutation.isPending
-                  ? t("familyGeneratingInvite")
-                  : t("familyGenerateInvite")}
+                <LoadingSwap isLoading={generateInviteMutation.isPending}>
+                  <span className="inline-flex items-center gap-2">
+                    <PlusIcon className="size-4" />
+                    {t("familyGenerateInvite")}
+                  </span>
+                </LoadingSwap>
               </Button>
             </div>
           )}

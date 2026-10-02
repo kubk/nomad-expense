@@ -1,6 +1,7 @@
 import { useState } from "react";
-import { ArrowLeftIcon, Loader2Icon } from "lucide-react";
+import { ArrowLeftIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { LoadingSwap } from "@/components/ui/loading-swap";
 import {
   Select,
   SelectContent,
@@ -190,11 +191,9 @@ function ImportSettingsForm({
           onClick={handleSave}
           disabled={updateImportSettingsMutation.isPending}
         >
-          {updateImportSettingsMutation.isPending ? (
-            <Loader2Icon className="h-4 w-4 animate-spin" />
-          ) : (
-            t("save")
-          )}
+          <LoadingSwap isLoading={updateImportSettingsMutation.isPending}>
+            {t("save")}
+          </LoadingSwap>
         </Button>
       </Footer>
     </Page>

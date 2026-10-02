@@ -1,7 +1,6 @@
 import { useState } from "react";
 import {
   Trash2Icon,
-  Loader2Icon,
   ChevronDownIcon,
   ArrowLeftIcon,
   RepeatIcon,
@@ -29,6 +28,7 @@ import { DateTime } from "luxon";
 import { getCurrencySymbol } from "@/shared/currency-formatter";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { FormActionButton } from "@/components/ui/form-action-button";
+import { LoadingSwap } from "@/components/ui/loading-swap";
 import { useInvalidateTransactions } from "@/shared/hooks/use-invalidate-transactions";
 import { CountableSwitch } from "./countable-switch";
 import { BaseCurrencyInfo } from "./base-currency-info";
@@ -380,13 +380,8 @@ function UpdateTransactionForm({
                 <div className="flex gap-3">
                   <FormActionButton
                     onClick={handleRepeat}
-                    icon={
-                      repeatTransactionMutation.isPending ? (
-                        <Loader2Icon className="h-4 w-4 animate-spin" />
-                      ) : (
-                        <RepeatIcon className="h-4 w-4" />
-                      )
-                    }
+                    icon={<RepeatIcon className="h-4 w-4" />}
+                    isLoading={repeatTransactionMutation.isPending}
                     disabled={
                       repeatTransactionMutation.isPending ||
                       isSaving ||
@@ -458,11 +453,7 @@ function UpdateTransactionForm({
               isTransactionLoading
             }
           >
-            {isSaving ? (
-              <Loader2Icon className="h-4 w-4 animate-spin" />
-            ) : (
-              t("save")
-            )}
+            <LoadingSwap isLoading={isSaving}>{t("save")}</LoadingSwap>
           </Button>
         </Footer>
       </form>

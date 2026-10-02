@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
-import { Loader2Icon } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { LoadingSwap } from "@/components/ui/loading-swap";
 import { haptic } from "@/shared/platform/haptics";
 import { useTranslation } from "@/translations/translation-provider";
 
@@ -52,11 +52,7 @@ export function ConfirmModal({
             disabled={isLoading}
             type={"button"}
           >
-            {isLoading ? (
-              <Loader2Icon className="h-4 w-4 animate-spin" />
-            ) : (
-              confirmText
-            )}
+            <LoadingSwap isLoading={isLoading}>{confirmText}</LoadingSwap>
           </Button>
         </div>
       </div>

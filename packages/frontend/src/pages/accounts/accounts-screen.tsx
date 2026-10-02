@@ -8,6 +8,7 @@ import {
 } from "lucide-react";
 import type { Account } from "api";
 import { Button } from "@/components/ui/button";
+import { LoadingSwap } from "@/components/ui/loading-swap";
 import { Badge } from "@/components/ui/badge";
 import { getCurrencySymbol } from "../../shared/currency-formatter";
 import { PageHeader } from "../widgets/page-header";
@@ -382,11 +383,9 @@ export function AccountsScreen({ route }: { route: RouteByType<"accounts"> }) {
               onClick={handleSaveReorder}
               disabled={reorderMutation.isPending}
             >
-              {reorderMutation.isPending ? (
-                <Loader2 className="w-4 h-4 animate-spin" />
-              ) : (
-                t("save")
-              )}
+              <LoadingSwap isLoading={reorderMutation.isPending}>
+                {t("save")}
+              </LoadingSwap>
             </Button>
           </MotionFooter>
         )}

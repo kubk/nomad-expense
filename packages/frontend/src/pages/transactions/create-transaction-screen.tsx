@@ -1,8 +1,9 @@
 import { useState } from "react";
-import { DeleteIcon, Loader2Icon } from "lucide-react";
+import { DeleteIcon } from "lucide-react";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import type { Account, TransactionType } from "api";
 import { Button } from "@/components/ui/button";
+import { LoadingSwap } from "@/components/ui/loading-swap";
 import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -300,11 +301,9 @@ export function CreateTransactionScreen({
             size="lg"
             type="submit"
           >
-            {createTransactionMutation.isPending ? (
-              <Loader2Icon className="size-4 animate-spin" />
-            ) : (
-              t("transactionsAddAction")
-            )}
+            <LoadingSwap isLoading={createTransactionMutation.isPending}>
+              {t("transactionsAddAction")}
+            </LoadingSwap>
           </Button>
         </Footer>
       </form>

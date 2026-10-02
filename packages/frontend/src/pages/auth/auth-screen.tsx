@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useMutation, useQuery } from "@tanstack/react-query";
-import { Loader2Icon } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { LoadingSwap } from "@/components/ui/loading-swap";
 import { Card, CardContent } from "@/components/ui/card";
 import { TelegramIcon } from "@/components/telegram-icon";
 import { trpc } from "@/shared/api";
@@ -160,12 +160,12 @@ export function AuthScreen() {
               onClick={signInWithTelegram}
               className="h-12 min-w-52 rounded-lg bg-[#3390ec] px-5 text-base font-normal text-white shadow-none hover:bg-[#2f85d5]"
             >
-              {isSigningIn ? (
-                <Loader2Icon className="size-5 animate-spin" />
-              ) : (
-                <TelegramIcon />
-              )}
-              {t("authContinueWithTelegram")}
+              <LoadingSwap isLoading={isSigningIn}>
+                <span className="inline-flex items-center gap-2">
+                  <TelegramIcon />
+                  {t("authContinueWithTelegram")}
+                </span>
+              </LoadingSwap>
             </Button>
             {isUnavailable && (
               <p className="text-sm text-destructive">

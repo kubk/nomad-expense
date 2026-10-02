@@ -1,6 +1,7 @@
 import { useState, type KeyboardEvent } from "react";
 import { Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { LoadingSwap } from "@/components/ui/loading-swap";
 import { Checkbox } from "@/components/ui/checkbox";
 import { getCurrencySymbol } from "@/shared/currency-formatter";
 import { RouteByType, useRouter } from "@/shared/stacked-router/router";
@@ -162,11 +163,7 @@ function MonthlyBreakdownAccountsContent({
             onClick={handleSave}
             disabled={!isDirty || isSaving}
           >
-            {isSaving ? (
-              <Loader2 className="h-4 w-4 animate-spin" />
-            ) : (
-              t("save")
-            )}
+            <LoadingSwap isLoading={isSaving}>{t("save")}</LoadingSwap>
           </Button>
         </Footer>
       )}
