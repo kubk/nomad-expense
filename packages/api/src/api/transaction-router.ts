@@ -2,10 +2,9 @@ import { z } from "zod";
 import {
   eq,
   and,
-  or,
   desc,
   gte,
-  lte,
+  lt,
   inArray,
   notInArray,
   sql,
@@ -99,18 +98,26 @@ const transactionFilterSchema = z.object({
     }),
   ),
   date: z.discriminatedUnion("type", [
+    z.object({ type: z.literal("all") }),
     z.object({
-      type: z.literal("months"),
-      value: z.number(),
+      type: z.literal("days"),
+      value: z.number().positive(),
     }),
     z.object({
-      type: z.literal("custom"),
-      value: z.array(
-        z.object({
-          year: z.number(),
-          month: z.number().min(1).max(12),
-        }),
+      type: z.literal("range"),
+      from: z.iso.date(),
+      to: z.iso.date(),
+      timezone: z.string().refine(
+        (zone) => DateTime.now().setZone(zone).isValid,
+        "Invalid timezone",
       ),
+    }).refine((range) => range.from <= range.to, {
+      message: "End date must be on or after start date",
+      path: ["to"],
+    }),
+    z.object({
+      type: z.literal("months"),
+      value: z.number().positive(),
     }),
   ]),
   order: z.object({
@@ -149,42 +156,26 @@ const getFilteredTransactions = async (
   }
 
   // Date filter
-  if (input.date.type === "months") {
-    // Recent N months filter
-    let dateFilter;
-    if (input.date.value === 1) {
-      dateFilter = sql`${transactionTable.createdAt} >= NOW() - INTERVAL '1 month'`;
-    } else if (input.date.value === 3) {
-      dateFilter = sql`${transactionTable.createdAt} >= NOW() - INTERVAL '3 months'`;
-    } else if (input.date.value === 6) {
-      dateFilter = sql`${transactionTable.createdAt} >= NOW() - INTERVAL '6 months'`;
-    } else if (input.date.value === 12) {
-      dateFilter = sql`${transactionTable.createdAt} >= NOW() - INTERVAL '12 months'`;
-    }
-    if (dateFilter) conditions.push(dateFilter);
-  } else if (input.date.type === "custom") {
-    // Custom year-month filter
-    if (input.date.value.length > 0) {
-      const monthConditions = input.date.value.map(({ year, month }) => {
-        const startDate = DateTime.fromObject({ year, month, day: 1 });
-        const endDate = startDate.endOf("month");
+  if (input.date.type === "days") {
+    conditions.push(
+      sql`${transactionTable.createdAt} >= NOW() - ${input.date.value} * INTERVAL '1 day'`,
+    );
+  } else if (input.date.type === "range") {
+    const start = DateTime.fromISO(input.date.from, {
+      zone: input.date.timezone,
+    }).startOf("day");
+    const end = DateTime.fromISO(input.date.to, {
+      zone: input.date.timezone,
+    }).startOf("day").plus({ days: 1 });
 
-        return and(
-          gte(transactionTable.createdAt, startDate.toJSDate()),
-          lte(transactionTable.createdAt, endDate.toJSDate()),
-        )!; // Non-null assertion since we know and() will return a value
-      });
-
-      if (monthConditions.length === 1) {
-        conditions.push(monthConditions[0]);
-      } else if (monthConditions.length > 1) {
-        // Use OR to match any of the specified months
-        const orCondition = or(...monthConditions);
-        if (orCondition) {
-          conditions.push(orCondition);
-        }
-      }
-    }
+    conditions.push(
+      gte(transactionTable.createdAt, start.toJSDate()),
+      lt(transactionTable.createdAt, end.toJSDate()),
+    );
+  } else if (input.date.type === "months") {
+    conditions.push(
+      sql`${transactionTable.createdAt} >= NOW() - ${input.date.value} * INTERVAL '1 month'`,
+    );
   }
 
   return db

@@ -177,7 +177,7 @@ function AccountFormContent({
       type: "transactions",
       filters: {
         accounts: [accountId],
-        date: { type: "months", value: 3 },
+        date: { type: "days", value: 90 },
         order: { field: "createdAt", direction: "desc" },
       },
     });

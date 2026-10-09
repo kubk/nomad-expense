@@ -1,3 +1,4 @@
+import { getTransactionMonthRange } from "@/shared/transaction-date-range";
 import { useState } from "react";
 import { SettingsIcon } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
@@ -36,7 +37,7 @@ export function MonthlyBreakdownFull({
     ? route.filters
     : {
         accounts: includedAccountIds,
-        date: { type: "months", value: 3 },
+        date: { type: "days", value: 90 },
         order: { field: "createdAt", direction: "desc" },
       };
 
@@ -109,10 +110,7 @@ export function MonthlyBreakdownFull({
                     type: "transactions",
                     filters: {
                       ...filters,
-                      date: {
-                        type: "custom",
-                        value: [{ year: month.year, month: month.monthNumber }],
-                      },
+                      date: getTransactionMonthRange(month.year, month.monthNumber),
                     },
                   });
                 }}

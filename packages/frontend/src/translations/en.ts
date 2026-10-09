@@ -169,24 +169,22 @@ export const en = {
   filtersTimePeriod: "Time period",
   filtersLastDays: (days: number) =>
     `Last ${days} ${plural(days, { one: "day", other: "days" })}`,
+  filtersLastDaysShort: (days: number) => `Last ${days}d`,
+  filtersChooseDates: "Select dates",
   filtersLastMonths: (months: number) => `Last ${months} ${month(months)}`,
   filtersCustom: "Custom",
   filtersBankAccounts: "Bank accounts",
   filtersSelectAll: "Select all",
-  filtersSelectAllYears: "Select all",
   filtersDeselectAll: "Deselect all",
   filtersSortBy: "Sort by",
   filtersNewestFirst: "Newest first",
   filtersOldestFirst: "Oldest first",
   filtersHighestAmount: "Highest amount",
   filtersLowestAmount: "Lowest amount",
-  filtersCustomDateRange: "Custom date range",
+  filtersCustomDateRange: "Custom period",
   filtersAllTime: "All time",
   filtersAccountCount: (count: number) =>
     `${count} ${plural(count, { one: "account", other: "accounts" })}`,
-  filtersYearMonths: (year: number, count: number) =>
-    `${year} (${count} ${month(count)})`,
-  filtersCustomMonths: (count: number) => `Custom (${count} ${month(count)})`,
   filtersDescriptionExact: (input: string) => `Description is '${input}'`,
   filtersDescriptionContains: (input: string) =>
     `Description contains '${input}'`,

@@ -7,6 +7,7 @@ import { useRouter } from "@/shared/stacked-router/router";
 import { calculateMaxAmount } from "../../shared/chart-calculations";
 import { useBaseCurrency } from "@/shared/hooks/use-base-currency";
 import { haptic } from "@/shared/platform/haptics";
+import { getTransactionMonthRange } from "@/shared/transaction-date-range";
 import { getShortMonthName } from "@/shared/date-utils";
 import { useAccountIds } from "@/shared/hooks/use-account-ids";
 import { LoaderCircleIcon } from "lucide-react";
@@ -119,12 +120,7 @@ export function MonthlyChart({
                         type: "transactions",
                         filters: {
                           accounts: accountIds,
-                          date: {
-                            type: "custom",
-                            value: [
-                              { year: month.year, month: month.monthNumber },
-                            ],
-                          },
+                          date: getTransactionMonthRange(month.year, month.monthNumber),
                           order: { field: "createdAt", direction: "desc" },
                         },
                       });

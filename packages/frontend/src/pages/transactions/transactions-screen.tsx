@@ -31,7 +31,7 @@ export function TransactionsScreen({
     ? route.filters
     : {
         accounts: accountIds,
-        date: { type: "months", value: 3 },
+        date: { type: "days", value: 90 },
         order: { field: "createdAt", direction: "desc" },
       };
 

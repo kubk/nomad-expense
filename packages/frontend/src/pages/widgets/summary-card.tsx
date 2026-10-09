@@ -7,7 +7,7 @@ import {
 import { formatAmount } from "../../shared/currency-formatter";
 import { type TransactionFilters } from "api";
 import { Skeleton } from "@/components/ui/skeleton";
-import { getShortMonthName } from "../../shared/date-utils";
+import { formatTransactionDateRange, getTransactionDateRange } from "@/shared/transaction-date-range";
 import { useBaseCurrency } from "@/shared/hooks/use-base-currency";
 import { haptic } from "@/shared/platform/haptics";
 import { useTranslation } from "@/translations/translation-provider";
@@ -62,26 +62,21 @@ function SummaryCard({
   isLoading: boolean;
 }) {
   const baseCurrency = useBaseCurrency();
-  const { t } = useTranslation();
+  const { t, language } = useTranslation();
 
   const getAccountsLabel = () => {
     return t("filtersAccountCount", appliedFilters.accounts.length);
   };
 
   const getDateLabel = () => {
+    if (appliedFilters.date.type === "days") {
+      return t("filtersLastDays", appliedFilters.date.value);
+    }
+    if (appliedFilters.date.type === "range") {
+      return formatTransactionDateRange(getTransactionDateRange(appliedFilters.date), language);
+    }
     if (appliedFilters.date.type === "months") {
       return t("filtersLastMonths", appliedFilters.date.value);
-    }
-    if (appliedFilters.date.type === "custom") {
-      const months = appliedFilters.date.value;
-      if (months.length === 1) {
-        return `${months[0].year} ${getShortMonthName(months[0].month)}`;
-      }
-      const years = [...new Set(months.map((m) => m.year))];
-      if (years.length === 1) {
-        return t("filtersYearMonths", years[0], months.length);
-      }
-      return t("filtersCustomMonths", months.length);
     }
     return t("filtersAllTime");
   };

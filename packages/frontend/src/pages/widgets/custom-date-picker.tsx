@@ -1,19 +1,24 @@
-import { useState } from "react";
+import { useLayoutEffect, useRef, useState } from "react";
+import { DateTime } from "luxon";
+import type { DateRange } from "react-day-picker";
+import { enUS, ru } from "react-day-picker/locale";
 import { Button } from "@/components/ui/button";
-import { Checkbox } from "@/components/ui/checkbox";
-import { ScrollArea } from "@/components/ui/scroll-area";
+import { Calendar } from "@/components/ui/calendar";
+import { DrawerFooter } from "@/components/ui/drawer";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ChevronLeftIcon } from "lucide-react";
-import { TransactionFilters } from "api";
+import type { TransactionFilters } from "api";
 import { useAvailableYears } from "@/shared/hooks/use-available-years";
 import {
-  getFullMonthName,
-  getMonthNumbers,
-  isMonthInFuture,
-} from "@/shared/date-utils";
+  formatTransactionDateRange,
+  getTransactionDateRange,
+} from "@/shared/transaction-date-range";
 import { haptic } from "@/shared/platform/haptics";
 import { useTranslation } from "@/translations/translation-provider";
 
-type CustomDateValue = { year: number; month: number };
+function getMonthPair(date: Date) {
+  return new Date(date.getFullYear(), Math.floor(date.getMonth() / 2) * 2, 1);
+}
 
 export function CustomDatePicker({
   filters,
@@ -22,196 +27,141 @@ export function CustomDatePicker({
 }: {
   filters: TransactionFilters;
   onApply: (filters: TransactionFilters) => void;
-  onBack: () => void;
+  onBack: (filters?: TransactionFilters) => void;
 }) {
-  const { t } = useTranslation();
+  const { t, language } = useTranslation();
   const availableYears = useAvailableYears(filters.accounts);
-
-  const [selectedMonths, setSelectedMonths] = useState<CustomDateValue[]>(
-    () => {
-      if (filters.date.type === "custom") {
-        return filters.date.value;
-      }
-      return [];
-    },
+  const [range, setRange] = useState<DateRange>(() => getTransactionDateRange(filters.date));
+  const initialRangeRef = useRef(range);
+  const [month, setMonth] = useState(() => getMonthPair(range.from ?? new Date()));
+  const monthStripRef = useRef<HTMLDivElement>(null);
+  const selectedMonthRef = useRef<HTMLButtonElement>(null);
+  const currentYear = new Date().getFullYear();
+  const firstYear = Math.min(currentYear - 3, ...availableYears, month.getFullYear());
+  const lastYear = Math.max(currentYear + 1, ...availableYears, month.getFullYear());
+  const monthFormatter = new Intl.DateTimeFormat(language, { month: "short" });
+  const formatMonthLabel = (date: Date) => monthFormatter.format(date).replace(/\.$/, "");
+  const monthPairs = Array.from({ length: (lastYear - firstYear + 1) * 6 }, (_, index) =>
+    new Date(firstYear + Math.floor(index / 6), (index % 6) * 2, 1),
   );
 
-  const monthNumbers = getMonthNumbers();
-
-  const isMonthSelected = (year: number, month: number) => {
-    return selectedMonths.some((m) => m.year === year && m.month === month);
-  };
-
-  const isYearFullySelected = (year: number) => {
-    const availableMonths = monthNumbers.filter(
-      (month) => !isMonthInFuture(year, month),
-    );
-    return (
-      availableMonths.length > 0 &&
-      availableMonths.every((month) => isMonthSelected(year, month))
-    );
-  };
-
-  const areAllYearsSelected =
-    availableYears.length > 0 && availableYears.every(isYearFullySelected);
-
-  const toggleMonth = (year: number, month: number) => {
-    haptic("selection");
-    setSelectedMonths((prev) => {
-      const exists = prev.find((m) => m.year === year && m.month === month);
-      if (exists) {
-        return prev.filter((m) => !(m.year === year && m.month === month));
-      } else {
-        return [...prev, { year, month }];
-      }
-    });
-  };
-
-  const toggleYear = (year: number) => {
-    haptic("selection");
-    const isFullySelected = isYearFullySelected(year);
-
-    if (isFullySelected) {
-      // Remove all months for this year
-      setSelectedMonths((prev) => prev.filter((m) => m.year !== year));
-    } else {
-      // Add only available (non-future) months for this year
-      setSelectedMonths((prev) => {
-        const withoutThisYear = prev.filter((m) => m.year !== year);
-        const availableMonths = monthNumbers.filter(
-          (month) => !isMonthInFuture(year, month),
-        );
-        const availableMonthsForYear = availableMonths.map((month) => ({
-          year,
-          month,
-        }));
-        return [...withoutThisYear, ...availableMonthsForYear];
-      });
+  useLayoutEffect(() => {
+    const strip = monthStripRef.current;
+    const selected = selectedMonthRef.current;
+    if (strip && selected) {
+      strip.scrollLeft = selected.offsetLeft - (strip.clientWidth - selected.clientWidth) / 2;
     }
-  };
+  }, [month, firstYear, lastYear]);
 
-  const toggleAllYears = () => {
-    haptic("selection");
-
-    if (areAllYearsSelected) {
-      setSelectedMonths([]);
-      return;
-    }
-
-    setSelectedMonths(
-      availableYears.flatMap((year) =>
-        monthNumbers
-          .filter((month) => !isMonthInFuture(year, month))
-          .map((month) => ({ year, month })),
-      ),
-    );
-  };
-
-  const handleApply = () => {
-    haptic("medium");
-    onApply({
+  const getSelectedFilters = (): TransactionFilters | undefined => {
+    if (!range.from || !range.to) return undefined;
+    return {
       ...filters,
       date: {
-        type: "custom",
-        value: selectedMonths,
+        type: "range",
+        from: DateTime.fromJSDate(range.from).toFormat("yyyy-MM-dd"),
+        to: DateTime.fromJSDate(range.to).toFormat("yyyy-MM-dd"),
+        timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
       },
-    });
+    };
+  };
+
+  const handleBack = () => {
+    const initialRange = initialRangeRef.current;
+    const hasChanged = range.from?.getTime() !== initialRange.from?.getTime()
+      || range.to?.getTime() !== initialRange.to?.getTime();
+    onBack(hasChanged ? getSelectedFilters() : undefined);
   };
 
   return (
-    <div className="space-y-6">
-      {/* Header */}
-      <div className="flex items-center justify-between gap-3">
-        <div className="flex items-center gap-3">
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={onBack}
-            className="h-8 w-8 p-0"
-          >
+    <Tabs
+      value={String(month.getTime())}
+      onValueChange={(value) => {
+        haptic("selection");
+        setMonth(new Date(Number(value)));
+      }}
+      className="flex min-h-0 flex-1 flex-col gap-0"
+    >
+      <div className="shrink-0 px-4 pt-5 pb-4">
+        <div className="mb-4 flex items-center gap-3">
+          <Button variant="ghost" size="icon" onClick={handleBack} className="size-11">
             <ChevronLeftIcon className="size-4" />
+            <span className="sr-only">{t("back")}</span>
           </Button>
-          <h3 className="font-medium">{t("filtersCustomDateRange")}</h3>
+          <h3 className="font-semibold">{t("filtersCustomDateRange")}</h3>
         </div>
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={toggleAllYears}
-          className="text-md h-6 px-2 text-muted-foreground hover:text-foreground"
+        <div
+          ref={monthStripRef}
+          data-vaul-no-drag
+          className="relative overflow-x-auto rounded-lg bg-muted [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
         >
-          {areAllYearsSelected
-            ? t("filtersDeselectAll")
-            : t("filtersSelectAllYears")}
-        </Button>
-      </div>
-
-      {/* Years and Months */}
-      <ScrollArea className="h-64" type="always">
-        <div className="space-y-4 p-1">
-          {availableYears.map((year) => (
-            <div key={year} className="space-y-3">
-              {/* Year Header */}
-              <div className="flex items-center gap-3">
-                <Checkbox
-                  id={`year-${year}`}
-                  checked={isYearFullySelected(year)}
-                  onCheckedChange={() => toggleYear(year)}
-                />
-                <label
-                  htmlFor={`year-${year}`}
-                  className="text-sm font-medium cursor-pointer"
-                >
-                  {year}
-                </label>
-              </div>
-
-              {/* Months */}
-              <div className="grid grid-cols-2 sm:grid-cols-3">
-                {monthNumbers.map((month) => {
-                  const isSelected = isMonthSelected(year, month);
-                  const isFuture = isMonthInFuture(year, month);
-
-                  return (
-                    <label
-                      key={month}
-                      htmlFor={`${year}-${month}`}
-                      className={`flex items-center gap-2 p-3 border-r border-b border-muted transition-colors w-full ${
-                        isFuture
-                          ? "opacity-50 cursor-not-allowed"
-                          : isSelected
-                            ? "bg-primary/10 cursor-pointer"
-                            : "cursor-pointer"
-                      }`}
-                    >
-                      <Checkbox
-                        id={`${year}-${month}`}
-                        checked={isSelected}
-                        disabled={isFuture}
-                        onCheckedChange={() =>
-                          !isFuture && toggleMonth(year, month)
-                        }
-                      />
-                      <span className="text-sm select-none flex-1">
-                        {getFullMonthName(month)}
-                      </span>
-                    </label>
-                  );
-                })}
-              </div>
-            </div>
-          ))}
+          <TabsList className="h-16 justify-start gap-1">
+          {monthPairs.map((pair) => {
+            const isSelected = pair.getTime() === month.getTime();
+            const nextMonth = new Date(pair.getFullYear(), pair.getMonth() + 1, 1);
+            return (
+              <TabsTrigger
+                key={pair.getTime()}
+                value={String(pair.getTime())}
+                ref={isSelected ? selectedMonthRef : undefined}
+                className="h-[58px] min-w-[88px] shrink-0 flex-none flex-col gap-0.5 px-2"
+              >
+                <span className="whitespace-nowrap">{formatMonthLabel(pair)}-{formatMonthLabel(nextMonth)}</span>
+                <span className="text-xs font-normal opacity-65">{pair.getFullYear()}</span>
+              </TabsTrigger>
+            );
+          })}
+          </TabsList>
         </div>
-      </ScrollArea>
-
-      {/* Actions */}
-      <div className="flex flex-col gap-2 py-4">
-        <Button size="lg" onClick={handleApply}>
-          {t("applyFilters")}
-        </Button>
-        <Button size="lg" variant="outline" onClick={onBack}>
-          {t("back")}
-        </Button>
       </div>
-    </div>
+      <TabsContent
+        value={String(month.getTime())}
+        className="min-h-0 flex-1 overflow-y-auto px-4 pb-5"
+        data-vaul-no-drag
+      >
+        <Calendar
+          mode="range"
+          selected={range}
+          onSelect={(nextRange) => {
+            haptic("selection");
+            setRange(nextRange ?? { from: undefined });
+          }}
+          resetOnSelect
+          month={month}
+          onMonthChange={(nextMonth) => setMonth(getMonthPair(nextMonth))}
+          numberOfMonths={2}
+          pagedNavigation
+          locale={language === "ru" ? ru : enUS}
+          className="w-full p-0 [--cell-size:44px] [&_[data-day]]:h-11 [&_[data-day]]:min-w-0 [&_[data-day]]:aspect-auto"
+          classNames={{
+            root: "w-full",
+            months: "relative flex w-full flex-col gap-6",
+            month: "flex w-full flex-col gap-2",
+            day: "group/day relative h-11 w-full p-0 text-center select-none",
+            week: "mt-1 flex w-full",
+          }}
+        />
+      </TabsContent>
+      <div className="shrink-0 border-t">
+        <p className="px-4 py-6 text-center text-lg leading-snug font-semibold tracking-tight">
+          {formatTransactionDateRange(range, language) || t("filtersChooseDates")}
+        </p>
+        <DrawerFooter className="flex-row pt-0 [&_button]:flex-1">
+          <Button size="lg" variant="outline" onClick={handleBack}>
+            {t("back")}
+          </Button>
+          <Button
+            size="lg"
+            disabled={!range.from || !range.to}
+            onClick={() => {
+              const selectedFilters = getSelectedFilters();
+              if (selectedFilters) onApply(selectedFilters);
+            }}
+          >
+            {t("applyFilters")}
+          </Button>
+        </DrawerFooter>
+      </div>
+    </Tabs>
   );
 }

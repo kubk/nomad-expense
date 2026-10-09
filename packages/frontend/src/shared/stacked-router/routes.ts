@@ -1,7 +1,12 @@
 import * as v from "valibot";
 import { transactionType } from "api";
 
-const toNumberSchema = v.pipe(v.unknown(), v.transform(Number), v.number());
+const toPositiveNumberSchema = v.pipe(
+  v.unknown(),
+  v.transform(Number),
+  v.number(),
+  v.check((value) => value > 0, "Must be positive"),
+);
 
 const transactionFiltersSchema = v.object({
   accounts: v.array(v.string()),
@@ -13,18 +18,20 @@ const transactionFiltersSchema = v.object({
     }),
   ),
   date: v.variant("type", [
+    v.object({ type: v.literal("all") }),
     v.object({
-      type: v.literal("months"),
-      value: toNumberSchema,
+      type: v.literal("days"),
+      value: toPositiveNumberSchema,
     }),
     v.object({
-      type: v.literal("custom"),
-      value: v.array(
-        v.object({
-          year: toNumberSchema,
-          month: toNumberSchema,
-        }),
-      ),
+      type: v.literal("range"),
+      from: v.string(),
+      to: v.string(),
+      timezone: v.string(),
+    }),
+    v.object({
+      type: v.literal("months"),
+      value: toPositiveNumberSchema,
     }),
   ]),
   order: v.object({

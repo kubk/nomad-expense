@@ -66,6 +66,10 @@ function FiltersDrawerContent({
     accounts.length > 0 && selectedAccountCount === accounts.length;
 
   const handleOpenChange = (newOpen: boolean) => {
+    if (!newOpen) {
+      setFilterForm(filters);
+      setShowCustomDatePicker(false);
+    }
     onOpenChange(newOpen);
   };
 
@@ -84,9 +88,8 @@ function FiltersDrawerContent({
   ];
 
   const timePeriods = [
-    { value: 1, label: t("filtersLastDays", 30) },
-    { value: 3, label: t("filtersLastDays", 90) },
-    { value: 6, label: t("filtersLastMonths", 6) },
+    { value: 30, label: t("filtersLastDaysShort", 30) },
+    { value: 90, label: t("filtersLastDaysShort", 90) },
   ];
 
   const handleAccountToggle = (account: string) => {
@@ -109,11 +112,11 @@ function FiltersDrawerContent({
     }));
   };
 
-  const handleMonthsChange = (months: number) => {
+  const handleDaysChange = (days: number) => {
     haptic("selection");
     setFilterForm((prev) => ({
       ...prev,
-      date: { type: "months", value: months },
+      date: { type: "days", value: days },
     }));
   };
 
@@ -135,7 +138,8 @@ function FiltersDrawerContent({
     setShowCustomDatePicker(true);
   };
 
-  const handleCustomDateBack = () => {
+  const handleCustomDateBack = (selectedFilters?: TransactionFilters) => {
+    if (selectedFilters) setFilterForm(selectedFilters);
     setShowCustomDatePicker(false);
   };
 
@@ -219,197 +223,202 @@ function FiltersDrawerContent({
 
   return (
     <Drawer open={open} onOpenChange={handleOpenChange}>
-      <DrawerContent>
-        <div className="mx-auto w-full max-w-sm">
-          <DrawerHeader className="p-2">
-            <DrawerTitle />
+      <DrawerContent
+        className={showCustomDatePicker
+          ? "h-[calc(100dvh-1rem)] data-[vaul-drawer-direction=bottom]:max-h-[calc(100dvh-1rem)]"
+          : undefined}
+      >
+        <div className={cn("mx-auto flex min-h-0 w-full flex-1 flex-col", !showCustomDatePicker && "max-w-sm")}>
+          <DrawerHeader className="sr-only">
+            <DrawerTitle>{t("filtersTimePeriod")}</DrawerTitle>
             <DrawerDescription />
           </DrawerHeader>
 
-          <div className="p-4 pt-0 pb-6 space-y-5">
-            {showCustomDatePicker ? (
-              <CustomDatePicker
-                filters={filterForm}
-                onApply={handleApply}
-                onBack={handleCustomDateBack}
-              />
-            ) : (
-              <>
-                <div>
-                  <div className="flex gap-2">
-                    <div className="relative flex-1">
-                      <SearchIcon className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
-                      <Input
-                        placeholder={t("filtersSearchPlaceholder")}
-                        value={filterForm.description?.input || ""}
-                        onChange={(e) =>
-                          handleDescriptionChange(e.target.value)
-                        }
-                        className="pl-9"
-                      />
-                    </div>
-                    {filterForm.description && (
-                      <Tabs
-                        value={filterForm.description.type}
-                        onValueChange={(value) =>
-                          handleDescriptionTypeChange(
-                            value as "includes" | "exact",
+          {showCustomDatePicker ? (
+            <CustomDatePicker
+              filters={filterForm}
+              onApply={handleApply}
+              onBack={handleCustomDateBack}
+            />
+          ) : (
+            <div className="min-h-0 overflow-y-auto p-4 pb-6 space-y-5">
+              <div>
+                <div className="flex gap-2">
+                  <div className="relative flex-1">
+                    <SearchIcon className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
+                    <Input
+                      placeholder={t("filtersSearchPlaceholder")}
+                      value={filterForm.description?.input || ""}
+                      onChange={(e) =>
+                        handleDescriptionChange(e.target.value)
+                      }
+                      className="pl-9"
+                    />
+                  </div>
+                  {filterForm.description && (
+                    <Tabs
+                      value={filterForm.description.type}
+                      onValueChange={(value) =>
+                        handleDescriptionTypeChange(
+                          value as "includes" | "exact",
+                        )
+                      }
+                    >
+                      <TabsList className="w-full">
+                        <TabsTrigger value="includes" className="flex-1">
+                          {t("filtersContains")}
+                        </TabsTrigger>
+                        <TabsTrigger value="exact" className="flex-1">
+                          {t("filtersExact")}
+                        </TabsTrigger>
+                      </TabsList>
+                    </Tabs>
+                  )}
+                </div>
+              </div>
+
+              <Tabs
+                value={filterForm.transactionType ?? "all"}
+                onValueChange={(value) =>
+                  handleTransactionTypeChange(
+                    value as TransactionTypeFilterValue,
+                  )
+                }
+              >
+                <TabsList className="w-full">
+                  {transactionTypeOptions.map((option) => (
+                    <TabsTrigger
+                      key={option.value}
+                      value={option.value}
+                      className="flex-1"
+                    >
+                      {option.label}
+                    </TabsTrigger>
+                  ))}
+                </TabsList>
+              </Tabs>
+
+              <div className="pt-2">
+                <div className="flex items-center justify-between mb-2">
+                  <div className="flex items-center gap-2">
+                    <CalendarIcon className="size-4 text-muted-foreground" />
+                    <h3 className="font-medium">{t("filtersTimePeriod")}</h3>
+                  </div>
+                </div>
+                <div className="flex overflow-x-auto pb-3 gap-2">
+                  <Badge
+                    asChild
+                    variant={getChipVariant(filterForm.date.type === "all")}
+                    className={getChipClassName(filterForm.date.type === "all")}
+                    onClick={() => {
+                      haptic("selection");
+                      setFilterForm((prev) => ({ ...prev, date: { type: "all" } }));
+                    }}
+                  >
+                    <button type="button">{t("filtersAllTime")}</button>
+                  </Badge>
+                  {timePeriods.map((period) => {
+                    const isActive = filterForm.date.type === "days" && filterForm.date.value === period.value;
+                    return (
+                      <Badge
+                        asChild
+                        key={period.value}
+                        variant={getChipVariant(isActive)}
+                        onClick={() => handleDaysChange(period.value)}
+                        className={getChipClassName(isActive)}
+                      >
+                        <button type="button">{period.label}</button>
+                      </Badge>
+                    );
+                  })}
+                  <Badge
+                    asChild
+                    variant={getChipVariant(filterForm.date.type === "range")}
+                    onClick={handleShowCustomDatePicker}
+                    className={getChipClassName(filterForm.date.type === "range")}
+                  >
+                    <button type="button">{t("filtersCustom")}</button>
+                  </Badge>
+                </div>
+              </div>
+
+              <div>
+                <div className="flex items-center justify-between mb-2">
+                  <div className="flex items-center gap-2">
+                    <CreditCardIcon className="size-4 text-muted-foreground" />
+                    <h3 className="font-medium">
+                      {t("filtersBankAccounts")}
+                      <span className="ml-1 text-sm font-normal text-muted-foreground">
+                        · {selectedAccountCount}
+                      </span>
+                    </h3>
+                  </div>
+                  {accounts.length > 1 && (
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={handleSelectAllAccounts}
+                      className="text-md h-6 px-2 text-muted-foreground hover:text-foreground"
+                    >
+                      {areAllAccountsSelected
+                        ? t("filtersDeselectAll")
+                        : t("filtersSelectAll")}
+                    </Button>
+                  )}
+                </div>
+                <div className="flex overflow-auto pb-3 gap-2">
+                  {accounts.map((account) => {
+                    const isActive = selectedAccountIds.has(account.id);
+
+                    return (
+                      <Badge
+                        key={account.id}
+                        variant={getChipVariant(isActive)}
+                        onClick={() => handleAccountToggle(account.id)}
+                        className={getChipClassName(isActive)}
+                      >
+                        {isActive && <CheckIcon className="size-3" />}
+                        {account.name}
+                      </Badge>
+                    );
+                  })}
+                </div>
+              </div>
+
+              <div>
+                <div className="flex items-center justify-between mb-2">
+                  <div className="flex items-center gap-2">
+                    <ArrowUpDownIcon className="size-4 text-muted-foreground" />
+                    <h3 className="font-medium">{t("filtersSortBy")}</h3>
+                  </div>
+                </div>
+                <div className="flex overflow-x-auto gap-2 pb-3">
+                  {sortOptions.map((option) => {
+                    const isActive = isOrderActive(
+                      option.field,
+                      option.direction,
+                    );
+
+                    return (
+                      <Badge
+                        key={`${option.field}-${option.direction}`}
+                        variant={getChipVariant(isActive)}
+                        className={getChipClassName(isActive)}
+                        onClick={() =>
+                          handleBadgeOrderChange(
+                            option.field,
+                            option.direction,
                           )
                         }
                       >
-                        <TabsList className="w-full">
-                          <TabsTrigger value="includes" className="flex-1">
-                            {t("filtersContains")}
-                          </TabsTrigger>
-                          <TabsTrigger value="exact" className="flex-1">
-                            {t("filtersExact")}
-                          </TabsTrigger>
-                        </TabsList>
-                      </Tabs>
-                    )}
-                  </div>
-                </div>
-
-                <Tabs
-                  value={filterForm.transactionType ?? "all"}
-                  onValueChange={(value) =>
-                    handleTransactionTypeChange(
-                      value as TransactionTypeFilterValue,
-                    )
-                  }
-                >
-                  <TabsList className="w-full">
-                    {transactionTypeOptions.map((option) => (
-                      <TabsTrigger
-                        key={option.value}
-                        value={option.value}
-                        className="flex-1"
-                      >
                         {option.label}
-                      </TabsTrigger>
-                    ))}
-                  </TabsList>
-                </Tabs>
-
-                <div className="pt-2">
-                  <div className="flex items-center justify-between mb-2">
-                    <div className="flex items-center gap-2">
-                      <CalendarIcon className="size-4 text-muted-foreground" />
-                      <h3 className="font-medium">{t("filtersTimePeriod")}</h3>
-                    </div>
-                  </div>
-                  <div className="flex overflow-x-auto pb-3 gap-2">
-                    {timePeriods.map((period) => {
-                      const isActive =
-                        filterForm.date.type === "months" &&
-                        filterForm.date.value === period.value;
-
-                      return (
-                        <Badge
-                          key={period.value}
-                          variant={getChipVariant(isActive)}
-                          onClick={() => handleMonthsChange(period.value)}
-                          className={getChipClassName(isActive)}
-                        >
-                          {period.label}
-                        </Badge>
-                      );
-                    })}
-                    <Badge
-                      variant={getChipVariant(
-                        filterForm.date.type === "custom",
-                      )}
-                      onClick={handleShowCustomDatePicker}
-                      className={getChipClassName(
-                        filterForm.date.type === "custom",
-                      )}
-                    >
-                      {filterForm.date.type === "custom" && (
-                        <CheckIcon className="size-3" />
-                      )}
-                      {t("filtersCustom")}
-                    </Badge>
-                  </div>
+                      </Badge>
+                    );
+                  })}
                 </div>
-
-                <div>
-                  <div className="flex items-center justify-between mb-2">
-                    <div className="flex items-center gap-2">
-                      <CreditCardIcon className="size-4 text-muted-foreground" />
-                      <h3 className="font-medium">
-                        {t("filtersBankAccounts")}
-                        <span className="ml-1 text-sm font-normal text-muted-foreground">
-                          · {selectedAccountCount}
-                        </span>
-                      </h3>
-                    </div>
-                    {accounts.length > 1 && (
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={handleSelectAllAccounts}
-                        className="text-md h-6 px-2 text-muted-foreground hover:text-foreground"
-                      >
-                        {areAllAccountsSelected
-                          ? t("filtersDeselectAll")
-                          : t("filtersSelectAll")}
-                      </Button>
-                    )}
-                  </div>
-                  <div className="flex overflow-auto pb-3 gap-2">
-                    {accounts.map((account) => {
-                      const isActive = selectedAccountIds.has(account.id);
-
-                      return (
-                        <Badge
-                          key={account.id}
-                          variant={getChipVariant(isActive)}
-                          onClick={() => handleAccountToggle(account.id)}
-                          className={getChipClassName(isActive)}
-                        >
-                          {isActive && <CheckIcon className="size-3" />}
-                          {account.name}
-                        </Badge>
-                      );
-                    })}
-                  </div>
-                </div>
-
-                <div>
-                  <div className="flex items-center justify-between mb-2">
-                    <div className="flex items-center gap-2">
-                      <ArrowUpDownIcon className="size-4 text-muted-foreground" />
-                      <h3 className="font-medium">{t("filtersSortBy")}</h3>
-                    </div>
-                  </div>
-                  <div className="flex overflow-x-auto gap-2 pb-3">
-                    {sortOptions.map((option) => {
-                      const isActive = isOrderActive(
-                        option.field,
-                        option.direction,
-                      );
-
-                      return (
-                        <Badge
-                          key={`${option.field}-${option.direction}`}
-                          variant={getChipVariant(isActive)}
-                          className={getChipClassName(isActive)}
-                          onClick={() =>
-                            handleBadgeOrderChange(
-                              option.field,
-                              option.direction,
-                            )
-                          }
-                        >
-                          {option.label}
-                        </Badge>
-                      );
-                    })}
-                  </div>
-                </div>
-              </>
-            )}
-          </div>
+              </div>
+            </div>
+          )}
 
           {!showCustomDatePicker && (
             <DrawerFooter className="flex-row border-t [&_button]:flex-1">
