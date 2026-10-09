@@ -15,15 +15,35 @@ export function PageHeader({
 }) {
   const { pop, currentRoute } = useRouter();
   const isForm = isFormRoute(currentRoute);
+  const telegram = isTelegram();
+
+  const actions = rightSlot ? (
+    <div
+      className={cn(
+        "bg-background shadow-sm rounded-full px-2 active:scale-95 transition-transform",
+        { "border shadow-xs": isForm },
+      )}
+    >
+      {rightSlot}
+    </div>
+  ) : null;
 
   return (
-    <div className="sticky top-0">
+    <div
+      className={cn("sticky top-0 shrink-0", {
+        // Screens start below Telegram's controls; lift only the header into that row.
+        "-mt-[var(--tg-content-safe-area-inset-top,0px)] pb-6": telegram,
+      })}
+    >
       <div
-        className={cn("relative flex items-center justify-center p-4 pb-6", {
-          "pt-1": isTelegram(),
-        })}
+        className={cn(
+          "relative flex items-center justify-center",
+          telegram
+            ? "h-[var(--tg-content-safe-area-inset-top,34px)] min-h-[34px] px-24"
+            : "p-4 pb-6",
+        )}
       >
-        {!isTelegram() ? (
+        {!telegram ? (
           <div className="absolute left-4">
             <button
               onClick={() => {
@@ -49,6 +69,7 @@ export function PageHeader({
               "bg-background font-medium text-sm shadow-sm rounded-full py-1.5 px-4",
               {
                 "border shadow-xs": isForm,
+                "max-w-full truncate": telegram,
               },
             )}
           >
@@ -58,21 +79,13 @@ export function PageHeader({
           <div className="h-[34px]" />
         )}
 
-        {rightSlot && (
-          <div className="absolute right-4">
-            <div
-              className={cn(
-                "bg-background shadow-sm rounded-full px-2 active:scale-95 transition-transform",
-                {
-                  "border shadow-xs": isForm,
-                },
-              )}
-            >
-              {rightSlot}
-            </div>
-          </div>
+        {actions && !telegram && (
+          <div className="absolute right-4">{actions}</div>
         )}
       </div>
+      {actions && telegram && (
+        <div className="flex justify-end px-4 pt-1">{actions}</div>
+      )}
     </div>
   );
 }
