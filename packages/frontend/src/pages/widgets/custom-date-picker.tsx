@@ -6,7 +6,6 @@ import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
 import { DrawerFooter } from "@/components/ui/drawer";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { ChevronLeftIcon } from "lucide-react";
 import type { TransactionFilters } from "api";
 import { useAvailableYears } from "@/shared/hooks/use-available-years";
 import {
@@ -83,13 +82,6 @@ export function CustomDatePicker({
       className="flex min-h-0 flex-1 flex-col gap-0"
     >
       <div className="shrink-0 px-4 pt-5 pb-4">
-        <div className="mb-4 flex items-center gap-3">
-          <Button variant="ghost" size="icon" onClick={handleBack} className="size-11">
-            <ChevronLeftIcon className="size-4" />
-            <span className="sr-only">{t("back")}</span>
-          </Button>
-          <h3 className="font-semibold">{t("filtersCustomDateRange")}</h3>
-        </div>
         <div
           ref={monthStripRef}
           data-vaul-no-drag

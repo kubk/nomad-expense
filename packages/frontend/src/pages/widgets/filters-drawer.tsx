@@ -225,7 +225,7 @@ function FiltersDrawerContent({
     <Drawer open={open} onOpenChange={handleOpenChange}>
       <DrawerContent
         className={showCustomDatePicker
-          ? "h-[calc(100dvh-1rem)] data-[vaul-drawer-direction=bottom]:max-h-[calc(100dvh-1rem)]"
+          ? "h-[calc(100dvh-8rem)] data-[vaul-drawer-direction=bottom]:max-h-[calc(100dvh-8rem)]"
           : undefined}
       >
         <div className={cn("mx-auto flex min-h-0 w-full flex-1 flex-col", !showCustomDatePicker && "max-w-sm")}>
