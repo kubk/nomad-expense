@@ -35,14 +35,16 @@ export function CustomDatePicker({
   const [month, setMonth] = useState(() => getMonthPair(range.from ?? new Date()));
   const monthStripRef = useRef<HTMLDivElement>(null);
   const selectedMonthRef = useRef<HTMLButtonElement>(null);
-  const currentYear = new Date().getFullYear();
+  const today = new Date();
+  const currentYear = today.getFullYear();
+  const currentMonthPair = getMonthPair(today);
   const firstYear = Math.min(currentYear - 3, ...availableYears, month.getFullYear());
-  const lastYear = Math.max(currentYear + 1, ...availableYears, month.getFullYear());
+  const lastYear = Math.max(currentYear, ...availableYears, month.getFullYear());
   const monthFormatter = new Intl.DateTimeFormat(language, { month: "short" });
   const formatMonthLabel = (date: Date) => monthFormatter.format(date).replace(/\.$/, "");
   const monthPairs = Array.from({ length: (lastYear - firstYear + 1) * 6 }, (_, index) =>
     new Date(firstYear + Math.floor(index / 6), (index % 6) * 2, 1),
-  );
+  ).filter((pair) => pair.getTime() <= currentMonthPair.getTime());
 
   useLayoutEffect(() => {
     const strip = monthStripRef.current;
@@ -123,6 +125,8 @@ export function CustomDatePicker({
           onMonthChange={(nextMonth) => setMonth(getMonthPair(nextMonth))}
           numberOfMonths={2}
           pagedNavigation
+          endMonth={today}
+          disabled={{ after: today }}
           locale={language === "ru" ? ru : enUS}
           className="w-full p-0 [--cell-size:44px] [&_[data-day]]:h-11 [&_[data-day]]:min-w-0 [&_[data-day]]:aspect-auto"
           classNames={{
