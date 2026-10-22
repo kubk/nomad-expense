@@ -10,8 +10,8 @@
     "lint:jscpd": "jscpd packages/api/src packages/frontend/src packages/kbank-api/src packages/kbank-parser/src --min-lines 10 --min-tokens 50 --cross-formats js-ts --ignore \"**/*.test.*\" --exit-code 1 --no-colors --no-tips --reporters ai",
     "lint:knip": "knip --reporter compact",
     "lint:oxlint": "oxlint --format=agent",
-    "lint:slop-scan": "slop-scan scan . --lint --ignore '**/.wrangler/**' --ignore 'packages/frontend/src/components/**' | tee /dev/stderr | grep -q '^0 findings$'",
-    "dead-code": "concurrently -n knip,slop-api,slop-frontend -c magenta,green,blue \"knip --reporter compact\" \"slop-scan scan packages/api --lint\" \"slop-scan scan packages/frontend --lint\"",
+    "lint:slop-police": "slop-police",
+    "dead-code": "concurrently -n knip,slop-police -c magenta,green \"knip --reporter compact\" \"slop-police\"",
     "typecheck": "pnpm --recursive run typecheck",
     "test": "pnpm --recursive run test",
     "filter-public-code": "git-filter git-filter.config.json",
@@ -27,6 +27,6 @@
     "knip": "^6.9.0",
     "oxlint": "^1.85.0",
     "prettier": "^3.5.3",
-    "slop-scan": "^0.3.0"
+    "slop-police": "^0.2.1"
   }
 }

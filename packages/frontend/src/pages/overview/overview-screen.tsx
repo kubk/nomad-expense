@@ -2,7 +2,6 @@ import { RecentTransactionsOverview } from "./recent-transactions-overview";
 import { OverviewHeader } from "./overview-header";
 import { MonthlyBreakdownOverview } from "./monthly-breakdown-overview";
 import { AddTransactionFab } from "./add-transaction-fab";
-import { cn } from "@/lib/utils";
 import { trpc } from "@/shared/api";
 import { useInfiniteQuery } from "@tanstack/react-query";
 
@@ -20,7 +19,7 @@ export function OverviewScreen() {
   const latestOverviewPage = overviewPages[overviewPages.length - 1];
 
   return (
-    <div className={cn("flex flex-col h-full bg-muted pb-30 overflow-auto")}>
+    <div className="flex flex-col h-full bg-muted pb-30 overflow-auto">
       <OverviewHeader
         overviewData={latestOverviewPage}
         isOverviewLoading={overviewQuery.isLoading}
