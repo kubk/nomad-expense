@@ -43,7 +43,6 @@
     "@dotenvx/dotenvx": "^1.39.1",
     "@trpc/server": "^11.4.3",
     "ai": "^6.0.5",
-    "better-sqlite3": "^12.2.0",
     "drizzle-orm": "^0.41.0",
     "grammy": "^1.38.2",
     "jose": "^6.2.12",
