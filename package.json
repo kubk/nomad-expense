@@ -27,6 +27,6 @@
     "knip": "^6.9.0",
     "oxlint": "^1.85.0",
     "prettier": "^3.5.3",
-    "slop-police": "^0.2.1"
+    "slop-police": "^0.3.1"
   }
 }
