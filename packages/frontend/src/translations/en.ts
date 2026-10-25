@@ -1,4 +1,4 @@
-import { createPlural } from "./plural";
+import { createPlural } from "api";
 
 const plural = createPlural("en");
 const transaction = (count: number) =>

@@ -1,6 +1,5 @@
 import { useState } from "react";
 import {
-  Trash2Icon,
   ChevronDownIcon,
   ArrowLeftIcon,
   RepeatIcon,
@@ -26,11 +25,12 @@ import { useQuery, useMutation } from "@tanstack/react-query";
 import type { RouterOutputs, TransactionType } from "api";
 import { DateTime } from "luxon";
 import { getCurrencySymbol } from "@/shared/currency-formatter";
-import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { FormActionButton } from "@/components/ui/form-action-button";
 import { LoadingSwap } from "@/components/ui/loading-swap";
 import { useInvalidateTransactions } from "@/shared/hooks/use-invalidate-transactions";
 import { CountableSwitch } from "./countable-switch";
+import { TransactionTypeTabs } from "./transaction-type-tabs";
+import { DeleteActionButton } from "../widgets/delete-action-button";
 import { BaseCurrencyInfo } from "./base-currency-info";
 import { haptic } from "@/shared/platform/haptics";
 import { isTelegram } from "@/shared/platform/telegram-platform";
@@ -230,25 +230,12 @@ function UpdateTransactionForm({
               {isTransactionLoading ? (
                 <Skeleton className="h-9 rounded-md w-full" />
               ) : (
-                <Tabs
+                <TransactionTypeTabs
                   value={formData.type}
-                  onValueChange={(value) => {
-                    haptic("selection");
-                    setFormData((prev) => ({
-                      ...prev,
-                      type: value as TransactionType,
-                    }));
+                  onChange={(type) => {
+                    setFormData((prev) => ({ ...prev, type }));
                   }}
-                >
-                  <TabsList className="grid w-full grid-cols-2">
-                    <TabsTrigger value="expense">
-                      {t("transactionTypeExpense")}
-                    </TabsTrigger>
-                    <TabsTrigger value="income">
-                      {t("transactionTypeIncome")}
-                    </TabsTrigger>
-                  </TabsList>
-                </Tabs>
+                />
               )}
             </div>
 
@@ -390,15 +377,9 @@ function UpdateTransactionForm({
                   >
                     {t("transactionsRepeat")}
                   </FormActionButton>
-                  <FormActionButton
-                    onClick={() => {
-                      haptic("heavy");
-                      setShowDeleteConfirm(true);
-                    }}
-                    icon={<Trash2Icon className="h-4 w-4" />}
-                  >
-                    {t("delete")}
-                  </FormActionButton>
+                  <DeleteActionButton
+                    onClick={() => setShowDeleteConfirm(true)}
+                  />
                 </div>
               )}
             </div>

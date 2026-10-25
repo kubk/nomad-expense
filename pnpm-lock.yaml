@@ -14,9 +14,6 @@ importers:
       git-filter:
         specifier: 2.6.0
         version: 2.6.0
-      jscpd:
-        specifier: ^5.3.2
-        version: 5.3.2
       knip:
         specifier: ^6.9.0
         version: 6.9.0(@emnapi/core@1.10.0)(@emnapi/runtime@1.10.0)
@@ -27,8 +24,8 @@ importers:
         specifier: ^3.5.3
         version: 3.6.2
       slop-police:
-        specifier: ^0.3.2
-        version: 0.3.2
+        specifier: ^0.3.5
+        version: 0.3.5
 
   packages/api:
     dependencies:
@@ -3437,51 +3434,6 @@ packages:
   js-tokens@9.0.1:
     resolution: {integrity: sha512-mxa9E9ITFOt0ban3j6L5MpjwegGz6lBQmM1IJkWeBZGcMxto50+eWdjC/52xDbS2vy0k7vIMK0Fe2wfL9OQSpQ==}
 
-  jscpd-darwin-arm64@5.3.2:
-    resolution: {integrity: sha512-dlNh+revPs3X1yTRNAYqZD9u7eqiR9I+KoNvEk9JzSwzOuaUQrgwpP5EZQB0NKuF0oZZZeKrk05OTsNorVpqmQ==}
-    cpu: [arm64]
-    os: [darwin]
-
-  jscpd-darwin-x64@5.3.2:
-    resolution: {integrity: sha512-JUt9dhLw2k1WNLqbFcqbDf8ErR6mp9ucKn+chRBsBRdx7MNbdEXmV5UuHRBO8d9h7Cw1eSpfpBPMTCXOS4aaeA==}
-    cpu: [x64]
-    os: [darwin]
-
-  jscpd-linux-arm64-gnu@5.3.2:
-    resolution: {integrity: sha512-4+Z/fW7nqruf47AXRXPe8nTeExPm93Gt4A/6B4Wsi6b0G8Ei/tYDxB4jAwUBXnOGVwxrr/IDJlgSEvHLbzX+MQ==}
-    cpu: [arm64]
-    os: [linux]
-
-  jscpd-linux-arm64-musl@5.3.2:
-    resolution: {integrity: sha512-+OsVA0iLfDNUIzJArAaJnGyOHxsflpbpkGh/mWs2nZV7vPd1g5Y9SWO+vj83f6BdaO9VNbUbaQAY4dBYadfHIA==}
-    cpu: [arm64]
-    os: [linux]
-
-  jscpd-linux-x64-gnu@5.3.2:
-    resolution: {integrity: sha512-DsNsbCCc5mMOGZdhzgPETsp9RAaKk03cdx1K9wx9RShePnF+AXstYYSiW7M/qjZqvBMlSpO60BXpJvNUQljJJg==}
-    cpu: [x64]
-    os: [linux]
-
-  jscpd-linux-x64-musl@5.3.2:
-    resolution: {integrity: sha512-9D+Jg4MXTHoY5FiK6Fh3FeAr1MsqNS98X5zMUH6PNXu9PKsT0g3Rez2vdYOnoKOE4n8o1XAs8eyU0pm3+HYwog==}
-    cpu: [x64]
-    os: [linux]
-
-  jscpd-windows-arm64-msvc@5.3.2:
-    resolution: {integrity: sha512-qPqZEMHUOjc5tKVU7PElyIhI1J0xyAuQ44S2SwLvKS5qw1NATGTaGhp8MuJkrvTmNcNZmLF0Me6Cv6zj6DVlWA==}
-    cpu: [arm64]
-    os: [win32]
-
-  jscpd-windows-x64-msvc@5.3.2:
-    resolution: {integrity: sha512-WfO1k0/NXA+2HjLaWUkheQv6bEkYrI4WKa/Cf429+dnpdiYB6S8KpJyd6/xGJd+XJ9nKhE0mIFuk3+VdXtaFMQ==}
-    cpu: [x64]
-    os: [win32]
-
-  jscpd@5.3.2:
-    resolution: {integrity: sha512-siYdg3TBNwizWFaYPgr1vwuSs+NWeKJjLAbd00Nkmr2y8TSZRSW0cOGKtqSLgOv7QXDbC/XECnCrZEm5v6RMkg==}
-    engines: {node: '>=18'}
-    hasBin: true
-
   jsesc@3.1.0:
     resolution: {integrity: sha512-/sM3dO2FOzXjKQhJuo0Q173wf2KOo8t4I8vHy6lF9poUp7bKT0/NHE8fPX23PwfhnykfqnC2xRxOnVw5XuGIaA==}
     engines: {node: '>=6'}
@@ -3916,28 +3868,28 @@ packages:
   signal-exit@3.0.7:
     resolution: {integrity: sha512-wnD2ZE+l+SPC/uoS0vXeE9L1+0wuaMqKlfz9AMUo38JsyLSBWSFcHR1Rri62LZc12vLr1gb3jl7iwQhgwpAbGQ==}
 
-  slop-police-darwin-arm64@0.3.2:
-    resolution: {integrity: sha512-Xi5bPI67dHw+Rz+1EedF3CzoVnT+DQ5sN4sCbMRgh9StP9FgPRjlk7qdaRbfjWhqoAe5NN/coP6nwmZOJcZj9g==}
+  slop-police-darwin-arm64@0.3.5:
+    resolution: {integrity: sha512-qcnu7q8WRttpi/FH9MM+/NQZ+0el0lYXBrpnak4qNzWnaJfx2qV+4rvc0VME5jGsSGJVF5EglzY07Ezr5z6VwQ==}
     cpu: [arm64]
     os: [darwin]
 
-  slop-police-darwin-x64@0.3.2:
-    resolution: {integrity: sha512-aNw01HRWij1i2sgKErhbocrnSO4lHIg4ueeyvnPvkg6QLjzue2N24Xrj2Rdb3NKMOT5qkoGRsItZbtR/GgErnw==}
+  slop-police-darwin-x64@0.3.5:
+    resolution: {integrity: sha512-GXf/JLf9Rns9TWe1EHcGGukXreMCQcZ+GUk9Tap0ZpyWpTyaAIKglZtcTdY1rxN4a40DsLbEReZgTXK1qy+Paw==}
     cpu: [x64]
     os: [darwin]
 
-  slop-police-linux-arm64@0.3.2:
-    resolution: {integrity: sha512-Eu9ASb+aikYOYCKDzHA/diG7ZQvyEusj0L5SSdMeVWJPeqP2N+jynz/g5Q/eyTWy3LmCI3vuhY+r/u3E3gUQrw==}
+  slop-police-linux-arm64@0.3.5:
+    resolution: {integrity: sha512-NvQWzsnwzR4iZniY+aQZ4uIBqY4gmKzQkjjAi6n4DZJdh9qFWGEtdfIqA2iGOGZhKJVRxOnGzuKXWBL5rhjWiQ==}
     cpu: [arm64]
     os: [linux]
 
-  slop-police-linux-x64@0.3.2:
-    resolution: {integrity: sha512-1dlo6TS/9SI3iX82gGK7jT9qj/q1uWyEf4hVpdfQFRTD9kUFi2vmi7P1WKkgnMTUcji3iyj7cqOVGYm9T8qQJQ==}
+  slop-police-linux-x64@0.3.5:
+    resolution: {integrity: sha512-RUPzeatSKOgL1tgbNHXumuhm6i6HB0/8DvKsV/Il5SO2q9HHqPq/9AKP1tlXEalImlS1g+FLO6qykBqvn3+J0g==}
     cpu: [x64]
     os: [linux]
 
-  slop-police@0.3.2:
-    resolution: {integrity: sha512-IZq5b5F7L4l+ZgLBWw5JcbwYfFKL0t7quLrD73Y0OfCzHttJyWHBuq0zzu0R3kGl7OS+WlUONQ61G2Qj3wr+TA==}
+  slop-police@0.3.5:
+    resolution: {integrity: sha512-FxRYHEDRqKyM7Hyox/qyu2ptqd/sTvqd1caIBDdNCL3grbrDBopT6gUAvbHcn6396ywic3y9kBIivza2pa4IRg==}
     engines: {node: '>=22.18'}
     hasBin: true
 
@@ -7027,41 +6979,6 @@ snapshots:
 
   js-tokens@9.0.1: {}
 
-  jscpd-darwin-arm64@5.3.2:
-    optional: true
-
-  jscpd-darwin-x64@5.3.2:
-    optional: true
-
-  jscpd-linux-arm64-gnu@5.3.2:
-    optional: true
-
-  jscpd-linux-arm64-musl@5.3.2:
-    optional: true
-
-  jscpd-linux-x64-gnu@5.3.2:
-    optional: true
-
-  jscpd-linux-x64-musl@5.3.2:
-    optional: true
-
-  jscpd-windows-arm64-msvc@5.3.2:
-    optional: true
-
-  jscpd-windows-x64-msvc@5.3.2:
-    optional: true
-
-  jscpd@5.3.2:
-    optionalDependencies:
-      jscpd-darwin-arm64: 5.3.2
-      jscpd-darwin-x64: 5.3.2
-      jscpd-linux-arm64-gnu: 5.3.2
-      jscpd-linux-arm64-musl: 5.3.2
-      jscpd-linux-x64-gnu: 5.3.2
-      jscpd-linux-x64-musl: 5.3.2
-      jscpd-windows-arm64-msvc: 5.3.2
-      jscpd-windows-x64-msvc: 5.3.2
-
   jsesc@3.1.0: {}
 
   json-buffer@3.0.1: {}
@@ -7554,24 +7471,24 @@ snapshots:
 
   signal-exit@3.0.7: {}
 
-  slop-police-darwin-arm64@0.3.2:
+  slop-police-darwin-arm64@0.3.5:
     optional: true
 
-  slop-police-darwin-x64@0.3.2:
+  slop-police-darwin-x64@0.3.5:
     optional: true
 
-  slop-police-linux-arm64@0.3.2:
+  slop-police-linux-arm64@0.3.5:
     optional: true
 
-  slop-police-linux-x64@0.3.2:
+  slop-police-linux-x64@0.3.5:
     optional: true
 
-  slop-police@0.3.2:
+  slop-police@0.3.5:
     optionalDependencies:
-      slop-police-darwin-arm64: 0.3.2
-      slop-police-darwin-x64: 0.3.2
-      slop-police-linux-arm64: 0.3.2
-      slop-police-linux-x64: 0.3.2
+      slop-police-darwin-arm64: 0.3.5
+      slop-police-darwin-x64: 0.3.5
+      slop-police-linux-arm64: 0.3.5
+      slop-police-linux-x64: 0.3.5
 
   smol-toml@1.6.1: {}
 

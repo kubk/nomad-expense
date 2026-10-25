@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react";
 import {
   CheckIcon,
-  Trash2Icon,
   ListPlusIcon,
   ArrowLeftIcon,
   PlusIcon,
@@ -34,6 +33,7 @@ import { RouteByType, useRouter } from "@/shared/stacked-router/router";
 import { isFormRoute } from "@/shared/stacked-router/routes";
 import { Label } from "@/components/ui/label";
 import { FormActionButton } from "@/components/ui/form-action-button";
+import { DeleteActionButton } from "../widgets/delete-action-button";
 import { haptic } from "@/shared/platform/haptics";
 import { isTelegram } from "@/shared/platform/telegram-platform";
 import { useTranslation } from "@/translations/translation-provider";
@@ -310,15 +310,9 @@ function AccountFormContent({
                 >
                   {t("accountsAdvanced")}
                 </FormActionButton>
-                <FormActionButton
-                  onClick={() => {
-                    haptic("heavy");
-                    setShowDeleteConfirm(true);
-                  }}
-                  icon={<Trash2Icon className="h-4 w-4" />}
-                >
-                  {t("delete")}
-                </FormActionButton>
+                <DeleteActionButton
+                  onClick={() => setShowDeleteConfirm(true)}
+                />
               </div>
             </div>
           )}

@@ -50,3 +50,11 @@ export { type TransactionFull } from "./db/db-types";
 export { type UserLike, getUserDisplayName } from "./services/user-display";
 
 export { links } from "./bot/messages";
+
+export { createPlural } from "./translations/plural";
+
+export {
+  translate,
+  type TranslationArgs,
+  type TranslationOf,
+} from "./translations/translate";

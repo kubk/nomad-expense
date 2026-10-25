@@ -6,7 +6,6 @@ import { Button } from "@/components/ui/button";
 import { LoadingSwap } from "@/components/ui/loading-swap";
 import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { getCurrencySymbol } from "@/shared/currency-formatter";
 import { queryClient, trpc } from "@/shared/api";
 import { useInvalidateTransactions } from "@/shared/hooks/use-invalidate-transactions";
@@ -23,6 +22,7 @@ import { Footer } from "../widgets/footer";
 import { QuickTitles } from "./quick-titles";
 import { UploadStatementButton } from "./upload-statement-button";
 import { AccountPickerDrawer } from "./account-picker-drawer";
+import { TransactionTypeTabs } from "./transaction-type-tabs";
 
 type CreateTransactionForm = {
   accountId: string;
@@ -184,26 +184,13 @@ export function CreateTransactionScreen({
     >
       <form className="flex h-full min-h-0 flex-col" onSubmit={handleSave}>
         <div className="flex shrink-0 items-center gap-2">
-          <Tabs
+          <TransactionTypeTabs
             className="min-w-0 flex-1"
             value={formData.type}
-            onValueChange={(value) => {
-              haptic("selection");
-              setFormData((current) => ({
-                ...current,
-                type: value as TransactionType,
-              }));
+            onChange={(type) => {
+              setFormData((current) => ({ ...current, type }));
             }}
-          >
-            <TabsList className="grid w-full grid-cols-2">
-              <TabsTrigger value="expense">
-                {t("transactionTypeExpense")}
-              </TabsTrigger>
-              <TabsTrigger value="income">
-                {t("transactionTypeIncome")}
-              </TabsTrigger>
-            </TabsList>
-          </Tabs>
+          />
 
           {selectedAccount && canUploadStatement ? (
             <UploadStatementButton accountId={selectedAccount.id} />

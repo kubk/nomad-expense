@@ -1,5 +1,5 @@
 import type { Translation } from "./translations";
-import { createPlural } from "./plural";
+import { createPlural } from "api";
 
 const plural = createPlural("ru");
 const transaction = (count: number) =>
