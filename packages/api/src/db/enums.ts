@@ -1,7 +1,6 @@
 import { z } from "zod";
 
 export const transactionSource = ["imported", "manual"] as const;
-export const transactionSourceSchema = z.enum(transactionSource);
 
 export const transactionImportRuleType = [
   "MakeUncountable",

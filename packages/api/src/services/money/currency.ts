@@ -1,6 +1,6 @@
 import { currency } from "../../db/enums";
 
-export type CurrencyInfo = {
+type CurrencyInfo = {
   code: SupportedCurrency;
   name: string;
   symbol: string;
