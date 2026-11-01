@@ -60,4 +60,23 @@ describe("parseEtherFiStatement", () => {
       type: "income",
     });
   });
+
+  it("parses the CSV export", async () => {
+    const statement = readFileSync("./fixtures/ether-fi-statement.csv");
+    const file = new File([statement], "ether-fi-statement.csv", {
+      type: "text/csv",
+    });
+
+    const transactions = await parseEtherFiStatement(file, "UTC");
+
+    expect(transactions).toHaveLength(17);
+    expect(transactions[0]).toEqual({
+      amountCents: 260,
+      createdAt: new Date("2026-10-31T19:46:24.000Z"),
+      currency: "USD",
+      description: "MRT-BEM",
+      info: "4111 - Local and Suburban Commuter Passenger Transportation, including Ferries",
+      type: "expense",
+    });
+  });
 });

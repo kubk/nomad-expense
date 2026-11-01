@@ -1,4 +1,5 @@
 import { DateTime } from "luxon";
+import Papa from "papaparse";
 import { readSheet, type CellValue, type Row } from "read-excel-file/universal";
 import { z } from "zod";
 import {
@@ -30,7 +31,7 @@ const etherFiRowSchema = z.object({
   ]),
   description: z.string().trim().min(1),
   status: etherFiStatusSchema,
-  amount: z.number().finite(),
+  amount: z.coerce.number().finite(),
   currency: z.literal("USD"),
   category: z.string().trim().nullable().optional(),
 });
@@ -45,16 +46,9 @@ const transactionTypeByEtherFiType = {
 } satisfies Record<EtherFiRow["type"], ParsedTransaction["type"]>;
 
 export const parseEtherFiStatement: ParseTransactionFn = async (file) => {
-  let sheet: Row[];
-
-  try {
-    sheet = await readSheet(file, "All Transactions", { trim: true });
-  } catch (error) {
-    throw new StatementFormatError(
-      "Unable to read the Ether.fi transaction sheet",
-      error,
-    );
-  }
+  const sheet = (await isXlsxFile(file))
+    ? await readXlsxRows(file)
+    : await readCsvRows(file);
 
   const headerRowIndex = sheet.findIndex((row) =>
     requiredHeaders.every((header) => row.includes(header)),
@@ -97,6 +91,42 @@ export const parseEtherFiStatement: ParseTransactionFn = async (file) => {
 
   return transactions;
 };
+
+async function isXlsxFile(file: File): Promise<boolean> {
+  // XLSX is a ZIP archive, which always starts with "PK"
+  const signature = new Uint8Array(await file.slice(0, 2).arrayBuffer());
+  return signature[0] === 0x50 && signature[1] === 0x4b;
+}
+
+async function readXlsxRows(file: File): Promise<Row[]> {
+  try {
+    return await readSheet(file, "All Transactions", { trim: true });
+  } catch (error) {
+    throw new StatementFormatError(
+      "Unable to read the Ether.fi transaction sheet",
+      error,
+    );
+  }
+}
+
+async function readCsvRows(file: File): Promise<Row[]> {
+  const result = Papa.parse<string[]>(await file.text(), {
+    skipEmptyLines: true,
+  });
+
+  if (result.errors.length > 0) {
+    throw new StatementFormatError(
+      `Unable to read the Ether.fi CSV: ${result.errors.map((e) => e.message).join(", ")}`,
+    );
+  }
+
+  return result.data.map((row) =>
+    row.map((cell) => {
+      const value = cell.trim();
+      return value === "" ? null : value;
+    }),
+  );
+}
 
 function rowToRecord(
   headers: Row,
