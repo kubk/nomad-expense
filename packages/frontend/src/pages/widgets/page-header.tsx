@@ -32,7 +32,9 @@ export function PageHeader({
     <div
       className={cn("sticky top-0 shrink-0", {
         // Screens start below Telegram's controls; lift only the header into that row.
-        "-mt-[var(--tg-content-safe-area-inset-top,0px)] pb-6": telegram,
+        // bg-inherit keeps screens stacked underneath from showing through the lifted area.
+        "-mt-[var(--tg-content-safe-area-inset-top,0px)] pb-6 bg-inherit":
+          telegram,
       })}
     >
       <div
