@@ -8,6 +8,8 @@ export default defineConfig({
           name: "ci",
           include: ["**/*.test.ts"],
           exclude: ["**/*.eval.test.ts", "**/node_modules/**"],
+          globalSetup: ["./src/lib/testing/global-setup.ts"],
+          setupFiles: ["./src/lib/testing/setup-worker-db.ts"],
         },
       },
       {
