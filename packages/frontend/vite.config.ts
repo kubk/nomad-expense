@@ -3,8 +3,14 @@ import react, { reactCompilerPreset } from "@vitejs/plugin-react";
 import babel from "@rolldown/plugin-babel";
 import tailwindcss from "@tailwindcss/vite";
 import path from "path";
+import { execSync } from "child_process";
 
 export default defineConfig({
+  define: {
+    __COMMIT_HASH__: JSON.stringify(
+      execSync("git rev-parse --short HEAD").toString().trim(),
+    ),
+  },
   plugins: [
     react(),
     babel({ presets: [reactCompilerPreset()] }),

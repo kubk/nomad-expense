@@ -120,6 +120,10 @@ export function SettingsScreen() {
             </div>
           )}
         </div>
+
+        <p className="text-center text-xs text-muted-foreground">
+          {__COMMIT_HASH__}
+        </p>
       </div>
 
       <ConfirmModal
