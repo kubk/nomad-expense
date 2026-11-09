@@ -11,6 +11,8 @@ const envSchema = z.object({
   AI_GATEWAY_API_KEY: z.string(),
   ERROR_REPORT_TELEGRAM_BOT_TOKEN: z.string().optional(),
   ERROR_REPORT_TELEGRAM_CHAT_ID: z.string().optional(),
+  // Artificial per-request delay on STAGE=local; set to 0 when real network latency is present.
+  LOCAL_API_DELAY_MS: z.coerce.number().int().min(0).default(1000),
 });
 
 type Env = z.infer<typeof envSchema>;

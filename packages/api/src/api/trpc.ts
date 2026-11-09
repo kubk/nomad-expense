@@ -7,8 +7,9 @@ export async function createContext({
   req,
   resHeaders,
 }: FetchCreateContextFnOptions) {
-  if (getEnv().STAGE === "local") {
-    await new Promise((resolve) => setTimeout(resolve, 1000));
+  const { STAGE, LOCAL_API_DELAY_MS } = getEnv();
+  if (STAGE === "local" && LOCAL_API_DELAY_MS > 0) {
+    await new Promise((resolve) => setTimeout(resolve, LOCAL_API_DELAY_MS));
   }
 
   const authResult = await authenticate({ type: "api", req });
