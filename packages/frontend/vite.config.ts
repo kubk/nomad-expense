@@ -17,5 +17,12 @@ export default defineConfig({
   },
   server: {
     port: 5194,
+    // Lets remote previews (Amp portals) reach the local API on the same origin via VITE_API_URL=/api.
+    proxy: {
+      "/api": {
+        target: "http://127.0.0.1:8794",
+        rewrite: (path) => path.replace(/^\/api/, ""),
+      },
+    },
   },
 });
