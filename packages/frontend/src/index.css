@@ -118,7 +118,8 @@
     @apply border-border outline-ring/50;
   }
   body {
-    @apply bg-background text-foreground;
+    /* Matches the screens' bg-muted so Safari's status and toolbar areas, which take the body color, blend in. */
+    @apply bg-muted text-foreground;
   }
 
   button:not([disabled]),
