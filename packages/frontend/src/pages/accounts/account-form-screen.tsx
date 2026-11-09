@@ -214,7 +214,7 @@ function AccountFormContent({
             <Label>{t("accountsColor")}</Label>
             <div
               className={cn(
-                "flex gap-3 pb-2",
+                "flex gap-3 p-3 -mr-4 bg-card shadow-xs rounded-l-xl",
                 "overflow-x-auto scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100",
               )}
             >
