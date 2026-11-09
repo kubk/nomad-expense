@@ -9,6 +9,7 @@ import {
   boolean,
   pgEnum,
   jsonb,
+  uniqueIndex,
 } from "drizzle-orm/pg-core";
 import { sql } from "drizzle-orm";
 import {
@@ -72,6 +73,19 @@ export const userTable = pgTable(
   (table) => [index("idx_user_telegram_id").on(table.telegramId)],
 );
 
+export const bankConnectionTable = pgTable(
+  "bank_connection",
+  {
+    ...sharedColumns,
+    familyId: uuid("family_id").notNull(),
+    name: varchar("name").notNull(),
+    credentials: jsonb("credentials").notNull(),
+    lastSyncedAt: timestamp("last_synced_at", { withTimezone: true }),
+    lastSyncError: text("last_sync_error"),
+  },
+  (table) => [index("idx_bank_connection_family_id").on(table.familyId)],
+);
+
 export const accountTable = pgTable(
   "account",
   {
@@ -85,6 +99,10 @@ export const accountTable = pgTable(
     meta: jsonb("meta"),
     sort: integer("sort").notNull().default(0),
     isHidden: boolean("is_hidden").notNull().default(false),
+    bankConnectionId: uuid("bank_connection_id").references(
+      () => bankConnectionTable.id,
+      { onDelete: "set null" },
+    ),
   },
   (table) => [index("idx_account_family_id").on(table.familyId)],
 );
@@ -104,8 +122,13 @@ export const transactionTable = pgTable(
     isCountable: boolean("is_countable").notNull().default(true),
     usdAmount: integer("usd_amount").notNull(),
     type: transactionTypeEnum("type").notNull().default("expense"),
+    externalId: varchar("external_id"),
   },
   (table) => [
+    uniqueIndex("idx_transaction_account_id_external_id").on(
+      table.accountId,
+      table.externalId,
+    ),
     index("idx_transaction_account_id").on(table.accountId),
     index("idx_transaction_account_id_created_at").on(
       table.accountId,

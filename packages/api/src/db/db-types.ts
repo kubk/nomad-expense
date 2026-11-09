@@ -1,5 +1,6 @@
 import {
   accountTable,
+  bankConnectionTable,
   transactionImportRuleTable,
   transactionTable,
 } from "./schema";
@@ -10,3 +11,4 @@ export type TransactionImportRule = InferSelectModel<
   typeof transactionImportRuleTable
 >;
 export type TransactionFull = InferSelectModel<typeof transactionTable>;
+export type BankConnection = InferSelectModel<typeof bankConnectionTable>;

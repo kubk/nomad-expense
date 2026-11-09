@@ -1,17 +1,17 @@
 import { z } from "zod";
 
-const envSchema = z
-  .object({
-    CLOUDFLARE_ACCOUNT_ID: z.string(),
-    CLOUDFLARE_API_TOKEN: z.string(),
-    DB_URL: z.string(),
-    STAGE: z.enum(["local", "production"]),
-    FRONTEND_URL: z.string(),
-    TELEGRAM_BOT_TOKEN: z.string(),
-    TELEGRAM_OIDC_CLIENT_ID: z.string().regex(/^\d+$/),
-    AI_GATEWAY_API_KEY: z.string(),
-  })
-  .required();
+const envSchema = z.object({
+  CLOUDFLARE_ACCOUNT_ID: z.string(),
+  CLOUDFLARE_API_TOKEN: z.string(),
+  DB_URL: z.string(),
+  STAGE: z.enum(["local", "production"]),
+  FRONTEND_URL: z.string(),
+  TELEGRAM_BOT_TOKEN: z.string(),
+  TELEGRAM_OIDC_CLIENT_ID: z.string().regex(/^\d+$/),
+  AI_GATEWAY_API_KEY: z.string(),
+  ERROR_REPORT_TELEGRAM_BOT_TOKEN: z.string().optional(),
+  ERROR_REPORT_TELEGRAM_CHAT_ID: z.string().optional(),
+});
 
 type Env = z.infer<typeof envSchema>;
 

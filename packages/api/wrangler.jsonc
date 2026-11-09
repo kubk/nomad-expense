@@ -34,6 +34,10 @@
 			"limits": {
 				"cpu_ms": 300000 // 5 minutes
 			},
+			// Bank sync, 23:50 Asia/Bangkok
+			"triggers": {
+				"crons": ["50 16 * * *"]
+			},
 			"hyperdrive": [
 				{
 					"binding": "HYPERDRIVE",

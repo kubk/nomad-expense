@@ -85,6 +85,13 @@
       "when": 1790242560270,
       "tag": "0011_add-browser-token",
       "breakpoints": true
+    },
+    {
+      "idx": 12,
+      "version": "7",
+      "when": 1794212575320,
+      "tag": "0012_bank-connections",
+      "breakpoints": true
     }
   ]
 }
