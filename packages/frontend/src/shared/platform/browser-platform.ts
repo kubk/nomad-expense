@@ -22,21 +22,6 @@ export function createBrowserPlatform(): Platform {
 
       return { top: 0, bottom: 0 };
     },
-    syncHeader(color: string) {
-      if (!isStandaloneMode()) {
-        return;
-      }
-      let metaThemeColor = document.querySelector(
-        "meta[name='theme-color']",
-      ) as HTMLMetaElement;
-
-      if (!metaThemeColor) {
-        metaThemeColor = document.createElement("meta");
-        metaThemeColor.name = "theme-color";
-        document.head.appendChild(metaThemeColor);
-      }
-      metaThemeColor.content = color;
-    },
     openInternalLink(link: string) {
       window.location.href = link;
     },

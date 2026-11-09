@@ -31,7 +31,7 @@ export function InviteLinkCard({
   };
 
   return (
-    <Card className="py-4 bg-muted/50">
+    <Card className="py-4 border-none shadow-sm">
       <CardContent className="px-4 space-y-3">
         <div className="flex items-center justify-between">
           <h3 className="font-medium text-foreground">

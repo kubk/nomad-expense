@@ -15,17 +15,13 @@ import { AuthScreen } from "../auth/auth-screen";
 import { AnimatePresence } from "framer-motion";
 import { useRouter } from "@/shared/stacked-router/router";
 import { useEffect, type ReactNode } from "react";
-import { isFormRoute, Route } from "@/shared/stacked-router/routes";
+import { Route } from "@/shared/stacked-router/routes";
 import { AnimatedScreen } from "@/shared/stacked-router/animated-screen";
 import { StatementUploadResultScreen } from "../transactions/statement-upload-result-screen";
-import { useHeaderColorSync } from "@/shared/platform/use-header-color-sync";
 import { getAuthToken } from "@/shared/auth-token";
-import { cn } from "@/lib/utils";
 
 export function App() {
-  const { navigationStack, navigate, currentRoute } = useRouter();
-  const isForm = isFormRoute(currentRoute);
-  useHeaderColorSync(isForm);
+  const { navigationStack, navigate } = useRouter();
 
   useEffect(() => {
     if (!getAuthToken()) {
@@ -38,9 +34,9 @@ export function App() {
       case "main":
         return <OverviewScreen />;
       case "settings":
-        return <SettingsScreen route={route} />;
+        return <SettingsScreen />;
       case "family":
-        return <FamilyScreen route={route} />;
+        return <FamilyScreen />;
       case "invite":
         return <InviteScreen route={route} />;
       case "accountForm":
@@ -54,11 +50,11 @@ export function App() {
       case "monthlyBreakdownFull":
         return <MonthlyBreakdownFull route={route} />;
       case "monthlyBreakdownSettings":
-        return <MonthlyBreakdownSettingsScreen route={route} />;
+        return <MonthlyBreakdownSettingsScreen />;
       case "monthlyBreakdownAccounts":
-        return <MonthlyBreakdownAccountsScreen route={route} />;
+        return <MonthlyBreakdownAccountsScreen />;
       case "accounts":
-        return <AccountsScreen route={route} />;
+        return <AccountsScreen />;
       case "auth":
         return <AuthScreen />;
       case "statementUploadResult":
@@ -92,12 +88,7 @@ export function App() {
   );
 
   return (
-    <div
-      className={cn(
-        "app-shell relative app-container overflow-hidden",
-        isForm ? "bg-background" : "bg-muted",
-      )}
-    >
+    <div className="app-shell relative app-container overflow-hidden bg-muted">
       <AnimatePresence initial={false} mode="sync">
         {navigationStack.map((route, index) =>
           renderScreen(route, index, navigationStack),

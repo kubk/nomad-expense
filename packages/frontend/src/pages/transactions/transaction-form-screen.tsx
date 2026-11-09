@@ -1,9 +1,5 @@
 import { useState } from "react";
-import {
-  ChevronDownIcon,
-  ArrowLeftIcon,
-  RepeatIcon,
-} from "lucide-react";
+import { ChevronDownIcon, ArrowLeftIcon, RepeatIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -15,7 +11,6 @@ import {
 } from "@/components/ui/popover";
 import { Skeleton } from "@/components/ui/skeleton";
 import { RouteByType, useRouter } from "@/shared/stacked-router/router";
-import { isFormRoute } from "@/shared/stacked-router/routes";
 import { PageHeader } from "../widgets/page-header";
 import { Page } from "../widgets/page";
 import { ConfirmModal } from "../widgets/confirm-modal";
@@ -47,7 +42,9 @@ export type TransactionForm = {
   isCountable: boolean;
 };
 
-type TransactionDetails = NonNullable<RouterOutputs["expenses"]["getTransaction"]>;
+type TransactionDetails = NonNullable<
+  RouterOutputs["expenses"]["getTransaction"]
+>;
 
 export function TransactionFormScreen({
   route,
@@ -58,21 +55,10 @@ export function TransactionFormScreen({
     return <CreateTransactionScreen route={route} />;
   }
 
-  return (
-    <UpdateTransactionScreen
-      route={route}
-      transactionId={route.transactionId}
-    />
-  );
+  return <UpdateTransactionScreen transactionId={route.transactionId} />;
 }
 
-function UpdateTransactionScreen({
-  route,
-  transactionId,
-}: {
-  route: RouteByType<"transactionForm">;
-  transactionId: string;
-}) {
+function UpdateTransactionScreen({ transactionId }: { transactionId: string }) {
   const { data: transaction } = useQuery(
     trpc.expenses.getTransaction.queryOptions({ id: transactionId }),
   );
@@ -80,7 +66,6 @@ function UpdateTransactionScreen({
   return (
     <UpdateTransactionForm
       key={transaction ? JSON.stringify(transaction) : "loading"}
-      route={route}
       transactionId={transactionId}
       transaction={transaction}
     />
@@ -88,11 +73,9 @@ function UpdateTransactionScreen({
 }
 
 function UpdateTransactionForm({
-  route,
   transactionId,
   transaction,
 }: {
-  route: RouteByType<"transactionForm">;
   transactionId: string;
   transaction?: TransactionDetails;
 }) {
@@ -212,16 +195,12 @@ function UpdateTransactionForm({
   };
 
   const isSaving =
-    updateTransactionMutation.isPending ||
-    repeatTransactionMutation.isPending;
+    updateTransactionMutation.isPending || repeatTransactionMutation.isPending;
 
   const isTransactionLoading = !transaction;
 
   return (
-    <Page
-      title={<PageHeader title={t("transactionsEditTitle")} />}
-      isForm={isFormRoute(route)}
-    >
+    <Page title={<PageHeader title={t("transactionsEditTitle")} />}>
       <form onSubmit={handleSave}>
         <div className="flex-1 flex flex-col">
           <div className="flex-1 space-y-6">

@@ -8,12 +8,10 @@ import { trpc } from "@/shared/api";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { useState } from "react";
 import { FamilyHelp } from "./family-help";
-import { RouteByType } from "@/shared/stacked-router/router";
-import { isFormRoute } from "@/shared/stacked-router/routes";
 import { haptic } from "@/shared/platform/haptics";
 import { useTranslation } from "@/translations/translation-provider";
 
-export function FamilyScreen({ route }: { route: RouteByType<"family"> }) {
+export function FamilyScreen() {
   const { t } = useTranslation();
   const [isHelpOpen, setIsHelpOpen] = useState(false);
 
@@ -38,7 +36,7 @@ export function FamilyScreen({ route }: { route: RouteByType<"family"> }) {
   };
 
   return (
-    <Page title={t("familyTitle")} isForm={isFormRoute(route)}>
+    <Page title={t("familyTitle")}>
       <div className="space-y-6">
         {/* Invite Section */}
         <div className="space-y-4">
@@ -55,7 +53,7 @@ export function FamilyScreen({ route }: { route: RouteByType<"family"> }) {
           {activeInvite && <InviteLinkCard invite={activeInvite} />}
 
           {!activeInvite && (
-            <div className="bg-accent rounded-xl p-4 text-center space-y-3">
+            <div className="bg-card shadow-sm rounded-xl p-4 text-center space-y-3">
               <p className="text-muted-foreground text-sm">
                 {t("familyInviteDescription")}
               </p>
@@ -93,7 +91,7 @@ export function FamilyScreen({ route }: { route: RouteByType<"family"> }) {
               {Array.from({ length: 2 }).map((_, i) => (
                 <div
                   key={i}
-                  className="h-19.5 bg-muted/50 rounded-lg animate-pulse"
+                  className="h-19.5 bg-foreground/10 rounded-xl animate-pulse"
                 />
               ))}
             </div>

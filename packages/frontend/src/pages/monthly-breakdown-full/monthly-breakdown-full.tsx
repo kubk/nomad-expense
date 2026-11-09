@@ -16,7 +16,6 @@ import { Page } from "../widgets/page";
 import { PageHeader } from "../widgets/page-header";
 import { RouteByType } from "@/shared/stacked-router/router";
 import { useRouter } from "@/shared/stacked-router/router";
-import { isFormRoute } from "@/shared/stacked-router/routes";
 import { calculateMaxAmount } from "../../shared/chart-calculations";
 import { useTranslation } from "@/translations/translation-provider";
 import { haptic } from "@/shared/platform/haptics";
@@ -82,7 +81,6 @@ export function MonthlyBreakdownFull({
           }
         />
       }
-      isForm={isFormRoute(route)}
     >
       <TransactionFiltersSummary
         isLoading={isLoading}
@@ -110,7 +108,10 @@ export function MonthlyBreakdownFull({
                     type: "transactions",
                     filters: {
                       ...filters,
-                      date: getTransactionMonthRange(month.year, month.monthNumber),
+                      date: getTransactionMonthRange(
+                        month.year,
+                        month.monthNumber,
+                      ),
                     },
                   });
                 }}

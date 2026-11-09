@@ -13,7 +13,7 @@ export function FamilyMemberItem({
   };
 }) {
   return (
-    <Card className="py-4 shadow-none">
+    <Card className="py-4 border-none shadow-sm">
       <CardContent className="py-0 px-4">
         <div className="flex items-center gap-3">
           <UserAvatar user={member} />

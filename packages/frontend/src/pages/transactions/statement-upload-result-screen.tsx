@@ -2,7 +2,6 @@ import { Card, CardContent } from "@/components/ui/card";
 import { TransactionItem } from "../widgets/transaction-item";
 import { Page } from "../widgets/page";
 import { RouteByType } from "@/shared/stacked-router/router";
-import { isFormRoute } from "@/shared/stacked-router/routes";
 import { getUploadResult } from "@/shared/upload-result-storage";
 import { useTranslation } from "@/translations/translation-provider";
 
@@ -16,7 +15,7 @@ export function StatementUploadResultScreen({
 
   if (!uploadResult) {
     return (
-      <Page title={t("uploadResultTitle")} isForm={isFormRoute(route)}>
+      <Page title={t("uploadResultTitle")}>
         <div className="flex items-center justify-center py-8">
           <p className="text-muted-foreground">{t("uploadResultMissing")}</p>
         </div>
@@ -33,7 +32,7 @@ export function StatementUploadResultScreen({
   );
 
   return (
-    <Page title={t("uploadResultTitle")} isForm={isFormRoute(route)}>
+    <Page title={t("uploadResultTitle")}>
       <div className="space-y-4">
         {sortedAdded.length > 0 && (
           <div>

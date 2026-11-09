@@ -23,7 +23,7 @@ export function TransactionTypeTabs({
         onChange(type as TransactionType);
       }}
     >
-      <TabsList className="grid w-full grid-cols-2">
+      <TabsList className="grid w-full grid-cols-2 bg-foreground/5 dark:bg-card">
         <TabsTrigger value="expense">{t("transactionTypeExpense")}</TabsTrigger>
         <TabsTrigger value="income">{t("transactionTypeIncome")}</TabsTrigger>
       </TabsList>

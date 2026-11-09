@@ -12,7 +12,6 @@ import { TransactionFilters } from "api";
 import { useAccountIds } from "@/shared/hooks/use-account-ids";
 import { Page } from "../widgets/page";
 import { RouteByType, useRouter } from "@/shared/stacked-router/router";
-import { isFormRoute } from "@/shared/stacked-router/routes";
 import { VList } from "virtua";
 import { FilterIcon } from "lucide-react";
 import { useTranslation } from "@/translations/translation-provider";
@@ -44,7 +43,7 @@ export function TransactionsScreen({
   const totalIncome = transactionsData?.totalIncome || 0;
 
   return (
-    <Page title={t("transactionsTitle")} isForm={isFormRoute(route)}>
+    <Page title={t("transactionsTitle")}>
       <TransactionFiltersSummary
         isLoading={isLoading}
         onFiltersClick={() => setIsDrawerOpen(true)}

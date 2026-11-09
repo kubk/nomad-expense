@@ -36,9 +36,6 @@ export function createTelegramPlatform(): Platform {
         bottom: webApp.safeAreaInset.bottom / 2,
       };
     },
-    syncHeader(color: string) {
-      webApp.setHeaderColor(color);
-    },
     openInternalLink(link: string) {
       webApp.openLink(link);
     },

@@ -30,7 +30,6 @@ import {
 } from "api";
 import { accountColorsPalette } from "./account-colors";
 import { RouteByType, useRouter } from "@/shared/stacked-router/router";
-import { isFormRoute } from "@/shared/stacked-router/routes";
 import { Label } from "@/components/ui/label";
 import { FormActionButton } from "@/components/ui/form-action-button";
 import { DeleteActionButton } from "../widgets/delete-action-button";
@@ -128,9 +127,7 @@ function AccountFormContent({
     if (!existingAccountColor) return;
 
     const timeoutId = setTimeout(() => {
-      const element = document.getElementById(
-        `color-${existingAccountColor}`,
-      );
+      const element = document.getElementById(`color-${existingAccountColor}`);
       element?.scrollIntoView({ inline: "center" });
     }, 300);
 
@@ -199,10 +196,7 @@ function AccountFormContent({
     createAccountMutation.isPending || updateAccountMutation.isPending;
 
   return (
-    <Page
-      title={isEdit ? t("accountsEditTitle") : t("accountsAddTitle")}
-      isForm={isFormRoute(route)}
-    >
+    <Page title={isEdit ? t("accountsEditTitle") : t("accountsAddTitle")}>
       <form onSubmit={handleSave}>
         <div className="flex-1 space-y-6">
           <div className="flex flex-col gap-2">

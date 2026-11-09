@@ -3,7 +3,6 @@ import { useRouter } from "@/shared/stacked-router/router";
 import { ArrowLeftIcon } from "lucide-react";
 import { isTelegram } from "@/shared/platform/telegram-platform";
 import { cn } from "@/lib/utils";
-import { isFormRoute } from "@/shared/stacked-router/routes";
 import { haptic } from "@/shared/platform/haptics";
 
 export function PageHeader({
@@ -13,17 +12,11 @@ export function PageHeader({
   title?: string | ReactNode;
   rightSlot?: ReactNode;
 }) {
-  const { pop, currentRoute } = useRouter();
-  const isForm = isFormRoute(currentRoute);
+  const { pop } = useRouter();
   const telegram = isTelegram();
 
   const actions = rightSlot ? (
-    <div
-      className={cn(
-        "bg-background shadow-sm rounded-full px-2 active:scale-95 transition-transform",
-        { "border shadow-xs": isForm },
-      )}
-    >
+    <div className="bg-background shadow-sm rounded-full px-2 active:scale-95 transition-transform">
       {rightSlot}
     </div>
   ) : null;
@@ -52,12 +45,7 @@ export function PageHeader({
                 haptic("light");
                 pop();
               }}
-              className={cn(
-                "bg-background flex items-center gap-1.5 font-medium text-sm shadow-sm rounded-full py-1.5 px-3 active:scale-95 transition-transform",
-                {
-                  "border shadow-xs": isForm,
-                },
-              )}
+              className="bg-background flex items-center gap-1.5 font-medium text-sm shadow-sm rounded-full py-1.5 px-3 active:scale-95 transition-transform"
             >
               <ArrowLeftIcon className="h-4 w-4" />
               Back
@@ -69,10 +57,7 @@ export function PageHeader({
           <div
             className={cn(
               "bg-background font-medium text-sm shadow-sm rounded-full py-1.5 px-4",
-              {
-                "border shadow-xs": isForm,
-                "max-w-full truncate": telegram,
-              },
+              { "max-w-full truncate": telegram },
             )}
           >
             {title}

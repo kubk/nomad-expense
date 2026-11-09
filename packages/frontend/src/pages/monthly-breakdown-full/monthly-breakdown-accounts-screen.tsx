@@ -4,8 +4,7 @@ import { Button } from "@/components/ui/button";
 import { LoadingSwap } from "@/components/ui/loading-swap";
 import { Checkbox } from "@/components/ui/checkbox";
 import { getCurrencySymbol } from "@/shared/currency-formatter";
-import { RouteByType, useRouter } from "@/shared/stacked-router/router";
-import { isFormRoute } from "@/shared/stacked-router/routes";
+import { useRouter } from "@/shared/stacked-router/router";
 import { useTranslation } from "@/translations/translation-provider";
 import { cn } from "@/lib/utils";
 import { haptic } from "@/shared/platform/haptics";
@@ -22,27 +21,20 @@ function areAccountIdsEqual(first: string[], second: string[]) {
   return second.every((accountId) => firstSet.has(accountId));
 }
 
-export function MonthlyBreakdownAccountsScreen({
-  route,
-}: {
-  route: RouteByType<"monthlyBreakdownAccounts">;
-}) {
+export function MonthlyBreakdownAccountsScreen() {
   const settings = useMonthlyBreakdownAccountIds();
 
   return (
     <MonthlyBreakdownAccountsContent
       key={JSON.stringify(settings.excludedAccountIds)}
-      route={route}
       settings={settings}
     />
   );
 }
 
 function MonthlyBreakdownAccountsContent({
-  route,
   settings,
 }: {
-  route: RouteByType<"monthlyBreakdownAccounts">;
   settings: ReturnType<typeof useMonthlyBreakdownAccountIds>;
 }) {
   const { pop } = useRouter();
@@ -54,9 +46,8 @@ function MonthlyBreakdownAccountsContent({
     isSaving,
     setExcludedAccountIds,
   } = settings;
-  const [draftExcludedAccountIds, setDraftExcludedAccountIds] = useState(
-    excludedAccountIds,
-  );
+  const [draftExcludedAccountIds, setDraftExcludedAccountIds] =
+    useState(excludedAccountIds);
 
   const isDirty = !areAccountIdsEqual(
     draftExcludedAccountIds,
@@ -95,10 +86,7 @@ function MonthlyBreakdownAccountsContent({
   };
 
   return (
-    <Page
-      title={t("monthlyBreakdownAccountsTitle")}
-      isForm={isFormRoute(route)}
-    >
+    <Page title={t("monthlyBreakdownAccountsTitle")}>
       {isLoading ? (
         <div className="flex justify-center items-center py-12">
           <Loader2 className="w-8 h-8 animate-spin text-muted-foreground" />

@@ -34,7 +34,7 @@ export function ModeToggle() {
         setTheme(value as Theme);
       }}
     >
-      <TabsList className="w-full grid grid-cols-3 h-auto">
+      <TabsList className="w-full grid grid-cols-3 h-auto bg-foreground/5 dark:bg-card">
         {themes.map(({ name, value, icon: Icon }) => (
           <TabsTrigger
             key={value}

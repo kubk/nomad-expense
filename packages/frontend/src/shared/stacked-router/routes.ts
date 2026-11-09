@@ -94,15 +94,3 @@ export const routeSchema = v.variant("type", [
 ]);
 
 export type Route = v.InferOutput<typeof routeSchema>;
-
-export function isFormRoute(route: Route) {
-  return (
-    route.type === "accountForm" ||
-    route.type === "importSettings" ||
-    route.type === "transactionForm" ||
-    route.type === "monthlyBreakdownSettings" ||
-    route.type === "monthlyBreakdownAccounts" ||
-    route.type === "settings" ||
-    route.type === "family"
-  );
-}

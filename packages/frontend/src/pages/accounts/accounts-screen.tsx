@@ -18,8 +18,7 @@ import { Page } from "../widgets/page";
 import { getColorById } from "./account-colors";
 import { cn } from "@/lib/utils";
 import { DateTime } from "luxon";
-import { RouteByType, useRouter } from "@/shared/stacked-router/router";
-import { isFormRoute } from "@/shared/stacked-router/routes";
+import { useRouter } from "@/shared/stacked-router/router";
 import { NoAccountsEmptyState } from "../widgets/no-accounts-empty-state";
 import { Footer } from "../widgets/footer";
 import { useState } from "react";
@@ -32,7 +31,7 @@ import { toast } from "sonner";
 
 const MotionFooter = motion.create(Footer);
 
-export function AccountsScreen({ route }: { route: RouteByType<"accounts"> }) {
+export function AccountsScreen() {
   const { navigate } = useRouter();
   const { t } = useTranslation();
   const [reorderedAccounts, setReorderedAccounts] = useState<Account[] | null>(
@@ -183,10 +182,7 @@ export function AccountsScreen({ route }: { route: RouteByType<"accounts"> }) {
               </h3>
               <div className="mt-1.5 flex items-center gap-1 text-xs text-muted-foreground">
                 <span>
-                  {t(
-                    "accountsTransactionCount",
-                    account.transactionCount,
-                  )}
+                  {t("accountsTransactionCount", account.transactionCount)}
                 </span>
                 {account.lastTransactionDate && (
                   <>
@@ -255,7 +251,6 @@ export function AccountsScreen({ route }: { route: RouteByType<"accounts"> }) {
   return (
     <>
       <Page
-        isForm={isFormRoute(route)}
         title={
           <PageHeader
             title={t("accountsTitle")}

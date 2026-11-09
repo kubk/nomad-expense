@@ -36,7 +36,7 @@ export function AccountPickerDrawer({
         <button
           type="button"
           className={cn(
-            "flex h-11 min-w-0 items-center gap-2 rounded-full bg-muted/70 px-3 text-sm font-medium active:scale-95 transition-transform",
+            "flex h-11 min-w-0 items-center gap-2 rounded-full bg-card px-3 shadow-sm text-sm font-medium active:scale-95 transition-transform",
             className,
           )}
           onClick={() => haptic("selection")}

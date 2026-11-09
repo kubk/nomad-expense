@@ -13,7 +13,6 @@ import { haptic } from "@/shared/platform/haptics";
 import { isTelegram } from "@/shared/platform/telegram-platform";
 import type { RouteByType } from "@/shared/stacked-router/router";
 import { useRouter } from "@/shared/stacked-router/router";
-import { isFormRoute } from "@/shared/stacked-router/routes";
 import { useTranslation } from "@/translations/translation-provider";
 import { NoAccountsEmptyState } from "../widgets/no-accounts-empty-state";
 import { Page } from "../widgets/page";
@@ -113,9 +112,7 @@ export function CreateTransactionScreen({
   );
   const areAccountsLoaded = !areAccountsLoading && Boolean(selectedAccount);
   const areQuickTitlesLoaded =
-    Boolean(selectedAccount) &&
-    !areTitlesLoading &&
-    titles !== undefined;
+    Boolean(selectedAccount) && !areTitlesLoading && titles !== undefined;
   const isFullyLoaded = areAccountsLoaded && areQuickTitlesLoaded;
 
   const createTransactionMutation = useMutation(
@@ -166,10 +163,7 @@ export function CreateTransactionScreen({
 
   if (!areAccountsLoading && accounts.length === 0) {
     return (
-      <Page
-        title={!isTelegram() ? <PageHeader /> : undefined}
-        isForm={isFormRoute(route)}
-      >
+      <Page title={!isTelegram() ? <PageHeader /> : undefined}>
         <div className="mt-[25%]">
           <NoAccountsEmptyState />
         </div>
@@ -178,10 +172,7 @@ export function CreateTransactionScreen({
   }
 
   return (
-    <Page
-      title={!isTelegram() ? <PageHeader /> : undefined}
-      isForm={isFormRoute(route)}
-    >
+    <Page title={!isTelegram() ? <PageHeader /> : undefined}>
       <form className="flex h-full min-h-0 flex-col" onSubmit={handleSave}>
         <div className="flex shrink-0 items-center gap-2">
           <TransactionTypeTabs
@@ -232,7 +223,7 @@ export function CreateTransactionScreen({
 
           <div className="shrink-0 space-y-3">
             <Input
-              className="h-12 rounded-xl px-4 shadow-none"
+              className="h-12 rounded-xl border-none px-4 shadow-sm"
               placeholder={t("transactionsDescriptionPlaceholder")}
               value={formData.description}
               onChange={(event) =>
@@ -258,7 +249,7 @@ export function CreateTransactionScreen({
             {keypadKeys.map((key) => (
               <Button
                 key={key}
-                className="h-13 rounded-2xl bg-muted/70 text-xl shadow-none hover:bg-muted"
+                className="h-13 rounded-2xl bg-card text-xl shadow-sm hover:bg-card"
                 onClick={() => handleKeypadClick(key)}
                 type="button"
                 variant="ghost"
@@ -267,7 +258,7 @@ export function CreateTransactionScreen({
               </Button>
             ))}
             <Button
-              className="h-13 rounded-2xl bg-muted/70 shadow-none hover:bg-muted"
+              className="h-13 rounded-2xl bg-card shadow-sm hover:bg-card"
               disabled={!formData.amount}
               onClick={handleBackspace}
               type="button"
@@ -281,9 +272,7 @@ export function CreateTransactionScreen({
         <Footer className="grid-cols-1">
           <Button
             disabled={
-              !isFullyLoaded ||
-              !isValid ||
-              createTransactionMutation.isPending
+              !isFullyLoaded || !isValid || createTransactionMutation.isPending
             }
             size="lg"
             type="submit"

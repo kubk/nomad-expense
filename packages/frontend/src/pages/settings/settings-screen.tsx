@@ -13,8 +13,7 @@ import { LanguageSetting } from "./language-setting";
 import { Page } from "../widgets/page";
 import { trpc } from "@/shared/api";
 import { useQuery } from "@tanstack/react-query";
-import { RouteByType, useRouter } from "@/shared/stacked-router/router";
-import { isFormRoute } from "@/shared/stacked-router/routes";
+import { useRouter } from "@/shared/stacked-router/router";
 import { clearAuthToken } from "@/shared/auth-token";
 import { ConfirmModal } from "../widgets/confirm-modal";
 import { useState } from "react";
@@ -24,7 +23,7 @@ import { isTelegram } from "@/shared/platform/telegram-platform";
 import { haptic } from "@/shared/platform/haptics";
 import { useTranslation } from "@/translations/translation-provider";
 
-export function SettingsScreen({ route }: { route: RouteByType<"settings"> }) {
+export function SettingsScreen() {
   const { navigate } = useRouter();
   const { t } = useTranslation();
   const { data: familyMembers } = useQuery(
@@ -39,7 +38,7 @@ export function SettingsScreen({ route }: { route: RouteByType<"settings"> }) {
   };
 
   return (
-    <Page title={t("settingsTitle")} isForm={isFormRoute(route)}>
+    <Page title={t("settingsTitle")}>
       <div className="space-y-8 mt-2">
         {/* Family Section */}
         <div className="space-y-4">
