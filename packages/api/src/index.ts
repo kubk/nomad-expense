@@ -3,7 +3,6 @@ import { createContext } from "./api/trpc";
 import { addCorsHeaders } from "./lib/cloudflare/cors";
 import { setEnv } from "./services/env";
 import { router } from "./api/router";
-import { setKv } from "./services/kv";
 import { uploadStatementHandler } from "./api/upload-statement-handler";
 import { getDb } from "./services/db";
 import { syncBankConnections } from "./services/bank-sync/sync-bank-connections";
@@ -12,7 +11,6 @@ import { reportError } from "./lib/report-error";
 export default {
   async fetch(request, env) {
     setEnv(env);
-    setKv(env.KV);
 
     if (request.method === "OPTIONS") {
       return addCorsHeaders();
@@ -36,7 +34,6 @@ export default {
 
   async scheduled(controller, env, ctx) {
     setEnv(env);
-    setKv(env.KV);
 
     ctx.waitUntil(
       syncBankConnections(getDb(), new Date(controller.scheduledTime)).catch(

@@ -1,4 +1,4 @@
-import { getKv } from "./kv";
+import { env } from "cloudflare:workers";
 
 const CACHE_TTL_SECONDS = 31536000; // 1 year
 
@@ -16,8 +16,7 @@ export const userCacheGet = async (
   telegramId: string,
 ): Promise<UserCacheData | null> => {
   try {
-    const kv = getKv();
-    const cached = await kv.get(getUserCacheKey(telegramId), "json");
+    const cached = await env.KV.get(getUserCacheKey(telegramId), "json");
 
     if (!cached) {
       return null;
@@ -35,9 +34,7 @@ export const userCacheSet = async (
   data: UserCacheData,
 ): Promise<void> => {
   try {
-    const kv = getKv();
-    const cacheKey = getUserCacheKey(telegramId);
-    await kv.put(cacheKey, JSON.stringify(data), {
+    await env.KV.put(getUserCacheKey(telegramId), JSON.stringify(data), {
       expirationTtl: CACHE_TTL_SECONDS,
     });
   } catch (error) {

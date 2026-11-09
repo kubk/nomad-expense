@@ -13,10 +13,6 @@ import type { WiseActivity } from "../bank-parsers/wise-activity-parser";
 import { reportError } from "../../lib/report-error";
 import { assert } from "../../lib/typescript/assert";
 
-vi.mock("cloudflare:workers", () => ({
-  env: {},
-}));
-
 vi.mock("../../lib/report-error", () => ({
   reportError: vi.fn(),
 }));

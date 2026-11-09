@@ -6,10 +6,6 @@ import { getDb } from "../services/db";
 import { transactionTable } from "../db/schema";
 import { convertWithLiveRate } from "../services/money/exchange-rate-api";
 
-vi.mock("cloudflare:workers", () => ({
-  env: {},
-}));
-
 vi.mock("../services/money/exchange-rate-api", () => ({
   convertWithLiveRate: vi.fn(
     async (

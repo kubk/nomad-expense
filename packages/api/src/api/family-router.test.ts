@@ -10,10 +10,6 @@ vi.mock("../services/notifications/notify-via-telegram", () => ({
   notifyViaTelegram: vi.fn(),
 }));
 
-vi.mock("cloudflare:workers", () => ({
-  env: {},
-}));
-
 vi.mock("../services/user-cache", () => ({
   userCacheSet: vi.fn(),
 }));
