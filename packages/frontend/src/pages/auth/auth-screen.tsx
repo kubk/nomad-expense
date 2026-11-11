@@ -29,7 +29,6 @@ export function AuthScreen() {
             <Button
               type="button"
               size="lg"
-              disabled={!store.isReady || store.isSigningIn}
               onClick={store.signInWithTelegram}
               className="h-12 min-w-52 rounded-lg bg-[#3390ec] px-5 text-base font-normal text-white shadow-none hover:bg-[#2f85d5]"
             >

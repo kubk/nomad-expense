@@ -101,7 +101,7 @@ export class AuthStore {
 
   signInWithTelegram() {
     const telegramLogin = this.telegramLogin;
-    if (!telegramLogin || !this.isConfigured) return;
+    if (!telegramLogin || !this.isConfigured || this.isSigningIn) return;
 
     const nonce = crypto.randomUUID();
     this.isSigningIn = true;
