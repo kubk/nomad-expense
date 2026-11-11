@@ -6,57 +6,30 @@ import {
 } from "../widgets/summary-card";
 import { FiltersDrawer } from "../widgets/filters-drawer";
 import { useState } from "react";
-import { trpc } from "@/shared/api";
-import { useQuery } from "@tanstack/react-query";
-import { TransactionFilters } from "api";
-import { useAccountIds } from "@/shared/hooks/use-account-ids";
+import { TransactionsScreenStore } from "./transactions-screen-store";
 import { Page } from "../widgets/page";
-import { RouteByType, useRouter } from "@/shared/stacked-router/router";
+import { type RouteByType } from "@/shared/stacked-router/router-store";
 import { VList } from "virtua";
 import { FilterIcon } from "lucide-react";
-import { useTranslation } from "@/translations/translation-provider";
+import { t } from "@/translations/translation-store";
 
 export function TransactionsScreen({
   route,
 }: {
   route: RouteByType<"transactions">;
 }) {
-  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
-  const { navigate } = useRouter();
-  const { t } = useTranslation();
-  const accountIds = useAccountIds();
-
-  const filters: TransactionFilters = route.filters
-    ? route.filters
-    : {
-        accounts: accountIds,
-        date: { type: "days", value: 90 },
-        order: { field: "createdAt", direction: "desc" },
-      };
-
-  const { data: transactionsData, isLoading } = useQuery(
-    trpc.expenses.transactionsList.queryOptions(filters),
-  );
-
-  const transactions = transactionsData?.transactions || [];
-  const totalExpenses = transactionsData?.totalExpenses || 0;
-  const totalIncome = transactionsData?.totalIncome || 0;
+  const [store] = useState(() => new TransactionsScreenStore(route.filters));
+  const transactions = store.transactions;
 
   return (
     <Page title={t("transactionsTitle")}>
-      <TransactionFiltersSummary
-        isLoading={isLoading}
-        onFiltersClick={() => setIsDrawerOpen(true)}
-        filters={filters}
-        totalExpenses={totalExpenses}
-        totalIncome={totalIncome}
-      />
+      <TransactionFiltersSummary store={store} />
 
       {/* Transactions List */}
       <div className="mt-4">
         <Card className="border-0 p-0 shadow-sm">
           <CardContent className="p-0">
-            {isLoading ? (
+            {store.isLoading ? (
               <TransactionListSkeleton />
             ) : transactions.length >= 6 ? (
               <VList style={{ height: 600 }}>
@@ -95,17 +68,7 @@ export function TransactionsScreen({
         </Card>
       </div>
 
-      <FiltersDrawer
-        open={isDrawerOpen}
-        onOpenChange={setIsDrawerOpen}
-        filters={filters}
-        onApply={(newFilters) => {
-          navigate(
-            { type: "transactions", filters: newFilters },
-            { replace: true },
-          );
-        }}
-      />
+      <FiltersDrawer target={store.filtersState} />
     </Page>
   );
 }

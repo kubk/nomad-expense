@@ -60,7 +60,6 @@ export function Component({
 ### Core Folders (Shadcn UI)
 - `components/` - Shadcn UI components only. Keep shadcn separate from our custom code
 - `lib/` - Shadcn utilities (e.g., `utils.ts` with `cn` function)
-- `hooks/` - Shadcn hooks only
 
 ### Application Structure
 - `pages/` - All application pages organized by feature:
@@ -74,12 +73,15 @@ export function Component({
 - `shared/` - Reusable functions and logic (NOT UI components)
   - API utilities, providers, routing helpers, etc.
 
-## React Query / Data Fetching
+## State and Data Fetching (MobX + mobx-query-lite)
 
-- **NEVER use `useQueryClient()` hook** - The app uses a singleton QueryClient instance
-- **Always import**: `import { queryClient } from "@/shared/api"` to access the QueryClient
-- **Cache invalidation**: Use the imported singleton `queryClient.invalidateQueries()` instead of the hook
-- **Why**: Using the hook can create multiple QueryClient instances, causing cache invalidation bugs where newly created data doesn't appear in lists
+- **MobX stores** own state: global singletons live in `src/store/` (and `routerStore`, `translationStore`); screen-local stores are classes next to their screen, created with `useState(() => new SomeStore())` and passed as `store={store}`
+- Stores call `makeAutoObservable(this, {}, { autoBind: true })`. Components read stores directly instead of receiving store values through props, and change state only through store methods
+- `mobx-react-plugin` (see `vite.config.ts`) wraps every component in `observer` and turns `async` store methods into flows, so never add `observer` or `runInAction` by hand
+- **Queries**: `makeQuery(apiProxy.<router>.<procedure>.query(input?))` from `@/shared/api`; reading `query.data` from a component fetches stale data automatically, so no `useEffect` loading
+- **Mutations**: `makeMutation(api.<router>.<procedure>.mutate)`, then `query.invalidate()` (never `refetch()`). Use `invalidateQueries({ key: ["expenses", "overview"] })` from `mobx-query-lite` to invalidate a procedure for every input (keys are the procedure path segments followed by the input, matched by prefix)
+- **Forms**: screen stores hold a `form` object of `mobx-form-lite` fields (`TextField`, `BooleanField`) and components bind to `field.value` / `field.onChange` instead of per-field setters. Validate with the field's `validate` option (shared validators in `@/shared/validators`) and `isFormValid(form)` instead of hand-written checks, read values with `formToPlain(form)`, use `afterChange` for side effects such as haptics and `formReset` to discard edits
+- **Mutate observables in place**: push, splice or assign a property instead of rebuilding objects with spreads, and don't reach for `observable.ref` to make that work. Copy (`.slice()`) only when a draft must not edit the source it starts from
 
 ## Date/Time Handling
 

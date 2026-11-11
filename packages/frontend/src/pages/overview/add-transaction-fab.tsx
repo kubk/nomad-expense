@@ -1,13 +1,11 @@
 import { PlusIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { useRouter } from "@/shared/stacked-router/router";
+import { routerStore } from "@/shared/stacked-router/router-store";
 import { platform } from "@/shared/platform/platforms";
 import { haptic } from "@/shared/platform/haptics";
 
 export function AddTransactionFab() {
-  const { currentRoute, navigate } = useRouter();
-
-  if (currentRoute.type !== "main") {
+  if (routerStore.currentRoute.type !== "main") {
     return null;
   }
 
@@ -22,7 +20,7 @@ export function AddTransactionFab() {
         className="pointer-events-auto h-14 w-14 rounded-full shadow-md"
         onClick={() => {
           haptic("light");
-          navigate({ type: "transactionForm" });
+          routerStore.navigate({ type: "transactionForm" });
         }}
       >
         <PlusIcon className="size-6" />

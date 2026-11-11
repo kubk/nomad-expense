@@ -1,5 +1,5 @@
 import { ReactNode } from "react";
-import { useRouter } from "@/shared/stacked-router/router";
+import { routerStore } from "@/shared/stacked-router/router-store";
 import { ArrowLeftIcon } from "lucide-react";
 import { isTelegram } from "@/shared/platform/telegram-platform";
 import { cn } from "@/lib/utils";
@@ -12,7 +12,6 @@ export function PageHeader({
   title?: string | ReactNode;
   rightSlot?: ReactNode;
 }) {
-  const { pop } = useRouter();
   const telegram = isTelegram();
 
   const actions = rightSlot ? (
@@ -43,7 +42,7 @@ export function PageHeader({
             <button
               onClick={() => {
                 haptic("light");
-                pop();
+                routerStore.pop();
               }}
               className="bg-background flex items-center gap-1.5 font-medium text-sm shadow-sm rounded-full py-1.5 px-3 active:scale-95 transition-transform"
             >

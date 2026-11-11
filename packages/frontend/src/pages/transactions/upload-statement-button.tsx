@@ -1,24 +1,15 @@
 import { PlusIcon } from "lucide-react";
 import { LoadingSwap } from "@/components/ui/loading-swap";
-import { trpc } from "@/shared/api";
-import { useQuery } from "@tanstack/react-query";
-import { uploadStatementFile } from "@/shared/upload-file";
 import { useRef, useState } from "react";
-import { toast } from "sonner";
-import { useRouter } from "@/shared/stacked-router/router";
-import { storeUploadResult } from "@/shared/upload-result-storage";
-import { useInvalidateTransactions } from "@/shared/hooks/use-invalidate-transactions";
-import { haptic } from "@/shared/platform/haptics";
-import { useTranslation } from "@/translations/translation-provider";
+import { accountsStore } from "@/store/accounts-store";
+import { t } from "@/translations/translation-store";
+import { UploadStatementStore } from "./upload-statement-store";
 
 export function UploadStatementButton({ accountId }: { accountId: string }) {
-  const { t } = useTranslation();
-  const { data: accounts = [] } = useQuery(trpc.accounts.list.queryOptions());
-  const account = accounts.find((a) => a.id === accountId);
+  const [store] = useState(() => new UploadStatementStore());
+  const account = accountsStore.findAccount(accountId);
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const invalidateTransactions = useInvalidateTransactions();
-  const [isUploading, setIsUploading] = useState(false);
-  const { navigate } = useRouter();
+  const isUploading = store.uploadMutation.isPending;
 
   if (!account || !account.bankType) {
     return null;
@@ -30,31 +21,9 @@ export function UploadStatementButton({ accountId }: { accountId: string }) {
     const file = event.target.files?.[0];
     if (!file) return;
 
-    setIsUploading(true);
-    try {
-      const result = await uploadStatementFile(file, accountId);
-
-      if (result.type === "success") {
-        const key = storeUploadResult(result.added, result.removed);
-        invalidateTransactions();
-        haptic("success");
-        toast.success(
-          t(
-            "uploadStatementSuccess",
-            result.removed?.length || 0,
-            result.added?.length || 0,
-          ),
-        );
-        navigate({ type: "statementUploadResult", key }, { replace: true });
-      } else {
-        haptic("error");
-        toast.error(result.message || t("uploadStatementFailed"));
-      }
-    } finally {
-      setIsUploading(false);
-      if (fileInputRef.current) {
-        fileInputRef.current.value = "";
-      }
+    await store.upload(file, accountId);
+    if (fileInputRef.current) {
+      fileInputRef.current.value = "";
     }
   };
 

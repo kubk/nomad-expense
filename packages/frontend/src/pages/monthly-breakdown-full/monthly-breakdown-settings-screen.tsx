@@ -2,19 +2,17 @@ import { ChevronRightIcon, CreditCardIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Page } from "../widgets/page";
-import { useRouter } from "@/shared/stacked-router/router";
-import { useTranslation } from "@/translations/translation-provider";
+import { routerStore } from "@/shared/stacked-router/router-store";
+import { t } from "@/translations/translation-store";
 import { haptic } from "@/shared/platform/haptics";
-import { useMonthlyBreakdownAccountIds } from "@/shared/hooks/use-monthly-breakdown-settings";
+import { accountsStore } from "@/store/accounts-store";
+import { monthlyBreakdownStore } from "@/store/monthly-breakdown-store";
 
 export function MonthlyBreakdownSettingsScreen() {
-  const { navigate } = useRouter();
-  const { t } = useTranslation();
-  const { accounts, includedAccountIds, isLoading } =
-    useMonthlyBreakdownAccountIds();
+  const includedAccountIds = monthlyBreakdownStore.includedAccountIds;
 
   const selectedAccountsLabel =
-    includedAccountIds.length === accounts.length
+    includedAccountIds.length === accountsStore.accounts.length
       ? t("filtersAll")
       : t("filtersAccountCount", includedAccountIds.length);
 
@@ -25,7 +23,7 @@ export function MonthlyBreakdownSettingsScreen() {
           <Button
             onClick={() => {
               haptic("light");
-              navigate({ type: "monthlyBreakdownAccounts" });
+              routerStore.navigate({ type: "monthlyBreakdownAccounts" });
             }}
             variant="outline"
             className="w-full justify-between"
@@ -35,7 +33,7 @@ export function MonthlyBreakdownSettingsScreen() {
               <span>{t("monthlyBreakdownSettingsIncludedAccounts")}</span>
             </div>
             <div className="flex items-center gap-2 text-muted-foreground">
-              {isLoading ? (
+              {monthlyBreakdownStore.isLoading ? (
                 <Skeleton className="h-4 w-16" />
               ) : (
                 <span className="text-sm">{selectedAccountsLabel}</span>

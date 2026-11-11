@@ -11,14 +11,17 @@ import {
 } from "@/components/ui/select";
 import { Page } from "../widgets/page";
 import { Footer } from "../widgets/footer";
-import { trpc, queryClient } from "@/shared/api";
-import { useQuery, useMutation } from "@tanstack/react-query";
-import { RouteByType, useRouter } from "@/shared/stacked-router/router";
+import { accountsStore } from "@/store/accounts-store";
+import { ImportSettingsStore } from "./import-settings-store";
+import {
+  type RouteByType,
+  routerStore,
+} from "@/shared/stacked-router/router-store";
 import { Label } from "@/components/ui/label";
 import { Skeleton } from "@/components/ui/skeleton";
 import { bank, type Account, type Bank } from "api";
 import { isTelegram } from "@/shared/platform/telegram-platform";
-import { useTranslation } from "@/translations/translation-provider";
+import { t } from "@/translations/translation-store";
 
 function getTimezones() {
   return [
@@ -42,22 +45,13 @@ function getTimezones() {
   ];
 }
 
-type Form = {
-  bankType: Bank | "None";
-  timezone: string;
-};
-
 export function ImportSettingsScreen({
   route,
 }: {
   route: RouteByType<"importSettings">;
 }) {
-  const { data: accounts = [], isLoading: isAccountsLoading } = useQuery(
-    trpc.accounts.list.queryOptions(),
-  );
-  const existingAccount = accounts.find(
-    (account) => account.id === route.accountId,
-  );
+  const isAccountsLoading = accountsStore.isLoading;
+  const existingAccount = accountsStore.findAccount(route.accountId);
 
   if (!isAccountsLoading && !existingAccount) {
     return null;
@@ -90,33 +84,10 @@ function ImportSettingsForm({
   existingAccount?: Account;
   isAccountsLoading: boolean;
 }) {
-  const { pop } = useRouter();
-  const { t } = useTranslation();
-  const { accountId } = route;
-
-  const [formData, setFormData] = useState<Form>(() => ({
-    bankType: existingAccount?.bankType || "None",
-    timezone: existingAccount?.timezone || "UTC",
-  }));
-
-  const updateImportSettingsMutation = useMutation(
-    trpc.accounts.updateImportSettings.mutationOptions({
-      onSuccess: () => {
-        queryClient.invalidateQueries({
-          queryKey: trpc.accounts.list.queryKey(),
-        });
-        pop();
-      },
-    }),
+  const [store] = useState(
+    () => new ImportSettingsStore(route.accountId, existingAccount),
   );
-
-  const handleSave = () => {
-    updateImportSettingsMutation.mutate({
-      id: accountId,
-      bankType: formData.bankType === "None" ? null : formData.bankType,
-      timezone: formData.timezone,
-    });
-  };
+  const isSaving = store.updateMutation.isPending;
 
   return (
     <Page title={t("importSettingsTitle")}>
@@ -127,10 +98,10 @@ function ImportSettingsForm({
             <Skeleton className="h-9 w-full" />
           ) : (
             <Select
-              value={formData.bankType}
-              onValueChange={(value: Form["bankType"]) => {
-                setFormData((prev) => ({ ...prev, bankType: value }));
-              }}
+              value={store.form.bankType.value}
+              onValueChange={(value: Bank | "None") =>
+                store.form.bankType.onChange(value)
+              }
             >
               <SelectTrigger className="w-full">
                 <SelectValue placeholder={t("importSettingsSelectBankType")} />
@@ -147,14 +118,12 @@ function ImportSettingsForm({
           )}
         </div>
 
-        {formData.bankType !== "None" && (
+        {store.form.bankType.value !== "None" && (
           <div className="flex flex-col gap-2">
             <Label>{t("importSettingsTimezone")}</Label>
             <Select
-              value={formData.timezone}
-              onValueChange={(value: string) =>
-                setFormData((prev) => ({ ...prev, timezone: value }))
-              }
+              value={store.form.timezone.value}
+              onValueChange={store.form.timezone.onChange}
             >
               <SelectTrigger className="w-full">
                 <SelectValue placeholder={t("importSettingsSelectTimezone")} />
@@ -177,8 +146,8 @@ function ImportSettingsForm({
             size="lg"
             variant="outline"
             type="button"
-            onClick={pop}
-            disabled={updateImportSettingsMutation.isPending}
+            onClick={routerStore.pop}
+            disabled={isSaving}
           >
             <ArrowLeftIcon className="w-4 h-4" />
             {t("back")}
@@ -187,12 +156,10 @@ function ImportSettingsForm({
         <Button
           size="lg"
           type="button"
-          onClick={handleSave}
-          disabled={updateImportSettingsMutation.isPending}
+          onClick={store.save}
+          disabled={isSaving}
         >
-          <LoadingSwap isLoading={updateImportSettingsMutation.isPending}>
-            {t("save")}
-          </LoadingSwap>
+          <LoadingSwap isLoading={isSaving}>{t("save")}</LoadingSwap>
         </Button>
       </Footer>
     </Page>

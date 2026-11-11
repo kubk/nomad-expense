@@ -10,41 +10,28 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { Skeleton } from "@/components/ui/skeleton";
-import { RouteByType, useRouter } from "@/shared/stacked-router/router";
+import {
+  type RouteByType,
+  routerStore,
+} from "@/shared/stacked-router/router-store";
 import { PageHeader } from "../widgets/page-header";
 import { Page } from "../widgets/page";
 import { ConfirmModal } from "../widgets/confirm-modal";
 import { Footer } from "../widgets/footer";
-import { trpc, queryClient } from "@/shared/api";
-import { useQuery, useMutation } from "@tanstack/react-query";
-import type { RouterOutputs, TransactionType } from "api";
-import { DateTime } from "luxon";
 import { getCurrencySymbol } from "@/shared/currency-formatter";
 import { FormActionButton } from "@/components/ui/form-action-button";
 import { LoadingSwap } from "@/components/ui/loading-swap";
-import { useInvalidateTransactions } from "@/shared/hooks/use-invalidate-transactions";
+import {
+  makeTransactionQuery,
+  UpdateTransactionStore,
+} from "./update-transaction-store";
 import { CountableSwitch } from "./countable-switch";
 import { TransactionTypeTabs } from "./transaction-type-tabs";
 import { DeleteActionButton } from "../widgets/delete-action-button";
 import { BaseCurrencyInfo } from "./base-currency-info";
-import { haptic } from "@/shared/platform/haptics";
 import { isTelegram } from "@/shared/platform/telegram-platform";
-import { useTranslation } from "@/translations/translation-provider";
+import { t } from "@/translations/translation-store";
 import { CreateTransactionScreen } from "./create-transaction-screen";
-
-export type TransactionForm = {
-  description: string;
-  accountId: string;
-  amount: string;
-  date: Date | undefined;
-  time: string;
-  type: TransactionType;
-  isCountable: boolean;
-};
-
-type TransactionDetails = NonNullable<
-  RouterOutputs["expenses"]["getTransaction"]
->;
 
 export function TransactionFormScreen({
   route,
@@ -59,9 +46,10 @@ export function TransactionFormScreen({
 }
 
 function UpdateTransactionScreen({ transactionId }: { transactionId: string }) {
-  const { data: transaction } = useQuery(
-    trpc.expenses.getTransaction.queryOptions({ id: transactionId }),
+  const [transactionQuery] = useState(() =>
+    makeTransactionQuery(transactionId),
   );
+  const transaction = transactionQuery.data;
 
   return (
     <UpdateTransactionForm
@@ -77,131 +65,22 @@ function UpdateTransactionForm({
   transaction,
 }: {
   transactionId: string;
-  transaction?: TransactionDetails;
+  transaction: ConstructorParameters<typeof UpdateTransactionStore>[1];
 }) {
-  const { pop } = useRouter();
-  const { t } = useTranslation();
-
-  const [formData, setFormData] = useState<TransactionForm>(() => {
-    if (transaction) {
-      const transactionDateTime = DateTime.fromISO(transaction.createdAt);
-
-      return {
-        description: transaction.description,
-        accountId: transaction.accountId,
-        amount: (transaction.amount / 100).toString(),
-        date: transactionDateTime.toJSDate(),
-        time: transactionDateTime.toFormat("HH:mm"),
-        type: transaction.type,
-        isCountable: transaction.isCountable,
-      };
-    }
-
-    return {
-      description: "",
-      accountId: "",
-      amount: "",
-      date: new Date(),
-      time: DateTime.now().toFormat("HH:mm"),
-      type: "expense",
-      isCountable: true,
-    };
-  });
-  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
-
-  const { data: accounts = [] } = useQuery(trpc.accounts.list.queryOptions());
-  const selectedAccount = accounts.find((acc) => acc.id === formData.accountId);
-
-  const invalidateTransactions = useInvalidateTransactions();
-
-  const updateTransactionMutation = useMutation(
-    trpc.expenses.updateTransaction.mutationOptions({
-      onSuccess: () => {
-        invalidateTransactions();
-        if (!transactionId) return;
-        queryClient.invalidateQueries({
-          queryKey: trpc.expenses.getTransaction.queryKey({
-            id: transactionId,
-          }),
-        });
-      },
-    }),
+  const [store] = useState(
+    () => new UpdateTransactionStore(transactionId, transaction),
   );
-
-  const deleteTransactionMutation = useMutation(
-    trpc.expenses.deleteTransaction.mutationOptions({
-      onSuccess: () => {
-        invalidateTransactions();
-        pop();
-      },
-    }),
-  );
-
-  const repeatTransactionMutation = useMutation(
-    trpc.expenses.createTransaction.mutationOptions({
-      onSuccess: () => {
-        invalidateTransactions();
-        queryClient.invalidateQueries({
-          queryKey: trpc.accounts.list.queryKey(),
-        });
-        pop();
-      },
-    }),
-  );
-
-  const handleSave = async (e: React.FormEvent) => {
-    e.preventDefault();
-    haptic("light");
-
-    const getCreatedAt = () => {
-      if (!formData.date || !formData.time) {
-        return new Date().toISOString();
-      }
-
-      const [hour, minute] = formData.time.split(":");
-      const dateTime = DateTime.fromJSDate(formData.date).set({
-        hour: parseInt(hour),
-        minute: parseInt(minute),
-        second: 0,
-      });
-      return dateTime.toISO() || new Date().toISOString();
-    };
-
-    await updateTransactionMutation.mutateAsync({
-      id: transactionId,
-      description: formData.description,
-      amount: parseFloat(formData.amount),
-      createdAt: getCreatedAt(),
-      type: formData.type,
-      isCountable: formData.isCountable,
-    });
-    pop();
-  };
-
-  const handleDelete = async () => {
-    await deleteTransactionMutation.mutateAsync({ id: transactionId });
-  };
-
-  const handleRepeat = async () => {
-    if (!transaction) return;
-
-    await repeatTransactionMutation.mutateAsync({
-      accountId: transaction.accountId,
-      description: formData.description,
-      amount: parseFloat(formData.amount),
-      type: formData.type,
-      createdAt: new Date().toISOString(),
-    });
-  };
-
-  const isSaving =
-    updateTransactionMutation.isPending || repeatTransactionMutation.isPending;
-
+  const isSaving = store.isSaving;
   const isTransactionLoading = !transaction;
 
   return (
     <Page title={<PageHeader title={t("transactionsEditTitle")} />}>
-      <form onSubmit={handleSave}>
+      <form
+        onSubmit={(e) => {
+          e.preventDefault();
+          store.save();
+        }}
+      >
         <div className="flex-1 flex flex-col">
           <div className="flex-1 space-y-6">
             {/* Transaction Type Selector */}
@@ -210,10 +89,8 @@ function UpdateTransactionForm({
                 <Skeleton className="h-9 rounded-md w-full" />
               ) : (
                 <TransactionTypeTabs
-                  value={formData.type}
-                  onChange={(type) => {
-                    setFormData((prev) => ({ ...prev, type }));
-                  }}
+                  value={store.form.type.value}
+                  onChange={store.form.type.onChange}
                 />
               )}
             </div>
@@ -236,12 +113,9 @@ function UpdateTransactionForm({
                       enterKeyHint="done"
                       step="0.01"
                       placeholder="0.00"
-                      value={formData.amount}
+                      value={store.form.amount.value}
                       onChange={(e) =>
-                        setFormData((prev) => ({
-                          ...prev,
-                          amount: e.target.value,
-                        }))
+                        store.form.amount.onChange(e.target.value)
                       }
                       className="flex-1"
                     />
@@ -264,12 +138,9 @@ function UpdateTransactionForm({
               ) : (
                 <Input
                   placeholder={t("transactionsDescriptionPlaceholder")}
-                  value={formData.description}
+                  value={store.form.description.value}
                   onChange={(e) =>
-                    setFormData((prev) => ({
-                      ...prev,
-                      description: e.target.value,
-                    }))
+                    store.form.description.onChange(e.target.value)
                   }
                 />
               )}
@@ -292,8 +163,8 @@ function UpdateTransactionForm({
                         type="button"
                         className="justify-between font-normal"
                       >
-                        {formData.date
-                          ? formData.date.toLocaleDateString()
+                        {store.form.date.value
+                          ? store.form.date.value.toLocaleDateString()
                           : t("transactionsSelectDate")}
                         <ChevronDownIcon className="h-4 w-4" />
                       </Button>
@@ -304,14 +175,8 @@ function UpdateTransactionForm({
                     >
                       <Calendar
                         mode="single"
-                        selected={formData.date}
-                        onSelect={(date) => {
-                          haptic("selection");
-                          setFormData((prev) => ({
-                            ...prev,
-                            date,
-                          }));
-                        }}
+                        selected={store.form.date.value}
+                        onSelect={store.form.date.onChange}
                       />
                     </PopoverContent>
                   </Popover>
@@ -327,13 +192,8 @@ function UpdateTransactionForm({
                   <Input
                     type="time"
                     id="time-picker"
-                    value={formData.time}
-                    onChange={(e) =>
-                      setFormData((prev) => ({
-                        ...prev,
-                        time: e.target.value,
-                      }))
-                    }
+                    value={store.form.time.value}
+                    onChange={(e) => store.form.time.onChange(e.target.value)}
                     className="bg-background appearance-none [&::-webkit-calendar-picker-indicator]:hidden [&::-webkit-calendar-picker-indicator]:appearance-none"
                   />
                 )}
@@ -345,31 +205,21 @@ function UpdateTransactionForm({
               {!isTransactionLoading && (
                 <div className="flex gap-3">
                   <FormActionButton
-                    onClick={handleRepeat}
+                    onClick={store.repeat}
                     icon={<RepeatIcon className="h-4 w-4" />}
-                    isLoading={repeatTransactionMutation.isPending}
-                    disabled={
-                      repeatTransactionMutation.isPending ||
-                      isSaving ||
-                      isTransactionLoading
-                    }
+                    isLoading={store.repeatMutation.isPending}
+                    disabled={isSaving || isTransactionLoading}
                   >
                     {t("transactionsRepeat")}
                   </FormActionButton>
                   <DeleteActionButton
-                    onClick={() => setShowDeleteConfirm(true)}
+                    onClick={() => store.setDeleteConfirmOpen(true)}
                   />
                 </div>
               )}
             </div>
 
-            {selectedAccount?.bankType ? (
-              <CountableSwitch
-                formData={formData}
-                setFormData={setFormData}
-                isTransactionLoading={isTransactionLoading}
-              />
-            ) : null}
+            {store.account?.bankType ? <CountableSwitch store={store} /> : null}
 
             {transaction ? (
               <BaseCurrencyInfo
@@ -381,13 +231,13 @@ function UpdateTransactionForm({
           </div>
 
           <ConfirmModal
-            isOpen={showDeleteConfirm}
-            onClose={() => setShowDeleteConfirm(false)}
-            onConfirm={handleDelete}
+            isOpen={store.isDeleteConfirmOpen}
+            onClose={() => store.setDeleteConfirmOpen(false)}
+            onConfirm={store.delete}
             title={t("transactionsDeleteTitle")}
             description={t("transactionsDeleteDescription")}
             confirmText={t("delete")}
-            isLoading={deleteTransactionMutation.isPending}
+            isLoading={store.deleteMutation.isPending}
           />
         </div>
         <Footer className={isTelegram() ? "grid-cols-1" : undefined}>
@@ -396,23 +246,14 @@ function UpdateTransactionForm({
               size={"lg"}
               variant="outline"
               type="button"
-              onClick={pop}
+              onClick={routerStore.pop}
               disabled={isSaving || isTransactionLoading}
             >
               <ArrowLeftIcon className="w-4 h-4" />
               {t("back")}
             </Button>
           ) : null}
-          <Button
-            size="lg"
-            type="submit"
-            disabled={
-              !formData.description.trim() ||
-              !formData.amount.trim() ||
-              isSaving ||
-              isTransactionLoading
-            }
-          >
+          <Button size="lg" type="submit" disabled={!store.canSave}>
             <LoadingSwap isLoading={isSaving}>{t("save")}</LoadingSwap>
           </Button>
         </Footer>

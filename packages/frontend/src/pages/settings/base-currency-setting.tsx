@@ -1,6 +1,7 @@
 import { useState } from "react";
-import { useMutation, useQuery } from "@tanstack/react-query";
 import { SUPPORTED_CURRENCIES, type Currency } from "api";
+import { familyStore } from "@/store/family-store";
+import { BaseCurrencySettingStore } from "./base-currency-setting-store";
 import { Label } from "@/components/ui/label";
 import {
   Select,
@@ -11,74 +12,24 @@ import {
 } from "@/components/ui/select";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { AlertTriangleIcon, RefreshCwIcon } from "lucide-react";
-import { trpc, queryClient } from "@/shared/api";
 import { ConfirmModal } from "../widgets/confirm-modal";
-import { toast } from "sonner";
-import { haptic } from "@/shared/platform/haptics";
-import { useTranslation } from "@/translations/translation-provider";
+import { t } from "@/translations/translation-store";
 
 export function BaseCurrencySetting() {
-  const { t } = useTranslation();
-  const [showConfirmModal, setShowConfirmModal] = useState(false);
-  const [pendingCurrency, setPendingCurrency] = useState<Currency | null>(null);
-
-  const { data: currentCurrency, isLoading } = useQuery(
-    trpc.family.getBaseCurrency.queryOptions(),
-  );
-
-  const updateCurrencyMutation = useMutation(
-    trpc.family.updateBaseCurrency.mutationOptions({
-      onSuccess: () => {
-        queryClient.invalidateQueries({
-          queryKey: trpc.family.getBaseCurrency.queryKey(),
-        });
-        queryClient.invalidateQueries({
-          queryKey: trpc.expenses.overview.pathKey(),
-        });
-        queryClient.invalidateQueries({
-          queryKey: trpc.expenses.transactionsByMonth.queryKey(),
-        });
-        setShowConfirmModal(false);
-        setPendingCurrency(null);
-      },
-      onError: (error) => {
-        toast.error(error.message || t("baseCurrencyUpdateFailed"));
-      },
-    }),
-  );
-
-  const handleCurrencyChange = (value: string) => {
-    haptic("selection");
-    setPendingCurrency(value as Currency);
-    setShowConfirmModal(true);
-  };
-
-  const handleConfirmChange = async () => {
-    if (!pendingCurrency) return;
-
-    await updateCurrencyMutation.mutateAsync({
-      baseCurrency: pendingCurrency,
-    });
-  };
-
-  const handleCancelChange = () => {
-    setShowConfirmModal(false);
-    setPendingCurrency(null);
-  };
-
-  const isUpdating = updateCurrencyMutation.isPending;
+  const [store] = useState(() => new BaseCurrencySettingStore());
+  const pendingCurrency = store.pendingCurrency;
 
   return (
     <div className="space-y-4">
       <div className="space-y-2">
         <Label>{t("baseCurrency")}</Label>
-        {isLoading ? (
+        {familyStore.baseCurrencyQuery.isPending ? (
           <div className="h-9 bg-muted animate-pulse rounded-md" />
         ) : (
           <Select
-            value={currentCurrency}
-            onValueChange={handleCurrencyChange}
-            disabled={isUpdating}
+            value={familyStore.baseCurrencyQuery.data}
+            onValueChange={(value) => store.selectCurrency(value as Currency)}
+            disabled={store.isUpdating}
           >
             <SelectTrigger className="w-full">
               <SelectValue placeholder={t("baseCurrencySelect")} />
@@ -98,9 +49,9 @@ export function BaseCurrencySetting() {
       </div>
 
       <ConfirmModal
-        isOpen={showConfirmModal}
-        onClose={handleCancelChange}
-        onConfirm={handleConfirmChange}
+        isOpen={pendingCurrency !== null}
+        onClose={store.cancel}
+        onConfirm={store.confirm}
         title={t("baseCurrencyChangeTitle")}
         description={
           <div className="space-y-4">
@@ -128,7 +79,7 @@ export function BaseCurrencySetting() {
             {t("baseCurrencyRecalculate")}
           </span>
         }
-        isLoading={isUpdating}
+        isLoading={store.isUpdating}
       />
     </div>
   );

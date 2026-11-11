@@ -13,22 +13,13 @@ import { FamilyScreen } from "../settings/family-screen";
 import { InviteScreen } from "../invite/invite-screen";
 import { AuthScreen } from "../auth/auth-screen";
 import { AnimatePresence } from "framer-motion";
-import { useRouter } from "@/shared/stacked-router/router";
-import { useEffect, type ReactNode } from "react";
+import { routerStore } from "@/shared/stacked-router/router-store";
+import { type ReactNode } from "react";
 import { Route } from "@/shared/stacked-router/routes";
 import { AnimatedScreen } from "@/shared/stacked-router/animated-screen";
 import { StatementUploadResultScreen } from "../transactions/statement-upload-result-screen";
-import { getAuthToken } from "@/shared/auth-token";
 
 export function App() {
-  const { navigationStack, navigate } = useRouter();
-
-  useEffect(() => {
-    if (!getAuthToken()) {
-      navigate({ type: "auth" });
-    }
-  }, [navigate]);
-
   const renderRouteContent = (route: Route): ReactNode => {
     switch (route.type) {
       case "main":
@@ -90,8 +81,8 @@ export function App() {
   return (
     <div className="app-shell relative app-container overflow-hidden bg-muted">
       <AnimatePresence initial={false} mode="sync">
-        {navigationStack.map((route, index) =>
-          renderScreen(route, index, navigationStack),
+        {routerStore.navigationStack.map((route, index, stack) =>
+          renderScreen(route, index, stack),
         )}
       </AnimatePresence>
 

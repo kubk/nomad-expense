@@ -2,7 +2,7 @@ import type { ReactNode } from "react";
 import { Button } from "@/components/ui/button";
 import { LoadingSwap } from "@/components/ui/loading-swap";
 import { haptic } from "@/shared/platform/haptics";
-import { useTranslation } from "@/translations/translation-provider";
+import { t } from "@/translations/translation-store";
 
 export function ConfirmModal({
   isOpen,
@@ -21,8 +21,6 @@ export function ConfirmModal({
   confirmText: ReactNode;
   isLoading: boolean;
 }) {
-  const { t } = useTranslation();
-
   if (!isOpen) return null;
 
   return (

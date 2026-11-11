@@ -1,28 +1,18 @@
 import { createRoot } from "react-dom/client";
 import { StrictMode } from "react";
-import { QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "sonner";
+import { refetchActiveQueriesOnVisible } from "mobx-query-lite";
 import "./index.css";
-import { ThemeProvider } from "./pages/widgets/theme-provider";
+import "./store/theme-store";
 import { App } from "./pages/layout/app";
-import { RouterProvider } from "./shared/stacked-router/router";
-import { queryClient } from "./shared/api";
-import { TranslationProvider } from "./translations/translation-provider";
 import { platform } from "./shared/platform/platforms";
 
 platform.initialize();
+refetchActiveQueriesOnVisible();
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
-    <ThemeProvider>
-      <TranslationProvider>
-        <QueryClientProvider client={queryClient}>
-          <RouterProvider>
-            <App />
-          </RouterProvider>
-          <Toaster />
-        </QueryClientProvider>
-      </TranslationProvider>
-    </ThemeProvider>
+    <App />
+    <Toaster />
   </StrictMode>,
 );

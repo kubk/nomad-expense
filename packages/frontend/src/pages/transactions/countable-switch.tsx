@@ -7,23 +7,13 @@ import {
   DrawerTitle,
 } from "@/components/ui/drawer";
 import { ArrowRightLeftIcon, CircleQuestionMarkIcon } from "lucide-react";
-import { useState, type Dispatch, type SetStateAction } from "react";
-import { TransactionForm } from "./transaction-form-screen";
+import { useState } from "react";
+import type { UpdateTransactionStore } from "./update-transaction-store";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Switch } from "@/components/ui/switch";
-import { haptic } from "@/shared/platform/haptics";
-import { useTranslation } from "@/translations/translation-provider";
+import { t } from "@/translations/translation-store";
 
-export function CountableSwitch({
-  formData,
-  setFormData,
-  isTransactionLoading,
-}: {
-  formData: TransactionForm;
-  setFormData: Dispatch<SetStateAction<TransactionForm>>;
-  isTransactionLoading: boolean;
-}) {
-  const { t } = useTranslation();
+export function CountableSwitch({ store }: { store: UpdateTransactionStore }) {
   const [isHelpOpen, setIsHelpOpen] = useState(false);
 
   return (
@@ -31,18 +21,12 @@ export function CountableSwitch({
       <div className="flex flex-col gap-2 pl-0.5">
         <div className="flex items-center gap-2">
           <label className="flex items-center gap-2 cursor-pointer">
-            {isTransactionLoading ? (
+            {store.isLoading ? (
               <Skeleton className="h-5 w-8" />
             ) : (
               <Switch
-                checked={!formData.isCountable}
-                onCheckedChange={(checked) => {
-                  haptic("selection");
-                  setFormData((prev) => ({
-                    ...prev,
-                    isCountable: !checked,
-                  }));
-                }}
+                checked={store.form.isExcludedFromTotals.value}
+                onCheckedChange={store.setExcludedFromTotals}
               />
             )}
             <span className="text-sm text-muted-foreground">

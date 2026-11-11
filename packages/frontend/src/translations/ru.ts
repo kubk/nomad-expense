@@ -36,7 +36,8 @@ export const ru: Translation = {
   navSettings: "Настройки",
 
   authContinueWithTelegram: "Продолжить через Telegram",
-  authTelegramSignInFailed: "Не удалось войти через Telegram. Попробуйте ещё раз.",
+  authTelegramSignInFailed:
+    "Не удалось войти через Telegram. Попробуйте ещё раз.",
   authTelegramUnavailable: "Вход через Telegram временно недоступен.",
 
   inviteAddingTitle: "Добавляем вас в семью",
@@ -215,4 +216,7 @@ export const ru: Translation = {
 
   dateToday: "Сегодня",
   dateYesterday: "Вчера",
+
+  validationRequired: "Обязательное поле",
+  validationPositiveAmount: "Введите сумму больше нуля",
 };

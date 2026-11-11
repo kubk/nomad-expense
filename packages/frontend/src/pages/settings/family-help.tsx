@@ -7,7 +7,7 @@ import {
   DrawerTitle,
 } from "@/components/ui/drawer";
 import { EyeIcon, UsersIcon } from "lucide-react";
-import { useTranslation } from "@/translations/translation-provider";
+import { t } from "@/translations/translation-store";
 
 export function FamilyHelp({
   open,
@@ -16,8 +16,6 @@ export function FamilyHelp({
   open: boolean;
   onOpenChange: (open: boolean) => void;
 }) {
-  const { t } = useTranslation();
-
   return (
     <Drawer open={open} onOpenChange={onOpenChange}>
       <DrawerContent>

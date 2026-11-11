@@ -1,7 +1,7 @@
-import { useBaseCurrency } from "@/shared/hooks/use-base-currency";
+import { familyStore } from "@/store/family-store";
 import { formatAmount } from "@/shared/currency-formatter";
 import { SupportedCurrency } from "api";
-import { useTranslation } from "@/translations/translation-provider";
+import { t } from "@/translations/translation-store";
 
 export function BaseCurrencyInfo({
   amount,
@@ -12,10 +12,7 @@ export function BaseCurrencyInfo({
   currency: SupportedCurrency;
   usdAmount: number;
 }) {
-  const baseCurrency = useBaseCurrency();
-  const { t } = useTranslation();
-
-  if (currency === baseCurrency) {
+  if (currency === familyStore.baseCurrency) {
     return null;
   }
 
@@ -24,10 +21,15 @@ export function BaseCurrencyInfo({
   return (
     <div className="flex flex-col gap-0.5 pl-0.5">
       <span className="text-sm text-muted-foreground">
-        {formatAmount(usdAmount, baseCurrency)}
+        {formatAmount(usdAmount, familyStore.baseCurrency)}
       </span>
       <span className="text-xs text-muted-foreground">
-        {t("transactionsRate", baseCurrency, rate.toFixed(2), currency)}
+        {t(
+          "transactionsRate",
+          familyStore.baseCurrency,
+          rate.toFixed(2),
+          currency,
+        )}
       </span>
     </div>
   );

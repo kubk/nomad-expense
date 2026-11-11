@@ -25,7 +25,8 @@ export const en = {
   navSettings: "Settings",
 
   authContinueWithTelegram: "Continue with Telegram",
-  authTelegramSignInFailed: "Could not sign in with Telegram. Please try again.",
+  authTelegramSignInFailed:
+    "Could not sign in with Telegram. Please try again.",
   authTelegramUnavailable: "Telegram login is temporarily unavailable.",
 
   inviteAddingTitle: "Adding you to a family",
@@ -194,4 +195,7 @@ export const en = {
 
   dateToday: "Today",
   dateYesterday: "Yesterday",
+
+  validationRequired: "Required",
+  validationPositiveAmount: "Enter an amount above zero",
 } as const;

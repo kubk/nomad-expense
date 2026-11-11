@@ -1,19 +1,15 @@
 import { useState } from "react";
 import { DeleteIcon } from "lucide-react";
-import { useMutation, useQuery } from "@tanstack/react-query";
-import type { Account, TransactionType } from "api";
 import { Button } from "@/components/ui/button";
 import { LoadingSwap } from "@/components/ui/loading-swap";
 import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
 import { getCurrencySymbol } from "@/shared/currency-formatter";
-import { queryClient, trpc } from "@/shared/api";
-import { useInvalidateTransactions } from "@/shared/hooks/use-invalidate-transactions";
-import { haptic } from "@/shared/platform/haptics";
+import { accountsStore } from "@/store/accounts-store";
+import { CreateTransactionStore } from "./create-transaction-store";
 import { isTelegram } from "@/shared/platform/telegram-platform";
-import type { RouteByType } from "@/shared/stacked-router/router";
-import { useRouter } from "@/shared/stacked-router/router";
-import { useTranslation } from "@/translations/translation-provider";
+import type { RouteByType } from "@/shared/stacked-router/router-store";
+import { t } from "@/translations/translation-store";
 import { NoAccountsEmptyState } from "../widgets/no-accounts-empty-state";
 import { Page } from "../widgets/page";
 import { PageHeader } from "../widgets/page-header";
@@ -23,39 +19,7 @@ import { UploadStatementButton } from "./upload-statement-button";
 import { AccountPickerDrawer } from "./account-picker-drawer";
 import { TransactionTypeTabs } from "./transaction-type-tabs";
 
-type CreateTransactionForm = {
-  accountId: string;
-  amount: string;
-  description: string;
-  type: TransactionType;
-};
-
 const keypadKeys = ["1", "2", "3", "4", "5", "6", "7", "8", "9", ".", "0"];
-
-function getDefaultManualAccount(accounts: Account[]) {
-  return accounts.reduce<Account | undefined>((defaultAccount, account) => {
-    if (!defaultAccount) return account;
-
-    return account.recentManualCount > defaultAccount.recentManualCount
-      ? account
-      : defaultAccount;
-  }, undefined);
-}
-
-function appendAmountCharacter(amount: string, character: string) {
-  if (character === ".") {
-    if (amount.includes(".")) return amount;
-    return amount.length === 0 ? "0." : `${amount}.`;
-  }
-
-  const decimalPart = amount.split(".")[1];
-  if (decimalPart?.length === 2 || amount.replace(".", "").length >= 10) {
-    return amount;
-  }
-
-  if (amount === "0") return character;
-  return `${amount}${character}`;
-}
 
 function getAmountTextSize(amount: string) {
   const characterCount = Math.max(amount.length, 1);
@@ -71,97 +35,12 @@ export function CreateTransactionScreen({
 }: {
   route: RouteByType<"transactionForm">;
 }) {
-  const { navigate } = useRouter();
-  const { t } = useTranslation();
-  const invalidateTransactions = useInvalidateTransactions();
-  const [formData, setFormData] = useState<CreateTransactionForm>({
-    accountId: route.accountId ?? "",
-    amount: "",
-    description: "",
-    type: "expense",
-  });
-  const { data: accounts = [], isLoading: areAccountsLoading } = useQuery(
-    trpc.accounts.list.queryOptions(),
-  );
-
-  const hasSelectedAccount = accounts.some(
-    (account) => account.id === formData.accountId,
-  );
-  const defaultManualAccount = getDefaultManualAccount(accounts);
-  const selectedAccountId =
-    !hasSelectedAccount && accounts.length > 0
-      ? (defaultManualAccount?.id ?? formData.accountId)
-      : formData.accountId;
-  const selectedAccount = accounts.find(
-    (account) => account.id === selectedAccountId,
-  );
+  const [store] = useState(() => new CreateTransactionStore(route.accountId));
+  const selectedAccount = store.selectedAccount;
+  const areAccountsLoaded = store.areAccountsLoaded;
   const canUploadStatement = Boolean(selectedAccount?.bankType);
 
-  const handleAccountChange = (accountId: string) => {
-    setFormData((current) => ({ ...current, accountId }));
-  };
-
-  const { data: titles, isLoading: areTitlesLoading } = useQuery(
-    trpc.expenses.getMostUsedDescriptions.queryOptions(
-      {
-        accountId: selectedAccount?.id ?? "",
-        transactionType: formData.type,
-      },
-      { enabled: Boolean(selectedAccount) },
-    ),
-  );
-  const areAccountsLoaded = !areAccountsLoading && Boolean(selectedAccount);
-  const areQuickTitlesLoaded =
-    Boolean(selectedAccount) && !areTitlesLoading && titles !== undefined;
-  const isFullyLoaded = areAccountsLoaded && areQuickTitlesLoaded;
-
-  const createTransactionMutation = useMutation(
-    trpc.expenses.createTransaction.mutationOptions({
-      onSuccess: () => {
-        invalidateTransactions();
-        queryClient.invalidateQueries({
-          queryKey: trpc.accounts.list.queryKey(),
-        });
-      },
-    }),
-  );
-
-  const handleSave = async (event: React.FormEvent) => {
-    event.preventDefault();
-    haptic("light");
-
-    await createTransactionMutation.mutateAsync({
-      accountId: selectedAccount?.id ?? formData.accountId,
-      amount: Number(formData.amount),
-      description: formData.description.trim(),
-      type: formData.type,
-    });
-
-    navigate({ type: "main" });
-  };
-
-  const handleKeypadClick = (key: string) => {
-    haptic("selection");
-    setFormData((current) => ({
-      ...current,
-      amount: appendAmountCharacter(current.amount, key),
-    }));
-  };
-
-  const handleBackspace = () => {
-    haptic("selection");
-    setFormData((current) => ({
-      ...current,
-      amount: current.amount.slice(0, -1),
-    }));
-  };
-
-  const isValid =
-    Boolean(selectedAccount) &&
-    Number(formData.amount) > 0 &&
-    Boolean(formData.description.trim());
-
-  if (!areAccountsLoading && accounts.length === 0) {
+  if (!accountsStore.isLoading && accountsStore.accounts.length === 0) {
     return (
       <Page title={!isTelegram() ? <PageHeader /> : undefined}>
         <div className="mt-[25%]">
@@ -173,14 +52,18 @@ export function CreateTransactionScreen({
 
   return (
     <Page title={!isTelegram() ? <PageHeader /> : undefined}>
-      <form className="flex h-full min-h-0 flex-col" onSubmit={handleSave}>
+      <form
+        className="flex h-full min-h-0 flex-col"
+        onSubmit={(event) => {
+          event.preventDefault();
+          store.save();
+        }}
+      >
         <div className="flex shrink-0 items-center gap-2">
           <TransactionTypeTabs
             className="min-w-0 flex-1"
-            value={formData.type}
-            onChange={(type) => {
-              setFormData((current) => ({ ...current, type }));
-            }}
+            value={store.form.type.value}
+            onChange={store.form.type.onChange}
           />
 
           {selectedAccount && canUploadStatement ? (
@@ -195,9 +78,9 @@ export function CreateTransactionScreen({
               role="status"
             >
               <span
-                className={`${getAmountTextSize(formData.amount)} whitespace-nowrap font-semibold tabular-nums tracking-tight`}
+                className={`${getAmountTextSize(store.form.amount.value)} whitespace-nowrap font-semibold tabular-nums tracking-tight`}
               >
-                {formData.amount || "0"}
+                {store.form.amount.value || "0"}
               </span>
               <span className="min-w-6 shrink-0 whitespace-nowrap text-2xl font-medium text-muted-foreground">
                 {areAccountsLoaded && selectedAccount ? (
@@ -213,9 +96,9 @@ export function CreateTransactionScreen({
             ) : (
               <div className="mt-3 flex max-w-full shrink-0 items-center gap-2">
                 <AccountPickerDrawer
-                  accounts={accounts}
+                  accounts={accountsStore.accounts}
                   selectedAccount={selectedAccount}
-                  onSelect={handleAccountChange}
+                  onSelect={store.form.accountId.onChange}
                 />
               </div>
             )}
@@ -225,21 +108,16 @@ export function CreateTransactionScreen({
             <Input
               className="h-12 rounded-xl border-none px-4 shadow-sm"
               placeholder={t("transactionsDescriptionPlaceholder")}
-              value={formData.description}
+              value={store.form.description.value}
               onChange={(event) =>
-                setFormData((current) => ({
-                  ...current,
-                  description: event.target.value,
-                }))
+                store.form.description.onChange(event.target.value)
               }
             />
 
             <QuickTitles
-              titles={titles}
-              isLoading={!areQuickTitlesLoaded}
-              onTitleClick={(description) =>
-                setFormData((current) => ({ ...current, description }))
-              }
+              titles={store.titles}
+              isLoading={!store.areTitlesLoaded}
+              onTitleClick={store.form.description.onChange}
             />
           </div>
         </div>
@@ -250,7 +128,7 @@ export function CreateTransactionScreen({
               <Button
                 key={key}
                 className="h-13 rounded-2xl bg-card text-xl shadow-sm hover:bg-card"
-                onClick={() => handleKeypadClick(key)}
+                onClick={() => store.pressKey(key)}
                 type="button"
                 variant="ghost"
               >
@@ -259,8 +137,8 @@ export function CreateTransactionScreen({
             ))}
             <Button
               className="h-13 rounded-2xl bg-card shadow-sm hover:bg-card"
-              disabled={!formData.amount}
-              onClick={handleBackspace}
+              disabled={!store.form.amount.value}
+              onClick={store.backspace}
               type="button"
               variant="ghost"
             >
@@ -270,14 +148,8 @@ export function CreateTransactionScreen({
         </div>
 
         <Footer className="grid-cols-1">
-          <Button
-            disabled={
-              !isFullyLoaded || !isValid || createTransactionMutation.isPending
-            }
-            size="lg"
-            type="submit"
-          >
-            <LoadingSwap isLoading={createTransactionMutation.isPending}>
+          <Button disabled={!store.canSubmit} size="lg" type="submit">
+            <LoadingSwap isLoading={store.createMutation.isPending}>
               {t("transactionsAddAction")}
             </LoadingSwap>
           </Button>

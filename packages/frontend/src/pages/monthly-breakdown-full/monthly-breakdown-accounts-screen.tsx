@@ -4,76 +4,29 @@ import { Button } from "@/components/ui/button";
 import { LoadingSwap } from "@/components/ui/loading-swap";
 import { Checkbox } from "@/components/ui/checkbox";
 import { getCurrencySymbol } from "@/shared/currency-formatter";
-import { useRouter } from "@/shared/stacked-router/router";
-import { useTranslation } from "@/translations/translation-provider";
+import { t } from "@/translations/translation-store";
 import { cn } from "@/lib/utils";
-import { haptic } from "@/shared/platform/haptics";
 import { Footer } from "../widgets/footer";
 import { NoAccountsEmptyState } from "../widgets/no-accounts-empty-state";
 import { Page } from "../widgets/page";
 import { getColorById } from "../accounts/account-colors";
-import { useMonthlyBreakdownAccountIds } from "@/shared/hooks/use-monthly-breakdown-settings";
-
-function areAccountIdsEqual(first: string[], second: string[]) {
-  if (first.length !== second.length) return false;
-
-  const firstSet = new Set(first);
-  return second.every((accountId) => firstSet.has(accountId));
-}
+import { accountsStore } from "@/store/accounts-store";
+import { monthlyBreakdownStore } from "@/store/monthly-breakdown-store";
+import { MonthlyBreakdownAccountsStore } from "./monthly-breakdown-accounts-store";
 
 export function MonthlyBreakdownAccountsScreen() {
-  const settings = useMonthlyBreakdownAccountIds();
-
+  // Remount when the saved selection loads or changes, so the draft starts from it
   return (
     <MonthlyBreakdownAccountsContent
-      key={JSON.stringify(settings.excludedAccountIds)}
-      settings={settings}
+      key={JSON.stringify(monthlyBreakdownStore.excludedAccountIds)}
     />
   );
 }
 
-function MonthlyBreakdownAccountsContent({
-  settings,
-}: {
-  settings: ReturnType<typeof useMonthlyBreakdownAccountIds>;
-}) {
-  const { pop } = useRouter();
-  const { t } = useTranslation();
-  const {
-    accounts,
-    excludedAccountIds,
-    isLoading,
-    isSaving,
-    setExcludedAccountIds,
-  } = settings;
-  const [draftExcludedAccountIds, setDraftExcludedAccountIds] =
-    useState(excludedAccountIds);
-
-  const isDirty = !areAccountIdsEqual(
-    draftExcludedAccountIds,
-    excludedAccountIds,
-  );
-
-  const isAccountIncluded = (accountId: string) => {
-    return !draftExcludedAccountIds.includes(accountId);
-  };
-
-  const toggleAccount = (accountId: string) => {
-    haptic("selection");
-    setDraftExcludedAccountIds((currentExcludedAccountIds) =>
-      !currentExcludedAccountIds.includes(accountId)
-        ? [...currentExcludedAccountIds, accountId]
-        : currentExcludedAccountIds.filter(
-            (excludedId) => excludedId !== accountId,
-          ),
-    );
-  };
-
-  const handleSave = async () => {
-    haptic("medium");
-    await setExcludedAccountIds(draftExcludedAccountIds);
-    pop();
-  };
+function MonthlyBreakdownAccountsContent() {
+  const [store] = useState(() => new MonthlyBreakdownAccountsStore());
+  const accounts = accountsStore.accounts;
+  const isLoading = monthlyBreakdownStore.isLoading;
 
   const handleKeyDown = (
     event: KeyboardEvent<HTMLDivElement>,
@@ -82,7 +35,7 @@ function MonthlyBreakdownAccountsContent({
     if (event.key !== "Enter" && event.key !== " ") return;
 
     event.preventDefault();
-    toggleAccount(accountId);
+    store.toggleAccount(accountId);
   };
 
   return (
@@ -99,14 +52,14 @@ function MonthlyBreakdownAccountsContent({
         <div className="flex flex-col gap-3">
           {accounts.map((account) => {
             const colorInfo = getColorById(account.color);
-            const isIncluded = isAccountIncluded(account.id);
+            const isIncluded = store.isAccountIncluded(account.id);
 
             return (
               <div
                 key={account.id}
                 role="button"
                 tabIndex={0}
-                onClick={() => toggleAccount(account.id)}
+                onClick={() => store.toggleAccount(account.id)}
                 onKeyDown={(event) => handleKeyDown(event, account.id)}
                 className={cn(
                   "w-full bg-card rounded-xl shadow-sm border-none transition-all active:scale-95",
@@ -148,10 +101,12 @@ function MonthlyBreakdownAccountsContent({
           <Button
             size="lg"
             type="button"
-            onClick={handleSave}
-            disabled={!isDirty || isSaving}
+            onClick={store.save}
+            disabled={!store.isDirty || monthlyBreakdownStore.isSaving}
           >
-            <LoadingSwap isLoading={isSaving}>{t("save")}</LoadingSwap>
+            <LoadingSwap isLoading={monthlyBreakdownStore.isSaving}>
+              {t("save")}
+            </LoadingSwap>
           </Button>
         </Footer>
       )}

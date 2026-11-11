@@ -1,10 +1,8 @@
 import { LoaderIcon } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
-import { useTranslation } from "@/translations/translation-provider";
+import { t } from "@/translations/translation-store";
 
 export function InviteLoader() {
-  const { t } = useTranslation();
-
   return (
     <div className="min-h-screen bg-background flex items-center justify-center p-4">
       <Card className="w-full max-w-md">

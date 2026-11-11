@@ -3,10 +3,10 @@ import { formatAmount } from "../../shared/currency-formatter";
 import { formatDisplayDate } from "@/shared/format-display-date";
 import { AccountBadge } from "../accounts/account-badge";
 import { cn } from "@/lib/utils";
-import { useRouter } from "@/shared/stacked-router/router";
-import { useBaseCurrency } from "@/shared/hooks/use-base-currency";
+import { routerStore } from "@/shared/stacked-router/router-store";
+import { familyStore } from "@/store/family-store";
 import { haptic } from "@/shared/platform/haptics";
-import { useTranslation } from "@/translations/translation-provider";
+import { t } from "@/translations/translation-store";
 
 export function TransactionItem({
   transaction,
@@ -15,14 +15,14 @@ export function TransactionItem({
   transaction: Transaction;
   borderBottom?: boolean;
 }) {
-  const { navigate } = useRouter();
-  const baseCurrency = useBaseCurrency();
-  const { t } = useTranslation();
   const isIncome = transaction.type === "income";
 
   const handleClick = () => {
     haptic("selection");
-    navigate({ type: "transactionForm", transactionId: transaction.id });
+    routerStore.navigate({
+      type: "transactionForm",
+      transactionId: transaction.id,
+    });
   };
 
   return (
@@ -67,7 +67,7 @@ export function TransactionItem({
           <span>{isIncome ? "+" : ""}</span>
           <span>{formatAmount(transaction.amount, transaction.currency)}</span>
         </div>
-        {transaction.currency !== baseCurrency && (
+        {transaction.currency !== familyStore.baseCurrency && (
           <div
             className={cn(
               "flex items-center gap-1 text-xs font-mono",
@@ -77,7 +77,9 @@ export function TransactionItem({
             )}
           >
             <span>{isIncome ? "+" : ""}</span>
-            <span>{formatAmount(transaction.usdAmount, baseCurrency)}</span>
+            <span>
+              {formatAmount(transaction.usdAmount, familyStore.baseCurrency)}
+            </span>
           </div>
         )}
       </div>

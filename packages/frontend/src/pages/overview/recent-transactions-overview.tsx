@@ -1,23 +1,14 @@
 import { ChevronRightIcon } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { TransactionItem } from "../widgets/transaction-item";
-import { useRouter } from "@/shared/stacked-router/router";
-import { useTranslation } from "@/translations/translation-provider";
-import type { RouterOutputs } from "api";
+import { routerStore } from "@/shared/stacked-router/router-store";
+import { t } from "@/translations/translation-store";
+import { overviewStore } from "@/store/overview-store";
 
-type OverviewData = RouterOutputs["expenses"]["overview"];
+export function RecentTransactionsOverview() {
+  const isLoading = overviewStore.isLoading;
 
-export function RecentTransactionsOverview({
-  overviewData,
-  isLoading,
-}: {
-  overviewData?: OverviewData;
-  isLoading: boolean;
-}) {
-  const { navigate } = useRouter();
-  const { t } = useTranslation();
-
-  const recentTransactions = overviewData?.recentTransactions;
+  const recentTransactions = overviewStore.overview?.recentTransactions;
 
   if (!isLoading && recentTransactions?.length === 0) {
     return null;
@@ -30,7 +21,7 @@ export function RecentTransactionsOverview({
           {t("overviewRecent")}
         </h2>
         <button
-          onClick={() => navigate({ type: "transactions" })}
+          onClick={() => routerStore.navigate({ type: "transactions" })}
           className="text-primary/70 active:scale-95 transition-transform duration-150 inline-flex items-center text-sm font-medium"
         >
           {t("overviewSeeAll")}

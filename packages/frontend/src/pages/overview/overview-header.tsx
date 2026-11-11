@@ -1,31 +1,15 @@
 import { formatAmount } from "@/shared/currency-formatter";
 import { UserAvatar } from "@/components/user-avatar";
-import { trpc } from "@/shared/api";
-import { useQuery } from "@tanstack/react-query";
-import { useRouter } from "@/shared/stacked-router/router";
+import { routerStore } from "@/shared/stacked-router/router-store";
 import { isTelegram } from "@/shared/platform/telegram-platform";
 import { cn } from "@/lib/utils";
-import { useBaseCurrency } from "@/shared/hooks/use-base-currency";
+import { familyStore } from "@/store/family-store";
 import { haptic } from "@/shared/platform/haptics";
-import { useTranslation } from "@/translations/translation-provider";
-import type { RouterOutputs } from "api";
+import { t } from "@/translations/translation-store";
+import { overviewStore } from "@/store/overview-store";
 
-type OverviewData = RouterOutputs["expenses"]["overview"];
-
-export function OverviewHeader({
-  overviewData,
-  isOverviewLoading,
-}: {
-  overviewData?: OverviewData;
-  isOverviewLoading: boolean;
-}) {
-  const { navigate } = useRouter();
-  const baseCurrency = useBaseCurrency();
-  const { t } = useTranslation();
-
-  const { data: familyMembers, isLoading: isFamilyLoading } = useQuery(
-    trpc.family.listMembers.queryOptions(),
-  );
+export function OverviewHeader() {
+  const familyMembers = familyStore.membersQuery.data;
 
   return (
     <div
@@ -40,12 +24,16 @@ export function OverviewHeader({
               {t("overviewExpensesLast30Days")}
             </p>
             <div className="text-3xl text-foreground font-bold font-mono">
-              {isOverviewLoading ? (
+              {overviewStore.isLoading ? (
                 <div className="animate-pulse bg-accent h-9 w-32 rounded" />
               ) : (
-                formatAmount(overviewData?.last30DaysTotal || 0, baseCurrency, {
-                  showFractions: false,
-                })
+                formatAmount(
+                  overviewStore.overview?.last30DaysTotal || 0,
+                  familyStore.baseCurrency,
+                  {
+                    showFractions: false,
+                  },
+                )
               )}
             </div>
           </div>
@@ -53,10 +41,10 @@ export function OverviewHeader({
             className="self-center flex -space-x-2 cursor-pointer active:scale-95 transition-transform"
             onClick={() => {
               haptic("light");
-              navigate({ type: "family" });
+              routerStore.navigate({ type: "family" });
             }}
           >
-            {isFamilyLoading ? (
+            {familyStore.membersQuery.isPending ? (
               <div className="animate-pulse bg-accent h-12 w-12 rounded-full" />
             ) : (
               familyMembers?.map((member, index) => (

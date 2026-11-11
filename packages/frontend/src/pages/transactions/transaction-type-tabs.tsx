@@ -1,7 +1,7 @@
 import type { TransactionType } from "api";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { haptic } from "@/shared/platform/haptics";
-import { useTranslation } from "@/translations/translation-provider";
+import { t } from "@/translations/translation-store";
 
 export function TransactionTypeTabs({
   value,
@@ -12,8 +12,6 @@ export function TransactionTypeTabs({
   onChange: (type: TransactionType) => void;
   className?: string;
 }) {
-  const { t } = useTranslation();
-
   return (
     <Tabs
       className={className}

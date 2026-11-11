@@ -24,54 +24,29 @@ import {
   type TransactionFilters,
   type TransactionType,
 } from "api";
-import { trpc } from "@/shared/api";
-import { useQuery } from "@tanstack/react-query";
 import { CustomDatePicker } from "./custom-date-picker";
-import { haptic } from "@/shared/platform/haptics";
-import { useTranslation } from "@/translations/translation-provider";
+import { FiltersFormStore, type FiltersState } from "./filters-form-store";
+import { accountsStore } from "@/store/accounts-store";
+import { t } from "@/translations/translation-store";
 import { cn } from "@/lib/utils";
 
 type TransactionTypeFilterValue = "all" | TransactionType;
 type TransactionOrderField = TransactionFilters["order"]["field"];
 type TransactionOrderDirection = TransactionFilters["order"]["direction"];
 
-type FiltersDrawerProps = {
-  open: boolean;
-  onOpenChange: (open: boolean) => void;
-  filters: TransactionFilters;
-  onApply: (filters: TransactionFilters) => void;
-};
-
-export function FiltersDrawer(props: FiltersDrawerProps) {
+export function FiltersDrawer({ target }: { target: FiltersState }) {
   return (
-    <FiltersDrawerContent key={JSON.stringify(props.filters)} {...props} />
+    <FiltersDrawerContent
+      key={JSON.stringify(target.filters)}
+      target={target}
+    />
   );
 }
 
-function FiltersDrawerContent({
-  open,
-  onOpenChange,
-  filters,
-  onApply,
-}: FiltersDrawerProps) {
-  const { t } = useTranslation();
-  const [filterForm, setFilterForm] = useState<TransactionFilters>(filters);
-  const [showCustomDatePicker, setShowCustomDatePicker] = useState(false);
-  const { data: accounts = [] } = useQuery(trpc.accounts.list.queryOptions());
-  const selectedAccountIds = new Set(filterForm.accounts);
-  const selectedAccountCount = accounts.filter((account) =>
-    selectedAccountIds.has(account.id),
-  ).length;
-  const areAllAccountsSelected =
-    accounts.length > 0 && selectedAccountCount === accounts.length;
-
-  const handleOpenChange = (newOpen: boolean) => {
-    if (!newOpen) {
-      setFilterForm(filters);
-      setShowCustomDatePicker(false);
-    }
-    onOpenChange(newOpen);
-  };
+function FiltersDrawerContent({ target }: { target: FiltersState }) {
+  const [store] = useState(() => new FiltersFormStore(target));
+  const { form } = store;
+  const accounts = accountsStore.accounts;
 
   const transactionTypeOptions: ReadonlyArray<{
     value: TransactionTypeFilterValue;
@@ -91,98 +66,6 @@ function FiltersDrawerContent({
     { value: 30, label: t("filtersLastDaysShort", 30) },
     { value: 90, label: t("filtersLastDaysShort", 90) },
   ];
-
-  const handleAccountToggle = (account: string) => {
-    haptic("selection");
-    setFilterForm((prev) => ({
-      ...prev,
-      accounts: prev.accounts.includes(account)
-        ? prev.accounts.filter((a) => a !== account)
-        : [...prev.accounts, account],
-    }));
-  };
-
-  const handleSelectAllAccounts = () => {
-    haptic("selection");
-    const allAccountIds = accounts.map((account) => account.id);
-
-    setFilterForm((prev) => ({
-      ...prev,
-      accounts: areAllAccountsSelected ? [] : allAccountIds,
-    }));
-  };
-
-  const handleDaysChange = (days: number) => {
-    haptic("selection");
-    setFilterForm((prev) => ({
-      ...prev,
-      date: { type: "days", value: days },
-    }));
-  };
-
-  const handleTransactionTypeChange = (value: TransactionTypeFilterValue) => {
-    haptic("selection");
-    setFilterForm((prev) => ({
-      ...prev,
-      transactionType: value === "all" ? undefined : value,
-    }));
-  };
-
-  const handleApply = (filters: TransactionFilters) => {
-    haptic("medium");
-    onApply(filters);
-    onOpenChange(false);
-  };
-
-  const handleShowCustomDatePicker = () => {
-    setShowCustomDatePicker(true);
-  };
-
-  const handleCustomDateBack = (selectedFilters?: TransactionFilters) => {
-    if (selectedFilters) setFilterForm(selectedFilters);
-    setShowCustomDatePicker(false);
-  };
-
-  const handleDescriptionChange = (value: string) => {
-    setFilterForm((prev) => ({
-      ...prev,
-      description: value.trim()
-        ? {
-            input: value.trim(),
-            type: prev.description?.type || "includes",
-          }
-        : undefined,
-    }));
-  };
-
-  const handleDescriptionTypeChange = (type: "includes" | "exact") => {
-    haptic("selection");
-    setFilterForm((prev) => ({
-      ...prev,
-      description: prev.description ? { ...prev.description, type } : undefined,
-    }));
-  };
-
-  const handleBadgeOrderChange = (
-    field: TransactionOrderField,
-    direction: TransactionOrderDirection,
-  ) => {
-    haptic("selection");
-    setFilterForm((prev) => ({
-      ...prev,
-      order: { field, direction },
-    }));
-  };
-
-  const isOrderActive = (
-    field: TransactionOrderField,
-    direction: TransactionOrderDirection,
-  ) => {
-    return (
-      filterForm.order.field === field &&
-      filterForm.order.direction === direction
-    );
-  };
 
   const sortOptions: ReadonlyArray<{
     field: TransactionOrderField;
@@ -222,24 +105,27 @@ function FiltersDrawerContent({
     isActive ? "default" : "secondary";
 
   return (
-    <Drawer open={open} onOpenChange={handleOpenChange}>
+    <Drawer open={target.isFiltersOpen} onOpenChange={store.setOpen}>
       <DrawerContent
-        className={showCustomDatePicker
-          ? "h-[calc(100dvh-8rem)] data-[vaul-drawer-direction=bottom]:max-h-[calc(100dvh-8rem)]"
-          : undefined}
+        className={
+          store.isCustomDatePickerOpen
+            ? "h-[calc(100dvh-8rem)] data-[vaul-drawer-direction=bottom]:max-h-[calc(100dvh-8rem)]"
+            : undefined
+        }
       >
-        <div className={cn("mx-auto flex min-h-0 w-full flex-1 flex-col", !showCustomDatePicker && "max-w-sm")}>
+        <div
+          className={cn(
+            "mx-auto flex min-h-0 w-full flex-1 flex-col",
+            !store.isCustomDatePickerOpen && "max-w-sm",
+          )}
+        >
           <DrawerHeader className="sr-only">
             <DrawerTitle>{t("filtersTimePeriod")}</DrawerTitle>
             <DrawerDescription />
           </DrawerHeader>
 
-          {showCustomDatePicker ? (
-            <CustomDatePicker
-              filters={filterForm}
-              onApply={handleApply}
-              onBack={handleCustomDateBack}
-            />
+          {store.isCustomDatePickerOpen ? (
+            <CustomDatePicker store={store} />
           ) : (
             <div className="min-h-0 overflow-y-auto p-4 pb-6 space-y-5">
               <div>
@@ -248,18 +134,18 @@ function FiltersDrawerContent({
                     <SearchIcon className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
                     <Input
                       placeholder={t("filtersSearchPlaceholder")}
-                      value={filterForm.description?.input || ""}
+                      value={form.description.value}
                       onChange={(e) =>
-                        handleDescriptionChange(e.target.value)
+                        form.description.onChange(e.target.value)
                       }
                       className="pl-9"
                     />
                   </div>
-                  {filterForm.description && (
+                  {form.description.value.trim() && (
                     <Tabs
-                      value={filterForm.description.type}
+                      value={form.descriptionType.value}
                       onValueChange={(value) =>
-                        handleDescriptionTypeChange(
+                        form.descriptionType.onChange(
                           value as "includes" | "exact",
                         )
                       }
@@ -278,10 +164,10 @@ function FiltersDrawerContent({
               </div>
 
               <Tabs
-                value={filterForm.transactionType ?? "all"}
+                value={form.transactionType.value ?? "all"}
                 onValueChange={(value) =>
-                  handleTransactionTypeChange(
-                    value as TransactionTypeFilterValue,
+                  form.transactionType.onChange(
+                    value === "all" ? undefined : (value as TransactionType),
                   )
                 }
               >
@@ -308,23 +194,27 @@ function FiltersDrawerContent({
                 <div className="flex overflow-x-auto pb-3 gap-2">
                   <Badge
                     asChild
-                    variant={getChipVariant(filterForm.date.type === "all")}
-                    className={getChipClassName(filterForm.date.type === "all")}
-                    onClick={() => {
-                      haptic("selection");
-                      setFilterForm((prev) => ({ ...prev, date: { type: "all" } }));
-                    }}
+                    variant={getChipVariant(form.date.value.type === "all")}
+                    className={getChipClassName(form.date.value.type === "all")}
+                    onClick={() => form.date.onChange({ type: "all" })}
                   >
                     <button type="button">{t("filtersAllTime")}</button>
                   </Badge>
                   {timePeriods.map((period) => {
-                    const isActive = filterForm.date.type === "days" && filterForm.date.value === period.value;
+                    const isActive =
+                      form.date.value.type === "days" &&
+                      form.date.value.value === period.value;
                     return (
                       <Badge
                         asChild
                         key={period.value}
                         variant={getChipVariant(isActive)}
-                        onClick={() => handleDaysChange(period.value)}
+                        onClick={() =>
+                          form.date.onChange({
+                            type: "days",
+                            value: period.value,
+                          })
+                        }
                         className={getChipClassName(isActive)}
                       >
                         <button type="button">{period.label}</button>
@@ -333,9 +223,11 @@ function FiltersDrawerContent({
                   })}
                   <Badge
                     asChild
-                    variant={getChipVariant(filterForm.date.type === "range")}
-                    onClick={handleShowCustomDatePicker}
-                    className={getChipClassName(filterForm.date.type === "range")}
+                    variant={getChipVariant(form.date.value.type === "range")}
+                    onClick={store.openCustomDatePicker}
+                    className={getChipClassName(
+                      form.date.value.type === "range",
+                    )}
                   >
                     <button type="button">{t("filtersCustom")}</button>
                   </Badge>
@@ -349,7 +241,7 @@ function FiltersDrawerContent({
                     <h3 className="font-medium">
                       {t("filtersBankAccounts")}
                       <span className="ml-1 text-sm font-normal text-muted-foreground">
-                        · {selectedAccountCount}
+                        · {store.selectedAccountCount}
                       </span>
                     </h3>
                   </div>
@@ -357,10 +249,10 @@ function FiltersDrawerContent({
                     <Button
                       variant="ghost"
                       size="sm"
-                      onClick={handleSelectAllAccounts}
+                      onClick={store.toggleAllAccounts}
                       className="text-md h-6 px-2 text-muted-foreground hover:text-foreground"
                     >
-                      {areAllAccountsSelected
+                      {store.areAllAccountsSelected
                         ? t("filtersDeselectAll")
                         : t("filtersSelectAll")}
                     </Button>
@@ -368,13 +260,13 @@ function FiltersDrawerContent({
                 </div>
                 <div className="flex overflow-auto pb-3 gap-2">
                   {accounts.map((account) => {
-                    const isActive = selectedAccountIds.has(account.id);
+                    const isActive = store.isAccountSelected(account.id);
 
                     return (
                       <Badge
                         key={account.id}
                         variant={getChipVariant(isActive)}
-                        onClick={() => handleAccountToggle(account.id)}
+                        onClick={() => store.toggleAccount(account.id)}
                         className={getChipClassName(isActive)}
                       >
                         {isActive && <CheckIcon className="size-3" />}
@@ -394,10 +286,7 @@ function FiltersDrawerContent({
                 </div>
                 <div className="flex overflow-x-auto gap-2 pb-3">
                   {sortOptions.map((option) => {
-                    const isActive = isOrderActive(
-                      option.field,
-                      option.direction,
-                    );
+                    const isActive = store.isOrderActive(option);
 
                     return (
                       <Badge
@@ -405,10 +294,10 @@ function FiltersDrawerContent({
                         variant={getChipVariant(isActive)}
                         className={getChipClassName(isActive)}
                         onClick={() =>
-                          handleBadgeOrderChange(
-                            option.field,
-                            option.direction,
-                          )
+                          form.order.onChange({
+                            field: option.field,
+                            direction: option.direction,
+                          })
                         }
                       >
                         {option.label}
@@ -420,14 +309,14 @@ function FiltersDrawerContent({
             </div>
           )}
 
-          {!showCustomDatePicker && (
+          {!store.isCustomDatePickerOpen && (
             <DrawerFooter className="flex-row border-t [&_button]:flex-1">
               <DrawerClose asChild>
                 <Button size="lg" variant="outline">
                   {t("cancel")}
                 </Button>
               </DrawerClose>
-              <Button size="lg" onClick={() => handleApply(filterForm)}>
+              <Button size="lg" onClick={store.apply}>
                 {t("applyFilters")}
               </Button>
             </DrawerFooter>

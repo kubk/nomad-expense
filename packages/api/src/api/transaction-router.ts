@@ -89,7 +89,8 @@ const overviewInputSchema = z.object({
 });
 
 const transactionFilterSchema = z.object({
-  accounts: z.array(z.string()),
+  // Omitted means every account of the family
+  accounts: z.array(z.string()).optional(),
   transactionType: z.optional(transactionTypeSchema),
   description: z.optional(
     z.object({
@@ -103,18 +104,22 @@ const transactionFilterSchema = z.object({
       type: z.literal("days"),
       value: z.number().positive(),
     }),
-    z.object({
-      type: z.literal("range"),
-      from: z.iso.date(),
-      to: z.iso.date(),
-      timezone: z.string().refine(
-        (zone) => DateTime.now().setZone(zone).isValid,
-        "Invalid timezone",
-      ),
-    }).refine((range) => range.from <= range.to, {
-      message: "End date must be on or after start date",
-      path: ["to"],
-    }),
+    z
+      .object({
+        type: z.literal("range"),
+        from: z.iso.date(),
+        to: z.iso.date(),
+        timezone: z
+          .string()
+          .refine(
+            (zone) => DateTime.now().setZone(zone).isValid,
+            "Invalid timezone",
+          ),
+      })
+      .refine((range) => range.from <= range.to, {
+        message: "End date must be on or after start date",
+        path: ["to"],
+      }),
     z.object({
       type: z.literal("months"),
       value: z.number().positive(),
@@ -130,12 +135,18 @@ const getFilteredTransactions = async (
   input: z.infer<typeof transactionFilterSchema>,
   familyId: string,
   db: DB,
+  excludedAccountIds: string[] = [],
 ) => {
   // Build query conditions
   const conditions = [eq(accountTable.familyId, familyId)];
 
   // Account filter
-  conditions.push(inArray(accountTable.id, input.accounts));
+  if (input.accounts) {
+    conditions.push(inArray(accountTable.id, input.accounts));
+  }
+  if (excludedAccountIds.length > 0) {
+    conditions.push(notInArray(accountTable.id, excludedAccountIds));
+  }
 
   // Transaction type filter
   if (input.transactionType) {
@@ -166,7 +177,9 @@ const getFilteredTransactions = async (
     }).startOf("day");
     const end = DateTime.fromISO(input.date.to, {
       zone: input.date.timezone,
-    }).startOf("day").plus({ days: 1 });
+    })
+      .startOf("day")
+      .plus({ days: 1 });
 
     conditions.push(
       gte(transactionTable.createdAt, start.toJSDate()),
@@ -255,9 +268,9 @@ const getMonthlyBreakdown = async ({
 
 export const expenseRouter = t.router({
   availableYears: protectedProcedure
-    .input(z.object({ accounts: z.array(z.string()) }))
+    .input(z.object({ accounts: z.array(z.string()).optional() }))
     .query(async ({ ctx, input }) => {
-      if (input.accounts.length === 0) {
+      if (input.accounts?.length === 0) {
         return [];
       }
 
@@ -272,7 +285,9 @@ export const expenseRouter = t.router({
         .where(
           and(
             eq(accountTable.familyId, ctx.familyId),
-            inArray(accountTable.id, input.accounts),
+            input.accounts
+              ? inArray(accountTable.id, input.accounts)
+              : undefined,
           ),
         )
         .groupBy(year)
@@ -357,8 +372,16 @@ export const expenseRouter = t.router({
     .query(async ({ ctx, input }) => {
       const db = getDb();
       const familyId = ctx.familyId;
+      // The monthly breakdown never counts accounts excluded in its settings, whatever the filters
+      const excludedAccountIds =
+        await getFamilyMonthlyBreakdownExcludedAccountIds(familyId);
 
-      const transactions = await getFilteredTransactions(input, familyId, db);
+      const transactions = await getFilteredTransactions(
+        input,
+        familyId,
+        db,
+        excludedAccountIds,
+      );
 
       // Group transactions by month (expenses and income separately)
       const monthlyExpenseTotals: {
@@ -504,11 +527,7 @@ export const expenseRouter = t.router({
       const db = getDb();
       const familyId = ctx.familyId;
 
-      const transaction = await getTransactionForFamily(
-        db,
-        input.id,
-        familyId,
-      );
+      const transaction = await getTransactionForFamily(db, input.id, familyId);
 
       const transactionResult = transaction[0];
       if (!transactionResult) {

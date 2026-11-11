@@ -1,4 +1,3 @@
-import { getTransactionMonthRange } from "@/shared/transaction-date-range";
 import { useState } from "react";
 import { SettingsIcon } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
@@ -9,58 +8,25 @@ import {
   TransactionListSkeleton,
 } from "../widgets/summary-card";
 import { FiltersDrawer } from "../widgets/filters-drawer";
-import { trpc } from "../../shared/api";
-import { useQuery } from "@tanstack/react-query";
-import { TransactionFilters } from "api";
 import { Page } from "../widgets/page";
 import { PageHeader } from "../widgets/page-header";
-import { RouteByType } from "@/shared/stacked-router/router";
-import { useRouter } from "@/shared/stacked-router/router";
+import {
+  type RouteByType,
+  routerStore,
+} from "@/shared/stacked-router/router-store";
 import { calculateMaxAmount } from "../../shared/chart-calculations";
-import { useTranslation } from "@/translations/translation-provider";
+import { t } from "@/translations/translation-store";
 import { haptic } from "@/shared/platform/haptics";
-import { useMonthlyBreakdownAccountIds } from "@/shared/hooks/use-monthly-breakdown-settings";
+import { MonthlyBreakdownFullStore } from "./monthly-breakdown-full-store";
 
 export function MonthlyBreakdownFull({
   route,
 }: {
   route: RouteByType<"monthlyBreakdownFull">;
 }) {
-  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
-  const { navigate } = useRouter();
-  const { t } = useTranslation();
-  const { includedAccountIds, isLoading: isMonthlyBreakdownAccountsLoading } =
-    useMonthlyBreakdownAccountIds();
-
-  const baseFilters: TransactionFilters = route.filters
-    ? route.filters
-    : {
-        accounts: includedAccountIds,
-        date: { type: "days", value: 90 },
-        order: { field: "createdAt", direction: "desc" },
-      };
-
-  const filters: TransactionFilters = {
-    ...baseFilters,
-    accounts: baseFilters.accounts.filter((accountId) =>
-      includedAccountIds.includes(accountId),
-    ),
-  };
-
-  const { data: transactionsData, isLoading: isTransactionsLoading } = useQuery(
-    {
-      ...trpc.expenses.transactionsByMonth.queryOptions(filters),
-      enabled: !isMonthlyBreakdownAccountsLoading,
-    },
-  );
-  const isLoading = isMonthlyBreakdownAccountsLoading || isTransactionsLoading;
-
-  const openFilters = () => setIsDrawerOpen(true);
-
-  const filteredMonthlyData = transactionsData?.data || [];
+  const [store] = useState(() => new MonthlyBreakdownFullStore(route.filters));
+  const filteredMonthlyData = store.months;
   const maxAmount = calculateMaxAmount(filteredMonthlyData);
-  const totalExpenses = transactionsData?.totalExpenses || 0;
-  const totalIncome = transactionsData?.totalIncome || 0;
 
   return (
     <Page
@@ -73,7 +39,7 @@ export function MonthlyBreakdownFull({
               size="sm"
               onClick={() => {
                 haptic("light");
-                navigate({ type: "monthlyBreakdownSettings" });
+                routerStore.navigate({ type: "monthlyBreakdownSettings" });
               }}
             >
               <SettingsIcon className="w-4 h-4" />
@@ -82,18 +48,12 @@ export function MonthlyBreakdownFull({
         />
       }
     >
-      <TransactionFiltersSummary
-        isLoading={isLoading}
-        onFiltersClick={openFilters}
-        filters={filters}
-        totalExpenses={totalExpenses}
-        totalIncome={totalIncome}
-      />
+      <TransactionFiltersSummary store={store} />
 
       {/* All Months - Transaction Style List */}
       <Card className="mt-4 shadow border-0 p-0">
         <CardContent className="p-0">
-          {isLoading ? (
+          {store.isLoading ? (
             <TransactionListSkeleton />
           ) : (
             filteredMonthlyData.map((month, index) => (
@@ -103,38 +63,14 @@ export function MonthlyBreakdownFull({
                 index={index}
                 totalItems={filteredMonthlyData.length}
                 maxAmount={maxAmount}
-                onMonthClick={(month) => {
-                  navigate({
-                    type: "transactions",
-                    filters: {
-                      ...filters,
-                      date: getTransactionMonthRange(
-                        month.year,
-                        month.monthNumber,
-                      ),
-                    },
-                  });
-                }}
+                onMonthClick={store.openMonth}
               />
             ))
           )}
         </CardContent>
       </Card>
 
-      <FiltersDrawer
-        open={isDrawerOpen}
-        onOpenChange={setIsDrawerOpen}
-        filters={filters}
-        onApply={(newFilters) => {
-          navigate(
-            {
-              type: "monthlyBreakdownFull",
-              filters: newFilters,
-            },
-            { replace: true },
-          );
-        }}
-      />
+      <FiltersDrawer target={store.filtersState} />
     </Page>
   );
 }

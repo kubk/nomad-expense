@@ -1,23 +1,18 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { CheckCircleIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { InviteLoader } from "./invite-loader";
 import { InviteError } from "./invite-error";
-import { trpc } from "@/shared/api";
-import { useMutation } from "@tanstack/react-query";
+import { InviteStore } from "./invite-store";
 import { getUserDisplayNameWithUsername } from "@/shared/user-display";
-import { RouteByType } from "@/shared/stacked-router/router";
-import { useRouter } from "@/shared/stacked-router/router";
-import { useTranslation } from "@/translations/translation-provider";
+import { type RouteByType } from "@/shared/stacked-router/router-store";
+import { routerStore } from "@/shared/stacked-router/router-store";
+import { t } from "@/translations/translation-store";
 
 export function InviteScreen({ route }: { route: RouteByType<"invite"> }) {
-  const { navigate } = useRouter();
-  const { t } = useTranslation();
-  const joinFamilyMutation = useMutation(
-    trpc.family.joinFamily.mutationOptions(),
-  );
-  const joinFamily = joinFamilyMutation.mutate;
+  const [store] = useState(() => new InviteStore());
+  const joinFamilyMutation = store.joinFamilyMutation;
 
   const inviteCode = route.code;
 
@@ -26,17 +21,22 @@ export function InviteScreen({ route }: { route: RouteByType<"invite"> }) {
       return;
     }
 
-    joinFamily({ code: inviteCode });
-  }, [inviteCode, joinFamily]);
+    store.joinFamily(inviteCode);
+  }, [inviteCode, store]);
 
-  if (joinFamilyMutation.isPending) {
+  if (
+    joinFamilyMutation.isPending ||
+    (inviteCode && !joinFamilyMutation.data && !joinFamilyMutation.error)
+  ) {
     return <InviteLoader />;
   }
 
-  if (joinFamilyMutation.isError || !inviteCode) {
+  if (joinFamilyMutation.error || !inviteCode) {
     const errorMessage = !inviteCode
       ? t("inviteNoCode")
-      : joinFamilyMutation.error?.message || t("inviteJoinFailed");
+      : (joinFamilyMutation.error instanceof Error
+          ? joinFamilyMutation.error.message
+          : "") || t("inviteJoinFailed");
 
     return <InviteError errorMessage={errorMessage} />;
   }
@@ -71,7 +71,7 @@ export function InviteScreen({ route }: { route: RouteByType<"invite"> }) {
               </div>
             </div>
             <Button
-              onClick={() => navigate({ type: "main" })}
+              onClick={() => routerStore.navigate({ type: "main" })}
               className="w-full"
             >
               {t("ok")}

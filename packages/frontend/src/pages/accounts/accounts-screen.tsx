@@ -6,147 +6,32 @@ import {
   EyeOffIcon,
   EyeIcon,
 } from "lucide-react";
-import type { Account } from "api";
 import { Button } from "@/components/ui/button";
 import { LoadingSwap } from "@/components/ui/loading-swap";
 import { Badge } from "@/components/ui/badge";
 import { getCurrencySymbol } from "../../shared/currency-formatter";
 import { PageHeader } from "../widgets/page-header";
-import { trpc, queryClient } from "@/shared/api";
-import { useQuery, useMutation } from "@tanstack/react-query";
+import { accountsStore } from "@/store/accounts-store";
+import { AccountsScreenStore } from "./accounts-screen-store";
 import { Page } from "../widgets/page";
 import { getColorById } from "./account-colors";
 import { cn } from "@/lib/utils";
 import { DateTime } from "luxon";
-import { useRouter } from "@/shared/stacked-router/router";
 import { NoAccountsEmptyState } from "../widgets/no-accounts-empty-state";
 import { Footer } from "../widgets/footer";
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { haptic } from "@/shared/platform/haptics";
-import { useTranslation } from "@/translations/translation-provider";
+import { t } from "@/translations/translation-store";
 import { AccountsActionsMenu } from "./accounts-actions-menu";
 import { SwipeableAccountCard } from "./swipeable-account-card";
-import { toast } from "sonner";
 
 const MotionFooter = motion.create(Footer);
 
 export function AccountsScreen() {
-  const { navigate } = useRouter();
-  const { t } = useTranslation();
-  const [reorderedAccounts, setReorderedAccounts] = useState<Account[] | null>(
-    null,
-  );
-  const [showHiddenAccounts, setShowHiddenAccounts] = useState(false);
-
-  const accountsQueryOptions = trpc.accounts.list.queryOptions();
-  const { data: accounts = [], isLoading } = useQuery(accountsQueryOptions);
-
-  const setHiddenMutation = useMutation(
-    trpc.accounts.setHidden.mutationOptions({
-      onMutate: async ({ id, isHidden }) => {
-        await queryClient.cancelQueries({
-          queryKey: accountsQueryOptions.queryKey,
-        });
-
-        queryClient.setQueryData(
-          accountsQueryOptions.queryKey,
-          (currentAccounts) =>
-            currentAccounts?.map((account) =>
-              account.id === id ? { ...account, isHidden } : account,
-            ),
-        );
-      },
-      onError: () => {
-        haptic("error");
-        toast.error(t("somethingWentWrong"));
-      },
-      onSettled: () =>
-        queryClient.invalidateQueries({
-          queryKey: accountsQueryOptions.queryKey,
-        }),
-    }),
-  );
-
-  const reorderMutation = useMutation(
-    trpc.accounts.reorder.mutationOptions({
-      onSuccess: () => {
-        queryClient.invalidateQueries({
-          queryKey: trpc.accounts.list.queryKey(),
-        });
-        setReorderedAccounts(null);
-      },
-    }),
-  );
-
-  const isReorderMode = reorderedAccounts !== null;
-  const hiddenAccounts = accounts.filter((account) => account.isHidden);
-  const visibleAccounts =
-    reorderedAccounts ?? accounts.filter((account) => !account.isHidden);
-  const hasHiddenAccounts = hiddenAccounts.length > 0;
-
-  const handleAccountClick = (accountId: string) => {
-    if (isReorderMode) return; // Don't navigate in reorder mode
-    haptic("selection");
-    navigate({ type: "accountForm", accountId });
-  };
-
-  const handleAddAccountClick = () => {
-    haptic("light");
-    navigate({ type: "accountForm" });
-  };
-
-  const handleReorderClick = () => {
-    setReorderedAccounts([...visibleAccounts]);
-  };
-
-  const handleCancelReorder = () => {
-    setReorderedAccounts(null);
-  };
-
-  const handleSaveReorder = () => {
-    if (!reorderedAccounts) return;
-    let visibleAccountIndex = 0;
-    const accountIds = accounts.map((account) => {
-      if (account.isHidden) return account.id;
-
-      const reorderedAccount = reorderedAccounts[visibleAccountIndex];
-      visibleAccountIndex += 1;
-      return reorderedAccount?.id ?? account.id;
-    });
-    reorderMutation.mutate({ accountIds });
-  };
-
-  const handleHideAccount = (accountId: string) => {
-    haptic("heavy");
-    setHiddenMutation.mutate({ id: accountId, isHidden: true });
-  };
-
-  const handleUnhideAccount = (accountId: string) => {
-    haptic("selection");
-    if (hiddenAccounts.length === 1) setShowHiddenAccounts(false);
-    setHiddenMutation.mutate({ id: accountId, isHidden: false });
-  };
-
-  const handleToggleHiddenAccounts = () => {
-    haptic("selection");
-    setShowHiddenAccounts((currentValue) => !currentValue);
-  };
-
-  const moveAccount = (index: number, direction: "up" | "down") => {
-    if (!reorderedAccounts) return;
-    haptic("selection");
-    const newAccounts = [...reorderedAccounts];
-    const targetIndex = direction === "up" ? index - 1 : index + 1;
-
-    if (targetIndex < 0 || targetIndex >= newAccounts.length) return;
-
-    [newAccounts[index], newAccounts[targetIndex]] = [
-      newAccounts[targetIndex],
-      newAccounts[index],
-    ];
-    setReorderedAccounts(newAccounts);
-  };
+  const [store] = useState(() => new AccountsScreenStore());
+  const accounts = accountsStore.accounts;
+  const isReorderMode = store.isReorderMode;
+  const visibleAccounts = store.visibleAccounts;
 
   const showDropdown = accounts.length >= 2;
 
@@ -161,7 +46,7 @@ export function AccountsScreen() {
       <div className="flex items-center">
         <button
           className="flex-1 p-5 text-left transition-transform"
-          onClick={() => handleAccountClick(account.id)}
+          onClick={() => store.openAccount(account.id)}
           disabled={isReorderMode}
         >
           <div className="flex items-start gap-4">
@@ -207,7 +92,7 @@ export function AccountsScreen() {
             variant="ghost"
             size="sm"
             title={t("accountsShowAccount")}
-            onClick={() => handleUnhideAccount(account.id)}
+            onClick={() => store.unhideAccount(account.id)}
             className="mr-3 h-9 w-9 p-0 text-muted-foreground"
           >
             <EyeIcon className="h-4 w-4" />
@@ -226,7 +111,7 @@ export function AccountsScreen() {
               <Button
                 variant="ghost"
                 size="sm"
-                onClick={() => moveAccount(reorderIndex, "up")}
+                onClick={() => store.moveAccount(reorderIndex, "up")}
                 disabled={reorderIndex === 0}
                 className="h-8 w-8 p-0"
               >
@@ -235,7 +120,7 @@ export function AccountsScreen() {
               <Button
                 variant="ghost"
                 size="sm"
-                onClick={() => moveAccount(reorderIndex, "down")}
+                onClick={() => store.moveAccount(reorderIndex, "down")}
                 disabled={reorderIndex === visibleAccounts.length - 1}
                 className="h-8 w-8 p-0"
               >
@@ -257,15 +142,11 @@ export function AccountsScreen() {
             rightSlot={
               !isReorderMode && showDropdown ? (
                 <AccountsActionsMenu
-                  onCreateAccount={handleAddAccountClick}
-                  onReorderAccounts={handleReorderClick}
+                  onCreateAccount={store.addAccount}
+                  onReorderAccounts={store.startReorder}
                 />
               ) : !isReorderMode ? (
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={handleAddAccountClick}
-                >
+                <Button variant="ghost" size="sm" onClick={store.addAccount}>
                   <PlusIcon className="w-4 h-4" />
                 </Button>
               ) : null
@@ -273,7 +154,7 @@ export function AccountsScreen() {
           />
         }
       >
-        {isLoading ? (
+        {accountsStore.isLoading ? (
           <div className="flex justify-center items-center py-12">
             <Loader2 className="w-8 h-8 animate-spin text-muted-foreground" />
           </div>
@@ -302,14 +183,14 @@ export function AccountsScreen() {
                 return (
                   <SwipeableAccountCard
                     key={account.id}
-                    onHide={() => handleHideAccount(account.id)}
+                    onHide={() => store.hideAccount(account.id)}
                   >
                     {renderAccountContent(account)}
                   </SwipeableAccountCard>
                 );
               })}
 
-              {hasHiddenAccounts && (
+              {store.hiddenAccounts.length > 0 && (
                 <motion.div
                   key="hidden-accounts-toggle"
                   layout
@@ -323,9 +204,9 @@ export function AccountsScreen() {
                     variant="outline"
                     className="h-7 rounded-full border-border/50 bg-transparent px-3 py-0 text-muted-foreground shadow-none transition-transform hover:bg-muted hover:text-foreground active:scale-95 [&>svg]:size-3.5"
                   >
-                    <button type="button" onClick={handleToggleHiddenAccounts}>
+                    <button type="button" onClick={store.toggleHiddenAccounts}>
                       <EyeOffIcon />
-                      {showHiddenAccounts
+                      {store.showHiddenAccounts
                         ? t("accountsHideHidden")
                         : t("accountsHiddenAccounts")}
                     </button>
@@ -333,8 +214,8 @@ export function AccountsScreen() {
                 </motion.div>
               )}
 
-              {showHiddenAccounts &&
-                hiddenAccounts.map((account) => (
+              {store.showHiddenAccounts &&
+                store.hiddenAccounts.map((account) => (
                   <motion.div
                     key={`hidden-${account.id}`}
                     layout
@@ -367,7 +248,7 @@ export function AccountsScreen() {
               variant="outline"
               className="flex-1"
               size="lg"
-              onClick={handleCancelReorder}
+              onClick={store.cancelReorder}
             >
               {t("cancel")}
             </Button>
@@ -375,10 +256,10 @@ export function AccountsScreen() {
               variant="default"
               className="flex-1"
               size="lg"
-              onClick={handleSaveReorder}
-              disabled={reorderMutation.isPending}
+              onClick={store.saveReorder}
+              disabled={store.reorderMutation.isPending}
             >
-              <LoadingSwap isLoading={reorderMutation.isPending}>
+              <LoadingSwap isLoading={store.reorderMutation.isPending}>
                 {t("save")}
               </LoadingSwap>
             </Button>

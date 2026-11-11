@@ -1,11 +1,9 @@
 import { PlusIcon, Wallet } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { useRouter } from "@/shared/stacked-router/router";
-import { useTranslation } from "@/translations/translation-provider";
+import { routerStore } from "@/shared/stacked-router/router-store";
+import { t } from "@/translations/translation-store";
 
 export function NoAccountsEmptyState() {
-  const { navigate } = useRouter();
-  const { t } = useTranslation();
   return (
     <div className="flex flex-col items-center justify-center py-12">
       <div className="w-16 h-16 rounded-full bg-muted/50 flex items-center justify-center mb-1.5">
@@ -19,7 +17,9 @@ export function NoAccountsEmptyState() {
       </p>
       <Button
         className="mt-5"
-        onClick={() => navigate({ type: "accountForm" }, { replace: true })}
+        onClick={() =>
+          routerStore.navigate({ type: "accountForm" }, { replace: true })
+        }
       >
         <PlusIcon className="w-4 h-4" />
         {t("accountsCreate")}

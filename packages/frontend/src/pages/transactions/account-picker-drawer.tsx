@@ -11,7 +11,7 @@ import {
 import { cn } from "@/lib/utils";
 import { getCurrencySymbol } from "@/shared/currency-formatter";
 import { haptic } from "@/shared/platform/haptics";
-import { useTranslation } from "@/translations/translation-provider";
+import { t } from "@/translations/translation-store";
 import { getColorById } from "../accounts/account-colors";
 import { useState } from "react";
 
@@ -26,7 +26,6 @@ export function AccountPickerDrawer({
   onSelect: (accountId: string) => void;
   className?: string;
 }) {
-  const { t } = useTranslation();
   const [isOpen, setIsOpen] = useState(false);
   const selectedColor = getColorById(selectedAccount.color);
 

@@ -1,16 +1,15 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { TransactionItem } from "../widgets/transaction-item";
 import { Page } from "../widgets/page";
-import { RouteByType } from "@/shared/stacked-router/router";
+import { type RouteByType } from "@/shared/stacked-router/router-store";
 import { getUploadResult } from "@/shared/upload-result-storage";
-import { useTranslation } from "@/translations/translation-provider";
+import { t } from "@/translations/translation-store";
 
 export function StatementUploadResultScreen({
   route,
 }: {
   route: RouteByType<"statementUploadResult">;
 }) {
-  const { t } = useTranslation();
   const uploadResult = getUploadResult(route.key);
 
   if (!uploadResult) {

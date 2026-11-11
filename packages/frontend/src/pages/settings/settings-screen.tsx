@@ -11,9 +11,8 @@ import { ModeToggle } from "./mode-toggle";
 import { BaseCurrencySetting } from "./base-currency-setting";
 import { LanguageSetting } from "./language-setting";
 import { Page } from "../widgets/page";
-import { trpc } from "@/shared/api";
-import { useQuery } from "@tanstack/react-query";
-import { useRouter } from "@/shared/stacked-router/router";
+import { familyStore } from "@/store/family-store";
+import { routerStore } from "@/shared/stacked-router/router-store";
 import { clearAuthToken } from "@/shared/auth-token";
 import { ConfirmModal } from "../widgets/confirm-modal";
 import { useState } from "react";
@@ -21,19 +20,15 @@ import { platform } from "@/shared/platform/platforms";
 import { links } from "api";
 import { isTelegram } from "@/shared/platform/telegram-platform";
 import { haptic } from "@/shared/platform/haptics";
-import { useTranslation } from "@/translations/translation-provider";
+import { t } from "@/translations/translation-store";
 
 export function SettingsScreen() {
-  const { navigate } = useRouter();
-  const { t } = useTranslation();
-  const { data: familyMembers } = useQuery(
-    trpc.family.listMembers.queryOptions(),
-  );
+  const familyMembers = familyStore.membersQuery.data;
   const [showLogoutModal, setShowLogoutModal] = useState(false);
 
   const handleLogout = () => {
     clearAuthToken();
-    navigate({ type: "auth" });
+    routerStore.navigate({ type: "auth" });
     setShowLogoutModal(false);
   };
 
@@ -46,7 +41,7 @@ export function SettingsScreen() {
           <Button
             onClick={() => {
               haptic("light");
-              navigate({ type: "family" });
+              routerStore.navigate({ type: "family" });
             }}
             variant="outline"
             className="w-full justify-between"

@@ -19,45 +19,31 @@ import {
 import { Page } from "../widgets/page";
 import { ConfirmModal } from "../widgets/confirm-modal";
 import { Footer } from "../widgets/footer";
-import { queryClient, trpc } from "@/shared/api";
-import { useQuery, useMutation } from "@tanstack/react-query";
+import { accountsStore } from "@/store/accounts-store";
+import { AccountFormStore } from "./account-form-store";
 import { cn } from "@/lib/utils";
 import {
   SUPPORTED_CURRENCIES,
   type Account,
   type SupportedCurrency,
-  type AccountColor,
 } from "api";
 import { accountColorsPalette } from "./account-colors";
-import { RouteByType, useRouter } from "@/shared/stacked-router/router";
+import {
+  type RouteByType,
+  routerStore,
+} from "@/shared/stacked-router/router-store";
 import { Label } from "@/components/ui/label";
 import { FormActionButton } from "@/components/ui/form-action-button";
 import { DeleteActionButton } from "../widgets/delete-action-button";
-import { haptic } from "@/shared/platform/haptics";
 import { isTelegram } from "@/shared/platform/telegram-platform";
-import { useTranslation } from "@/translations/translation-provider";
-
-function invalidateAccounts() {
-  queryClient.invalidateQueries({
-    queryKey: trpc.accounts.list.queryKey(),
-  });
-}
-
-type Form = {
-  name: string;
-  color: AccountColor;
-  currency: SupportedCurrency;
-};
+import { t } from "@/translations/translation-store";
 
 export function AccountFormScreen({
   route,
 }: {
   route: RouteByType<"accountForm">;
 }) {
-  const { data: accounts = [] } = useQuery(trpc.accounts.list.queryOptions());
-  const existingAccount = accounts.find(
-    (account) => account.id === route.accountId,
-  );
+  const existingAccount = accountsStore.findAccount(route.accountId);
 
   return (
     <AccountFormContent
@@ -75,51 +61,10 @@ function AccountFormContent({
   route: RouteByType<"accountForm">;
   existingAccount?: Account;
 }) {
-  const { navigate, pop } = useRouter();
-  const { t } = useTranslation();
   const accountId = route.accountId;
   const isEdit = Boolean(accountId);
 
-  const [formData, setFormData] = useState<Form>(() =>
-    existingAccount
-      ? {
-          name: existingAccount.name,
-          color: existingAccount.color,
-          currency: existingAccount.currency,
-        }
-      : {
-          name: "",
-          color: accountColorsPalette[0].id,
-          currency: "USD",
-        },
-  );
-  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
-
-  const createAccountMutation = useMutation(
-    trpc.accounts.create.mutationOptions({
-      onSuccess: () => {
-        invalidateAccounts();
-      },
-    }),
-  );
-
-  const updateAccountMutation = useMutation(
-    trpc.accounts.update.mutationOptions({
-      onSuccess: () => {
-        invalidateAccounts();
-      },
-    }),
-  );
-
-  const deleteAccountMutation = useMutation(
-    trpc.accounts.delete.mutationOptions({
-      onSuccess: () => {
-        invalidateAccounts();
-        navigate({ type: "accounts" });
-        setShowDeleteConfirm(false);
-      },
-    }),
-  );
+  const [store] = useState(() => new AccountFormStore(existingAccount));
 
   const existingAccountColor = existingAccount?.color;
 
@@ -134,43 +79,10 @@ function AccountFormContent({
     return () => clearTimeout(timeoutId);
   }, [existingAccountColor]);
 
-  const handleSave = async (e: React.FormEvent) => {
-    e.preventDefault();
-    haptic("light");
-    try {
-      if (isEdit && accountId) {
-        await updateAccountMutation.mutateAsync({
-          id: accountId,
-          name: formData.name,
-          color: formData.color,
-        });
-      } else {
-        await createAccountMutation.mutateAsync({
-          name: formData.name,
-          color: formData.color,
-          currency: formData.currency,
-        });
-      }
-      pop();
-    } catch (error) {
-      console.error("Failed to save account:", error);
-    }
-  };
-
-  const handleDelete = async () => {
-    if (!accountId) return;
-
-    try {
-      await deleteAccountMutation.mutateAsync({ id: accountId });
-    } catch (error) {
-      console.error("Failed to delete account:", error);
-    }
-  };
-
   const handleTransactionsClick = () => {
     if (!accountId) return;
 
-    navigate({
+    routerStore.navigate({
       type: "transactions",
       filters: {
         accounts: [accountId],
@@ -183,30 +95,32 @@ function AccountFormContent({
   const handleImportClick = () => {
     if (!accountId) return;
 
-    navigate({ type: "importSettings", accountId });
+    routerStore.navigate({ type: "importSettings", accountId });
   };
 
   const handleCreateTransactionClick = () => {
     if (!accountId) return;
 
-    navigate({ type: "transactionForm", accountId });
+    routerStore.navigate({ type: "transactionForm", accountId });
   };
 
-  const isLoading =
-    createAccountMutation.isPending || updateAccountMutation.isPending;
+  const isLoading = store.isSaving;
 
   return (
     <Page title={isEdit ? t("accountsEditTitle") : t("accountsAddTitle")}>
-      <form onSubmit={handleSave}>
+      <form
+        onSubmit={(e) => {
+          e.preventDefault();
+          store.save();
+        }}
+      >
         <div className="flex-1 space-y-6">
           <div className="flex flex-col gap-2">
             <Label>{t("accountsName")}</Label>
             <Input
               placeholder={t("accountsNamePlaceholder")}
-              value={formData.name}
-              onChange={(e) =>
-                setFormData((prev) => ({ ...prev, name: e.target.value }))
-              }
+              value={store.form.name.value}
+              onChange={(e) => store.form.name.onChange(e.target.value)}
             />
           </div>
 
@@ -225,18 +139,12 @@ function AccountFormContent({
                   id={`color-${color.id}`}
                   type="button"
                   className="relative w-14 h-14 rounded-lg flex-shrink-0 flex items-center justify-center"
-                  onClick={() => {
-                    haptic("selection");
-                    setFormData((prev) => ({
-                      ...prev,
-                      color: color.id,
-                    }));
-                  }}
+                  onClick={() => store.form.color.onChange(color.id)}
                 >
                   <div
                     className={cn("absolute inset-0 rounded-lg", color.bg)}
                   />
-                  {formData.color === color.id && (
+                  {store.form.color.value === color.id && (
                     <CheckIcon
                       strokeWidth={4}
                       className={cn("w-5 h-5 relative", color.text)}
@@ -251,24 +159,20 @@ function AccountFormContent({
             <div className="flex flex-col gap-3">
               <Label>{t("accountsCurrency")}</Label>
               <Select
-                value={formData.currency}
-                onValueChange={(value) => {
-                  haptic("selection");
-                  setFormData((prev) => ({
-                    ...prev,
-                    currency: value as SupportedCurrency,
-                  }));
-                }}
+                value={store.form.currency.value}
+                onValueChange={(value) =>
+                  store.form.currency.onChange(value as SupportedCurrency)
+                }
               >
                 <SelectTrigger className="w-full">
                   <SelectValue>
                     {(() => {
                       const currency = SUPPORTED_CURRENCIES.find(
-                        (c) => c.code === formData.currency,
+                        (c) => c.code === store.form.currency.value,
                       );
                       return currency
                         ? `(${currency.symbol}) ${currency.code}`
-                        : formData.currency;
+                        : store.form.currency.value;
                     })()}
                   </SelectValue>
                 </SelectTrigger>
@@ -305,7 +209,7 @@ function AccountFormContent({
                   {t("accountsAdvanced")}
                 </FormActionButton>
                 <DeleteActionButton
-                  onClick={() => setShowDeleteConfirm(true)}
+                  onClick={() => store.setDeleteConfirmOpen(true)}
                 />
               </div>
             </div>
@@ -313,13 +217,13 @@ function AccountFormContent({
         </div>
 
         <ConfirmModal
-          isOpen={showDeleteConfirm}
-          onClose={() => setShowDeleteConfirm(false)}
-          onConfirm={handleDelete}
+          isOpen={store.isDeleteConfirmOpen}
+          onClose={() => store.setDeleteConfirmOpen(false)}
+          onConfirm={store.delete}
           title={t("accountsDeleteTitle")}
           description={t("accountsDeleteDescription")}
           confirmText={t("delete")}
-          isLoading={deleteAccountMutation.isPending}
+          isLoading={store.deleteMutation.isPending}
         />
 
         <Footer className={isTelegram() ? "grid-cols-1" : undefined}>
@@ -328,7 +232,7 @@ function AccountFormContent({
               size="lg"
               variant="outline"
               type="button"
-              onClick={pop}
+              onClick={routerStore.pop}
               disabled={isLoading}
             >
               <ArrowLeftIcon className="w-4 h-4" />
@@ -338,7 +242,7 @@ function AccountFormContent({
           <Button
             size="lg"
             type="submit"
-            disabled={!formData.name.trim() || isLoading}
+            disabled={!store.isValid || isLoading}
           >
             <LoadingSwap isLoading={isLoading}>{t("save")}</LoadingSwap>
           </Button>

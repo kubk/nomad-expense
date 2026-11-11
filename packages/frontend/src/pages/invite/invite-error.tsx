@@ -1,13 +1,10 @@
 import { XCircleIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { useRouter } from "@/shared/stacked-router/router";
-import { useTranslation } from "@/translations/translation-provider";
+import { routerStore } from "@/shared/stacked-router/router-store";
+import { t } from "@/translations/translation-store";
 
 export function InviteError({ errorMessage }: { errorMessage: string }) {
-  const { navigate } = useRouter();
-  const { t } = useTranslation();
-
   return (
     <div className="min-h-screen bg-background flex items-center justify-center p-4">
       <Card className="w-full max-w-md">
@@ -23,7 +20,7 @@ export function InviteError({ errorMessage }: { errorMessage: string }) {
               <p className="text-muted-foreground">{errorMessage}</p>
             </div>
             <Button
-              onClick={() => navigate({ type: "main" })}
+              onClick={() => routerStore.navigate({ type: "main" })}
               className="w-full"
             >
               {t("inviteGoToOverview")}

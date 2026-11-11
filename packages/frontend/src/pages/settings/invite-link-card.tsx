@@ -6,7 +6,7 @@ import { DateTime } from "luxon";
 import { generateInviteUrl } from "./generate-invite-url";
 import { copyToClipboard } from "../../shared/copy-to-clipboard";
 import { haptic } from "@/shared/platform/haptics";
-import { useTranslation } from "@/translations/translation-provider";
+import { t } from "@/translations/translation-store";
 
 export function InviteLinkCard({
   invite,
@@ -16,7 +16,6 @@ export function InviteLinkCard({
     expiresAt: string;
   };
 }) {
-  const { t } = useTranslation();
   const [copied, setCopied] = useState(false);
 
   const inviteUrl = generateInviteUrl(invite.code);

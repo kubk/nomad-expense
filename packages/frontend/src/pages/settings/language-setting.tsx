@@ -6,7 +6,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { haptic } from "@/shared/platform/haptics";
-import { useTranslation } from "@/translations/translation-provider";
+import { translationStore } from "@/translations/translation-store";
 import type { LanguageMode } from "@/translations/translations";
 
 const languageModes: LanguageMode[] = ["auto", "en", "ru"];
@@ -17,14 +17,12 @@ const languageLabels: Record<LanguageMode, string> = {
 };
 
 export function LanguageSetting() {
-  const { languageMode, setLanguageMode } = useTranslation();
-
   return (
     <Select
-      value={languageMode}
+      value={translationStore.languageMode}
       onValueChange={(value) => {
         haptic("selection");
-        setLanguageMode(value as LanguageMode);
+        translationStore.setLanguageMode(value as LanguageMode);
       }}
     >
       <SelectTrigger className="w-full">

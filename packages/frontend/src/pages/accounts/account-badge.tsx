@@ -1,13 +1,9 @@
-import { trpc } from "@/shared/api";
-import { useQuery } from "@tanstack/react-query";
+import { accountsStore } from "@/store/accounts-store";
 import { cn } from "@/lib/utils";
 import { getColorById } from "./account-colors";
 
 export function AccountBadge({ accountId }: { accountId: string }) {
-  const { data: account } = useQuery({
-    ...trpc.accounts.list.queryOptions(),
-    select: (accounts) => accounts.find((a) => a.id === accountId),
-  });
+  const account = accountsStore.findAccount(accountId);
 
   if (!account) {
     return null;

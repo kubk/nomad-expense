@@ -7,71 +7,78 @@ import { Calendar } from "@/components/ui/calendar";
 import { DrawerFooter } from "@/components/ui/drawer";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import type { TransactionFilters } from "api";
-import { useAvailableYears } from "@/shared/hooks/use-available-years";
+import type { FiltersFormStore } from "./filters-form-store";
 import {
   formatTransactionDateRange,
   getTransactionDateRange,
 } from "@/shared/transaction-date-range";
 import { haptic } from "@/shared/platform/haptics";
-import { useTranslation } from "@/translations/translation-provider";
+import { t, translationStore } from "@/translations/translation-store";
 
 function getMonthPair(date: Date) {
   return new Date(date.getFullYear(), Math.floor(date.getMonth() / 2) * 2, 1);
 }
 
-export function CustomDatePicker({
-  filters,
-  onApply,
-  onBack,
-}: {
-  filters: TransactionFilters;
-  onApply: (filters: TransactionFilters) => void;
-  onBack: (filters?: TransactionFilters) => void;
-}) {
-  const { t, language } = useTranslation();
-  const availableYears = useAvailableYears(filters.accounts);
-  const [range, setRange] = useState<DateRange>(() => getTransactionDateRange(filters.date));
+export function CustomDatePicker({ store }: { store: FiltersFormStore }) {
+  const availableYears = store.availableYears;
+  const [range, setRange] = useState<DateRange>(() =>
+    getTransactionDateRange(store.form.date.value),
+  );
   const initialRangeRef = useRef(range);
-  const [month, setMonth] = useState(() => getMonthPair(range.from ?? new Date()));
+  const [month, setMonth] = useState(() =>
+    getMonthPair(range.from ?? new Date()),
+  );
   const monthStripRef = useRef<HTMLDivElement>(null);
   const selectedMonthRef = useRef<HTMLButtonElement>(null);
   const today = new Date();
   const currentYear = today.getFullYear();
   const currentMonthPair = getMonthPair(today);
-  const firstYear = Math.min(currentYear - 3, ...availableYears, month.getFullYear());
-  const lastYear = Math.max(currentYear, ...availableYears, month.getFullYear());
-  const monthFormatter = new Intl.DateTimeFormat(language, { month: "short" });
-  const formatMonthLabel = (date: Date) => monthFormatter.format(date).replace(/\.$/, "");
-  const monthPairs = Array.from({ length: (lastYear - firstYear + 1) * 6 }, (_, index) =>
-    new Date(firstYear + Math.floor(index / 6), (index % 6) * 2, 1),
+  const firstYear = Math.min(
+    currentYear - 3,
+    ...availableYears,
+    month.getFullYear(),
+  );
+  const lastYear = Math.max(
+    currentYear,
+    ...availableYears,
+    month.getFullYear(),
+  );
+  const monthFormatter = new Intl.DateTimeFormat(translationStore.language, {
+    month: "short",
+  });
+  const formatMonthLabel = (date: Date) =>
+    monthFormatter.format(date).replace(/\.$/, "");
+  const monthPairs = Array.from(
+    { length: (lastYear - firstYear + 1) * 6 },
+    (_, index) =>
+      new Date(firstYear + Math.floor(index / 6), (index % 6) * 2, 1),
   ).filter((pair) => pair.getTime() <= currentMonthPair.getTime());
 
   useLayoutEffect(() => {
     const strip = monthStripRef.current;
     const selected = selectedMonthRef.current;
     if (strip && selected) {
-      strip.scrollLeft = selected.offsetLeft - (strip.clientWidth - selected.clientWidth) / 2;
+      strip.scrollLeft =
+        selected.offsetLeft - (strip.clientWidth - selected.clientWidth) / 2;
     }
   }, [month, firstYear, lastYear]);
 
-  const getSelectedFilters = (): TransactionFilters | undefined => {
+  const getSelectedDate = (): TransactionFilters["date"] | undefined => {
     if (!range.from || !range.to) return undefined;
     return {
-      ...filters,
-      date: {
-        type: "range",
-        from: DateTime.fromJSDate(range.from).toFormat("yyyy-MM-dd"),
-        to: DateTime.fromJSDate(range.to).toFormat("yyyy-MM-dd"),
-        timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
-      },
+      type: "range",
+      from: DateTime.fromJSDate(range.from).toFormat("yyyy-MM-dd"),
+      to: DateTime.fromJSDate(range.to).toFormat("yyyy-MM-dd"),
+      timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
     };
   };
 
   const handleBack = () => {
     const initialRange = initialRangeRef.current;
-    const hasChanged = range.from?.getTime() !== initialRange.from?.getTime()
-      || range.to?.getTime() !== initialRange.to?.getTime();
-    onBack(hasChanged ? getSelectedFilters() : undefined);
+    const hasChanged =
+      range.from?.getTime() !== initialRange.from?.getTime() ||
+      range.to?.getTime() !== initialRange.to?.getTime();
+    store.closeCustomDatePicker(hasChanged ? getSelectedDate() : undefined);
   };
 
   return (
@@ -90,21 +97,29 @@ export function CustomDatePicker({
           className="relative overflow-x-auto rounded-lg bg-muted [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
         >
           <TabsList className="h-16 justify-start gap-1">
-          {monthPairs.map((pair) => {
-            const isSelected = pair.getTime() === month.getTime();
-            const nextMonth = new Date(pair.getFullYear(), pair.getMonth() + 1, 1);
-            return (
-              <TabsTrigger
-                key={pair.getTime()}
-                value={String(pair.getTime())}
-                ref={isSelected ? selectedMonthRef : undefined}
-                className="h-[58px] min-w-[88px] shrink-0 flex-none flex-col gap-0.5 px-2"
-              >
-                <span className="whitespace-nowrap">{formatMonthLabel(pair)}-{formatMonthLabel(nextMonth)}</span>
-                <span className="text-xs font-normal opacity-65">{pair.getFullYear()}</span>
-              </TabsTrigger>
-            );
-          })}
+            {monthPairs.map((pair) => {
+              const isSelected = pair.getTime() === month.getTime();
+              const nextMonth = new Date(
+                pair.getFullYear(),
+                pair.getMonth() + 1,
+                1,
+              );
+              return (
+                <TabsTrigger
+                  key={pair.getTime()}
+                  value={String(pair.getTime())}
+                  ref={isSelected ? selectedMonthRef : undefined}
+                  className="h-[58px] min-w-[88px] shrink-0 flex-none flex-col gap-0.5 px-2"
+                >
+                  <span className="whitespace-nowrap">
+                    {formatMonthLabel(pair)}-{formatMonthLabel(nextMonth)}
+                  </span>
+                  <span className="text-xs font-normal opacity-65">
+                    {pair.getFullYear()}
+                  </span>
+                </TabsTrigger>
+              );
+            })}
           </TabsList>
         </div>
       </div>
@@ -127,7 +142,7 @@ export function CustomDatePicker({
           pagedNavigation
           endMonth={today}
           disabled={{ after: today }}
-          locale={language === "ru" ? ru : enUS}
+          locale={translationStore.language === "ru" ? ru : enUS}
           className="w-full p-0 [--cell-size:44px] [&_[data-day]]:h-11 [&_[data-day]]:min-w-0 [&_[data-day]]:aspect-auto"
           classNames={{
             root: "w-full",
@@ -140,7 +155,8 @@ export function CustomDatePicker({
       </TabsContent>
       <div className="shrink-0 border-t">
         <p className="px-4 py-6 text-center text-lg leading-snug font-semibold tracking-tight">
-          {formatTransactionDateRange(range, language) || t("filtersChooseDates")}
+          {formatTransactionDateRange(range, translationStore.language) ||
+            t("filtersChooseDates")}
         </p>
         <DrawerFooter className="flex-row pt-0 [&_button]:flex-1">
           <Button size="lg" variant="outline" onClick={handleBack}>
@@ -150,8 +166,10 @@ export function CustomDatePicker({
             size="lg"
             disabled={!range.from || !range.to}
             onClick={() => {
-              const selectedFilters = getSelectedFilters();
-              if (selectedFilters) onApply(selectedFilters);
+              const date = getSelectedDate();
+              if (!date) return;
+              store.form.date.onChange(date);
+              store.apply();
             }}
           >
             {t("applyFilters")}

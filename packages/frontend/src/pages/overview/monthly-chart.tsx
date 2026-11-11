@@ -3,40 +3,24 @@ import { formatAmount } from "../../shared/currency-formatter";
 import { cn } from "@/lib/utils";
 import { MonthlyChartEmptyState } from "./monthly-chart-empty-state";
 import { MonthlyChartLoader } from "./monthly-chart-loader";
-import { useRouter } from "@/shared/stacked-router/router";
+import { routerStore } from "@/shared/stacked-router/router-store";
 import { calculateMaxAmount } from "../../shared/chart-calculations";
-import { useBaseCurrency } from "@/shared/hooks/use-base-currency";
+import { familyStore } from "@/store/family-store";
 import { haptic } from "@/shared/platform/haptics";
 import { getTransactionMonthRange } from "@/shared/transaction-date-range";
 import { getShortMonthName } from "@/shared/date-utils";
-import { useAccountIds } from "@/shared/hooks/use-account-ids";
+import { overviewStore } from "@/store/overview-store";
 import { LoaderCircleIcon } from "lucide-react";
-import type { RouterOutputs } from "api";
 
-type OverviewData = RouterOutputs["expenses"]["overview"];
-
-export function MonthlyChart({
-  overviewPages,
-  isLoading,
-  isFetchingPreviousPage,
-  hasPreviousPage,
-  fetchPreviousPage,
-}: {
-  overviewPages: OverviewData[];
-  isLoading: boolean;
-  isFetchingPreviousPage: boolean;
-  hasPreviousPage: boolean;
-  fetchPreviousPage: () => Promise<unknown>;
-}) {
+export function MonthlyChart() {
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const didScrollToLatestRef = useRef(false);
   const previousScrollWidthRef = useRef<number | undefined>(undefined);
   const previousScrollLeftRef = useRef(0);
-  const { navigate } = useRouter();
-  const accountIds = useAccountIds();
-  const baseCurrency = useBaseCurrency();
 
-  const sortedMonthlyData = overviewPages.flatMap((page) => page.overview.data);
+  const isLoading = overviewStore.isLoading;
+  const isFetchingPreviousPage = overviewStore.isFetchingOlderMonths;
+  const sortedMonthlyData = overviewStore.months;
   const maxAmount = calculateMaxAmount(sortedMonthlyData);
 
   useEffect(() => {
@@ -67,7 +51,7 @@ export function MonthlyChart({
     if (
       !scrollContainer ||
       scrollContainer.scrollLeft > 24 ||
-      !hasPreviousPage ||
+      !overviewStore.hasOlderMonths ||
       isFetchingPreviousPage
     ) {
       return;
@@ -75,9 +59,7 @@ export function MonthlyChart({
 
     previousScrollWidthRef.current = scrollContainer.scrollWidth;
     previousScrollLeftRef.current = scrollContainer.scrollLeft;
-    fetchPreviousPage().catch(() => {
-      previousScrollWidthRef.current = undefined;
-    });
+    overviewStore.loadOlderMonths();
   };
 
   return (
@@ -116,18 +98,20 @@ export function MonthlyChart({
                     className="flex flex-col cursor-pointer items-center min-w-[64px]"
                     onClick={() => {
                       haptic("selection");
-                      navigate({
+                      routerStore.navigate({
                         type: "transactions",
                         filters: {
-                          accounts: accountIds,
-                          date: getTransactionMonthRange(month.year, month.monthNumber),
+                          date: getTransactionMonthRange(
+                            month.year,
+                            month.monthNumber,
+                          ),
                           order: { field: "createdAt", direction: "desc" },
                         },
                       });
                     }}
                   >
                     <div className="mb-4 text-xs font-semibold text-foreground text-center font-mono">
-                      {formatAmount(month.usdAmount, baseCurrency, {
+                      {formatAmount(month.usdAmount, familyStore.baseCurrency, {
                         showFractions: false,
                       })}
                     </div>

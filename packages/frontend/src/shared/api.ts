@@ -1,20 +1,10 @@
 import { env } from "./env";
 import type { ApiRouter } from "api";
-import { QueryClient } from "@tanstack/react-query";
 import { createTRPCClient, httpLink } from "@trpc/client";
-import { createTRPCOptionsProxy } from "@trpc/tanstack-react-query";
 import { getAuthToken } from "./auth-token";
+import { createApiProxy } from "./create-api-proxy";
 
-export const queryClient = new QueryClient({
-  defaultOptions: {
-    queries: {
-      staleTime: 1000 * 60 * 5,
-      gcTime: 1000 * 60 * 10,
-    },
-  },
-});
-
-const trpcClient = createTRPCClient<ApiRouter>({
+export const api = createTRPCClient<ApiRouter>({
   links: [
     httpLink({
       url: env.VITE_API_URL,
@@ -25,7 +15,5 @@ const trpcClient = createTRPCClient<ApiRouter>({
   ],
 });
 
-export const trpc = createTRPCOptionsProxy<ApiRouter>({
-  client: trpcClient,
-  queryClient,
-});
+// Turns `apiProxy.accounts.list.query()` into a mobx-query-lite config keyed by the procedure path and input
+export const apiProxy = createApiProxy(api);

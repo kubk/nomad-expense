@@ -8,7 +8,7 @@ import {
 import { createPortal } from "react-dom";
 import { ArrowUpDownIcon, MoreVerticalIcon, PlusIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { useTranslation } from "@/translations/translation-provider";
+import { t } from "@/translations/translation-store";
 
 type MenuPosition = {
   top: number;
@@ -31,7 +31,6 @@ export function AccountsActionsMenu({
   onCreateAccount,
   onReorderAccounts,
 }: AccountsActionsMenuProps) {
-  const { t } = useTranslation();
   const triggerRef = useRef<HTMLButtonElement>(null);
   const menuRef = useRef<HTMLDivElement>(null);
   const [isOpen, setIsOpen] = useState(false);

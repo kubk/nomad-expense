@@ -8,11 +8,7 @@ import { convertWithLiveRate } from "../services/money/exchange-rate-api";
 
 vi.mock("../services/money/exchange-rate-api", () => ({
   convertWithLiveRate: vi.fn(
-    async (
-      amountInCents: number,
-      fromCurrency: string,
-      toCurrency: string,
-    ) => {
+    async (amountInCents: number, fromCurrency: string, toCurrency: string) => {
       if (fromCurrency === toCurrency) {
         return amountInCents;
       }
@@ -79,5 +75,67 @@ describe("transaction router", () => {
       "USD",
       new Date(updatedCreatedAt),
     );
+  });
+
+  it("lists every family account when the filter omits accounts", async () => {
+    const caller = await getCaller({ loginAs: "alice" });
+    const baseFilters = {
+      date: { type: "all" as const },
+      order: { field: "createdAt" as const, direction: "desc" as const },
+    };
+
+    const omitted = await caller.expenses.transactionsList(baseFilters);
+    const explicit = await caller.expenses.transactionsList({
+      ...baseFilters,
+      accounts: [
+        fixtures.accounts.accountTry.id,
+        fixtures.accounts.accountUsd.id,
+      ],
+    });
+    const tryOnly = await caller.expenses.transactionsList({
+      ...baseFilters,
+      accounts: [fixtures.accounts.accountTry.id],
+    });
+
+    const ids = (result: typeof omitted) =>
+      result.transactions.map((transaction) => transaction.id).sort();
+    expect(ids(omitted)).toEqual(ids(explicit));
+    expect(ids(tryOnly).length).toBeGreaterThan(0);
+    expect(ids(tryOnly).length).toBeLessThan(ids(omitted).length);
+  });
+
+  it("leaves accounts excluded from the monthly breakdown out of it even when the filter lists them", async () => {
+    const caller = await getCaller({ loginAs: "alice" });
+    const filters = {
+      accounts: [
+        fixtures.accounts.accountTry.id,
+        fixtures.accounts.accountUsd.id,
+      ],
+      date: { type: "all" as const },
+      order: { field: "createdAt" as const, direction: "desc" as const },
+    };
+
+    // Income only exists on the USD account
+    const before = await caller.expenses.transactionsByMonth(filters);
+    expect(before.totalIncome).toBeGreaterThan(0);
+
+    await caller.family.updateMonthlyBreakdownExcludedAccountIds({
+      excludedAccountIds: [fixtures.accounts.accountUsd.id],
+    });
+
+    const listed = await caller.expenses.transactionsByMonth(filters);
+    const omitted = await caller.expenses.transactionsByMonth({
+      ...filters,
+      accounts: undefined,
+    });
+    const tryOnly = await caller.expenses.transactionsByMonth({
+      ...filters,
+      accounts: [fixtures.accounts.accountTry.id],
+    });
+
+    expect(listed.totalIncome).toBe(0);
+    expect(listed).toEqual(tryOnly);
+    expect(omitted).toEqual(tryOnly);
+    expect(tryOnly.totalExpenses).toBeGreaterThan(0);
   });
 });

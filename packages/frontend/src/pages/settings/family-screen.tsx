@@ -4,36 +4,18 @@ import { LoadingSwap } from "@/components/ui/loading-swap";
 import { Page } from "../widgets/page";
 import { FamilyMemberItem } from "./family-member-item";
 import { InviteLinkCard } from "./invite-link-card";
-import { trpc } from "@/shared/api";
-import { useQuery, useMutation } from "@tanstack/react-query";
+import { familyStore } from "@/store/family-store";
 import { useState } from "react";
 import { FamilyHelp } from "./family-help";
-import { haptic } from "@/shared/platform/haptics";
-import { useTranslation } from "@/translations/translation-provider";
+import { t } from "@/translations/translation-store";
 
 export function FamilyScreen() {
-  const { t } = useTranslation();
   const [isHelpOpen, setIsHelpOpen] = useState(false);
 
-  const { data: members, isLoading: isMembersLoading } = useQuery(
-    trpc.family.listMembers.queryOptions(),
-  );
-  const { data: activeInvite, refetch: refetchActiveInvite } = useQuery(
-    trpc.family.getActiveInvite.queryOptions(),
-  );
-
-  const generateInviteMutation = useMutation(
-    trpc.family.generateInvite.mutationOptions({
-      onSuccess: () => {
-        refetchActiveInvite();
-      },
-    }),
-  );
-
-  const handleGenerateInvite = () => {
-    haptic("light");
-    generateInviteMutation.mutate();
-  };
+  const members = familyStore.membersQuery.data;
+  const isMembersLoading = familyStore.membersQuery.isPending;
+  const activeInvite = familyStore.activeInviteQuery.data;
+  const isGeneratingInvite = familyStore.generateInviteMutation.isPending;
 
   return (
     <Page title={t("familyTitle")}>
@@ -58,11 +40,11 @@ export function FamilyScreen() {
                 {t("familyInviteDescription")}
               </p>
               <Button
-                onClick={handleGenerateInvite}
+                onClick={familyStore.generateInvite}
                 size="lg"
-                disabled={generateInviteMutation.isPending}
+                disabled={isGeneratingInvite}
               >
-                <LoadingSwap isLoading={generateInviteMutation.isPending}>
+                <LoadingSwap isLoading={isGeneratingInvite}>
                   <span className="inline-flex items-center gap-2">
                     <PlusIcon className="size-4" />
                     {t("familyGenerateInvite")}

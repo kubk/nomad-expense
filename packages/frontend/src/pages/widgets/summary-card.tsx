@@ -6,11 +6,15 @@ import {
 } from "lucide-react";
 import { formatAmount } from "../../shared/currency-formatter";
 import { type TransactionFilters } from "api";
+import type { FiltersState } from "./filters-form-store";
 import { Skeleton } from "@/components/ui/skeleton";
-import { formatTransactionDateRange, getTransactionDateRange } from "@/shared/transaction-date-range";
-import { useBaseCurrency } from "@/shared/hooks/use-base-currency";
+import {
+  formatTransactionDateRange,
+  getTransactionDateRange,
+} from "@/shared/transaction-date-range";
+import { familyStore } from "@/store/family-store";
 import { haptic } from "@/shared/platform/haptics";
-import { useTranslation } from "@/translations/translation-provider";
+import { t, translationStore } from "@/translations/translation-store";
 
 export function TransactionListSkeleton() {
   return (
@@ -25,25 +29,23 @@ export function TransactionListSkeleton() {
 }
 
 export function TransactionFiltersSummary({
-  onFiltersClick,
-  filters,
-  totalExpenses,
-  totalIncome,
-  isLoading,
+  store,
 }: {
-  onFiltersClick: () => void;
-  filters: TransactionFilters;
-  totalExpenses: number;
-  totalIncome: number;
-  isLoading: boolean;
+  store: {
+    filtersState: FiltersState;
+    isLoading: boolean;
+    accountCount: number;
+    data?: { totalExpenses: number; totalIncome: number };
+  };
 }) {
   return (
     <SummaryCard
-      onFiltersClick={onFiltersClick}
-      appliedFilters={filters}
-      totalAmount={totalExpenses}
-      totalIncome={totalIncome}
-      isLoading={isLoading}
+      onFiltersClick={() => store.filtersState.setFiltersOpen(true)}
+      appliedFilters={store.filtersState.filters}
+      accountCount={store.accountCount}
+      totalAmount={store.data?.totalExpenses ?? 0}
+      totalIncome={store.data?.totalIncome ?? 0}
+      isLoading={store.isLoading}
     />
   );
 }
@@ -54,18 +56,17 @@ function SummaryCard({
   totalAmount,
   totalIncome,
   isLoading,
+  accountCount,
 }: {
   onFiltersClick: () => void;
   appliedFilters: TransactionFilters;
   totalAmount: number;
   totalIncome: number;
   isLoading: boolean;
+  accountCount: number;
 }) {
-  const baseCurrency = useBaseCurrency();
-  const { t, language } = useTranslation();
-
   const getAccountsLabel = () => {
-    return t("filtersAccountCount", appliedFilters.accounts.length);
+    return t("filtersAccountCount", accountCount);
   };
 
   const getDateLabel = () => {
@@ -73,7 +74,10 @@ function SummaryCard({
       return t("filtersLastDays", appliedFilters.date.value);
     }
     if (appliedFilters.date.type === "range") {
-      return formatTransactionDateRange(getTransactionDateRange(appliedFilters.date), language);
+      return formatTransactionDateRange(
+        getTransactionDateRange(appliedFilters.date),
+        translationStore.language,
+      );
     }
     if (appliedFilters.date.type === "months") {
       return t("filtersLastMonths", appliedFilters.date.value);
@@ -141,7 +145,7 @@ function SummaryCard({
               <Skeleton className="h-8 w-22" />
             ) : (
               <div className="text-2xl font-bold text-foreground font-mono">
-                {formatAmount(totalAmount, baseCurrency, {
+                {formatAmount(totalAmount, familyStore.baseCurrency, {
                   showFractions: false,
                 })}
               </div>
@@ -161,7 +165,7 @@ function SummaryCard({
               <div className="text-2xl flex items-center gap-1 font-bold text-green-600 dark:text-green-400 font-mono">
                 <span>+</span>
                 <span>
-                  {formatAmount(totalIncome, baseCurrency, {
+                  {formatAmount(totalIncome, familyStore.baseCurrency, {
                     showFractions: false,
                   })}
                 </span>

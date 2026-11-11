@@ -9,7 +9,8 @@ const toPositiveNumberSchema = v.pipe(
 );
 
 const transactionFiltersSchema = v.object({
-  accounts: v.array(v.string()),
+  // Omitted means every account
+  accounts: v.optional(v.array(v.string())),
   transactionType: v.optional(v.picklist(transactionType)),
   description: v.optional(
     v.object({

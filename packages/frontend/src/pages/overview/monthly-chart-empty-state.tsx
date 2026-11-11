@@ -1,8 +1,6 @@
-import { useTranslation } from "@/translations/translation-provider";
+import { t } from "@/translations/translation-store";
 
 export function MonthlyChartEmptyState() {
-  const { t } = useTranslation();
-
   return (
     <div className="flex flex-col items-center justify-center">
       <div className="w-full mb-6">

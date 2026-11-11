@@ -6,25 +6,22 @@ import {
 } from "lucide-react";
 import { AnimatePresence, motion } from "framer-motion";
 import { cn } from "@/lib/utils";
-import { useRouter } from "@/shared/stacked-router/router";
+import { routerStore } from "@/shared/stacked-router/router-store";
 import { Route } from "@/shared/stacked-router/routes";
 import { platform } from "@/shared/platform/platforms";
 import { haptic } from "@/shared/platform/haptics";
-import { useTranslation } from "@/translations/translation-provider";
+import { t } from "@/translations/translation-store";
 
 export function Navigation() {
-  const { currentRoute, navigate } = useRouter();
-  const { t } = useTranslation();
-
   const shouldHide =
-    currentRoute.type === "monthlyBreakdownFull" ||
-    currentRoute.type === "monthlyBreakdownSettings" ||
-    currentRoute.type === "monthlyBreakdownAccounts" ||
-    currentRoute.type === "transactionForm" ||
-    currentRoute.type === "importSettings" ||
-    currentRoute.type === "accountForm" ||
-    currentRoute.type === "auth" ||
-    currentRoute.type === "invite";
+    routerStore.currentRoute.type === "monthlyBreakdownFull" ||
+    routerStore.currentRoute.type === "monthlyBreakdownSettings" ||
+    routerStore.currentRoute.type === "monthlyBreakdownAccounts" ||
+    routerStore.currentRoute.type === "transactionForm" ||
+    routerStore.currentRoute.type === "importSettings" ||
+    routerStore.currentRoute.type === "accountForm" ||
+    routerStore.currentRoute.type === "auth" ||
+    routerStore.currentRoute.type === "invite";
 
   const navItems: Array<{
     routeKey: string;
@@ -75,13 +72,13 @@ export function Navigation() {
         >
           <div className="flex justify-around items-center py-3">
             {navItems.map(({ routeKey, route, icon: Icon, label }) => {
-              const isActive = route.type === currentRoute.type;
+              const isActive = route.type === routerStore.currentRoute.type;
               return (
                 <button
                   key={routeKey}
                   onClick={() => {
                     haptic("selection");
-                    navigate(route);
+                    routerStore.navigate(route);
                   }}
                   className={cn(
                     "flex flex-col items-center gap-1 px-3 py-2 rounded-lg transition-colors",

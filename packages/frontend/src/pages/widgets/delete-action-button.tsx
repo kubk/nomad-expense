@@ -1,11 +1,9 @@
 import { Trash2Icon } from "lucide-react";
 import { FormActionButton } from "@/components/ui/form-action-button";
 import { haptic } from "@/shared/platform/haptics";
-import { useTranslation } from "@/translations/translation-provider";
+import { t } from "@/translations/translation-store";
 
 export function DeleteActionButton({ onClick }: { onClick: () => void }) {
-  const { t } = useTranslation();
-
   return (
     <FormActionButton
       onClick={() => {

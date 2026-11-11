@@ -1,6 +1,6 @@
 import { MonthlyData } from "api";
 import { formatAmount } from "../../shared/currency-formatter";
-import { useBaseCurrency } from "@/shared/hooks/use-base-currency";
+import { familyStore } from "@/store/family-store";
 import { getShortMonthName } from "@/shared/date-utils";
 
 export function MonthlyBreakdownItem({
@@ -16,7 +16,6 @@ export function MonthlyBreakdownItem({
   maxAmount: number;
   onMonthClick: (month: MonthlyData) => void;
 }) {
-  const baseCurrency = useBaseCurrency();
   const widthPercentage = (month.usdAmount / maxAmount) * 100;
   const barWidth = Math.max(widthPercentage, 2); // Minimum 2% width
 
@@ -32,7 +31,7 @@ export function MonthlyBreakdownItem({
               {getShortMonthName(month.monthNumber)} {month.year}
             </div>
             <div className="font-semibold text-foreground font-mono">
-              {formatAmount(month.usdAmount, baseCurrency)}
+              {formatAmount(month.usdAmount, familyStore.baseCurrency)}
             </div>
           </div>
 
