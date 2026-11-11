@@ -1,4 +1,5 @@
 import { Platform } from "./platforms";
+import { addIosStartupImages } from "./ios-startup-image";
 
 function isStandaloneMode() {
   const navigator = window.navigator as Navigator & { standalone?: boolean };
@@ -11,7 +12,9 @@ function isStandaloneMode() {
 
 export function createBrowserPlatform(): Platform {
   return {
-    initialize() {},
+    initialize() {
+      addIosStartupImages();
+    },
     safeAreaInset() {
       if (isStandaloneMode()) {
         return {
