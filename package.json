@@ -21,6 +21,7 @@
     "git-filter": "2.6.0",
     "oxlint": "^1.85.0",
     "prettier": "^3.5.3",
-    "slop-police": "^0.3.19"
+    "slop-police": "^0.3.19",
+    "slop-police-kubk-pet-projects": "^0.1.1"
   }
 }
