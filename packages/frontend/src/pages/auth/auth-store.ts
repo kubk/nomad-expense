@@ -79,10 +79,6 @@ export class AuthStore {
     return Number.isSafeInteger(this.clientId) && this.clientId > 0;
   }
 
-  get isReady() {
-    return this.isConfigured && Boolean(this.telegramLogin);
-  }
-
   get isUnavailable() {
     return (
       this.isTelegramLoginUnavailable ||
