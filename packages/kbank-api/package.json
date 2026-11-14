@@ -5,12 +5,11 @@
 		"deploy": "wrangler deploy",
 		"start": "wrangler dev",
 		"test": "echo 1",
-		"typecheck": "tsc -b --noEmit",
+		"typecheck": "tsrs -b --noEmit",
 		"cf-typegen": "wrangler types"
 	},
 	"devDependencies": {
 		"@types/node": "^24.5.2",
-		"typescript": "7.0.2",
 		"wrangler": "^4.38.0"
 	},
 	"dependencies": {

@@ -9,7 +9,7 @@ ENV TZ=UTC
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
 COPY packages/kbank-parser/package.json ./packages/kbank-parser/package.json
 
-RUN corepack enable && if [ "$INSTALL_DEV" = "true" ]; then pnpm install --filter kbank-parser --frozen-lockfile; else pnpm install --filter kbank-parser --prod --frozen-lockfile; fi
+RUN corepack enable && if [ "$INSTALL_DEV" = "true" ]; then pnpm install --filter kbank-parser --filter . --frozen-lockfile; else pnpm install --filter kbank-parser --prod --frozen-lockfile; fi
 
 COPY packages/kbank-parser ./packages/kbank-parser
 

@@ -22,6 +22,8 @@
     "oxlint": "^1.85.0",
     "prettier": "^3.5.3",
     "slop-police": "^0.3.25",
-    "slop-police-kubk-pet-projects": "^0.1.1"
+    "slop-police-kubk-pet-projects": "^0.1.1",
+    "tsrs": "0.25.0-ts7.1.0-beta",
+    "typescript": "^7.0.2"
   }
 }
