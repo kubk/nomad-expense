@@ -1,4 +1,5 @@
 import { expect, it, describe, vi } from "vitest";
+import { DateTime } from "luxon";
 import { eq } from "drizzle-orm";
 import { setUpDbTest, fixtures } from "../lib/testing/set-up-db-test";
 import { getCaller } from "../lib/testing/get-trpc-caller";
@@ -137,5 +138,71 @@ describe("transaction router", () => {
     expect(listed).toEqual(tryOnly);
     expect(omitted).toEqual(tryOnly);
     expect(tryOnly.totalExpenses).toBeGreaterThan(0);
+  });
+
+  it("overview pages the latest expense months across gaps and shows the newest transactions of any account", async () => {
+    const db = getDb();
+    const monthStart = DateTime.utc().startOf("month").plus({ days: 1 });
+    // A ten-month gap pushes the page's older months far behind the latest ones
+    const expenseMonthsAgo = [0, 1, 12, 13, 14, 15, 16, 17, 18];
+    const transaction = {
+      accountId: fixtures.accounts.accountUsd.id,
+      description: "Groceries",
+      amount: 1000,
+      currency: "USD" as const,
+      usdAmount: 1000,
+    };
+    await db.insert(transactionTable).values(
+      expenseMonthsAgo.map((monthsAgo) => ({
+        ...transaction,
+        usdAmount: 1000 + monthsAgo,
+        createdAt: monthStart.minus({ months: monthsAgo }).toJSDate(),
+      })),
+    );
+    // Income stays out of the breakdown but is the newest activity
+    const now = DateTime.utc().startOf("second");
+    const inDays = (days: number) => now.plus({ days }).toJSDate();
+    await db.insert(transactionTable).values([
+      { ...transaction, type: "income", createdAt: inDays(3) },
+      { ...transaction, type: "income", createdAt: inDays(2) },
+      {
+        ...transaction,
+        accountId: fixtures.accounts.accountTry.id,
+        currency: "TRY",
+        type: "income",
+        createdAt: inDays(1),
+      },
+    ]);
+
+    const caller = await getCaller({ loginAs: "alice" });
+    const overview = await caller.expenses.overview({ cursor: 0 });
+
+    expect(
+      overview.overview.data.map(({ year, monthNumber, usdAmount }) => ({
+        year,
+        monthNumber,
+        usdAmount,
+      })),
+    ).toEqual(
+      [17, 16, 15, 14, 13, 12, 1, 0].map((monthsAgo) => {
+        const month = monthStart.minus({ months: monthsAgo });
+        return {
+          year: month.year,
+          monthNumber: month.month,
+          usdAmount: 1000 + monthsAgo,
+        };
+      }),
+    );
+    expect(overview.overview.previousCursor).toBe(1);
+    expect(
+      overview.recentTransactions.map(({ accountId, createdAt }) => ({
+        accountId,
+        createdAt,
+      })),
+    ).toEqual([
+      { accountId: fixtures.accounts.accountUsd.id, createdAt: inDays(3) },
+      { accountId: fixtures.accounts.accountUsd.id, createdAt: inDays(2) },
+      { accountId: fixtures.accounts.accountTry.id, createdAt: inDays(1) },
+    ]);
   });
 });

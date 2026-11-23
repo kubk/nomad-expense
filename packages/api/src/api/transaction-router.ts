@@ -9,6 +9,7 @@ import {
   notInArray,
   sql,
   ilike,
+  type SQL,
 } from "drizzle-orm";
 import { DateTime } from "luxon";
 import { protectedProcedure, t } from "./trpc";
@@ -221,21 +222,37 @@ const getMonthlyBreakdown = async ({
     conditions.push(notInArray(accountTable.id, excludedAccountIds));
   }
 
-  const monthlyBreakdownDb = db
-    .select({
-      year,
-      monthNumber: month,
-      usdAmount: sql<number>`COALESCE(SUM(${transactionTable.usdAmount}), 0)::integer`,
-    })
-    .from(transactionTable)
-    .innerJoin(accountTable, eq(transactionTable.accountId, accountTable.id))
-    .where(and(...conditions))
-    .groupBy(year, month)
-    .orderBy(desc(year), desc(month));
+  const getMonths = (since?: SQL) =>
+    db
+      .select({
+        year,
+        monthNumber: month,
+        usdAmount: sql<number>`COALESCE(SUM(${transactionTable.usdAmount}), 0)::integer`,
+      })
+      .from(transactionTable)
+      .innerJoin(accountTable, eq(transactionTable.accountId, accountTable.id))
+      .where(
+        and(
+          ...conditions,
+          since ? gte(transactionTable.createdAt, since) : undefined,
+        ),
+      )
+      .groupBy(year, month)
+      .orderBy(desc(year), desc(month))
+      .limit(monthlyBreakdownPageSize + 1)
+      .offset(cursor * monthlyBreakdownPageSize);
 
-  const monthlyBreakdown = await monthlyBreakdownDb
-    .limit(monthlyBreakdownPageSize + 1)
-    .offset(cursor * monthlyBreakdownPageSize);
+  // Most families have expenses every month, so this page usually lies within
+  // as many latest calendar months, and only their transactions are read. A
+  // full page is then exact, as every month outside the window is older. A
+  // short one may miss months that gaps pushed out, so read every month.
+  const pageMonthCount = (cursor + 1) * monthlyBreakdownPageSize + 1;
+  let monthlyBreakdown = await getMonths(
+    sql`date_trunc('month', NOW()) - make_interval(months => ${pageMonthCount - 1})`,
+  );
+  if (monthlyBreakdown.length <= monthlyBreakdownPageSize) {
+    monthlyBreakdown = await getMonths();
+  }
   const hasPreviousPage = monthlyBreakdown.length > monthlyBreakdownPageSize;
   const visibleMonthlyBreakdown = hasPreviousPage
     ? monthlyBreakdown.slice(0, monthlyBreakdownPageSize)
@@ -301,16 +318,19 @@ export const expenseRouter = t.router({
     .query(async ({ ctx, input }) => {
       const db = getDb();
       const familyId = ctx.familyId;
-      const excludedAccountIds =
-        await getFamilyMonthlyBreakdownExcludedAccountIds(familyId);
 
       const familyConditions = [eq(accountTable.familyId, familyId)];
-      const monthlyBreakdownDb = getMonthlyBreakdown({
-        db,
+      // The other overview queries don't wait for the excluded accounts
+      const monthlyBreakdownDb = getFamilyMonthlyBreakdownExcludedAccountIds(
         familyId,
-        excludedAccountIds,
-        cursor: input.cursor,
-      });
+      ).then((excludedAccountIds) =>
+        getMonthlyBreakdown({
+          db,
+          familyId,
+          excludedAccountIds,
+          cursor: input.cursor,
+        }),
+      );
 
       if (input.cursor > 0) {
         const monthlyBreakdown = await monthlyBreakdownDb;
@@ -340,6 +360,16 @@ export const expenseRouter = t.router({
           ),
         );
 
+      // The family's newest transactions are among the newest of each account,
+      // which idx_transaction_account_id_created_at reads without touching the
+      // rest of the family's transactions.
+      const recentTransactionLimit = 3;
+      const newestAccountTransactionIds = db
+        .select({ id: transactionTable.id })
+        .from(transactionTable)
+        .where(eq(transactionTable.accountId, accountTable.id))
+        .orderBy(desc(transactionTable.createdAt))
+        .limit(recentTransactionLimit);
       const recentTransactionsDb = db
         .select(transactionSelection)
         .from(transactionTable)
@@ -347,9 +377,22 @@ export const expenseRouter = t.router({
           accountTable,
           eq(transactionTable.accountId, accountTable.id),
         )
-        .where(and(...familyConditions))
+        .where(
+          and(
+            ...familyConditions,
+            inArray(
+              transactionTable.id,
+              db
+                .select({
+                  id: sql`unnest(array${newestAccountTransactionIds})`,
+                })
+                .from(accountTable)
+                .where(eq(accountTable.familyId, familyId)),
+            ),
+          ),
+        )
         .orderBy(desc(transactionTable.createdAt))
-        .limit(3);
+        .limit(recentTransactionLimit);
 
       const [monthlyBreakdown, last30DaysResult, recentTransactions] =
         await Promise.all([
