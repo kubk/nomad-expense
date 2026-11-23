@@ -9,8 +9,10 @@ import { getEnv } from "../env";
 import { getUserById } from "../../db/user/get-user-by-id";
 import { getLanguage } from "../../translations/translations";
 import { getUserByBrowserToken } from "../../db/user/get-user-by-browser-token";
+import type { DB } from "../db";
 
 export async function authenticate(
+  db: DB,
   input: { type: "api"; req: Request } | { type: "bot"; botUser: User },
 ): Promise<{ userId: string; familyId: string; language?: string } | null> {
   let telegramUser: UserTelegramType | null = null;
@@ -27,7 +29,7 @@ export async function authenticate(
         telegramAuthMethod.browser.length + 1,
       );
       const user = /^[a-f0-9]{64}$/.test(browserToken)
-        ? await getUserByBrowserToken(browserToken)
+        ? await getUserByBrowserToken(db, browserToken)
         : null;
       const telegramId = Number(user?.telegramId);
       if (
@@ -54,7 +56,7 @@ export async function authenticate(
       authorization.startsWith(telegramAuthMethod.u)
     ) {
       const userId = authorization.slice(telegramAuthMethod.u.length);
-      const user = await getUserById(userId);
+      const user = await getUserById(db, userId);
 
       if (user && user.telegramId) {
         telegramUser = {
@@ -103,7 +105,7 @@ export async function authenticate(
     };
   }
 
-  const user = await upsertUserByTelegramData(telegramUser);
+  const user = await upsertUserByTelegramData(db, telegramUser);
 
   runInBackground(
     userCacheSet(telegramId, {

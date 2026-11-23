@@ -26,7 +26,7 @@ export async function onMessage(ctx: Context) {
   const db = getDb();
   const userState = await getUserBotState(db, ctx.from.id.toString());
 
-  const authResult = await authenticate({ type: "bot", botUser: ctx.from });
+  const authResult = await authenticate(db, { type: "bot", botUser: ctx.from });
   if (!authResult) {
     return;
   }
@@ -101,6 +101,7 @@ export async function onMessage(ctx: Context) {
 
     try {
       await createTransactionWithRules(
+        db,
         userState.accountId,
         authResult.familyId,
         description,
@@ -159,6 +160,7 @@ export async function onMessage(ctx: Context) {
       if (parseResult.transactionType && parseResult.description) {
         try {
           await createTransactionWithRules(
+            db,
             parseResult.account.id,
             authResult.familyId,
             parseResult.description,

@@ -1,9 +1,9 @@
 import { eq } from "drizzle-orm";
 import { userTable } from "../../db/schema";
-import { getDb } from "../../services/db";
+import type { DB } from "../../services/db";
 
-export async function getUserByBrowserToken(browserToken: string) {
-  const users = await getDb()
+export async function getUserByBrowserToken(db: DB, browserToken: string) {
+  const users = await db
     .select()
     .from(userTable)
     .where(eq(userTable.browserToken, browserToken))

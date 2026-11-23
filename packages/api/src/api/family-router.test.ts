@@ -64,6 +64,7 @@ describe("family router", () => {
 
     // Verify notification was sent to the family owner (Alice)
     expect(notifyViaTelegram).toHaveBeenCalledWith(
+      expect.anything(),
       expect.objectContaining({
         type: "userJoinedYourFamily",
       }),

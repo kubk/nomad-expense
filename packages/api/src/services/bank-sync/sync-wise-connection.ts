@@ -91,7 +91,7 @@ export async function syncWiseConnection(
   }
   const entries = parseWiseActivities(newActivities, debitsByActivityId);
 
-  const baseCurrency = await getFamilyBaseCurrency(connection.familyId);
+  const baseCurrency = await getFamilyBaseCurrency(db, connection.familyId);
 
   for (const account of accounts) {
     const accountEntries = entries.filter(

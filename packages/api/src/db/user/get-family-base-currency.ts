@@ -1,13 +1,12 @@
-import { getDb } from "../../services/db";
+import type { DB } from "../../services/db";
 import { userTable } from "../../db/schema";
 import { eq } from "drizzle-orm";
 import type { SupportedCurrency } from "../../services/money/currency";
 
 export async function getFamilyBaseCurrency(
+  db: DB,
   familyId: string,
 ): Promise<SupportedCurrency> {
-  const db = getDb();
-
   const result = await db
     .select({ baseCurrency: userTable.baseCurrency })
     .from(userTable)

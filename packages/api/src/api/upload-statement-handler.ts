@@ -18,9 +18,10 @@ export async function uploadStatementHandler(
   request: Request,
 ): Promise<Response> {
   let authResult: Awaited<ReturnType<typeof authenticate>> = null;
+  const db = getDb();
 
   try {
-    authResult = await authenticate({ type: "api", req: request });
+    authResult = await authenticate(db, { type: "api", req: request });
     if (!authResult) {
       const { t } = getTranslation(authResult);
       return jsonResponse(401, { type: "error", message: t("unauthorized") });
@@ -46,7 +47,6 @@ export async function uploadStatementHandler(
       });
     }
 
-    const db = getDb();
     const accountResult = await getAccountByFamilyId(
       db,
       accountId,

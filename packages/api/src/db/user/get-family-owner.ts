@@ -1,9 +1,8 @@
 import { eq } from "drizzle-orm";
-import { getDb } from "../../services/db";
+import type { DB } from "../../services/db";
 import { userTable } from "../schema";
 
-export async function getFamilyOwner(familyId: string) {
-  const db = getDb();
+export async function getFamilyOwner(db: DB, familyId: string) {
   const users = await db
     .select()
     .from(userTable)

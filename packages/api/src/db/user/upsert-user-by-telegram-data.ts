@@ -1,5 +1,5 @@
 import { sql } from "drizzle-orm";
-import { getDb } from "../../services/db";
+import type { DB } from "../../services/db";
 import { userTable } from "../../db/schema";
 import { type UserTelegramType } from "../../services/auth/schema";
 
@@ -8,10 +8,10 @@ function mergeName(firstName: string, lastName?: string) {
 }
 
 export async function upsertUserByTelegramData(
+  db: DB,
   telegramData: UserTelegramType,
   browserToken?: string,
 ) {
-  const db = getDb();
   const newFamilyId = crypto.randomUUID();
 
   const result = await db

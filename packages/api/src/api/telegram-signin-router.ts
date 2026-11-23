@@ -48,7 +48,11 @@ export const telegramSignin = publicProcedure
       photoUrl: identity.picture,
       start: null,
     };
-    const user = await upsertUserByTelegramData(telegramUser, browserToken);
+    const user = await upsertUserByTelegramData(
+      ctx.db,
+      telegramUser,
+      browserToken,
+    );
     if (!user.browserToken) {
       throw new TRPCError({ code: "INTERNAL_SERVER_ERROR" });
     }

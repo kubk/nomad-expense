@@ -58,7 +58,7 @@ describe("upload-statement-handler", () => {
 
   async function setupAuth() {
     const { authenticate } = await import("../services/auth/authenticate");
-    const user = await getUserById(fixtures.users.alice.id);
+    const user = await getUserById(getDb(), fixtures.users.alice.id);
     assert(user);
     vi.mocked(authenticate).mockResolvedValue({
       userId: user.id,
@@ -117,6 +117,7 @@ describe("upload-statement-handler", () => {
 
     // Verify notification was sent
     expect(notifyViaTelegram).toHaveBeenCalledWith(
+      expect.anything(),
       expect.objectContaining({
         type: "uploadedBankStatement",
       }),
@@ -163,6 +164,7 @@ describe("upload-statement-handler", () => {
 
     // Verify notification was sent
     expect(notifyViaTelegram).toHaveBeenCalledWith(
+      expect.anything(),
       expect.objectContaining({
         type: "uploadedBankStatement",
       }),
@@ -255,6 +257,7 @@ describe("upload-statement-handler", () => {
 
     // Verify notification was sent
     expect(notifyViaTelegram).toHaveBeenCalledWith(
+      expect.anything(),
       expect.objectContaining({
         type: "uploadedBankStatement",
       }),
@@ -320,6 +323,7 @@ describe("upload-statement-handler", () => {
 
     // Verify notification was sent (should be called twice - once for each import)
     expect(notifyViaTelegram).toHaveBeenCalledWith(
+      expect.anything(),
       expect.objectContaining({
         type: "uploadedBankStatement",
       }),

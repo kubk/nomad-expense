@@ -14,7 +14,7 @@ import {
 import { DateTime } from "luxon";
 import { protectedProcedure, t } from "./trpc";
 import { transactionTable, accountTable } from "../db/schema";
-import { getDb, type DB } from "../services/db";
+import type { DB } from "../services/db";
 import { transactionTypeSchema } from "../db/enums";
 import { getAccountByFamilyId } from "../db/account/get-account-by-family-id";
 import { TRPCError } from "@trpc/server";
@@ -292,7 +292,7 @@ export const expenseRouter = t.router({
       }
 
       const year = sql<number>`EXTRACT(YEAR FROM ${transactionTable.createdAt})::integer`;
-      const years = await getDb()
+      const years = await ctx.db
         .select({ year })
         .from(transactionTable)
         .innerJoin(
@@ -316,12 +316,13 @@ export const expenseRouter = t.router({
   overview: protectedProcedure
     .input(overviewInputSchema)
     .query(async ({ ctx, input }) => {
-      const db = getDb();
+      const { db } = ctx;
       const familyId = ctx.familyId;
 
       const familyConditions = [eq(accountTable.familyId, familyId)];
       // The other overview queries don't wait for the excluded accounts
       const monthlyBreakdownDb = getFamilyMonthlyBreakdownExcludedAccountIds(
+        db,
         familyId,
       ).then((excludedAccountIds) =>
         getMonthlyBreakdown({
@@ -413,11 +414,11 @@ export const expenseRouter = t.router({
   transactionsByMonth: protectedProcedure
     .input(transactionFilterSchema)
     .query(async ({ ctx, input }) => {
-      const db = getDb();
+      const { db } = ctx;
       const familyId = ctx.familyId;
       // The monthly breakdown never counts accounts excluded in its settings, whatever the filters
       const excludedAccountIds =
-        await getFamilyMonthlyBreakdownExcludedAccountIds(familyId);
+        await getFamilyMonthlyBreakdownExcludedAccountIds(db, familyId);
 
       const transactions = await getFilteredTransactions(
         input,
@@ -528,7 +529,7 @@ export const expenseRouter = t.router({
   transactionsList: protectedProcedure
     .input(transactionFilterSchema)
     .query(async ({ ctx, input }) => {
-      const db = getDb();
+      const { db } = ctx;
       const familyId = ctx.familyId;
 
       const transactions = (
@@ -567,7 +568,7 @@ export const expenseRouter = t.router({
   getTransaction: protectedProcedure
     .input(z.object({ id: z.string() }))
     .query(async ({ ctx, input }) => {
-      const db = getDb();
+      const { db } = ctx;
       const familyId = ctx.familyId;
 
       const transaction = await getTransactionForFamily(db, input.id, familyId);
@@ -592,7 +593,7 @@ export const expenseRouter = t.router({
       }),
     )
     .mutation(async ({ ctx, input }) => {
-      const db = getDb();
+      const { db } = ctx;
       const familyId = ctx.familyId;
 
       // Verify transaction belongs to user and keep the transaction currency.
@@ -602,7 +603,7 @@ export const expenseRouter = t.router({
         familyId,
       );
 
-      const baseCurrency = await getFamilyBaseCurrency(familyId);
+      const baseCurrency = await getFamilyBaseCurrency(db, familyId);
       const transactionDate = new Date(input.createdAt);
 
       const money = await createMoney(
@@ -632,7 +633,7 @@ export const expenseRouter = t.router({
   deleteTransaction: protectedProcedure
     .input(z.object({ id: z.string() }))
     .mutation(async ({ ctx, input }) => {
-      const db = getDb();
+      const { db } = ctx;
       const familyId = ctx.familyId;
 
       // Verify transaction belongs to user
@@ -656,7 +657,7 @@ export const expenseRouter = t.router({
       }),
     )
     .mutation(async ({ ctx, input }) => {
-      const db = getDb();
+      const { db } = ctx;
       const familyId = ctx.familyId;
 
       await getAuthorizedFamilyAccount(db, input.accountId, familyId);
@@ -665,6 +666,7 @@ export const expenseRouter = t.router({
       const amountCents = Math.round(input.amount * 100);
 
       await createTransactionWithRules(
+        db,
         input.accountId,
         familyId,
         input.description,
@@ -685,7 +687,7 @@ export const expenseRouter = t.router({
       }),
     )
     .query(async ({ ctx, input }) => {
-      const db = getDb();
+      const { db } = ctx;
       const familyId = ctx.familyId;
 
       const account = await getAuthorizedFamilyAccount(

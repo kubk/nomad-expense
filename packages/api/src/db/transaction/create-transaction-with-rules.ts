@@ -1,4 +1,4 @@
-import { getDb } from "../../services/db";
+import type { DB } from "../../services/db";
 import { transactionTable } from "../schema";
 import { createMoney } from "../../services/money/money";
 import { applyImportRules } from "../../services/transaction-import/import-rules";
@@ -11,6 +11,7 @@ import { getFamilyBaseCurrency } from "../user/get-family-base-currency";
 import type { TransactionType } from "../enums";
 
 export async function createTransactionWithRules(
+  db: DB,
   accountId: string,
   familyId: string,
   description: string,
@@ -19,15 +20,13 @@ export async function createTransactionWithRules(
   authorUserId: string,
   createdAt?: Date,
 ) {
-  const db = getDb();
-
   const accountResult = await getAccountByFamilyId(db, accountId, familyId);
   if (accountResult.type === "notFound") {
     throw new Error("Account not found or unauthorized");
   }
 
   const account = accountResult.account;
-  const baseCurrency = await getFamilyBaseCurrency(familyId);
+  const baseCurrency = await getFamilyBaseCurrency(db, familyId);
 
   // Use the transaction date for exchange rate, or current date if not provided
   const transactionDate = createdAt ?? new Date();
@@ -68,9 +67,9 @@ export async function createTransactionWithRules(
   const transaction = result[0];
 
   // Send notification to family members
-  const author = await getUserById(authorUserId);
+  const author = await getUserById(db, authorUserId);
   if (author) {
-    await notifyViaTelegram({
+    await notifyViaTelegram(db, {
       type: "newTransaction",
       familyId,
       excludeUserId: authorUserId,

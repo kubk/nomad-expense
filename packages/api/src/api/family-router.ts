@@ -7,7 +7,6 @@ import {
   transactionTable,
   accountTable,
 } from "../db/schema";
-import { getDb } from "../services/db";
 import { getUserById } from "../db/user/get-user-by-id";
 import { userCacheSet } from "../services/user-cache";
 import { z } from "zod";
@@ -24,7 +23,7 @@ import { getFamilyMonthlyBreakdownExcludedAccountIds } from "../db/user/get-fami
 
 export const familyRouter = t.router({
   listMembers: protectedProcedure.query(async ({ ctx }) => {
-    const db = getDb();
+    const { db } = ctx;
     const familyId = ctx.familyId;
 
     const members = await db
@@ -43,7 +42,7 @@ export const familyRouter = t.router({
   }),
 
   generateInvite: protectedProcedure.mutation(async ({ ctx }) => {
-    const db = getDb();
+    const { db } = ctx;
     const familyId = ctx.familyId;
     const userId = ctx.userId;
 
@@ -82,7 +81,7 @@ export const familyRouter = t.router({
   }),
 
   getActiveInvite: protectedProcedure.query(async ({ ctx }) => {
-    const db = getDb();
+    const { db } = ctx;
     const familyId = ctx.familyId;
 
     const activeInvite = await db
@@ -112,7 +111,7 @@ export const familyRouter = t.router({
       }),
     )
     .mutation(async ({ ctx, input }) => {
-      const db = getDb();
+      const { db } = ctx;
       const userId = ctx.userId;
       const { t } = getTranslation(ctx);
 
@@ -180,7 +179,7 @@ export const familyRouter = t.router({
           .where(eq(inviteTable.id, inviteResult.id));
       });
 
-      const user = await getUserById(userId);
+      const user = await getUserById(db, userId);
       // Update cache with new familyId
       if (user?.telegramId) {
         await userCacheSet(user.telegramId, {
@@ -191,9 +190,9 @@ export const familyRouter = t.router({
       }
 
       // Notify family owner about new member
-      const familyOwner = await getFamilyOwner(inviteResult.familyId);
+      const familyOwner = await getFamilyOwner(db, inviteResult.familyId);
       if (familyOwner && familyOwner.id !== userId && user) {
-        await notifyViaTelegram({
+        await notifyViaTelegram(db, {
           type: "userJoinedYourFamily",
           targetUserId: familyOwner.id,
           newMemberName: getUserDisplayName(user),
@@ -207,7 +206,7 @@ export const familyRouter = t.router({
     }),
 
   getBaseCurrency: protectedProcedure.query(async ({ ctx }) => {
-    return getFamilyBaseCurrency(ctx.familyId);
+    return getFamilyBaseCurrency(ctx.db, ctx.familyId);
   }),
 
   updateBaseCurrency: protectedProcedure
@@ -217,7 +216,7 @@ export const familyRouter = t.router({
       }),
     )
     .mutation(async ({ ctx, input }) => {
-      const db = getDb();
+      const { db } = ctx;
       const familyId = ctx.familyId;
       const newBaseCurrency = input.baseCurrency;
 
@@ -347,7 +346,7 @@ export const familyRouter = t.router({
 
   getMonthlyBreakdownExcludedAccountIds: protectedProcedure.query(
     async ({ ctx }) => {
-      return getFamilyMonthlyBreakdownExcludedAccountIds(ctx.familyId);
+      return getFamilyMonthlyBreakdownExcludedAccountIds(ctx.db, ctx.familyId);
     },
   ),
 
@@ -358,7 +357,7 @@ export const familyRouter = t.router({
       }),
     )
     .mutation(async ({ ctx, input }) => {
-      const db = getDb();
+      const { db } = ctx;
       const familyId = ctx.familyId;
       const uniqueAccountIds = [...new Set(input.excludedAccountIds)];
 

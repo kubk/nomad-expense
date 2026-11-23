@@ -1,5 +1,5 @@
 import { eq, and, ne, isNotNull } from "drizzle-orm";
-import { getDb } from "../db";
+import type { DB } from "../db";
 import { userTable } from "../../db/schema";
 import { getBot } from "../telegram/get-bot";
 import type { Money } from "../money/money";
@@ -32,8 +32,7 @@ type NotificationPayload =
       removedTransactions: number;
     };
 
-export async function notifyViaTelegram(payload: NotificationPayload) {
-  const db = getDb();
+export async function notifyViaTelegram(db: DB, payload: NotificationPayload) {
   const bot = getBot();
 
   try {

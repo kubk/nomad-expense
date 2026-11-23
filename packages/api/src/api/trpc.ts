@@ -2,6 +2,7 @@ import { initTRPC, TRPCError } from "@trpc/server";
 import { FetchCreateContextFnOptions } from "@trpc/server/adapters/fetch";
 import { authenticate } from "../services/auth/authenticate";
 import { getEnv } from "../services/env";
+import { getDb } from "../services/db";
 
 export async function createContext({
   req,
@@ -12,11 +13,14 @@ export async function createContext({
     await new Promise((resolve) => setTimeout(resolve, LOCAL_API_DELAY_MS));
   }
 
-  const authResult = await authenticate({ type: "api", req });
+  // One client per request, so its queries share its connections
+  const db = getDb();
+  const authResult = await authenticate(db, { type: "api", req });
 
   return {
     req,
     resHeaders,
+    db,
     userId: authResult?.userId || null,
     familyId: authResult?.familyId || null,
     language: authResult?.language || "en",

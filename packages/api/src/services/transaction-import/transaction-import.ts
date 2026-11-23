@@ -44,7 +44,7 @@ export async function importTransactions(
   );
 
   const importRules = await getRulesByAccountId(db, account.id);
-  const baseCurrency = await getFamilyBaseCurrency(account.familyId);
+  const baseCurrency = await getFamilyBaseCurrency(db, account.familyId);
 
   const newTransactions = await Promise.all(
     transactions.map(async (transaction) => {
@@ -91,9 +91,9 @@ export async function importTransactions(
   });
 
   // Send notification to family members
-  const author = await getUserById(authorUserId);
+  const author = await getUserById(db, authorUserId);
   if (author) {
-    await notifyViaTelegram({
+    await notifyViaTelegram(db, {
       type: "uploadedBankStatement",
       familyId: account.familyId,
       excludeUserId: authorUserId,

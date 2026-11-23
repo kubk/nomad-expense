@@ -1,12 +1,11 @@
 import { eq } from "drizzle-orm";
 import { userTable } from "../../db/schema";
-import { getDb } from "../../services/db";
+import type { DB } from "../../services/db";
 
 export async function getFamilyMonthlyBreakdownExcludedAccountIds(
+  db: DB,
   familyId: string,
 ): Promise<string[]> {
-  const db = getDb();
-
   const result = await db
     .select({
       excludedAccountIds: userTable.monthlyBreakdownExcludedAccountIds,

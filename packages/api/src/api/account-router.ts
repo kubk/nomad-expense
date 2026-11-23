@@ -1,7 +1,6 @@
 import { eq, and, asc, max, count, gte, sql } from "drizzle-orm";
 import { protectedProcedure, t } from "./trpc";
 import { accountTable, transactionTable } from "../db/schema";
-import { getDb } from "../services/db";
 import { z } from "zod";
 import { accountColorSchema, bankSchema, currencySchema } from "../db/enums";
 import { TRPCError } from "@trpc/server";
@@ -14,7 +13,7 @@ const accountFamilyFilter = (familyId: string, accountId: string) =>
 
 export const accountRouter = t.router({
   list: protectedProcedure.query(async ({ ctx }) => {
-    const db = getDb();
+    const { db } = ctx;
     const familyId = ctx.familyId;
 
     // Correlated subqueries read one account's rows through
@@ -66,7 +65,7 @@ export const accountRouter = t.router({
       }),
     )
     .mutation(async ({ ctx, input }) => {
-      const db = getDb();
+      const { db } = ctx;
       const familyId = ctx.familyId;
 
       const maxSortResults = await db
@@ -104,7 +103,7 @@ export const accountRouter = t.router({
       }),
     )
     .mutation(async ({ ctx, input }) => {
-      const db = getDb();
+      const { db } = ctx;
       const familyId = ctx.familyId;
 
       const results = await db
@@ -126,7 +125,7 @@ export const accountRouter = t.router({
       }),
     )
     .mutation(async ({ ctx, input }) => {
-      const db = getDb();
+      const { db } = ctx;
       const familyId = ctx.familyId;
 
       const results = await db
@@ -145,7 +144,7 @@ export const accountRouter = t.router({
       }),
     )
     .mutation(async ({ ctx, input }) => {
-      const db = getDb();
+      const { db } = ctx;
 
       const results = await db
         .update(accountTable)
@@ -169,7 +168,7 @@ export const accountRouter = t.router({
       }),
     )
     .mutation(async ({ ctx, input }) => {
-      const db = getDb();
+      const { db } = ctx;
       const familyId = ctx.familyId;
 
       const updateStatements = input.accountIds.map((accountId, index) =>
@@ -220,7 +219,7 @@ export const accountRouter = t.router({
       }),
     )
     .mutation(async ({ ctx, input }) => {
-      const db = getDb();
+      const { db } = ctx;
       const familyId = ctx.familyId;
 
       const results = await db
