@@ -52,7 +52,7 @@ export function AccountsScreen() {
           onClick={() => store.openAccount(account.id)}
           disabled={isReorderMode}
         >
-          <div className="flex items-start gap-4">
+          <div className="flex items-center gap-4">
             <div className="relative">
               <div className={cn("h-12 w-12 rounded-xl", colorInfo.bg)} />
               <div
@@ -68,24 +68,16 @@ export function AccountsScreen() {
               <h3 className="text-lg font-semibold text-foreground">
                 {account.name}
               </h3>
-              <div className="mt-1.5 flex items-center gap-1 text-xs text-muted-foreground">
-                <span>
-                  {t("accountsTransactionCount", account.transactionCount)}
-                </span>
-                {account.lastTransactionDate && (
-                  <>
-                    <span>·</span>
-                    <span>
-                      {t(
-                        "accountsLastTransaction",
-                        DateTime.fromISO(
-                          account.lastTransactionDate,
-                        ).toLocaleString(DateTime.DATE_SHORT),
-                      )}
-                    </span>
-                  </>
-                )}
-              </div>
+              {account.lastTransactionDate && (
+                <div className="mt-1.5 text-xs text-muted-foreground">
+                  {t(
+                    "accountsLastTransaction",
+                    DateTime.fromISO(
+                      account.lastTransactionDate,
+                    ).toLocaleString(DateTime.DATE_SHORT),
+                  )}
+                </div>
+              )}
             </div>
           </div>
         </button>

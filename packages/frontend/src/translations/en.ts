@@ -113,7 +113,6 @@ export const en = {
   accountsTransaction: "Transaction",
   accountsTransactions: "Transactions",
   accountsAdvanced: "Advanced",
-  accountsTransactionCount: (count: number) => `${count} ${transaction(count)}`,
   accountsLastTransaction: (date: string) => `Last: ${date}`,
   accountsDeleteTitle: "Delete account",
   accountsDeleteDescription:

@@ -1,4 +1,4 @@
-import { eq, and, asc, max, count, sql } from "drizzle-orm";
+import { eq, and, asc, max, count, gte, sql } from "drizzle-orm";
 import { protectedProcedure, t } from "./trpc";
 import { accountTable, transactionTable } from "../db/schema";
 import { getDb } from "../services/db";
@@ -17,6 +17,24 @@ export const accountRouter = t.router({
     const db = getDb();
     const familyId = ctx.familyId;
 
+    // Correlated subqueries read one account's rows through
+    // idx_transaction_account_id_created_at instead of aggregating a join over
+    // every transaction of the family.
+    const lastTransactionDate = db
+      .select({ value: max(transactionTable.createdAt) })
+      .from(transactionTable)
+      .where(eq(transactionTable.accountId, accountTable.id));
+    const recentManualCount = db
+      .select({ value: count() })
+      .from(transactionTable)
+      .where(
+        and(
+          eq(transactionTable.accountId, accountTable.id),
+          eq(transactionTable.source, "manual"),
+          gte(transactionTable.createdAt, sql`NOW() - INTERVAL '3 months'`),
+        ),
+      );
+
     const accounts = await db
       .select({
         id: accountTable.id,
@@ -27,29 +45,13 @@ export const accountRouter = t.router({
         isHidden: accountTable.isHidden,
         bankType: accountTable.bankType,
         timezone: accountTable.timezone,
-        lastTransactionDate: max(transactionTable.createdAt),
-        transactionCount: count(transactionTable.id),
-        recentManualCount: sql<number>`COUNT(${transactionTable.id}) FILTER (
-          WHERE ${transactionTable.source} = 'manual'
-            AND ${transactionTable.createdAt} >= NOW() - INTERVAL '3 months'
-        )::integer`,
+        lastTransactionDate: sql<Date | null>`${lastTransactionDate}`.mapWith(
+          transactionTable.createdAt,
+        ),
+        recentManualCount: sql<number>`${recentManualCount}`.mapWith(Number),
       })
       .from(accountTable)
-      .leftJoin(
-        transactionTable,
-        eq(accountTable.id, transactionTable.accountId),
-      )
       .where(eq(accountTable.familyId, familyId))
-      .groupBy(
-        accountTable.id,
-        accountTable.name,
-        accountTable.currency,
-        accountTable.color,
-        accountTable.sort,
-        accountTable.isHidden,
-        accountTable.bankType,
-        accountTable.createdAt,
-      )
       .orderBy(asc(accountTable.sort), asc(accountTable.createdAt));
 
     return accounts;

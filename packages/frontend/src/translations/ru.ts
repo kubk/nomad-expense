@@ -127,7 +127,6 @@ export const ru: Translation = {
   accountsTransaction: "Транзакция",
   accountsTransactions: "Транзакции",
   accountsAdvanced: "Дополнительно",
-  accountsTransactionCount: (count) => `${count} ${transaction(count)}`,
   accountsLastTransaction: (date) => `Последняя: ${date}`,
   accountsDeleteTitle: "Удалить счет",
   accountsDeleteDescription:
