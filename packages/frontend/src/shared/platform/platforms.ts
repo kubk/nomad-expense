@@ -10,3 +10,6 @@ export type Platform = {
 export const platform = isTelegram()
   ? createTelegramPlatform()
   : createBrowserPlatform();
+
+export const isMobile = () =>
+  window.matchMedia && window.matchMedia("(max-width: 600px)").matches;

@@ -1,5 +1,6 @@
 import type { WebHaptics, defaultPatterns } from "web-haptics";
 import { getWebApp, isTelegram } from "./telegram-platform";
+import { isMobile } from "./platforms";
 
 type HapticType =
   | "error"
@@ -9,9 +10,6 @@ type HapticType =
   | "medium"
   | "heavy"
   | "selection";
-
-const isMobile = () =>
-  window.matchMedia && window.matchMedia("(max-width: 600px)").matches;
 
 let webHaptics:
   | { instance: WebHaptics; patterns: typeof defaultPatterns }

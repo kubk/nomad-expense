@@ -8,6 +8,17 @@ import {
 import { createPortal } from "react-dom";
 import { ArrowUpDownIcon, MoreVerticalIcon, PlusIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import {
+  Drawer,
+  DrawerClose,
+  DrawerContent,
+  DrawerDescription,
+  DrawerHeader,
+  DrawerTitle,
+  DrawerTrigger,
+} from "@/components/ui/drawer";
+import { cn } from "@/lib/utils";
+import { isMobile } from "@/shared/platform/platforms";
 import { t } from "@/translations/translation-store";
 
 type MenuPosition = {
@@ -27,7 +38,73 @@ function clamp(value: number, min: number, max: number) {
   return Math.min(Math.max(value, min), max);
 }
 
-export function AccountsActionsMenu({
+export function AccountsActionsMenu(props: AccountsActionsMenuProps) {
+  return isMobile() ? (
+    <AccountsActionsDrawer {...props} />
+  ) : (
+    <AccountsActionsDropdown {...props} />
+  );
+}
+
+function AccountsActionsDrawer({
+  onCreateAccount,
+  onReorderAccounts,
+}: AccountsActionsMenuProps) {
+  const [isOpen, setIsOpen] = useState(false);
+
+  const actions = [
+    { text: t("accountsCreate"), icon: PlusIcon, onClick: onCreateAccount },
+    {
+      text: t("accountsReorder"),
+      icon: ArrowUpDownIcon,
+      onClick: onReorderAccounts,
+    },
+  ];
+
+  return (
+    <Drawer open={isOpen} onOpenChange={setIsOpen}>
+      <DrawerTrigger asChild>
+        <Button variant="ghost" size="sm">
+          <MoreVerticalIcon className="w-4 h-4" />
+        </Button>
+      </DrawerTrigger>
+      <DrawerContent>
+        <DrawerHeader className="p-2">
+          <DrawerTitle />
+          <DrawerDescription />
+        </DrawerHeader>
+        <div className="flex flex-col gap-2 px-4 pb-4">
+          <div className="overflow-hidden rounded-xl bg-muted">
+            {actions.map(({ text, icon: Icon, onClick }, index) => (
+              <button
+                key={text}
+                type="button"
+                className={cn(
+                  "flex w-full items-center gap-4 px-4 py-4 text-left active:bg-accent",
+                  index > 0 && "border-t border-background",
+                )}
+                onClick={() => {
+                  setIsOpen(false);
+                  onClick();
+                }}
+              >
+                <Icon className="size-5 text-muted-foreground" />
+                <span>{text}</span>
+              </button>
+            ))}
+          </div>
+          <DrawerClose asChild>
+            <Button variant="secondary" size="lg" className="w-full">
+              {t("cancel")}
+            </Button>
+          </DrawerClose>
+        </div>
+      </DrawerContent>
+    </Drawer>
+  );
+}
+
+function AccountsActionsDropdown({
   onCreateAccount,
   onReorderAccounts,
 }: AccountsActionsMenuProps) {
