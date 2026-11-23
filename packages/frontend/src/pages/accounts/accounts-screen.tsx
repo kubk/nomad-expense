@@ -5,6 +5,7 @@ import {
   ChevronDownIcon,
   EyeOffIcon,
   EyeIcon,
+  ArrowUpDownIcon,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { LoadingSwap } from "@/components/ui/loading-swap";
@@ -22,10 +23,12 @@ import { Footer } from "../widgets/footer";
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { t } from "@/translations/translation-store";
-import { AccountsActionsMenu } from "./accounts-actions-menu";
 import { SwipeableAccountCard } from "./swipeable-account-card";
 
 const MotionFooter = motion.create(Footer);
+
+const pillClassName =
+  "h-7 rounded-full border-border/50 bg-transparent px-3 py-0 text-muted-foreground shadow-none transition-transform hover:bg-muted hover:text-foreground active:scale-95 [&>svg]:size-3.5";
 
 export function AccountsScreen() {
   const [store] = useState(() => new AccountsScreenStore());
@@ -33,7 +36,7 @@ export function AccountsScreen() {
   const isReorderMode = store.isReorderMode;
   const visibleAccounts = store.visibleAccounts;
 
-  const showDropdown = accounts.length >= 2;
+  const canReorder = accounts.length >= 2;
 
   const renderAccountContent = (
     account: (typeof accounts)[number],
@@ -135,25 +138,7 @@ export function AccountsScreen() {
 
   return (
     <>
-      <Page
-        title={
-          <PageHeader
-            title={t("accountsTitle")}
-            rightSlot={
-              !isReorderMode && showDropdown ? (
-                <AccountsActionsMenu
-                  onCreateAccount={store.addAccount}
-                  onReorderAccounts={store.startReorder}
-                />
-              ) : !isReorderMode ? (
-                <Button variant="ghost" size="sm" onClick={store.addAccount}>
-                  <PlusIcon className="w-4 h-4" />
-                </Button>
-              ) : null
-            }
-          />
-        }
-      >
+      <Page title={<PageHeader title={t("accountsTitle")} />}>
         {accountsStore.isLoading ? (
           <div className="flex justify-center items-center py-12">
             <Loader2 className="w-8 h-8 animate-spin text-muted-foreground" />
@@ -190,29 +175,65 @@ export function AccountsScreen() {
                 );
               })}
 
-              {store.hiddenAccounts.length > 0 && (
-                <motion.div
-                  key="hidden-accounts-toggle"
+              {accounts.length > 0 && !isReorderMode && (
+                <motion.button
+                  key="create-account"
                   layout
+                  type="button"
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   exit={{ opacity: 0 }}
-                  className="flex justify-center py-1"
+                  onClick={store.addAccount}
+                  className="flex w-full items-center gap-4 rounded-2xl border-2 border-dashed border-muted-foreground/25 p-5 text-left text-base font-medium text-muted-foreground transition-transform active:scale-[0.98]"
                 >
-                  <Badge
-                    asChild
-                    variant="outline"
-                    className="h-7 rounded-full border-border/50 bg-transparent px-3 py-0 text-muted-foreground shadow-none transition-transform hover:bg-muted hover:text-foreground active:scale-95 [&>svg]:size-3.5"
-                  >
-                    <button type="button" onClick={store.toggleHiddenAccounts}>
-                      <EyeOffIcon />
-                      {store.showHiddenAccounts
-                        ? t("accountsHideHidden")
-                        : t("accountsHiddenAccounts")}
-                    </button>
-                  </Badge>
-                </motion.div>
+                  <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-background text-foreground shadow-sm">
+                    <PlusIcon className="h-5 w-5" />
+                  </div>
+                  {t("accountsCreate")}
+                </motion.button>
               )}
+
+              {!isReorderMode &&
+                (canReorder || store.hiddenAccounts.length > 0) && (
+                  <motion.div
+                    key="account-actions"
+                    layout
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    className="flex flex-wrap justify-center gap-2 py-1"
+                  >
+                    {canReorder && (
+                      <Badge
+                        asChild
+                        variant="outline"
+                        className={pillClassName}
+                      >
+                        <button type="button" onClick={store.startReorder}>
+                          <ArrowUpDownIcon />
+                          {t("accountsReorder")}
+                        </button>
+                      </Badge>
+                    )}
+                    {store.hiddenAccounts.length > 0 && (
+                      <Badge
+                        asChild
+                        variant="outline"
+                        className={pillClassName}
+                      >
+                        <button
+                          type="button"
+                          onClick={store.toggleHiddenAccounts}
+                        >
+                          <EyeOffIcon />
+                          {store.showHiddenAccounts
+                            ? t("accountsHideHidden")
+                            : t("accountsHiddenAccounts")}
+                        </button>
+                      </Badge>
+                    )}
+                  </motion.div>
+                )}
 
               {store.showHiddenAccounts &&
                 store.hiddenAccounts.map((account) => (
